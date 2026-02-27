@@ -1,6 +1,0 @@
-/home/runner/work/Parallax/Parallax/build/CMakeFiles/parallax_lib.dir
-/home/runner/work/Parallax/Parallax/build/CMakeFiles/parallax.dir
-/home/runner/work/Parallax/Parallax/build/CMakeFiles/parallax_tests.dir
-/home/runner/work/Parallax/Parallax/build/CMakeFiles/test.dir
-/home/runner/work/Parallax/Parallax/build/CMakeFiles/edit_cache.dir
-/home/runner/work/Parallax/Parallax/build/CMakeFiles/rebuild_cache.dir

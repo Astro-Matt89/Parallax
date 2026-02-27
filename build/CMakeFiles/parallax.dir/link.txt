@@ -1,1 +1,0 @@
-/usr/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file=CMakeFiles/parallax.dir/link.d CMakeFiles/parallax.dir/src/main.cpp.o -o parallax  libparallax_lib.a

@@ -1,0 +1,75 @@
+Package: vcpkg-cmake-config
+Version: 2024-05-23
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 8fe973245cfc9a55ba968a7ead6cb720b013d02a1c2715ab5e5e1fb6fb885663
+Status: install ok installed
+
+Package: vcpkg-cmake
+Version: 2024-04-23
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 2ef88504cb709b78f1540685ef91c09832d8e37e29d703707667d8b4b73909cd
+Status: install ok installed
+
+Package: glm
+Version: 1.0.3
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: efb77410dc70b6493f8f9c77a516b6bf3f5f7b4dc6bb55f1a78f584611b14e29
+Description: OpenGL Mathematics (GLM)
+Status: install ok installed
+
+Package: sdl2
+Version: 2.32.10
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 3f13ddb52e34377da9063ae921145afd7d8ac6ec17019723775860a6318e141a
+Description: Simple DirectMedia Layer is a cross-platform development library designed to provide low level access to audio, keyboard, mouse, joystick, and graphics hardware via OpenGL and Direct3D.
+Status: install ok installed
+
+Package: fmt
+Version: 12.1.0
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: d64b17d08cc21ebb62efac8473584e3d61cdd22243b26a39eaa6d51876613a6b
+Description: {fmt} is an open-source formatting library providing a fast and safe alternative to C stdio and C++ iostreams.
+Status: install ok installed
+
+Package: spdlog
+Version: 1.17.0
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 93f6a528bede9449bde55ab0b14d589b9bfb93ac9fc61da713c62799cb01d4dd
+Description: Very fast, header-only/compiled, C++ logging library.
+Default-Features: fmt, tz-offset
+Status: install ok installed
+
+Package: spdlog
+Feature: fmt
+Depends: fmt
+Architecture: x64-windows
+Multi-Arch: same
+Description: Use fmt library
+Status: install ok installed
+
+Package: spdlog
+Feature: tz-offset
+Architecture: x64-windows
+Multi-Arch: same
+Description: Omit %z timezone offset (use on platforms without tm_gmtoff)
+Status: install ok installed
+
+Package: vulkan-memory-allocator
+Version: 3.3.0
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: b91d845ceb87e4feb259dd5302cde0bd3b7ccd15574b597bbba7d83edf397b4c
+Description: Easy to integrate Vulkan memory allocation library from GPUOpen
+Status: install ok installed
+

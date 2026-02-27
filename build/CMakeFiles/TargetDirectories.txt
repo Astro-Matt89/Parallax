@@ -1,0 +1,4 @@
+C:/Parallax-dev/Parallax/build/CMakeFiles/compile_shaders.dir
+C:/Parallax-dev/Parallax/build/CMakeFiles/ALL_BUILD.dir
+C:/Parallax-dev/Parallax/build/CMakeFiles/ZERO_CHECK.dir
+C:/Parallax-dev/Parallax/build/src/CMakeFiles/parallax.dir

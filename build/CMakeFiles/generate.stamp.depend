@@ -1,0 +1,65 @@
+# CMake generation dependency list for this directory.
+C:/Parallax-dev/Parallax/CMakeLists.txt
+C:/Parallax-dev/Parallax/build/CMakeFiles/4.3.0-rc1/CMakeCXXCompiler.cmake
+C:/Parallax-dev/Parallax/build/CMakeFiles/4.3.0-rc1/CMakeRCCompiler.cmake
+C:/Parallax-dev/Parallax/build/CMakeFiles/4.3.0-rc1/CMakeSystem.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/VulkanMemoryAllocator/VulkanMemoryAllocatorConfig.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/VulkanMemoryAllocator/VulkanMemoryAllocatorConfigVersion.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/fmt/fmt-config-version.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/fmt/fmt-config.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/fmt/fmt-targets-debug.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/fmt/fmt-targets-release.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/fmt/fmt-targets.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/glm/glmConfig-debug.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/glm/glmConfig-release.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/glm/glmConfig.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/glm/glmConfigVersion.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/sdl2/SDL2Config.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/sdl2/SDL2ConfigVersion.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/sdl2/SDL2Targets-debug.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/sdl2/SDL2Targets-release.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/sdl2/SDL2Targets.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/sdl2/SDL2mainTargets-debug.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/sdl2/SDL2mainTargets-release.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/sdl2/SDL2mainTargets.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/sdl2/sdlfind.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/spdlog/spdlogConfig.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/spdlog/spdlogConfigTargets-debug.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/spdlog/spdlogConfigTargets-release.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/spdlog/spdlogConfigTargets.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/spdlog/spdlogConfigVersion.cmake
+C:/Parallax-dev/Parallax/vcpkg.json
+C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeCXXInformation.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeCommonLanguageInclude.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeDependentOption.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeFindDependencyMacro.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeGenericSystem.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeInitializeConfigs.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeLanguageInformation.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeRCInformation.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeSystemSpecificInformation.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/CMakeSystemSpecificInitialize.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/CheckCXXSourceCompiles.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/CheckIncludeFileCXX.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/CheckLibraryExists.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/Compiler/CMakeCommonCompilerMacros.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/Compiler/MSVC-CXX.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/Compiler/MSVC.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/FeatureSummary.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/FindPackageMessage.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/FindThreads.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/FindVulkan.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/Internal/CMakeCXXLinkerInformation.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/Internal/CMakeCommonLinkerInformation.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/Internal/CheckSourceCompiles.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/Linker/MSVC-CXX.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/Linker/MSVC.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/Platform/Linker/Windows-MSVC-CXX.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/Platform/Linker/Windows-MSVC.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/Platform/Windows-Initialize.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/Platform/Windows-MSVC-CXX.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/Platform/Windows-MSVC.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/Platform/Windows.cmake
+C:/Program Files/CMake/share/cmake-4.3/Modules/Platform/WindowsPaths.cmake
+C:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake

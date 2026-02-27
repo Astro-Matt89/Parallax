@@ -42,3 +42,7 @@
 
 # CMake build directory
 build/
+
+# CodeQL analysis artifacts
+_codeql_build_dir/
+_codeql_detected_source_root

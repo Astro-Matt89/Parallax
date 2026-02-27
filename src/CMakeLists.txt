@@ -2,10 +2,9 @@
 # Parallax executable
 # -----------------------------------------------------------------
 
-# For now, only main.cpp exists (Task 1.1 scaffold).
-# Source files will be added as tasks are implemented.
 add_executable(parallax
     main.cpp
+    core/logger.cpp
 )
 
 target_include_directories(parallax PRIVATE

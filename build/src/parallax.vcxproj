@@ -438,6 +438,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="C:\Parallax-dev\Parallax\src\main.cpp" />
+    <ClCompile Include="C:\Parallax-dev\Parallax\src\core\logger.cpp" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

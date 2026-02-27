@@ -1,0 +1,6 @@
+[20:34:10.655] [PARALLAX] [info] Parallax v0.1.0 starting...
+[20:34:10.664] [PARALLAX] [trace] Core logger trace test
+[20:34:10.665] [PARALLAX] [info] Core logger info test
+[20:34:10.666] [PARALLAX] [warning] Core logger warn test
+[20:34:10.667] [APP] [info] App logger info test
+[20:34:10.669] [PARALLAX] [info] Parallax shutdown complete.

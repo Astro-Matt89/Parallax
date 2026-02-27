@@ -117,9 +117,10 @@ public:
     double limitingMagnitude(double exposure_s,
                               double sky_bg_mag = 21.0,
                               double seeing_arcsec = 2.0) const {
+        static constexpr int kBinarySearchMaxIterations = 64;
         // Binary search between mag 1 and 30
         double lo = 1.0, hi = 30.0;
-        for (int i = 0; i < 64; ++i) {
+        for (int i = 0; i < kBinarySearchMaxIterations; ++i) {
             double mid = (lo + hi) * 0.5;
             if (snr(mid, exposure_s, sky_bg_mag, seeing_arcsec) >= 5.0)
                 lo = mid;

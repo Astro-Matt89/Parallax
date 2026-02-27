@@ -55,7 +55,8 @@ void ConsoleRenderer::renderStarField(std::ostream& out,
 
     hline(out, viewport_w, '=');
     if (!title.empty()) {
-        out << "| " << std::left << std::setw(viewport_w - 4)
+        int content_width = viewport_w - 4;
+        out << "| " << std::left << std::setw(content_width)
             << title << " |" << '\n';
         hline(out, viewport_w, '-');
     }

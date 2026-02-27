@@ -84,7 +84,8 @@ double ProceduralGenerator::stellarDensity(double /*ra_deg*/, double dec_deg,
     // Galactic latitude approximation from declination (rough for demo).
     // A proper implementation would use galactic coordinates.
     // Use dec as proxy (densest near equator for Milky Way mid-latitudes).
-    double b_approx = std::abs(dec_deg - (-28.0)); // rough galactic equator offset
+    static constexpr double kGalacticEquatorOffsetDeg = 28.0; // rough galactic plane dec offset
+    double b_approx = std::abs(dec_deg - (-kGalacticEquatorOffsetDeg));
     double density = 500.0 * std::exp(-b_approx / 25.0) + 30.0;
     return density; // stars per sq degree down to V~12
 }

@@ -24,10 +24,11 @@ int testProcedural() {
     }
 
     // Different seed -> different sequence
+    PcgRng rng_ref(42, 1);
     PcgRng rng3(99, 1);
     bool any_diff = false;
     for (int i = 0; i < 10; ++i) {
-        if (rng3.next() != PcgRng(42, 1).next()) { any_diff = true; break; }
+        if (rng3.next() != rng_ref.next()) { any_diff = true; break; }
     }
     test::check(any_diff, "PCG different seeds produce different output");
 

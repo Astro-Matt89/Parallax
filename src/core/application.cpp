@@ -3,6 +3,10 @@
 
 #include "core/application.hpp"
 
+#include "catalog/catalog_loader.hpp"
+
+#include <glm/trigonometric.hpp>
+
 #include <cstdlib>
 #include <filesystem>
 #include <limits>
@@ -50,26 +54,76 @@ void Application::init()
     // 1. Window
     m_window = std::make_unique<Window>(WindowConfig{.title = "Parallax", .width = 1280, .height = 720});
 
-    // 2. Vulkan context (instance, surface, device, queues)
+    // 2. Input (must exist before setting the event callback)
+    m_input = std::make_unique<Input>();
+
+    // Wire SDL events → Input system
+    m_window->set_event_callback([this](const SDL_Event& event) {
+        m_input->process_event(event);
+    });
+
+    // 3. Vulkan context (instance, surface, device, queues)
     m_context = std::make_unique<vulkan::Context>(
         vulkan::ContextConfig{.app_name = "Parallax", .enable_validation = true},
         *m_window);
 
-    // 3. Swapchain
+    // 4. Swapchain
     m_swapchain = std::make_unique<vulkan::Swapchain>(
         *m_context, m_window->get_width(), m_window->get_height());
 
-    // 4. Pipeline (render pass + graphics pipeline + framebuffers)
+    // 5. Pipeline (render pass + framebuffers — kept from Sprint 01)
     std::filesystem::path shader_dir{PLX_SHADER_DIR};
     PLX_CORE_INFO("Shader directory: {}", shader_dir.string());
     m_pipeline = std::make_unique<vulkan::Pipeline>(*m_context, *m_swapchain, shader_dir);
 
-    // 5. Command pool + buffers
+    // 6. Starfield renderer (uses Pipeline's render pass)
+    m_starfield = std::make_unique<rendering::Starfield>(
+        *m_context, m_pipeline->get_render_pass(), shader_dir);
+
+    // 7. Camera
+    m_camera = std::make_unique<rendering::Camera>();
+
+    // 8. Load star catalog
+    const std::filesystem::path catalog_path{"data/catalogs/bright_stars.csv"};
+    auto loaded_stars = catalog::CatalogLoader::load_bright_star_csv(catalog_path);
+    if (loaded_stars.has_value())
+    {
+        m_stars = std::move(loaded_stars.value());
+        PLX_CORE_INFO("Star catalog loaded: {} stars from {}", m_stars.size(), catalog_path.string());
+    }
+    else
+    {
+        PLX_CORE_WARN("Failed to load star catalog from {}. Rendering will show no stars.",
+                      catalog_path.string());
+    }
+
+    // 9. Observer location: La Palma, Canary Islands (28.76°N, 17.89°W)
+    m_observer = astro::ObserverLocation{
+        .latitude_rad  = glm::radians(28.76),
+        .longitude_rad = glm::radians(-17.89),
+    };
+
+    // 10. Simulation time: current system UTC
+    m_julian_date = astro::TimeSystem::now_as_jd();
+    m_time_scale = 1.0;
+    {
+        const auto dt = astro::TimeSystem::from_julian_date(m_julian_date);
+        PLX_CORE_INFO("Simulation start: JD {:.6f} ({:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:04.1f} UTC)",
+                      m_julian_date, dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second);
+        PLX_CORE_INFO("Observer: La Palma ({:.2f}N, {:.2f}W)",
+                      glm::degrees(m_observer.latitude_rad),
+                      -glm::degrees(m_observer.longitude_rad));
+    }
+
+    // 11. Command pool + buffers
     create_command_pool();
     create_command_buffers();
 
-    // 6. Synchronization objects
+    // 12. Synchronization objects
     create_sync_objects();
+
+    // 13. Initialize frame time
+    m_last_frame_time = std::chrono::steady_clock::now();
 
     PLX_CORE_INFO("Application initialized — all subsystems ready");
 }
@@ -97,10 +151,19 @@ void Application::shutdown()
         PLX_CORE_TRACE("Command pool destroyed");
     }
 
-    // Reverse creation order: pipeline → swapchain → context → window
+    // Reverse creation order: starfield → pipeline → swapchain → context → window
+    m_starfield.reset();
     m_pipeline.reset();
     m_swapchain.reset();
     m_context.reset();
+
+    // Clear the event callback before destroying the window
+    // (callback captures `this`, which references m_input)
+    if (m_window)
+    {
+        m_window->set_event_callback(nullptr);
+    }
+    m_input.reset();
     m_window.reset();
 }
 
@@ -112,6 +175,14 @@ void Application::main_loop()
 {
     while (!m_window->should_close())
     {
+        // -----------------------------------------------------------------
+        // 1. Reset per-frame input state
+        // -----------------------------------------------------------------
+        m_input->new_frame();
+
+        // -----------------------------------------------------------------
+        // 2. Poll SDL events (Window handles SDL_QUIT/resize; callback → Input)
+        // -----------------------------------------------------------------
         m_window->poll_events();
 
         if (m_window->was_resized())
@@ -125,10 +196,120 @@ void Application::main_loop()
             continue;
         }
 
+        // -----------------------------------------------------------------
+        // 3. Compute delta time
+        // -----------------------------------------------------------------
+        auto now = std::chrono::steady_clock::now();
+        const f64 delta_time_sec = std::chrono::duration<f64>(now - m_last_frame_time).count();
+        m_last_frame_time = now;
+
+        // Clamp delta to avoid huge jumps (e.g., after a breakpoint)
+        const f64 clamped_dt = std::min(delta_time_sec, 0.1);
+
+        // -----------------------------------------------------------------
+        // 4. Process input → Camera/simulation
+        // -----------------------------------------------------------------
+        process_input();
+
+        // -----------------------------------------------------------------
+        // 5. Update simulation time + star transforms
+        // -----------------------------------------------------------------
+        update_simulation(clamped_dt);
+
+        // -----------------------------------------------------------------
+        // 6. Render
+        // -----------------------------------------------------------------
         draw_frame();
     }
 
     m_context->wait_idle();
+}
+
+// =================================================================
+// Input processing — translates Input state to Camera/simulation actions
+// =================================================================
+
+void Application::process_input()
+{
+    // -----------------------------------------------------------------
+    // Mouse drag → Camera pan
+    //
+    // Convert pixel delta to radians: pixels × (FOV / window_width)
+    // Negate X so dragging right pans the view left (sky moves right)
+    // Negate Y so dragging down pans up (natural inversion)
+    // -----------------------------------------------------------------
+    if (m_input->is_mouse_dragging())
+    {
+        const auto drag = m_input->get_mouse_drag_delta();
+        const f64 fov = m_camera->get_fov_rad();
+        const f64 sensitivity = fov / static_cast<f64>(m_window->get_width());
+
+        const f64 delta_az  = -static_cast<f64>(drag.x) * sensitivity;
+        const f64 delta_alt = -static_cast<f64>(drag.y) * sensitivity;
+        m_camera->pan(delta_az, delta_alt);
+    }
+
+    // -----------------------------------------------------------------
+    // Scroll wheel → Camera zoom
+    //
+    // scroll > 0 → zoom in (decrease FOV) → factor < 1.0
+    // scroll < 0 → zoom out (increase FOV) → factor > 1.0
+    // -----------------------------------------------------------------
+    const f32 scroll = m_input->get_scroll_delta();
+    if (scroll != 0.0f)
+    {
+        const f64 zoom_factor = 1.0 - static_cast<f64>(scroll) * 0.1;
+        m_camera->zoom(zoom_factor);
+    }
+
+    // -----------------------------------------------------------------
+    // Space → toggle pause/resume
+    // -----------------------------------------------------------------
+    if (m_input->is_key_pressed(SDL_SCANCODE_SPACE))
+    {
+        m_time_scale = (m_time_scale > 0.0) ? 0.0 : 1.0;
+        PLX_CORE_INFO("Time {}", m_time_scale > 0.0 ? "resumed" : "paused");
+    }
+
+    // -----------------------------------------------------------------
+    // R → reset camera to defaults
+    // -----------------------------------------------------------------
+    if (m_input->is_key_pressed(SDL_SCANCODE_R))
+    {
+        m_camera->reset();
+        PLX_CORE_INFO("Camera reset to defaults");
+    }
+
+    // -----------------------------------------------------------------
+    // Escape → quit
+    // -----------------------------------------------------------------
+    if (m_input->is_key_pressed(SDL_SCANCODE_ESCAPE))
+    {
+        m_window->request_close();
+    }
+}
+
+// =================================================================
+// Simulation update — advance time, compute LST, transform stars
+// =================================================================
+
+void Application::update_simulation(f64 delta_time_sec)
+{
+    // -----------------------------------------------------------------
+    // Advance Julian Date (JD is in days, delta_time is in seconds)
+    // -----------------------------------------------------------------
+    m_julian_date += (delta_time_sec * m_time_scale) / 86400.0;
+
+    // -----------------------------------------------------------------
+    // Compute Local Sidereal Time
+    // -----------------------------------------------------------------
+    const f64 lst = astro::TimeSystem::lmst(m_julian_date, m_observer.longitude_rad);
+
+    // -----------------------------------------------------------------
+    // Transform all catalog stars and upload to GPU
+    // (Starfield::update does: RA/Dec → Alt/Az → screen + brightness)
+    // -----------------------------------------------------------------
+    m_starfield->update(m_stars, m_observer, lst, *m_camera);
 }
 
 // =================================================================
@@ -183,9 +364,6 @@ void Application::draw_frame()
 
     // -----------------------------------------------------------------
     // 4. Submit to graphics queue
-    //    Wait on: image_available (per frame-in-flight slot)
-    //    Signal:  render_finished (per swapchain image — safe for present reuse)
-    //    Signal:  in_flight_fence (per frame-in-flight slot — CPU sync)
     // -----------------------------------------------------------------
     VkSemaphore wait_semaphores[] = {m_image_available_semaphores[m_current_frame]};
     VkPipelineStageFlags wait_stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
@@ -207,7 +385,6 @@ void Application::draw_frame()
 
     // -----------------------------------------------------------------
     // 5. Present
-    //    Wait on: render_finished (same per-image semaphore we just signaled)
     // -----------------------------------------------------------------
     VkSwapchainKHR swapchains[] = {m_swapchain->get_handle()};
 
@@ -241,7 +418,7 @@ void Application::draw_frame()
 }
 
 // =================================================================
-// Command buffer recording
+// Command buffer recording — now uses Starfield instead of test draw
 // =================================================================
 
 void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_index)
@@ -268,8 +445,6 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
 
     vkCmdBeginRenderPass(cmd, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
 
-    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->get_pipeline());
-
     // Dynamic viewport
     VkViewport viewport{};
     viewport.x = 0.0f;
@@ -286,8 +461,12 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
     scissor.extent = extent;
     vkCmdSetScissor(cmd, 0, 1, &scissor);
 
-    // Draw 1 vertex = 1 point (the test star)
-    vkCmdDraw(cmd, 1, 1, 0, 0);
+    // -----------------------------------------------------------------
+    // Draw the starfield (replaces the old test_star draw)
+    // Starfield::draw() binds its own pipeline, descriptor set, push
+    // constants, and issues vkCmdDraw(1, star_count, 0, 0)
+    // -----------------------------------------------------------------
+    m_starfield->draw(cmd);
 
     vkCmdEndRenderPass(cmd);
 

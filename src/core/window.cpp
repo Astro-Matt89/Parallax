@@ -90,11 +90,22 @@ bool Window::should_close() const
     return m_should_close;
 }
 
+void Window::request_close()
+{
+    m_should_close = true;
+}
+
 void Window::poll_events()
 {
     SDL_Event event{};
     while (SDL_PollEvent(&event) != 0)
     {
+        // Forward every event to the callback (Input system)
+        if (m_event_callback)
+        {
+            m_event_callback(event);
+        }
+
         switch (event.type)
         {
             case SDL_QUIT:
@@ -153,6 +164,11 @@ void Window::poll_events()
                 break;
         }
     }
+}
+
+void Window::set_event_callback(EventCallback callback)
+{
+    m_event_callback = std::move(callback);
 }
 
 SDL_Window* Window::get_native_handle() const

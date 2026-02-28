@@ -10,6 +10,7 @@
 #include <vulkan/vulkan.h>
 
 #include <cstdint>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -25,6 +26,9 @@ namespace parallax::core
         bool fullscreen = false;
         bool resizable = true;
     };
+
+    /// @brief Callback type for receiving raw SDL events from the window.
+    using EventCallback = std::function<void(const SDL_Event&)>;
 
     /// @brief SDL2 window wrapper providing Vulkan surface creation and input polling.
     ///
@@ -48,9 +52,18 @@ namespace parallax::core
         /// @brief Returns true if the window has been requested to close.
         [[nodiscard]] bool should_close() const;
 
+        /// @brief Request the window to close (e.g., from Escape key).
+        void request_close();
+
         /// @brief Poll all pending SDL events.
         /// Updates internal state for close requests and resize events.
+        /// If an event callback is set, it is called for every event.
         void poll_events();
+
+        /// @brief Set a callback to receive all SDL events during poll_events().
+        /// The callback is invoked for every event, including window events.
+        /// @param callback The callback function, or nullptr to clear.
+        void set_event_callback(EventCallback callback);
 
         /// @brief Access the underlying SDL_Window pointer.
         [[nodiscard]] SDL_Window* get_native_handle() const;
@@ -80,6 +93,7 @@ namespace parallax::core
         uint32_t m_height = 0;
         bool m_should_close = false;
         bool m_was_resized = false;
+        EventCallback m_event_callback;
     };
 
 } // namespace parallax::core

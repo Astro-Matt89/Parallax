@@ -13,6 +13,7 @@ add_executable(parallax
     astro/time_system.cpp
     astro/coordinates.cpp
     catalog/catalog_loader.cpp
+    rendering/camera.cpp
 )
 
 target_include_directories(parallax PRIVATE

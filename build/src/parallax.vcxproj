@@ -447,6 +447,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Parallax-dev\Parallax\src\astro\time_system.cpp" />
     <ClCompile Include="C:\Parallax-dev\Parallax\src\astro\coordinates.cpp" />
     <ClCompile Include="C:\Parallax-dev\Parallax\src\catalog\catalog_loader.cpp" />
+    <ClCompile Include="C:\Parallax-dev\Parallax\src\rendering\camera.cpp" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

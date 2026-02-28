@@ -10,6 +10,9 @@
     <ClCompile Include="C:\Parallax-dev\Parallax\src\core\window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Parallax-dev\Parallax\src\core\application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Parallax-dev\Parallax\src\vulkan\context.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

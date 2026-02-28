@@ -8,10 +8,18 @@ add_executable(parallax
     core/window.cpp
     vulkan/context.cpp
     vulkan/swapchain.cpp
+    vulkan/pipeline.cpp
 )
 
 target_include_directories(parallax PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
+)
+
+# -----------------------------------------------------------------
+# Compile definitions
+# -----------------------------------------------------------------
+target_compile_definitions(parallax PRIVATE
+    PLX_SHADER_DIR="${SHADER_OUTPUT_DIR}"
 )
 
 # -----------------------------------------------------------------

@@ -6,9 +6,11 @@
 #include "core/logger.hpp"
 #include "core/window.hpp"
 #include "vulkan/context.hpp"
+#include "vulkan/pipeline.hpp"
 #include "vulkan/swapchain.hpp"
 
 #include <cstdlib>
+#include <filesystem>
 
 int main()
 {
@@ -27,12 +29,18 @@ int main()
         // Swapchain
         parallax::vulkan::Swapchain swapchain(context, window.get_width(), window.get_height());
 
+        // Pipeline + render pass + framebuffers
+        // PLX_SHADER_DIR is injected by CMake as an absolute path to build/shaders/
+        std::filesystem::path shader_dir{PLX_SHADER_DIR};
+        PLX_CORE_INFO("Shader directory: {}", shader_dir.string());
+
+        parallax::vulkan::Pipeline pipeline(context, swapchain, shader_dir);
+
         // Main loop
         while (!window.should_close())
         {
             window.poll_events();
 
-            // Handle resize
             if (window.was_resized())
             {
                 uint32_t w = window.get_width();
@@ -41,7 +49,8 @@ int main()
                 if (w > 0 && h > 0)
                 {
                     swapchain.recreate(w, h);
-                    PLX_CORE_INFO("Swapchain recreated: {}x{}", w, h);
+                    pipeline.recreate_framebuffers(swapchain);
+                    PLX_CORE_INFO("Swapchain + framebuffers recreated: {}x{}", w, h);
                 }
             }
         }

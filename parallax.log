@@ -192,3 +192,118 @@
 [10:32:55.678] [PARALLAX] [trace] Vulkan instance destroyed
 [10:32:55.693] [PARALLAX] [info] Window destroyed
 [10:32:55.702] [PARALLAX] [info] Parallax shutdown complete.
+[11:06:12.316] [PARALLAX] [info] Parallax v0.1.0 starting...
+[11:06:12.451] [PARALLAX] [info] Window created: "Parallax" (1280x720) [Vulkan | resizable]
+[11:06:12.452] [PARALLAX] [trace] SDL2 requires 2 Vulkan instance extension(s):
+[11:06:12.453] [PARALLAX] [trace]   - VK_KHR_surface
+[11:06:12.454] [PARALLAX] [trace]   - VK_KHR_win32_surface
+[11:06:12.466] [PARALLAX] [info] Requesting 3 instance extension(s):
+[11:06:12.466] [PARALLAX] [info]   - VK_KHR_surface
+[11:06:12.467] [PARALLAX] [info]   - VK_KHR_win32_surface
+[11:06:12.468] [PARALLAX] [info]   - VK_EXT_debug_utils
+[11:06:12.469] [PARALLAX] [info] Validation layers enabled: VK_LAYER_KHRONOS_validation
+[11:06:12.472] [PARALLAX] [trace] [Vulkan] windows_get_device_registry_files: GUID for 3 is not SoftwareComponent skipping
+[11:06:12.475] [PARALLAX] [trace] [Vulkan] Searching for ICD drivers named .\nvoglv64.dll
+[11:06:12.479] [PARALLAX] [trace] [Vulkan] Loading layer library C:\VulkanSDK\1.4.341.1\Bin\.\VkLayer_khronos_validation.dll
+[11:06:12.481] [PARALLAX] [trace] [Vulkan] Loading layer library C:\ProgramData\obs-studio-hook\.\graphics-hook64.dll
+[11:06:12.482] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[11:06:12.483] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[11:06:12.568] [PARALLAX] [info] Vulkan instance created (API 1.3)
+[11:06:12.568] [PARALLAX] [info] Vulkan debug messenger created
+[11:06:12.569] [PARALLAX] [info] Vulkan surface created
+[11:06:12.572] [PARALLAX] [info] Found 1 Vulkan-capable GPU(s):
+[11:06:12.572] [PARALLAX] [info]   - NVIDIA GeForce GTX 1660 (type: discrete)
+[11:06:12.579] [PARALLAX] [info] Selected GPU: NVIDIA GeForce GTX 1660
+[11:06:12.580] [PARALLAX] [info]   Driver version: 79.344.0
+[11:06:12.581] [PARALLAX] [info]   Vulkan API: 1.4.325
+[11:06:12.581] [PARALLAX] [info]   VRAM: 6180 MB
+[11:06:12.583] [PARALLAX] [info]   Graphics queue family: 0
+[11:06:12.587] [PARALLAX] [info]   Present queue family: 0
+[11:06:12.647] [PARALLAX] [info] Vulkan logical device created
+[11:06:12.651] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[11:06:12.651] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[11:06:12.760] [PARALLAX] [info] Swapchain created: 1280x720, 3 images, format 50, MAILBOX (triple buffer)
+[11:06:12.776] [PARALLAX] [info] Shader directory: C:\Parallax-dev\Parallax\build\bin\Debug\shaders
+[11:06:12.777] [PARALLAX] [info] Render pass created
+[11:06:12.789] [PARALLAX] [critical] Failed to open shader file: C:\Parallax-dev\Parallax\build\bin\Debug\shaders\test_star.vert.spv
+[11:09:12.415] [PARALLAX] [info] Parallax v0.1.0 starting...
+[11:09:12.559] [PARALLAX] [info] Window created: "Parallax" (1280x720) [Vulkan | resizable]
+[11:09:12.559] [PARALLAX] [trace] SDL2 requires 2 Vulkan instance extension(s):
+[11:09:12.560] [PARALLAX] [trace]   - VK_KHR_surface
+[11:09:12.561] [PARALLAX] [trace]   - VK_KHR_win32_surface
+[11:09:12.572] [PARALLAX] [info] Requesting 3 instance extension(s):
+[11:09:12.573] [PARALLAX] [info]   - VK_KHR_surface
+[11:09:12.574] [PARALLAX] [info]   - VK_KHR_win32_surface
+[11:09:12.575] [PARALLAX] [info]   - VK_EXT_debug_utils
+[11:09:12.576] [PARALLAX] [info] Validation layers enabled: VK_LAYER_KHRONOS_validation
+[11:09:12.578] [PARALLAX] [trace] [Vulkan] windows_get_device_registry_files: GUID for 3 is not SoftwareComponent skipping
+[11:09:12.582] [PARALLAX] [trace] [Vulkan] Searching for ICD drivers named .\nvoglv64.dll
+[11:09:12.585] [PARALLAX] [trace] [Vulkan] Loading layer library C:\VulkanSDK\1.4.341.1\Bin\.\VkLayer_khronos_validation.dll
+[11:09:12.587] [PARALLAX] [trace] [Vulkan] Loading layer library C:\ProgramData\obs-studio-hook\.\graphics-hook64.dll
+[11:09:12.589] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[11:09:12.589] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[11:09:12.671] [PARALLAX] [info] Vulkan instance created (API 1.3)
+[11:09:12.671] [PARALLAX] [info] Vulkan debug messenger created
+[11:09:12.672] [PARALLAX] [info] Vulkan surface created
+[11:09:12.674] [PARALLAX] [info] Found 1 Vulkan-capable GPU(s):
+[11:09:12.674] [PARALLAX] [info]   - NVIDIA GeForce GTX 1660 (type: discrete)
+[11:09:12.681] [PARALLAX] [info] Selected GPU: NVIDIA GeForce GTX 1660
+[11:09:12.682] [PARALLAX] [info]   Driver version: 79.344.0
+[11:09:12.682] [PARALLAX] [info]   Vulkan API: 1.4.325
+[11:09:12.683] [PARALLAX] [info]   VRAM: 6180 MB
+[11:09:12.685] [PARALLAX] [info]   Graphics queue family: 0
+[11:09:12.685] [PARALLAX] [info]   Present queue family: 0
+[11:09:12.745] [PARALLAX] [info] Vulkan logical device created
+[11:09:12.749] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[11:09:12.750] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[11:09:12.768] [PARALLAX] [info] Swapchain created: 1280x720, 3 images, format 50, MAILBOX (triple buffer)
+[11:09:12.769] [PARALLAX] [info] Shader directory: C:/Parallax-dev/Parallax/build/shaders
+[11:09:12.770] [PARALLAX] [info] Render pass created
+[11:09:12.854] [PARALLAX] [trace] Shader module loaded: test_star.vert.spv
+[11:09:12.855] [PARALLAX] [trace] Shader module loaded: test_star.frag.spv
+[11:09:13.231] [PARALLAX] [info] Graphics pipeline created (POINT_LIST, dynamic viewport/scissor)
+[11:09:13.232] [PARALLAX] [info] Framebuffers created: 3 (1280x720)
+[11:09:19.472] [PARALLAX] [trace] Window resized: 1920x1057
+[11:09:19.475] [PARALLAX] [trace] Swapchain destroyed
+[11:09:19.481] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[11:09:19.481] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[11:09:19.487] [PARALLAX] [info] Swapchain created: 1920x1057, 3 images, format 50, MAILBOX (triple buffer)
+[11:09:19.487] [PARALLAX] [info] Framebuffers created: 3 (1920x1057)
+[11:09:19.491] [PARALLAX] [info] Swapchain + framebuffers recreated: 1920x1057
+[11:09:21.718] [PARALLAX] [trace] Window resized: 1280x720
+[11:09:21.719] [PARALLAX] [trace] Window restored: 1280x720
+[11:09:21.721] [PARALLAX] [trace] Swapchain destroyed
+[11:09:21.726] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[11:09:21.726] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[11:09:21.734] [PARALLAX] [info] Swapchain created: 1280x720, 3 images, format 50, MAILBOX (triple buffer)
+[11:09:21.735] [PARALLAX] [info] Framebuffers created: 3 (1280x720)
+[11:09:21.736] [PARALLAX] [info] Swapchain + framebuffers recreated: 1280x720
+[11:09:24.040] [PARALLAX] [trace] Window resized: 1280x596
+[11:09:24.041] [PARALLAX] [trace] Window resized: 1280x596
+[11:09:24.043] [PARALLAX] [trace] Swapchain destroyed
+[11:09:24.046] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[11:09:24.047] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[11:09:24.054] [PARALLAX] [info] Swapchain created: 1280x596, 3 images, format 50, MAILBOX (triple buffer)
+[11:09:24.055] [PARALLAX] [info] Framebuffers created: 3 (1280x596)
+[11:09:24.056] [PARALLAX] [info] Swapchain + framebuffers recreated: 1280x596
+[11:09:25.758] [PARALLAX] [trace] Window resized: 916x474
+[11:09:25.759] [PARALLAX] [trace] Window resized: 916x474
+[11:09:25.762] [PARALLAX] [trace] Swapchain destroyed
+[11:09:25.766] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[11:09:25.766] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[11:09:25.772] [PARALLAX] [info] Swapchain created: 916x474, 3 images, format 50, MAILBOX (triple buffer)
+[11:09:25.773] [PARALLAX] [info] Framebuffers created: 3 (916x474)
+[11:09:25.774] [PARALLAX] [info] Swapchain + framebuffers recreated: 916x474
+[11:09:27.078] [PARALLAX] [trace] Graphics pipeline destroyed
+[11:09:27.079] [PARALLAX] [trace] Render pass destroyed
+[11:09:27.082] [PARALLAX] [trace] Swapchain destroyed
+[11:09:27.107] [PARALLAX] [trace] Vulkan logical device destroyed
+[11:09:27.108] [PARALLAX] [trace] Vulkan debug messenger destroyed
+[11:09:27.108] [PARALLAX] [trace] Vulkan surface destroyed
+[11:09:27.110] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\nvoglv64.dll
+[11:09:27.111] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\nvoglv64.dll
+[11:09:27.111] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\ProgramData\obs-studio-hook\graphics-hook64.dll
+[11:09:27.115] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\VulkanSDK\1.4.341.1\Bin\VkLayer_khronos_validation.dll
+[11:09:27.116] [PARALLAX] [trace] Vulkan instance destroyed
+[11:09:27.129] [PARALLAX] [info] Window destroyed
+[11:09:27.139] [PARALLAX] [info] Parallax shutdown complete.

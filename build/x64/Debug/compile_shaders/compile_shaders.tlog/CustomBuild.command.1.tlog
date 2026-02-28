@@ -1,3 +1,31 @@
+^C:\PARALLAX-DEV\PARALLAX\BUILD\CMAKEFILES\3D8C1758119FE9BE1BC83335E3A11D21\TEST_STAR.FRAG.SPV.RULE
+setlocal
+C:\VulkanSDK\1.4.341.1\Bin\glslangValidator.exe -V C:/Parallax-dev/Parallax/shaders/test_star.frag -o C:/Parallax-dev/Parallax/build/shaders/test_star.frag.spv
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\PARALLAX-DEV\PARALLAX\BUILD\CMAKEFILES\3D8C1758119FE9BE1BC83335E3A11D21\TEST_STAR.VERT.SPV.RULE
+setlocal
+C:\VulkanSDK\1.4.341.1\Bin\glslangValidator.exe -V C:/Parallax-dev/Parallax/shaders/test_star.vert -o C:/Parallax-dev/Parallax/build/shaders/test_star.vert.spv
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\PARALLAX-DEV\PARALLAX\BUILD\CMAKEFILES\F3CE5FE29BA837A1ADA6F4C67994E6CD\COMPILE_SHADERS.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
 ^C:\PARALLAX-DEV\PARALLAX\CMAKELISTS.TXT
 setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -SC:/Parallax-dev/Parallax -BC:/Parallax-dev/Parallax/build --check-stamp-file C:/Parallax-dev/Parallax/build/CMakeFiles/generate.stamp

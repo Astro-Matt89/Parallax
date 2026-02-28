@@ -3,3 +3,4 @@ C:\Parallax-dev\Parallax\src\core\logger.cpp;C:\Parallax-dev\Parallax\build\src\
 C:\Parallax-dev\Parallax\src\core\window.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\window.obj
 C:\Parallax-dev\Parallax\src\vulkan\context.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\context.obj
 C:\Parallax-dev\Parallax\src\vulkan\swapchain.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\swapchain.obj
+C:\Parallax-dev\Parallax\src\vulkan\pipeline.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\pipeline.obj

@@ -359,10 +359,12 @@ Star Entry (compact, 32 bytes):
 
 ## 8. Current Sprint
 
-**Sprint:** 01 — Foundation
-**Goal:** Vulkan context + SDL2 window + render black sky + single triangle test
+**Sprint:** 02 — Planetarium Core
+**Goal:** Real starfield from catalog data, coordinate transforms, camera, time simulation
 
-See: `docs/sprints/sprint_01.md`
+See: `docs/sprints/sprint_02.md`
+
+**Previous:** Sprint 01 ✅ — Vulkan pipeline, SDL2 window, test render
 
 ---
 

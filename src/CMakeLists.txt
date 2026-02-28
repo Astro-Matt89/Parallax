@@ -7,6 +7,7 @@ add_executable(parallax
     core/logger.cpp
     core/window.cpp
     core/application.cpp
+    core/input.cpp
     vulkan/context.cpp
     vulkan/swapchain.cpp
     vulkan/pipeline.cpp

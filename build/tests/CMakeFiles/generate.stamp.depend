@@ -1,0 +1,5 @@
+# CMake generation dependency list for this directory.
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/doctest/doctestConfig.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/doctest/doctestConfigVersion.cmake
+C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/share/doctest/doctestTargets.cmake
+C:/Parallax-dev/Parallax/tests/CMakeLists.txt

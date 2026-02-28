@@ -11,6 +11,14 @@
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="compile_shaders.vcxproj"/>
 		<BuildDependency Project="src/parallax.vcxproj"/>
+		<BuildDependency Project="tests/test_time_system.vcxproj"/>
+		<Build Solution="Debug|*" Project="false"/>
+		<Build Solution="Release|*" Project="false"/>
+		<Build Solution="MinSizeRel|*" Project="false"/>
+		<Build Solution="RelWithDebInfo|*" Project="false"/>
+	</Project>
+	<Project Path="RUN_TESTS.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="2c7ddf7d-084b-3cc5-afa8-1cca981c1c0e">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<Build Solution="Debug|*" Project="false"/>
 		<Build Solution="Release|*" Project="false"/>
 		<Build Solution="MinSizeRel|*" Project="false"/>
@@ -23,5 +31,8 @@
 	<Project Path="src/parallax.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="072af682-e785-3102-b06d-6bd32136ad49">
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="compile_shaders.vcxproj"/>
+	</Project>
+	<Project Path="tests/test_time_system.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="a0c0faec-e2ca-309d-b09e-c70af00821fd">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 	</Project>
 </Solution>

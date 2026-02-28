@@ -22,6 +22,9 @@
     <ClCompile Include="C:\Parallax-dev\Parallax\src\vulkan\pipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Parallax-dev\Parallax\src\astro\time_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Parallax-dev\Parallax\src\CMakeLists.txt" />

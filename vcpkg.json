@@ -9,6 +9,7 @@
         },
         "glm",
         "spdlog",
-        "vulkan-memory-allocator"
+        "vulkan-memory-allocator",
+        "doctest"
     ]
 }

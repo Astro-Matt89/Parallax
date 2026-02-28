@@ -80,3 +80,12 @@ Abi: b91d845ceb87e4feb259dd5302cde0bd3b7ccd15574b597bbba7d83edf397b4c
 Description: Easy to integrate Vulkan memory allocation library from GPUOpen
 Status: install ok installed
 
+Package: doctest
+Version: 2.4.12
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: d6a893116a81465c7af8099f7d3a55b0228a7857209ebfdf186764597d69068d
+Description: The fastest feature-rich C++11/14/17/20 single-header testing framework
+Status: install ok installed
+

@@ -184,6 +184,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Project>{072AF682-E785-3102-B06D-6BD32136AD49}</Project>
       <Name>parallax</Name>
     </ProjectReference>
+    <ProjectReference Include="C:\Parallax-dev\Parallax\build\tests\test_time_system.vcxproj">
+      <Project>{A0C0FAEC-E2CA-309D-B09E-C70AF00821FD}</Project>
+      <Name>test_time_system</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

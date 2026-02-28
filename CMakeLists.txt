@@ -96,3 +96,13 @@ add_custom_target(compile_shaders ALL DEPENDS ${SPIRV_OUTPUTS})
 # Source subdirectory
 # -----------------------------------------------------------------
 add_subdirectory(src)
+
+# -----------------------------------------------------------------
+# Tests (optional, enable with -DPLX_BUILD_TESTS=ON)
+# -----------------------------------------------------------------
+option(PLX_BUILD_TESTS "Build unit tests" ON)
+
+if(PLX_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()

@@ -1,4 +1,8 @@
 C:/Parallax-dev/Parallax/build/CMakeFiles/compile_shaders.dir
+C:/Parallax-dev/Parallax/build/CMakeFiles/RUN_TESTS.dir
 C:/Parallax-dev/Parallax/build/CMakeFiles/ALL_BUILD.dir
 C:/Parallax-dev/Parallax/build/CMakeFiles/ZERO_CHECK.dir
 C:/Parallax-dev/Parallax/build/src/CMakeFiles/parallax.dir
+C:/Parallax-dev/Parallax/build/src/CMakeFiles/RUN_TESTS.dir
+C:/Parallax-dev/Parallax/build/tests/CMakeFiles/test_time_system.dir
+C:/Parallax-dev/Parallax/build/tests/CMakeFiles/RUN_TESTS.dir

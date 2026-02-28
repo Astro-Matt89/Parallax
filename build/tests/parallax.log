@@ -1,0 +1,17 @@
+[21:44:29.381] [PARALLAX] [info] CatalogLoader: Loaded 3 stars from C:\Users\sputn\AppData\Local\Temp\test_bright.csv
+[21:44:29.383] [PARALLAX] [info] CatalogLoader: Loaded 3 stars from C:\Users\sputn\AppData\Local\Temp\test_bright.csv
+[21:44:29.383] [PARALLAX] [info] CatalogLoader: Loaded 3 stars from C:\Users\sputn\AppData\Local\Temp\test_bright.csv
+[21:44:29.384] [PARALLAX] [info] CatalogLoader: Loaded 21 stars from C:\Users\sputn\AppData\Local\Temp\test_full_bright.csv
+[21:44:29.385] [PARALLAX] [info] CatalogLoader: Loaded 2 stars from C:\Users\sputn\AppData\Local\Temp\test_hip.csv
+[21:44:29.386] [PARALLAX] [info] CatalogLoader: Loaded 1 stars from C:\Users\sputn\AppData\Local\Temp\test_zero_ra.csv
+[21:44:29.387] [PARALLAX] [info] CatalogLoader: Loaded 1 stars from C:\Users\sputn\AppData\Local\Temp\test_180_ra.csv
+[21:44:29.388] [PARALLAX] [info] CatalogLoader: Loaded 1 stars from C:\Users\sputn\AppData\Local\Temp\test_neg_dec.csv
+[21:44:29.389] [PARALLAX] [info] CatalogLoader: Loaded 1 stars from C:\Users\sputn\AppData\Local\Temp\test_neg_mag.csv
+[21:44:29.390] [PARALLAX] [info] CatalogLoader: Loaded 1 stars from C:\Users\sputn\AppData\Local\Temp\test_neg_bv.csv
+[21:44:29.390] [PARALLAX] [error] CatalogLoader: Failed to open file: this_file_does_not_exist.csv
+[21:44:29.391] [PARALLAX] [error] CatalogLoader: No valid stars found in: C:\Users\sputn\AppData\Local\Temp\test_empty.csv
+[21:44:29.392] [PARALLAX] [warning] CatalogLoader: Failed to parse values on line 3: Bad,not_a_number,bad,bad,bad
+[21:44:29.392] [PARALLAX] [warning] CatalogLoader: Malformed line 5: Incomplete,101.287
+[21:44:29.392] [PARALLAX] [warning] CatalogLoader: Skipped 2 malformed lines
+[21:44:29.392] [PARALLAX] [info] CatalogLoader: Loaded 2 stars from C:\Users\sputn\AppData\Local\Temp\test_malformed.csv
+[21:44:29.393] [PARALLAX] [info] CatalogLoader: Loaded 3 stars from C:\Users\sputn\AppData\Local\Temp\test_brightness.csv

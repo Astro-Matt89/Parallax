@@ -42,3 +42,24 @@ target_link_libraries(test_coordinates PRIVATE
 )
 
 add_test(NAME Coordinates COMMAND test_coordinates)
+
+# -----------------------------------------------------------------
+# Test: CatalogLoader
+# -----------------------------------------------------------------
+add_executable(test_catalog_loader
+    test_catalog_loader.cpp
+    "${CMAKE_SOURCE_DIR}/src/catalog/catalog_loader.cpp"
+    "${CMAKE_SOURCE_DIR}/src/core/logger.cpp"
+)
+
+target_include_directories(test_catalog_loader PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_catalog_loader PRIVATE
+    doctest::doctest
+    glm::glm
+    spdlog::spdlog
+)
+
+add_test(NAME CatalogLoader COMMAND test_catalog_loader)

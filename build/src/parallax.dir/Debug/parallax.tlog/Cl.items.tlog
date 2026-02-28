@@ -7,3 +7,4 @@ C:\Parallax-dev\Parallax\src\vulkan\swapchain.cpp;C:\Parallax-dev\Parallax\build
 C:\Parallax-dev\Parallax\src\vulkan\pipeline.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\pipeline.obj
 C:\Parallax-dev\Parallax\src\astro\time_system.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\time_system.obj
 C:\Parallax-dev\Parallax\src\astro\coordinates.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\coordinates.obj
+C:\Parallax-dev\Parallax\src\catalog\catalog_loader.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\catalog_loader.obj

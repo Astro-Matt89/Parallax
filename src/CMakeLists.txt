@@ -12,6 +12,7 @@ add_executable(parallax
     vulkan/pipeline.cpp
     astro/time_system.cpp
     astro/coordinates.cpp
+    catalog/catalog_loader.cpp
 )
 
 target_include_directories(parallax PRIVATE

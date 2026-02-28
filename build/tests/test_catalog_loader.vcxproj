@@ -22,12 +22,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{072AF682-E785-3102-B06D-6BD32136AD49}</ProjectGuid>
+    <ProjectGuid>{C9879E85-7C3D-38E0-8FC2-66243EF020B2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <VcpkgEnabled>false</VcpkgEnabled>
     <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
     <Platform>x64</Platform>
-    <ProjectName>parallax</ProjectName>
+    <ProjectName>test_catalog_loader</ProjectName>
     <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -61,26 +61,26 @@
   <PropertyGroup>
     <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Parallax-dev\Parallax\build\bin\Debug\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">parallax.dir\Debug\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">parallax</TargetName>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">test_catalog_loader.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">test_catalog_loader</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Parallax-dev\Parallax\build\bin\Release\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">parallax.dir\Release\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">parallax</TargetName>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">test_catalog_loader.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">test_catalog_loader</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Parallax-dev\Parallax\build\bin\MinSizeRel\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">parallax.dir\MinSizeRel\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">parallax</TargetName>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">test_catalog_loader.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">test_catalog_loader</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Parallax-dev\Parallax\build\bin\RelWithDebInfo\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">parallax.dir\RelWithDebInfo\</IntDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">parallax</TargetName>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">test_catalog_loader.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">test_catalog_loader</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
@@ -88,7 +88,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>C:\Parallax-dev\Parallax\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/VulkanSDK/1.4.341.1/include" /external:I "C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/include" /external:I "C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/include/SDL2" /external:I "C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/include/vma" /utf-8</AdditionalOptions>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/include" /utf-8</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <BufferSecurityCheck></BufferSecurityCheck>
@@ -112,16 +112,16 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;PLX_SHADER_DIR="C:/Parallax-dev/Parallax/build/shaders";PLX_PLATFORM_WINDOWS;SPDLOG_SHARED_LIB;SPDLOG_COMPILED_LIB;SPDLOG_FMT_EXTERNAL;FMT_SHARED;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;PLX_PLATFORM_WINDOWS;SPDLOG_SHARED_LIB;SPDLOG_COMPILED_LIB;SPDLOG_FMT_EXTERNAL;FMT_SHARED;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;PLX_SHADER_DIR=\"C:/Parallax-dev/Parallax/build/shaders\";PLX_PLATFORM_WINDOWS;SPDLOG_SHARED_LIB;SPDLOG_COMPILED_LIB;SPDLOG_FMT_EXTERNAL;FMT_SHARED;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Parallax-dev\Parallax\src;C:\VulkanSDK\1.4.341.1\include;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include\SDL2;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include\vma;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;PLX_PLATFORM_WINDOWS;SPDLOG_SHARED_LIB;SPDLOG_COMPILED_LIB;SPDLOG_FMT_EXTERNAL;FMT_SHARED;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Parallax-dev\Parallax\src;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Parallax-dev\Parallax\src;C:\VulkanSDK\1.4.341.1\include;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include\SDL2;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include\vma;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Parallax-dev\Parallax\src;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -131,7 +131,7 @@
     <PostBuildEvent>
       <Message></Message>
       <Command>setlocal
-C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/dev/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Parallax-dev/Parallax/build/bin/Debug/parallax.exe -installedDir C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/debug/bin -OutVariable out
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/dev/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Parallax-dev/Parallax/build/bin/Debug/test_catalog_loader.exe -installedDir C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/debug/bin -OutVariable out
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -141,16 +141,16 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>C:\VulkanSDK\1.4.341.1\Lib\vulkan-1.lib;..\vcpkg_installed\x64-windows\debug\lib\SDL2d.lib;..\vcpkg_installed\x64-windows\debug\lib\manual-link\SDL2maind.lib;..\vcpkg_installed\x64-windows\debug\lib\glm.lib;..\vcpkg_installed\x64-windows\debug\lib\spdlogd.lib;shell32.lib;..\vcpkg_installed\x64-windows\debug\lib\fmtd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\vcpkg_installed\x64-windows\debug\lib\glm.lib;..\vcpkg_installed\x64-windows\debug\lib\spdlogd.lib;..\vcpkg_installed\x64-windows\debug\lib\fmtd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
-      <ImportLibrary>C:/Parallax-dev/Parallax/build/lib/Debug/parallax.lib</ImportLibrary>
+      <ImportLibrary>C:/Parallax-dev/Parallax/build/lib/Debug/test_catalog_loader.lib</ImportLibrary>
       <LinkErrorReporting></LinkErrorReporting>
-      <ProgramDataBaseFile>C:/Parallax-dev/Parallax/build/bin/Debug/parallax.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>C:/Parallax-dev/Parallax/build/bin/Debug/test_catalog_loader.pdb</ProgramDataBaseFile>
       <RandomizedBaseAddress></RandomizedBaseAddress>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -161,7 +161,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>C:\Parallax-dev\Parallax\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/VulkanSDK/1.4.341.1/include" /external:I "C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/include" /external:I "C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/include/SDL2" /external:I "C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/include/vma" /utf-8</AdditionalOptions>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/include" /utf-8</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <BufferSecurityCheck></BufferSecurityCheck>
@@ -184,18 +184,18 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <TreatWarningAsError>true</TreatWarningAsError>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;PLX_SHADER_DIR="C:/Parallax-dev/Parallax/build/shaders";PLX_PLATFORM_WINDOWS;SPDLOG_SHARED_LIB;SPDLOG_COMPILED_LIB;SPDLOG_FMT_EXTERNAL;FMT_SHARED;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;PLX_PLATFORM_WINDOWS;SPDLOG_SHARED_LIB;SPDLOG_COMPILED_LIB;SPDLOG_FMT_EXTERNAL;FMT_SHARED;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;PLX_SHADER_DIR=\"C:/Parallax-dev/Parallax/build/shaders\";PLX_PLATFORM_WINDOWS;SPDLOG_SHARED_LIB;SPDLOG_COMPILED_LIB;SPDLOG_FMT_EXTERNAL;FMT_SHARED;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Parallax-dev\Parallax\src;C:\VulkanSDK\1.4.341.1\include;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include\SDL2;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include\vma;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;PLX_PLATFORM_WINDOWS;SPDLOG_SHARED_LIB;SPDLOG_COMPILED_LIB;SPDLOG_FMT_EXTERNAL;FMT_SHARED;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Parallax-dev\Parallax\src;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Parallax-dev\Parallax\src;C:\VulkanSDK\1.4.341.1\include;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include\SDL2;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include\vma;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Parallax-dev\Parallax\src;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -205,7 +205,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <PostBuildEvent>
       <Message></Message>
       <Command>setlocal
-C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/dev/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Parallax-dev/Parallax/build/bin/Release/parallax.exe -installedDir C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/bin -OutVariable out
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/dev/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Parallax-dev/Parallax/build/bin/Release/test_catalog_loader.exe -installedDir C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/bin -OutVariable out
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -215,16 +215,16 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>C:\VulkanSDK\1.4.341.1\Lib\vulkan-1.lib;..\vcpkg_installed\x64-windows\lib\SDL2.lib;..\vcpkg_installed\x64-windows\lib\manual-link\SDL2main.lib;..\vcpkg_installed\x64-windows\lib\glm.lib;..\vcpkg_installed\x64-windows\lib\spdlog.lib;shell32.lib;..\vcpkg_installed\x64-windows\lib\fmt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\vcpkg_installed\x64-windows\lib\glm.lib;..\vcpkg_installed\x64-windows\lib\spdlog.lib;..\vcpkg_installed\x64-windows\lib\fmt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
-      <ImportLibrary>C:/Parallax-dev/Parallax/build/lib/Release/parallax.lib</ImportLibrary>
+      <ImportLibrary>C:/Parallax-dev/Parallax/build/lib/Release/test_catalog_loader.lib</ImportLibrary>
       <LinkErrorReporting></LinkErrorReporting>
-      <ProgramDataBaseFile>C:/Parallax-dev/Parallax/build/bin/Release/parallax.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>C:/Parallax-dev/Parallax/build/bin/Release/test_catalog_loader.pdb</ProgramDataBaseFile>
       <RandomizedBaseAddress></RandomizedBaseAddress>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -235,7 +235,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>C:\Parallax-dev\Parallax\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/VulkanSDK/1.4.341.1/include" /external:I "C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/include" /external:I "C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/include/SDL2" /external:I "C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/include/vma" /utf-8</AdditionalOptions>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/include" /utf-8</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <BufferSecurityCheck></BufferSecurityCheck>
@@ -258,18 +258,18 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <TreatWarningAsError>true</TreatWarningAsError>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;PLX_SHADER_DIR="C:/Parallax-dev/Parallax/build/shaders";PLX_PLATFORM_WINDOWS;SPDLOG_SHARED_LIB;SPDLOG_COMPILED_LIB;SPDLOG_FMT_EXTERNAL;FMT_SHARED;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;PLX_PLATFORM_WINDOWS;SPDLOG_SHARED_LIB;SPDLOG_COMPILED_LIB;SPDLOG_FMT_EXTERNAL;FMT_SHARED;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;PLX_SHADER_DIR=\"C:/Parallax-dev/Parallax/build/shaders\";PLX_PLATFORM_WINDOWS;SPDLOG_SHARED_LIB;SPDLOG_COMPILED_LIB;SPDLOG_FMT_EXTERNAL;FMT_SHARED;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Parallax-dev\Parallax\src;C:\VulkanSDK\1.4.341.1\include;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include\SDL2;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include\vma;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;PLX_PLATFORM_WINDOWS;SPDLOG_SHARED_LIB;SPDLOG_COMPILED_LIB;SPDLOG_FMT_EXTERNAL;FMT_SHARED;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Parallax-dev\Parallax\src;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Parallax-dev\Parallax\src;C:\VulkanSDK\1.4.341.1\include;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include\SDL2;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include\vma;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Parallax-dev\Parallax\src;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -279,7 +279,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <PostBuildEvent>
       <Message></Message>
       <Command>setlocal
-C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/dev/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Parallax-dev/Parallax/build/bin/MinSizeRel/parallax.exe -installedDir C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/bin -OutVariable out
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/dev/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Parallax-dev/Parallax/build/bin/MinSizeRel/test_catalog_loader.exe -installedDir C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/bin -OutVariable out
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -289,16 +289,16 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>C:\VulkanSDK\1.4.341.1\Lib\vulkan-1.lib;..\vcpkg_installed\x64-windows\lib\SDL2.lib;..\vcpkg_installed\x64-windows\lib\manual-link\SDL2main.lib;..\vcpkg_installed\x64-windows\lib\glm.lib;..\vcpkg_installed\x64-windows\lib\spdlog.lib;shell32.lib;..\vcpkg_installed\x64-windows\lib\fmt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\vcpkg_installed\x64-windows\lib\glm.lib;..\vcpkg_installed\x64-windows\lib\spdlog.lib;..\vcpkg_installed\x64-windows\lib\fmt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
-      <ImportLibrary>C:/Parallax-dev/Parallax/build/lib/MinSizeRel/parallax.lib</ImportLibrary>
+      <ImportLibrary>C:/Parallax-dev/Parallax/build/lib/MinSizeRel/test_catalog_loader.lib</ImportLibrary>
       <LinkErrorReporting></LinkErrorReporting>
-      <ProgramDataBaseFile>C:/Parallax-dev/Parallax/build/bin/MinSizeRel/parallax.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>C:/Parallax-dev/Parallax/build/bin/MinSizeRel/test_catalog_loader.pdb</ProgramDataBaseFile>
       <RandomizedBaseAddress></RandomizedBaseAddress>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -309,7 +309,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>C:\Parallax-dev\Parallax\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/VulkanSDK/1.4.341.1/include" /external:I "C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/include" /external:I "C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/include/SDL2" /external:I "C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/include/vma" /utf-8</AdditionalOptions>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/include" /utf-8</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <BufferSecurityCheck></BufferSecurityCheck>
@@ -333,16 +333,16 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <TreatWarningAsError>true</TreatWarningAsError>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;PLX_SHADER_DIR="C:/Parallax-dev/Parallax/build/shaders";PLX_PLATFORM_WINDOWS;SPDLOG_SHARED_LIB;SPDLOG_COMPILED_LIB;SPDLOG_FMT_EXTERNAL;FMT_SHARED;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;PLX_PLATFORM_WINDOWS;SPDLOG_SHARED_LIB;SPDLOG_COMPILED_LIB;SPDLOG_FMT_EXTERNAL;FMT_SHARED;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;PLX_SHADER_DIR=\"C:/Parallax-dev/Parallax/build/shaders\";PLX_PLATFORM_WINDOWS;SPDLOG_SHARED_LIB;SPDLOG_COMPILED_LIB;SPDLOG_FMT_EXTERNAL;FMT_SHARED;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Parallax-dev\Parallax\src;C:\VulkanSDK\1.4.341.1\include;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include\SDL2;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include\vma;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;PLX_PLATFORM_WINDOWS;SPDLOG_SHARED_LIB;SPDLOG_COMPILED_LIB;SPDLOG_FMT_EXTERNAL;FMT_SHARED;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Parallax-dev\Parallax\src;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Parallax-dev\Parallax\src;C:\VulkanSDK\1.4.341.1\include;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include\SDL2;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include\vma;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Parallax-dev\Parallax\src;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -352,7 +352,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <PostBuildEvent>
       <Message></Message>
       <Command>setlocal
-C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/dev/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Parallax-dev/Parallax/build/bin/RelWithDebInfo/parallax.exe -installedDir C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/bin -OutVariable out
+C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/dev/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Parallax-dev/Parallax/build/bin/RelWithDebInfo/test_catalog_loader.exe -installedDir C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/bin -OutVariable out
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -362,16 +362,16 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>C:\VulkanSDK\1.4.341.1\Lib\vulkan-1.lib;..\vcpkg_installed\x64-windows\lib\SDL2.lib;..\vcpkg_installed\x64-windows\lib\manual-link\SDL2main.lib;..\vcpkg_installed\x64-windows\lib\glm.lib;..\vcpkg_installed\x64-windows\lib\spdlog.lib;shell32.lib;..\vcpkg_installed\x64-windows\lib\fmt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>..\vcpkg_installed\x64-windows\lib\glm.lib;..\vcpkg_installed\x64-windows\lib\spdlog.lib;..\vcpkg_installed\x64-windows\lib\fmt.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
-      <ImportLibrary>C:/Parallax-dev/Parallax/build/lib/RelWithDebInfo/parallax.lib</ImportLibrary>
+      <ImportLibrary>C:/Parallax-dev/Parallax/build/lib/RelWithDebInfo/test_catalog_loader.lib</ImportLibrary>
       <LinkErrorReporting></LinkErrorReporting>
-      <ProgramDataBaseFile>C:/Parallax-dev/Parallax/build/bin/RelWithDebInfo/parallax.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>C:/Parallax-dev/Parallax/build/bin/RelWithDebInfo/test_catalog_loader.pdb</ProgramDataBaseFile>
       <RandomizedBaseAddress></RandomizedBaseAddress>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -380,11 +380,11 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Parallax-dev\Parallax\src\CMakeLists.txt">
+    <CustomBuild Include="C:\Parallax-dev\Parallax\tests\CMakeLists.txt">
       <UseUtf8Encoding>Always</UseUtf8Encoding>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Parallax-dev/Parallax/src/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Parallax-dev/Parallax/tests/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/Parallax-dev/Parallax -BC:/Parallax-dev/Parallax/build --check-stamp-file C:/Parallax-dev/Parallax/build/src/CMakeFiles/generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Parallax-dev/Parallax -BC:/Parallax-dev/Parallax/build --check-stamp-file C:/Parallax-dev/Parallax/build/tests/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -392,12 +392,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Parallax-dev\Parallax\build\src\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\share\doctest\doctestConfig.cmake;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\share\doctest\doctestConfigVersion.cmake;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\share\doctest\doctestTargets.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Parallax-dev\Parallax\build\tests\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Parallax-dev/Parallax/src/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Parallax-dev/Parallax/tests/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/Parallax-dev/Parallax -BC:/Parallax-dev/Parallax/build --check-stamp-file C:/Parallax-dev/Parallax/build/src/CMakeFiles/generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Parallax-dev/Parallax -BC:/Parallax-dev/Parallax/build --check-stamp-file C:/Parallax-dev/Parallax/build/tests/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -405,12 +405,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Parallax-dev\Parallax\build\src\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\share\doctest\doctestConfig.cmake;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\share\doctest\doctestConfigVersion.cmake;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\share\doctest\doctestTargets.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Parallax-dev\Parallax\build\tests\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Parallax-dev/Parallax/src/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Parallax-dev/Parallax/tests/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/Parallax-dev/Parallax -BC:/Parallax-dev/Parallax/build --check-stamp-file C:/Parallax-dev/Parallax/build/src/CMakeFiles/generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Parallax-dev/Parallax -BC:/Parallax-dev/Parallax/build --check-stamp-file C:/Parallax-dev/Parallax/build/tests/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -418,12 +418,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Parallax-dev\Parallax\build\src\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\share\doctest\doctestConfig.cmake;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\share\doctest\doctestConfigVersion.cmake;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\share\doctest\doctestTargets.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Parallax-dev\Parallax\build\tests\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Parallax-dev/Parallax/src/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Parallax-dev/Parallax/tests/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/Parallax-dev/Parallax -BC:/Parallax-dev/Parallax/build --check-stamp-file C:/Parallax-dev/Parallax/build/src/CMakeFiles/generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Parallax-dev/Parallax -BC:/Parallax-dev/Parallax/build --check-stamp-file C:/Parallax-dev/Parallax/build/tests/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -431,34 +431,21 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Parallax-dev\Parallax\build\src\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\share\doctest\doctestConfig.cmake;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\share\doctest\doctestConfigVersion.cmake;C:\Parallax-dev\Parallax\build\vcpkg_installed\x64-windows\share\doctest\doctestTargets.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Parallax-dev\Parallax\build\tests\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="C:\Parallax-dev\Parallax\src\main.cpp" />
-    <ClCompile Include="C:\Parallax-dev\Parallax\src\core\logger.cpp" />
-    <ClCompile Include="C:\Parallax-dev\Parallax\src\core\window.cpp" />
-    <ClCompile Include="C:\Parallax-dev\Parallax\src\core\application.cpp" />
-    <ClCompile Include="C:\Parallax-dev\Parallax\src\vulkan\context.cpp" />
-    <ClCompile Include="C:\Parallax-dev\Parallax\src\vulkan\swapchain.cpp" />
-    <ClCompile Include="C:\Parallax-dev\Parallax\src\vulkan\pipeline.cpp" />
-    <ClCompile Include="C:\Parallax-dev\Parallax\src\astro\time_system.cpp" />
-    <ClCompile Include="C:\Parallax-dev\Parallax\src\astro\coordinates.cpp" />
+    <ClCompile Include="C:\Parallax-dev\Parallax\tests\test_catalog_loader.cpp" />
     <ClCompile Include="C:\Parallax-dev\Parallax\src\catalog\catalog_loader.cpp" />
+    <ClCompile Include="C:\Parallax-dev\Parallax\src\core\logger.cpp" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="C:\Parallax-dev\Parallax\build\ZERO_CHECK.vcxproj">
       <Project>{FAE10562-09A1-3491-9B40-8965BCE10BAC}</Project>
       <Name>ZERO_CHECK</Name>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </ProjectReference>
-    <ProjectReference Include="C:\Parallax-dev\Parallax\build\compile_shaders.vcxproj">
-      <Project>{B0AFFBD4-118C-3F53-9224-2061DC4E497E}</Project>
-      <Name>compile_shaders</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </ProjectReference>

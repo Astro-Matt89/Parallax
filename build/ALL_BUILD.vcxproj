@@ -184,6 +184,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Project>{072AF682-E785-3102-B06D-6BD32136AD49}</Project>
       <Name>parallax</Name>
     </ProjectReference>
+    <ProjectReference Include="C:\Parallax-dev\Parallax\build\tests\test_catalog_loader.vcxproj">
+      <Project>{C9879E85-7C3D-38E0-8FC2-66243EF020B2}</Project>
+      <Name>test_catalog_loader</Name>
+    </ProjectReference>
     <ProjectReference Include="C:\Parallax-dev\Parallax\build\tests\test_coordinates.vcxproj">
       <Project>{DE6642A6-C134-3DF2-A7F2-77675FEB652C}</Project>
       <Name>test_coordinates</Name>

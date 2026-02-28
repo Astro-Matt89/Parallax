@@ -11,6 +11,9 @@
       <FullPath>C:\Parallax-dev\Parallax\build\bin\Debug\parallax.exe</FullPath>
     </ProjectOutput>
     <ProjectOutput>
+      <FullPath>C:\Parallax-dev\Parallax\build\bin\Debug\test_catalog_loader.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
       <FullPath>C:\Parallax-dev\Parallax\build\bin\Debug\test_coordinates.exe</FullPath>
     </ProjectOutput>
     <ProjectOutput>

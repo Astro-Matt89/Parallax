@@ -11,6 +11,7 @@ add_executable(parallax
     vulkan/swapchain.cpp
     vulkan/pipeline.cpp
     astro/time_system.cpp
+    astro/coordinates.cpp
 )
 
 target_include_directories(parallax PRIVATE

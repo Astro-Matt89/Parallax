@@ -1,6 +1,7 @@
 Detecting compiler hash for triplet x64-windows...
 Compiler found: C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/cl.exe
 The following packages are already installed:
+    doctest:x64-windows@2.4.12
   * fmt:x64-windows@12.1.0
     glm:x64-windows@1.0.3
     sdl2[core,vulkan]:x64-windows@2.32.10
@@ -8,15 +9,6 @@ The following packages are already installed:
   * vcpkg-cmake:x64-windows@2024-04-23
   * vcpkg-cmake-config:x64-windows@2024-05-23
     vulkan-memory-allocator:x64-windows@3.3.0
-The following packages will be built and installed:
-    doctest:x64-windows@2.4.12
-Restored 1 package(s) from C:\Users\sputn\AppData\Local\vcpkg\archives in 88.8 ms. Use --debug to see more details.
-Installing 1/1 doctest:x64-windows@2.4.12...
-doctest:x64-windows@2.4.12 package ABI: d6a893116a81465c7af8099f7d3a55b0228a7857209ebfdf186764597d69068d
-Elapsed time to handle doctest:x64-windows: 59.5 ms
-Installed contents are licensed to you by owners. Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.
-Packages installed in this vcpkg installation declare the following licenses:
-MIT
 doctest provides CMake targets:
 
   # this is heuristically generated, and may not be correct
@@ -70,4 +62,4 @@ or
 
 See the documentation for more information on setting up your project: https://gpuopen-librariesandsdks.github.io/VulkanMemoryAllocator/html/index.html
 
-All requested installations completed successfully in: 62.3 ms
+All requested installations completed successfully in: 743 us

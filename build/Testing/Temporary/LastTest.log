@@ -1,10 +1,10 @@
-Start testing: Feb 28 19:46 W. Europe Standard Time
+Start testing: Feb 28 19:57 W. Europe Standard Time
 ----------------------------------------------------------
-1/1 Testing: TimeSystem
-1/1 Test: TimeSystem
+1/2 Testing: TimeSystem
+1/2 Test: TimeSystem
 Command: "C:/Parallax-dev/Parallax/build/bin/Debug/test_time_system.exe"
 Directory: C:/Parallax-dev/Parallax/build/tests
-"TimeSystem" start time: Feb 28 19:46 W. Europe Standard Time
+"TimeSystem" start time: Feb 28 19:57 W. Europe Standard Time
 Output:
 ----------------------------------------------------------
 [doctest] doctest version is "2.4.12"
@@ -14,11 +14,32 @@ Output:
 [doctest] assertions: 39 | 39 passed | 0 failed |
 [doctest] Status: SUCCESS!
 <end of output>
-Test time =   0.12 sec
+Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"TimeSystem" end time: Feb 28 19:46 W. Europe Standard Time
+"TimeSystem" end time: Feb 28 19:57 W. Europe Standard Time
 "TimeSystem" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-End testing: Feb 28 19:46 W. Europe Standard Time
+2/2 Testing: Coordinates
+2/2 Test: Coordinates
+Command: "C:/Parallax-dev/Parallax/build/bin/Debug/test_coordinates.exe"
+Directory: C:/Parallax-dev/Parallax/build/tests
+"Coordinates" start time: Feb 28 19:57 W. Europe Standard Time
+Output:
+----------------------------------------------------------
+[doctest] doctest version is "2.4.12"
+[doctest] run with "--help" for options
+===============================================================================
+[doctest] test cases:  14 |  14 passed | 0 failed | 0 skipped
+[doctest] assertions: 198 | 198 passed | 0 failed |
+[doctest] Status: SUCCESS!
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"Coordinates" end time: Feb 28 19:57 W. Europe Standard Time
+"Coordinates" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Feb 28 19:57 W. Europe Standard Time

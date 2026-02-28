@@ -82,35 +82,18 @@ void Application::shutdown()
 {
     if (!m_context)
     {
-        return; // Already shut down or never initialized
+        return;
     }
 
     m_context->wait_idle();
 
-    VkDevice device = m_context->get_device();
-
-    // Destroy sync objects
-    for (uint32_t i = 0; i < kMaxFramesInFlight; ++i)
-    {
-        if (m_render_finished_semaphores[i] != VK_NULL_HANDLE)
-        {
-            vkDestroySemaphore(device, m_render_finished_semaphores[i], nullptr);
-        }
-        if (m_image_available_semaphores[i] != VK_NULL_HANDLE)
-        {
-            vkDestroySemaphore(device, m_image_available_semaphores[i], nullptr);
-        }
-        if (m_in_flight_fences[i] != VK_NULL_HANDLE)
-        {
-            vkDestroyFence(device, m_in_flight_fences[i], nullptr);
-        }
-    }
-    PLX_CORE_TRACE("Sync objects destroyed");
+    destroy_sync_objects();
 
     // Command pool (implicitly frees command buffers)
     if (m_command_pool != VK_NULL_HANDLE)
     {
-        vkDestroyCommandPool(device, m_command_pool, nullptr);
+        vkDestroyCommandPool(m_context->get_device(), m_command_pool, nullptr);
+        m_command_pool = VK_NULL_HANDLE;
         PLX_CORE_TRACE("Command pool destroyed");
     }
 
@@ -157,7 +140,7 @@ void Application::draw_frame()
     VkDevice device = m_context->get_device();
 
     // -----------------------------------------------------------------
-    // 1. Wait for this frame's fence (previous use of this frame slot)
+    // 1. Wait for this frame slot's fence (previous use of this slot)
     // -----------------------------------------------------------------
     check_vk(
         vkWaitForFences(device, 1, &m_in_flight_fences[m_current_frame], VK_TRUE, std::numeric_limits<uint64_t>::max()),
@@ -178,7 +161,7 @@ void Application::draw_frame()
     if (acquire_result == VK_ERROR_OUT_OF_DATE_KHR)
     {
         recreate_swapchain();
-        return; // Retry next frame
+        return;
     }
     if (acquire_result != VK_SUCCESS && acquire_result != VK_SUBOPTIMAL_KHR)
     {
@@ -200,10 +183,13 @@ void Application::draw_frame()
 
     // -----------------------------------------------------------------
     // 4. Submit to graphics queue
+    //    Wait on: image_available (per frame-in-flight slot)
+    //    Signal:  render_finished (per swapchain image — safe for present reuse)
+    //    Signal:  in_flight_fence (per frame-in-flight slot — CPU sync)
     // -----------------------------------------------------------------
     VkSemaphore wait_semaphores[] = {m_image_available_semaphores[m_current_frame]};
     VkPipelineStageFlags wait_stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-    VkSemaphore signal_semaphores[] = {m_render_finished_semaphores[m_current_frame]};
+    VkSemaphore signal_semaphores[] = {m_render_finished_semaphores[image_index]};
 
     VkSubmitInfo submit_info{};
     submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -221,6 +207,7 @@ void Application::draw_frame()
 
     // -----------------------------------------------------------------
     // 5. Present
+    //    Wait on: render_finished (same per-image semaphore we just signaled)
     // -----------------------------------------------------------------
     VkSwapchainKHR swapchains[] = {m_swapchain->get_handle()};
 
@@ -248,7 +235,7 @@ void Application::draw_frame()
     }
 
     // -----------------------------------------------------------------
-    // 6. Advance frame index
+    // 6. Advance frame-in-flight index
     // -----------------------------------------------------------------
     m_current_frame = (m_current_frame + 1) % kMaxFramesInFlight;
 }
@@ -281,10 +268,9 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
 
     vkCmdBeginRenderPass(cmd, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
 
-    // Bind the test star pipeline
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->get_pipeline());
 
-    // Set dynamic viewport
+    // Dynamic viewport
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
@@ -294,7 +280,7 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
     viewport.maxDepth = 1.0f;
     vkCmdSetViewport(cmd, 0, 1, &viewport);
 
-    // Set dynamic scissor
+    // Dynamic scissor
     VkRect2D scissor{};
     scissor.offset = {0, 0};
     scissor.extent = extent;
@@ -321,13 +307,38 @@ void Application::recreate_swapchain()
 
     if (w == 0 || h == 0)
     {
-        return; // Minimized — skip until restored
+        return;
     }
+
+    // Destroy old per-image semaphores before swapchain recreation changes image count
+    VkDevice device = m_context->get_device();
+    for (auto sem : m_render_finished_semaphores)
+    {
+        if (sem != VK_NULL_HANDLE)
+        {
+            vkDestroySemaphore(device, sem, nullptr);
+        }
+    }
+    m_render_finished_semaphores.clear();
 
     m_swapchain->recreate(w, h);
     m_pipeline->recreate_framebuffers(*m_swapchain);
 
-    PLX_CORE_INFO("Swapchain + framebuffers recreated: {}x{}", w, h);
+    // Recreate per-image semaphores for the new swapchain image count
+    uint32_t image_count = m_swapchain->get_image_count();
+    m_render_finished_semaphores.resize(image_count);
+
+    VkSemaphoreCreateInfo sem_info{};
+    sem_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+    for (uint32_t i = 0; i < image_count; ++i)
+    {
+        check_vk(
+            vkCreateSemaphore(device, &sem_info, nullptr, &m_render_finished_semaphores[i]),
+            "vkCreateSemaphore (render finished, recreate)");
+    }
+
+    PLX_CORE_INFO("Swapchain + framebuffers recreated: {}x{} ({} images)", w, h, image_count);
 }
 
 // =================================================================
@@ -371,29 +382,69 @@ void Application::create_command_buffers()
 
 void Application::create_sync_objects()
 {
+    VkDevice device = m_context->get_device();
+
     VkSemaphoreCreateInfo semaphore_info{};
     semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
     VkFenceCreateInfo fence_info{};
     fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    fence_info.flags = VK_FENCE_CREATE_SIGNALED_BIT; // Start signaled so first frame doesn't deadlock
+    fence_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-    VkDevice device = m_context->get_device();
-
+    // Per-frame-in-flight: image_available semaphores + fences
     for (uint32_t i = 0; i < kMaxFramesInFlight; ++i)
     {
         check_vk(
             vkCreateSemaphore(device, &semaphore_info, nullptr, &m_image_available_semaphores[i]),
             "vkCreateSemaphore (image available)");
         check_vk(
-            vkCreateSemaphore(device, &semaphore_info, nullptr, &m_render_finished_semaphores[i]),
-            "vkCreateSemaphore (render finished)");
-        check_vk(
             vkCreateFence(device, &fence_info, nullptr, &m_in_flight_fences[i]),
             "vkCreateFence (in flight)");
     }
 
-    PLX_CORE_INFO("Sync objects created: {} frames in flight", kMaxFramesInFlight);
+    // Per-swapchain-image: render_finished semaphores
+    uint32_t image_count = m_swapchain->get_image_count();
+    m_render_finished_semaphores.resize(image_count);
+
+    for (uint32_t i = 0; i < image_count; ++i)
+    {
+        check_vk(
+            vkCreateSemaphore(device, &semaphore_info, nullptr, &m_render_finished_semaphores[i]),
+            "vkCreateSemaphore (render finished)");
+    }
+
+    PLX_CORE_INFO("Sync objects created: {} frames in flight, {} image semaphores",
+                  kMaxFramesInFlight, image_count);
+}
+
+void Application::destroy_sync_objects()
+{
+    VkDevice device = m_context->get_device();
+
+    for (auto sem : m_render_finished_semaphores)
+    {
+        if (sem != VK_NULL_HANDLE)
+        {
+            vkDestroySemaphore(device, sem, nullptr);
+        }
+    }
+    m_render_finished_semaphores.clear();
+
+    for (uint32_t i = 0; i < kMaxFramesInFlight; ++i)
+    {
+        if (m_image_available_semaphores[i] != VK_NULL_HANDLE)
+        {
+            vkDestroySemaphore(device, m_image_available_semaphores[i], nullptr);
+            m_image_available_semaphores[i] = VK_NULL_HANDLE;
+        }
+        if (m_in_flight_fences[i] != VK_NULL_HANDLE)
+        {
+            vkDestroyFence(device, m_in_flight_fences[i], nullptr);
+            m_in_flight_fences[i] = VK_NULL_HANDLE;
+        }
+    }
+
+    PLX_CORE_TRACE("Sync objects destroyed");
 }
 
 } // namespace parallax::core

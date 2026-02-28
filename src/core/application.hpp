@@ -21,6 +21,8 @@ namespace parallax::core
     ///
     /// Lifecycle: init() in constructor → run() drives main_loop() → shutdown() in destructor.
     /// Frame rendering uses 2 frames in flight with per-frame fences and semaphores.
+    /// Render-finished semaphores are per-swapchain-image to avoid reuse conflicts
+    /// with the presentation engine.
     class Application
     {
     public:
@@ -49,6 +51,7 @@ namespace parallax::core
         void create_command_pool();
         void create_command_buffers();
         void create_sync_objects();
+        void destroy_sync_objects();
 
         void record_command_buffer(VkCommandBuffer cmd, uint32_t image_index);
 
@@ -69,11 +72,17 @@ namespace parallax::core
         std::vector<VkCommandBuffer> m_command_buffers;
 
         // -----------------------------------------------------------------
-        // Per-frame synchronization (2 frames in flight)
+        // Per-frame synchronization (indexed by frame-in-flight slot)
         // -----------------------------------------------------------------
         std::array<VkSemaphore, kMaxFramesInFlight> m_image_available_semaphores{};
-        std::array<VkSemaphore, kMaxFramesInFlight> m_render_finished_semaphores{};
         std::array<VkFence, kMaxFramesInFlight> m_in_flight_fences{};
+
+        // -----------------------------------------------------------------
+        // Per-swapchain-image synchronization
+        // Render-finished semaphores are indexed by swapchain image to avoid
+        // reuse while the presentation engine still holds the semaphore.
+        // -----------------------------------------------------------------
+        std::vector<VkSemaphore> m_render_finished_semaphores;
 
         uint32_t m_current_frame = 0;
         bool m_framebuffer_resized = false;

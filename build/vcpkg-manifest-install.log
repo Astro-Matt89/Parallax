@@ -1,13 +1,60 @@
 Detecting compiler hash for triplet x64-windows...
 Compiler found: C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/cl.exe
-The following packages are already installed:
+The following packages will be built and installed:
   * fmt:x64-windows@12.1.0
     glm:x64-windows@1.0.3
-    sdl2:x64-windows@2.32.10
-    spdlog[core,tz-offset,fmt]:x64-windows@1.17.0
+    sdl2[core,vulkan]:x64-windows@2.32.10
+    spdlog[core,fmt,tz-offset]:x64-windows@1.17.0
   * vcpkg-cmake:x64-windows@2024-04-23
   * vcpkg-cmake-config:x64-windows@2024-05-23
     vulkan-memory-allocator:x64-windows@3.3.0
+Additional packages (*) will be modified to complete this operation.
+Restored 6 package(s) from C:\Users\sputn\AppData\Local\vcpkg\archives in 3.3 s. Use --debug to see more details.
+Installing 1/7 vcpkg-cmake-config:x64-windows@2024-05-23...
+vcpkg-cmake-config:x64-windows@2024-05-23 package ABI: 8fe973245cfc9a55ba968a7ead6cb720b013d02a1c2715ab5e5e1fb6fb885663
+Elapsed time to handle vcpkg-cmake-config:x64-windows: 105 ms
+Installing 2/7 vcpkg-cmake:x64-windows@2024-04-23...
+vcpkg-cmake:x64-windows@2024-04-23 package ABI: 2ef88504cb709b78f1540685ef91c09832d8e37e29d703707667d8b4b73909cd
+Elapsed time to handle vcpkg-cmake:x64-windows: 103 ms
+Installing 3/7 glm:x64-windows@1.0.3...
+glm:x64-windows@1.0.3 package ABI: efb77410dc70b6493f8f9c77a516b6bf3f5f7b4dc6bb55f1a78f584611b14e29
+Elapsed time to handle glm:x64-windows: 734 ms
+Installing 4/7 sdl2[core,vulkan]:x64-windows@2.32.10...
+sdl2[core,vulkan]:x64-windows@2.32.10 package ABI: 1982e0e8ececacea6479b63de78edb517ad297f219f4491b7b7226333e897408
+Building sdl2[core,vulkan]:x64-windows@2.32.10...
+-- Using cached libsdl-org-SDL-release-2.32.10.tar.gz
+-- Cleaning sources at C:/dev/vcpkg/buildtrees/sdl2/src/se-2.32.10-3b143ac573.clean. Use --editable to skip cleaning for the packages you specify.
+-- Extracting source C:/dev/vcpkg/downloads/libsdl-org-SDL-release-2.32.10.tar.gz
+-- Applying patch deps.patch
+-- Applying patch alsa-dep-fix.patch
+-- Applying patch cxx-linkage-pkgconfig.diff
+-- Using source at C:/dev/vcpkg/buildtrees/sdl2/src/se-2.32.10-3b143ac573.clean
+-- Configuring x64-windows
+-- Building x64-windows-dbg
+-- Building x64-windows-rel
+-- Fixing pkgconfig file: C:/dev/vcpkg/packages/sdl2_x64-windows/lib/pkgconfig/sdl2.pc
+-- Using cached msys2-mingw-w64-x86_64-pkgconf-1~2.5.1-1-any.pkg.tar.zst
+-- Using cached msys2-msys2-runtime-3.6.5-1-x86_64.pkg.tar.zst
+-- Using msys root at C:/dev/vcpkg/downloads/tools/msys2/3e71d1f8e22ab23f
+-- Fixing pkgconfig file: C:/dev/vcpkg/packages/sdl2_x64-windows/debug/lib/pkgconfig/sdl2.pc
+-- Installing: C:/dev/vcpkg/packages/sdl2_x64-windows/share/sdl2/usage
+-- Installing: C:/dev/vcpkg/packages/sdl2_x64-windows/share/sdl2/copyright
+-- Performing post-build validation
+Starting submission of sdl2[core,vulkan]:x64-windows@2.32.10 to 1 binary cache(s) in the background
+Elapsed time to handle sdl2:x64-windows: 2.7 min
+Installing 5/7 fmt:x64-windows@12.1.0...
+fmt:x64-windows@12.1.0 package ABI: d64b17d08cc21ebb62efac8473584e3d61cdd22243b26a39eaa6d51876613a6b
+Elapsed time to handle fmt:x64-windows: 14.6 ms
+Installing 6/7 spdlog[core,fmt,tz-offset]:x64-windows@1.17.0...
+spdlog[core,fmt,tz-offset]:x64-windows@1.17.0 package ABI: 93f6a528bede9449bde55ab0b14d589b9bfb93ac9fc61da713c62799cb01d4dd
+Elapsed time to handle spdlog:x64-windows: 518 ms
+Installing 7/7 vulkan-memory-allocator:x64-windows@3.3.0...
+vulkan-memory-allocator:x64-windows@3.3.0 package ABI: b91d845ceb87e4feb259dd5302cde0bd3b7ccd15574b597bbba7d83edf397b4c
+Elapsed time to handle vulkan-memory-allocator:x64-windows: 8.62 ms
+Installed contents are licensed to you by owners. Microsoft is not responsible for, nor does it grant any licenses to, third-party packages.
+Packages installed in this vcpkg installation declare the following licenses:
+MIT
+Zlib
 The package glm provides CMake targets:
 
     find_package(glm CONFIG REQUIRED)
@@ -55,4 +102,6 @@ or
 
 See the documentation for more information on setting up your project: https://gpuopen-librariesandsdks.github.io/VulkanMemoryAllocator/html/index.html
 
-All requested installations completed successfully in: 684 us
+Waiting for 1 remaining binary cache submissions...
+Completed submission of sdl2[core,vulkan]:x64-windows@2.32.10 to 1 binary cache(s) in 2.5 s (1/1)
+All requested installations completed successfully in: 2.7 min

@@ -7,6 +7,9 @@
     <ClCompile Include="C:\Parallax-dev\Parallax\src\core\logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Parallax-dev\Parallax\src\core\window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Parallax-dev\Parallax\src\CMakeLists.txt" />

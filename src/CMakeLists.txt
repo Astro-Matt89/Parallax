@@ -5,6 +5,7 @@
 add_executable(parallax
     main.cpp
     core/logger.cpp
+    core/window.cpp
 )
 
 target_include_directories(parallax PRIVATE

@@ -26,8 +26,15 @@ Version: 2.32.10
 Depends: vcpkg-cmake, vcpkg-cmake-config
 Architecture: x64-windows
 Multi-Arch: same
-Abi: 3f13ddb52e34377da9063ae921145afd7d8ac6ec17019723775860a6318e141a
+Abi: 1982e0e8ececacea6479b63de78edb517ad297f219f4491b7b7226333e897408
 Description: Simple DirectMedia Layer is a cross-platform development library designed to provide low level access to audio, keyboard, mouse, joystick, and graphics hardware via OpenGL and Direct3D.
+Status: install ok installed
+
+Package: sdl2
+Feature: vulkan
+Architecture: x64-windows
+Multi-Arch: same
+Description: Vulkan functionality for SDL
 Status: install ok installed
 
 Package: fmt

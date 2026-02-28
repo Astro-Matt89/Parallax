@@ -2,7 +2,7 @@ alsa-dep-fix.patch 674cc8cc421d4b9b225d229d682c2981fd10c9bce78734e162339b1cae398
 cmake 4.3.0-rc1
 cxx-linkage-pkgconfig.diff af0f3c506d447f4ee39ca1bb73b398bf578f664e552273c1c54aa22aec6bed31
 deps.patch d429bf68ebd9ebe26a86b1e52406caae8866b7453b8682bacb7de91d22e56d32
-features core
+features core;vulkan
 portfile.cmake 956aa5abdde09c8cf6c5967343ef359abc0e80a415bb90905aa7debeb95a6a4b
 ports.cmake f4cc0e4d312b743fcb1e9b680c66d17bb556996dc267dc1301eac9037608a378
 post_build_checks 2

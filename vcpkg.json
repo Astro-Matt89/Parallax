@@ -3,7 +3,10 @@
     "version-string": "0.1.0",
     "description": "Ground-based astronomical observatory simulator",
     "dependencies": [
-        "sdl2",
+        {
+            "name": "sdl2",
+            "features": ["vulkan"]
+        },
         "glm",
         "spdlog",
         "vulkan-memory-allocator"

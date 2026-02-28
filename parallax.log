@@ -4,3 +4,13 @@
 [20:34:10.666] [PARALLAX] [warning] Core logger warn test
 [20:34:10.667] [APP] [info] App logger info test
 [20:34:10.669] [PARALLAX] [info] Parallax shutdown complete.
+[20:40:59.106] [PARALLAX] [info] Parallax v0.1.0 starting...
+[20:40:59.314] [PARALLAX] [critical] SDL_CreateWindow failed: Vulkan support is either not configured in SDL or not available in current SDL video driver (windows) or platform
+[21:14:12.766] [PARALLAX] [info] Parallax v0.1.0 starting...
+[21:14:12.989] [PARALLAX] [info] Window created: "Parallax" (1280x720) [Vulkan | resizable]
+[21:14:12.989] [PARALLAX] [trace] SDL2 requires 2 Vulkan instance extension(s):
+[21:14:12.990] [PARALLAX] [trace]   - VK_KHR_surface
+[21:14:12.991] [PARALLAX] [trace]   - VK_KHR_win32_surface
+[21:14:12.991] [PARALLAX] [info] Vulkan extensions required: 2
+[22:24:25.844] [PARALLAX] [info] Window destroyed
+[22:24:25.872] [PARALLAX] [info] Parallax shutdown complete.

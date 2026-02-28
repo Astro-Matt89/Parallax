@@ -91,7 +91,7 @@ events:
       The output was:
       0
       MSBuild version 18.3.0-release-26070-10+3972042b7 for .NET Framework
-      Build started 2/27/2026 7:59:39 PM.
+      Build started 2/27/2026 9:13:36 PM.
       
       Project "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\4.3.0-rc1\\CompilerIdCXX\\CompilerIdCXX.vcxproj" on node 1 (default targets).
       PrepareForBuild:
@@ -131,7 +131,7 @@ events:
           0 Warning(s)
           0 Error(s)
       
-      Time Elapsed 00:00:26.77
+      Time Elapsed 00:00:04.07
       
       
       Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.exe"
@@ -3046,8 +3046,8 @@ events:
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-eouyzd"
-      binary: "C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-eouyzd"
+      source: "C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-cik87p"
+      binary: "C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-cik87p"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/Ob0 /Od /RTC1"
@@ -3062,39 +3062,39 @@ events:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-eouyzd'
+        Change Dir: 'C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-cik87p'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_74846.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_00a04.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
         MSBuild version 18.3.0-release-26070-10+3972042b7 for .NET Framework
-        Build started 2/27/2026 8:04:20 PM.
+        Build started 2/27/2026 9:13:41 PM.
         
-        Project "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-eouyzd\\cmTC_74846.vcxproj" on node 1 (default targets).
+        Project "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-cik87p\\cmTC_00a04.vcxproj" on node 1 (default targets).
         PrepareForBuild:
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-eouyzd\\Debug\\".
-          Creating directory "cmTC_74846.dir\\Debug\\cmTC_74846.tlog\\".
+          Creating directory "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-cik87p\\Debug\\".
+          Creating directory "cmTC_00a04.dir\\Debug\\cmTC_00a04.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_74846.dir\\Debug\\cmTC_74846.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_74846.dir\\Debug\\cmTC_74846.tlog\\unsuccessfulbuild".
+          Creating "cmTC_00a04.dir\\Debug\\cmTC_00a04.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_00a04.dir\\Debug\\cmTC_00a04.tlog\\unsuccessfulbuild".
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /Fo"cmTC_74846.dir\\Debug\\\\" /Fd"cmTC_74846.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.3\\Modules\\CMakeCXXCompilerABI.cpp"
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /Fo"cmTC_00a04.dir\\Debug\\\\" /Fd"cmTC_00a04.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.3\\Modules\\CMakeCXXCompilerABI.cpp"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.50.35725 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /Fo"cmTC_74846.dir\\Debug\\\\" /Fd"cmTC_74846.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.3\\Modules\\CMakeCXXCompilerABI.cpp"
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /Fo"cmTC_00a04.dir\\Debug\\\\" /Fd"cmTC_00a04.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.3\\Modules\\CMakeCXXCompilerABI.cpp"
           CMakeCXXCompilerABI.cpp
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-eouyzd\\Debug\\cmTC_74846.exe" /INCREMENTAL /ILK:"cmTC_74846.dir\\Debug\\cmTC_74846.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-eouyzd/Debug/cmTC_74846.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-eouyzd/Debug/cmTC_74846.lib" /MACHINE:X64  /machine:x64 cmTC_74846.dir\\Debug\\CMakeCXXCompilerABI.obj
-          cmTC_74846.vcxproj -> C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-eouyzd\\Debug\\cmTC_74846.exe
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-cik87p\\Debug\\cmTC_00a04.exe" /INCREMENTAL /ILK:"cmTC_00a04.dir\\Debug\\cmTC_00a04.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-cik87p/Debug/cmTC_00a04.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-cik87p/Debug/cmTC_00a04.lib" /MACHINE:X64  /machine:x64 cmTC_00a04.dir\\Debug\\CMakeCXXCompilerABI.obj
+          cmTC_00a04.vcxproj -> C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-cik87p\\Debug\\cmTC_00a04.exe
         FinalizeBuildStatus:
-          Deleting file "cmTC_74846.dir\\Debug\\cmTC_74846.tlog\\unsuccessfulbuild".
-          Touching "cmTC_74846.dir\\Debug\\cmTC_74846.tlog\\cmTC_74846.lastbuildstate".
-        Done Building Project "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-eouyzd\\cmTC_74846.vcxproj" (default targets).
+          Deleting file "cmTC_00a04.dir\\Debug\\cmTC_00a04.tlog\\unsuccessfulbuild".
+          Touching "cmTC_00a04.dir\\Debug\\cmTC_00a04.tlog\\cmTC_00a04.lastbuildstate".
+        Done Building Project "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-cik87p\\cmTC_00a04.vcxproj" (default targets).
         
         Build succeeded.
             0 Warning(s)
             0 Error(s)
         
-        Time Elapsed 00:00:02.17
+        Time Elapsed 00:00:02.09
         
       exitCode: 0
   -
@@ -5284,8 +5284,8 @@ events:
     checks:
       - "Performing Test CMAKE_HAVE_LIBC_PTHREAD"
     directories:
-      source: "C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-zij2hp"
-      binary: "C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-zij2hp"
+      source: "C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-lih3tz"
+      binary: "C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-lih3tz"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/Ob0 /Od /RTC1"
@@ -5299,68 +5299,68 @@ events:
       variable: "CMAKE_HAVE_LIBC_PTHREAD"
       cached: true
       stdout: |
-        Change Dir: 'C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-zij2hp'
+        Change Dir: 'C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-lih3tz'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_6759c.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_063f2.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
         MSBuild version 18.3.0-release-26070-10+3972042b7 for .NET Framework
-        Build started 2/27/2026 8:04:24 PM.
+        Build started 2/27/2026 9:13:45 PM.
         
-        Project "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\cmTC_6759c.vcxproj" on node 1 (default targets).
+        Project "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\cmTC_063f2.vcxproj" on node 1 (default targets).
         PrepareForBuild:
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\Debug\\".
-          Creating directory "cmTC_6759c.dir\\Debug\\cmTC_6759c.tlog\\".
+          Creating directory "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\Debug\\".
+          Creating directory "cmTC_063f2.dir\\Debug\\cmTC_063f2.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_6759c.dir\\Debug\\cmTC_6759c.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_6759c.dir\\Debug\\cmTC_6759c.tlog\\unsuccessfulbuild".
+          Creating "cmTC_063f2.dir\\Debug\\cmTC_063f2.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_063f2.dir\\Debug\\cmTC_063f2.tlog\\unsuccessfulbuild".
         ComputeStdModulesCompileInputs:
           Reading library manifest file 'C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\modules\\modules.json' which provides data for library 'microsoft/STL'.
           Adding module source 'C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\modules\\std.ixx' from library 'microsoft/STL' to be built with this project.
           Adding module source 'C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\modules\\std.compat.ixx' from library 'microsoft/STL' to be built with this project.
         MakeDirsForCl:
-          Creating directory "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\cmTC_6759c.dir\\Debug\\microsoft\\STL".
+          Creating directory "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\cmTC_063f2.dir\\Debug\\microsoft\\STL".
         SetModuleDependencies:
-          Creating directory "cmTC_6759c.dir\\Debug\\cmTC_6759c_MD.tlog\\".
+          Creating directory "cmTC_063f2.dir\\Debug\\cmTC_063f2_MD.tlog\\".
           Scanning sources for module dependencies...
-          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_6759c.dir\\Debug\\\\" /scanDependencies "cmTC_6759c.dir\\Debug\\\\" /Fo"cmTC_6759c.dir\\Debug\\\\" /Fd"cmTC_6759c.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\src.cxx"
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_063f2.dir\\Debug\\\\" /scanDependencies "cmTC_063f2.dir\\Debug\\\\" /Fo"cmTC_063f2.dir\\Debug\\\\" /Fd"cmTC_063f2.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\src.cxx"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.50.35725 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_6759c.dir\\Debug\\\\" /scanDependencies "cmTC_6759c.dir\\Debug\\\\" /Fo"cmTC_6759c.dir\\Debug\\\\" /Fd"cmTC_6759c.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\src.cxx"
+          cl /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_063f2.dir\\Debug\\\\" /scanDependencies "cmTC_063f2.dir\\Debug\\\\" /Fo"cmTC_063f2.dir\\Debug\\\\" /Fd"cmTC_063f2.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\src.cxx"
           src.cxx
-        C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\src.cxx(1,10): fatal  error C1083: Cannot open include file: 'pthread.h': No such file or directory [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\cmTC_6759c.vcxproj]
-        C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\src.cxx(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\cmTC_6759c.vcxproj]
-        C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Microsoft\\VC\\v180\\Microsoft.CppCommon.targets(533,5): warning MSB8074: Cannot read Module Dependencies file cmTC_6759c.dir\\Debug\\src.cxx.module.json: Expecting element 'root' from namespace ''.. Encountered 'None'  with name '', namespace ''.  The build order might be incorrect. [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\cmTC_6759c.vcxproj]
+        C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\src.cxx(1,10): fatal  error C1083: Cannot open include file: 'pthread.h': No such file or directory [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\cmTC_063f2.vcxproj]
+        C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\src.cxx(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\cmTC_063f2.vcxproj]
+        C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Microsoft\\VC\\v180\\Microsoft.CppCommon.targets(533,5): warning MSB8074: Cannot read Module Dependencies file cmTC_063f2.dir\\Debug\\src.cxx.module.json: Expecting element 'root' from namespace ''.. Encountered 'None'  with name '', namespace ''.  The build order might be incorrect. [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\cmTC_063f2.vcxproj]
         ClCompile:
           Compiling...
-          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_6759c.dir\\Debug\\\\" /Fo"cmTC_6759c.dir\\Debug\\\\" /Fd"cmTC_6759c.dir\\Debug\\vc145.pdb" /sourceDependencies "cmTC_6759c.dir\\Debug\\.d.json" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\src.cxx"
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_063f2.dir\\Debug\\\\" /Fo"cmTC_063f2.dir\\Debug\\\\" /Fd"cmTC_063f2.dir\\Debug\\vc145.pdb" /sourceDependencies "cmTC_063f2.dir\\Debug\\.d.json" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\src.cxx"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.50.35725 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_6759c.dir\\Debug\\\\" /Fo"cmTC_6759c.dir\\Debug\\\\" /Fd"cmTC_6759c.dir\\Debug\\vc145.pdb" /sourceDependencies "cmTC_6759c.dir\\Debug\\.d.json" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\src.cxx"
+          cl /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_063f2.dir\\Debug\\\\" /Fo"cmTC_063f2.dir\\Debug\\\\" /Fd"cmTC_063f2.dir\\Debug\\vc145.pdb" /sourceDependencies "cmTC_063f2.dir\\Debug\\.d.json" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\src.cxx"
           src.cxx
-        C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\src.cxx(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\cmTC_6759c.vcxproj]
-        Done Building Project "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\cmTC_6759c.vcxproj" (default targets) -- FAILED.
+        C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\src.cxx(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\cmTC_063f2.vcxproj]
+        Done Building Project "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\cmTC_063f2.vcxproj" (default targets) -- FAILED.
         
         Build FAILED.
         
-        "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\cmTC_6759c.vcxproj" (default target) (1) ->
+        "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\cmTC_063f2.vcxproj" (default target) (1) ->
         (SetModuleDependencies target) -> 
-          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Microsoft\\VC\\v180\\Microsoft.CppCommon.targets(533,5): warning MSB8074: Cannot read Module Dependencies file cmTC_6759c.dir\\Debug\\src.cxx.module.json: Expecting element 'root' from namespace ''.. Encountered 'None'  with name '', namespace ''.  The build order might be incorrect. [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\cmTC_6759c.vcxproj]
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Microsoft\\VC\\v180\\Microsoft.CppCommon.targets(533,5): warning MSB8074: Cannot read Module Dependencies file cmTC_063f2.dir\\Debug\\src.cxx.module.json: Expecting element 'root' from namespace ''.. Encountered 'None'  with name '', namespace ''.  The build order might be incorrect. [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\cmTC_063f2.vcxproj]
         
         
-        "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\cmTC_6759c.vcxproj" (default target) (1) ->
+        "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\cmTC_063f2.vcxproj" (default target) (1) ->
         (SetModuleDependencies target) -> 
-          C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\src.cxx(1,10): fatal  error C1083: Cannot open include file: 'pthread.h': No such file or directory [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\cmTC_6759c.vcxproj]
-          C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\src.cxx(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\cmTC_6759c.vcxproj]
+          C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\src.cxx(1,10): fatal  error C1083: Cannot open include file: 'pthread.h': No such file or directory [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\cmTC_063f2.vcxproj]
+          C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\src.cxx(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\cmTC_063f2.vcxproj]
         
         
-        "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\cmTC_6759c.vcxproj" (default target) (1) ->
+        "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\cmTC_063f2.vcxproj" (default target) (1) ->
         (ClCompile target) -> 
-          C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\src.cxx(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-zij2hp\\cmTC_6759c.vcxproj]
+          C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\src.cxx(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-lih3tz\\cmTC_063f2.vcxproj]
         
             1 Warning(s)
             3 Error(s)
         
-        Time Elapsed 00:00:09.51
+        Time Elapsed 00:00:03.65
         
       exitCode: 1
   -
@@ -5376,8 +5376,8 @@ events:
     checks:
       - "Looking for pthread_create in pthreads"
     directories:
-      source: "C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-b7nhcn"
-      binary: "C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-b7nhcn"
+      source: "C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-jvveh9"
+      binary: "C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-jvveh9"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/Ob0 /Od /RTC1"
@@ -5391,56 +5391,56 @@ events:
       variable: "CMAKE_HAVE_PTHREADS_CREATE"
       cached: true
       stdout: |
-        Change Dir: 'C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-b7nhcn'
+        Change Dir: 'C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-jvveh9'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_c357f.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_55211.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
         MSBuild version 18.3.0-release-26070-10+3972042b7 for .NET Framework
-        Build started 2/27/2026 8:04:34 PM.
+        Build started 2/27/2026 9:13:49 PM.
         
-        Project "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-b7nhcn\\cmTC_c357f.vcxproj" on node 1 (default targets).
+        Project "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jvveh9\\cmTC_55211.vcxproj" on node 1 (default targets).
         PrepareForBuild:
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-b7nhcn\\Debug\\".
-          Creating directory "cmTC_c357f.dir\\Debug\\cmTC_c357f.tlog\\".
+          Creating directory "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jvveh9\\Debug\\".
+          Creating directory "cmTC_55211.dir\\Debug\\cmTC_55211.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_c357f.dir\\Debug\\cmTC_c357f.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_c357f.dir\\Debug\\cmTC_c357f.tlog\\unsuccessfulbuild".
+          Creating "cmTC_55211.dir\\Debug\\cmTC_55211.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_55211.dir\\Debug\\cmTC_55211.tlog\\unsuccessfulbuild".
         ComputeStdModulesCompileInputs:
           Reading library manifest file 'C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\modules\\modules.json' which provides data for library 'microsoft/STL'.
           Adding module source 'C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\modules\\std.ixx' from library 'microsoft/STL' to be built with this project.
           Adding module source 'C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\modules\\std.compat.ixx' from library 'microsoft/STL' to be built with this project.
         MakeDirsForCl:
-          Creating directory "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-b7nhcn\\cmTC_c357f.dir\\Debug\\microsoft\\STL".
+          Creating directory "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jvveh9\\cmTC_55211.dir\\Debug\\microsoft\\STL".
         SetModuleDependencies:
-          Creating directory "cmTC_c357f.dir\\Debug\\cmTC_c357f_MD.tlog\\".
+          Creating directory "cmTC_55211.dir\\Debug\\cmTC_55211_MD.tlog\\".
           Scanning sources for module dependencies...
-          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_c357f.dir\\Debug\\\\" /scanDependencies "cmTC_c357f.dir\\Debug\\\\" /Fo"cmTC_c357f.dir\\Debug\\\\" /Fd"cmTC_c357f.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-b7nhcn\\CheckFunctionExists.cxx"
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_55211.dir\\Debug\\\\" /scanDependencies "cmTC_55211.dir\\Debug\\\\" /Fo"cmTC_55211.dir\\Debug\\\\" /Fd"cmTC_55211.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jvveh9\\CheckFunctionExists.cxx"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.50.35725 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_c357f.dir\\Debug\\\\" /scanDependencies "cmTC_c357f.dir\\Debug\\\\" /Fo"cmTC_c357f.dir\\Debug\\\\" /Fd"cmTC_c357f.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-b7nhcn\\CheckFunctionExists.cxx"
+          cl /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_55211.dir\\Debug\\\\" /scanDependencies "cmTC_55211.dir\\Debug\\\\" /Fo"cmTC_55211.dir\\Debug\\\\" /Fd"cmTC_55211.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jvveh9\\CheckFunctionExists.cxx"
           CheckFunctionExists.cxx
         ClCompile:
           Compiling...
-          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_c357f.dir\\Debug\\\\" /Fo"cmTC_c357f.dir\\Debug\\\\" /Fd"cmTC_c357f.dir\\Debug\\vc145.pdb" /sourceDependencies "cmTC_c357f.dir\\Debug\\.d.json" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-b7nhcn\\CheckFunctionExists.cxx"
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_55211.dir\\Debug\\\\" /Fo"cmTC_55211.dir\\Debug\\\\" /Fd"cmTC_55211.dir\\Debug\\vc145.pdb" /sourceDependencies "cmTC_55211.dir\\Debug\\.d.json" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jvveh9\\CheckFunctionExists.cxx"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.50.35725 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_c357f.dir\\Debug\\\\" /Fo"cmTC_c357f.dir\\Debug\\\\" /Fd"cmTC_c357f.dir\\Debug\\vc145.pdb" /sourceDependencies "cmTC_c357f.dir\\Debug\\.d.json" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-b7nhcn\\CheckFunctionExists.cxx"
+          cl /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_55211.dir\\Debug\\\\" /Fo"cmTC_55211.dir\\Debug\\\\" /Fd"cmTC_55211.dir\\Debug\\vc145.pdb" /sourceDependencies "cmTC_55211.dir\\Debug\\.d.json" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jvveh9\\CheckFunctionExists.cxx"
           CheckFunctionExists.cxx
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-b7nhcn\\Debug\\cmTC_c357f.exe" /INCREMENTAL /ILK:"cmTC_c357f.dir\\Debug\\cmTC_c357f.ilk" /NOLOGO pthreads.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-b7nhcn/Debug/cmTC_c357f.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-b7nhcn/Debug/cmTC_c357f.lib" /MACHINE:X64  /machine:x64 cmTC_c357f.dir\\Debug\\CheckFunctionExists.obj
-        LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-b7nhcn\\cmTC_c357f.vcxproj]
-        Done Building Project "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-b7nhcn\\cmTC_c357f.vcxproj" (default targets) -- FAILED.
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jvveh9\\Debug\\cmTC_55211.exe" /INCREMENTAL /ILK:"cmTC_55211.dir\\Debug\\cmTC_55211.ilk" /NOLOGO pthreads.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-jvveh9/Debug/cmTC_55211.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-jvveh9/Debug/cmTC_55211.lib" /MACHINE:X64  /machine:x64 cmTC_55211.dir\\Debug\\CheckFunctionExists.obj
+        LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jvveh9\\cmTC_55211.vcxproj]
+        Done Building Project "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jvveh9\\cmTC_55211.vcxproj" (default targets) -- FAILED.
         
         Build FAILED.
         
-        "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-b7nhcn\\cmTC_c357f.vcxproj" (default target) (1) ->
+        "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jvveh9\\cmTC_55211.vcxproj" (default target) (1) ->
         (Link target) -> 
-          LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-b7nhcn\\cmTC_c357f.vcxproj]
+          LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jvveh9\\cmTC_55211.vcxproj]
         
             0 Warning(s)
             1 Error(s)
         
-        Time Elapsed 00:00:03.62
+        Time Elapsed 00:00:02.31
         
       exitCode: 1
   -
@@ -5456,8 +5456,8 @@ events:
     checks:
       - "Looking for pthread_create in pthread"
     directories:
-      source: "C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-hy6zgq"
-      binary: "C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-hy6zgq"
+      source: "C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-wbfqzi"
+      binary: "C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-wbfqzi"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/Ob0 /Od /RTC1"
@@ -5471,56 +5471,56 @@ events:
       variable: "CMAKE_HAVE_PTHREAD_CREATE"
       cached: true
       stdout: |
-        Change Dir: 'C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-hy6zgq'
+        Change Dir: 'C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-wbfqzi'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_d5552.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_b7938.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
         MSBuild version 18.3.0-release-26070-10+3972042b7 for .NET Framework
-        Build started 2/27/2026 8:04:39 PM.
+        Build started 2/27/2026 9:13:52 PM.
         
-        Project "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-hy6zgq\\cmTC_d5552.vcxproj" on node 1 (default targets).
+        Project "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-wbfqzi\\cmTC_b7938.vcxproj" on node 1 (default targets).
         PrepareForBuild:
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-hy6zgq\\Debug\\".
-          Creating directory "cmTC_d5552.dir\\Debug\\cmTC_d5552.tlog\\".
+          Creating directory "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-wbfqzi\\Debug\\".
+          Creating directory "cmTC_b7938.dir\\Debug\\cmTC_b7938.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_d5552.dir\\Debug\\cmTC_d5552.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_d5552.dir\\Debug\\cmTC_d5552.tlog\\unsuccessfulbuild".
+          Creating "cmTC_b7938.dir\\Debug\\cmTC_b7938.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_b7938.dir\\Debug\\cmTC_b7938.tlog\\unsuccessfulbuild".
         ComputeStdModulesCompileInputs:
           Reading library manifest file 'C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\modules\\modules.json' which provides data for library 'microsoft/STL'.
           Adding module source 'C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\modules\\std.ixx' from library 'microsoft/STL' to be built with this project.
           Adding module source 'C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\modules\\std.compat.ixx' from library 'microsoft/STL' to be built with this project.
         MakeDirsForCl:
-          Creating directory "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-hy6zgq\\cmTC_d5552.dir\\Debug\\microsoft\\STL".
+          Creating directory "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-wbfqzi\\cmTC_b7938.dir\\Debug\\microsoft\\STL".
         SetModuleDependencies:
-          Creating directory "cmTC_d5552.dir\\Debug\\cmTC_d5552_MD.tlog\\".
+          Creating directory "cmTC_b7938.dir\\Debug\\cmTC_b7938_MD.tlog\\".
           Scanning sources for module dependencies...
-          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_d5552.dir\\Debug\\\\" /scanDependencies "cmTC_d5552.dir\\Debug\\\\" /Fo"cmTC_d5552.dir\\Debug\\\\" /Fd"cmTC_d5552.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-hy6zgq\\CheckFunctionExists.cxx"
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_b7938.dir\\Debug\\\\" /scanDependencies "cmTC_b7938.dir\\Debug\\\\" /Fo"cmTC_b7938.dir\\Debug\\\\" /Fd"cmTC_b7938.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-wbfqzi\\CheckFunctionExists.cxx"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.50.35725 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_d5552.dir\\Debug\\\\" /scanDependencies "cmTC_d5552.dir\\Debug\\\\" /Fo"cmTC_d5552.dir\\Debug\\\\" /Fd"cmTC_d5552.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-hy6zgq\\CheckFunctionExists.cxx"
+          cl /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_b7938.dir\\Debug\\\\" /scanDependencies "cmTC_b7938.dir\\Debug\\\\" /Fo"cmTC_b7938.dir\\Debug\\\\" /Fd"cmTC_b7938.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-wbfqzi\\CheckFunctionExists.cxx"
           CheckFunctionExists.cxx
         ClCompile:
           Compiling...
-          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_d5552.dir\\Debug\\\\" /Fo"cmTC_d5552.dir\\Debug\\\\" /Fd"cmTC_d5552.dir\\Debug\\vc145.pdb" /sourceDependencies "cmTC_d5552.dir\\Debug\\.d.json" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-hy6zgq\\CheckFunctionExists.cxx"
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_b7938.dir\\Debug\\\\" /Fo"cmTC_b7938.dir\\Debug\\\\" /Fd"cmTC_b7938.dir\\Debug\\vc145.pdb" /sourceDependencies "cmTC_b7938.dir\\Debug\\.d.json" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-wbfqzi\\CheckFunctionExists.cxx"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.50.35725 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_d5552.dir\\Debug\\\\" /Fo"cmTC_d5552.dir\\Debug\\\\" /Fd"cmTC_d5552.dir\\Debug\\vc145.pdb" /sourceDependencies "cmTC_d5552.dir\\Debug\\.d.json" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-hy6zgq\\CheckFunctionExists.cxx"
+          cl /c /Zi /W1 /WX- /diagnostics:column /FS /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /std:c++20 /ifcOutput "cmTC_b7938.dir\\Debug\\\\" /Fo"cmTC_b7938.dir\\Debug\\\\" /Fd"cmTC_b7938.dir\\Debug\\vc145.pdb" /sourceDependencies "cmTC_b7938.dir\\Debug\\.d.json" /external:W1 /TP /errorReport:queue "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-wbfqzi\\CheckFunctionExists.cxx"
           CheckFunctionExists.cxx
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-hy6zgq\\Debug\\cmTC_d5552.exe" /INCREMENTAL /ILK:"cmTC_d5552.dir\\Debug\\cmTC_d5552.ilk" /NOLOGO pthread.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-hy6zgq/Debug/cmTC_d5552.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-hy6zgq/Debug/cmTC_d5552.lib" /MACHINE:X64  /machine:x64 cmTC_d5552.dir\\Debug\\CheckFunctionExists.obj
-        LINK : fatal error LNK1104: cannot open file 'pthread.lib' [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-hy6zgq\\cmTC_d5552.vcxproj]
-        Done Building Project "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-hy6zgq\\cmTC_d5552.vcxproj" (default targets) -- FAILED.
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-wbfqzi\\Debug\\cmTC_b7938.exe" /INCREMENTAL /ILK:"cmTC_b7938.dir\\Debug\\cmTC_b7938.ilk" /NOLOGO pthread.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-wbfqzi/Debug/cmTC_b7938.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Parallax-dev/Parallax/build/CMakeFiles/CMakeScratch/TryCompile-wbfqzi/Debug/cmTC_b7938.lib" /MACHINE:X64  /machine:x64 cmTC_b7938.dir\\Debug\\CheckFunctionExists.obj
+        LINK : fatal error LNK1104: cannot open file 'pthread.lib' [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-wbfqzi\\cmTC_b7938.vcxproj]
+        Done Building Project "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-wbfqzi\\cmTC_b7938.vcxproj" (default targets) -- FAILED.
         
         Build FAILED.
         
-        "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-hy6zgq\\cmTC_d5552.vcxproj" (default target) (1) ->
+        "C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-wbfqzi\\cmTC_b7938.vcxproj" (default target) (1) ->
         (Link target) -> 
-          LINK : fatal error LNK1104: cannot open file 'pthread.lib' [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-hy6zgq\\cmTC_d5552.vcxproj]
+          LINK : fatal error LNK1104: cannot open file 'pthread.lib' [C:\\Parallax-dev\\Parallax\\build\\CMakeFiles\\CMakeScratch\\TryCompile-wbfqzi\\cmTC_b7938.vcxproj]
         
             0 Warning(s)
             1 Error(s)
         
-        Time Elapsed 00:00:06.42
+        Time Elapsed 00:00:01.83
         
       exitCode: 1
   -
@@ -6562,16 +6562,12 @@ events:
         - "C:/Program Files/CMake"
         - "C:/Program Files (x86)/parallax"
       CMAKE_FIND_ROOT_PATH: "C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows/debug;C:/Parallax-dev/Parallax/build/vcpkg_installed/x64-windows"
-...
-
----
-events:
   -
     kind: "find-v1"
     backtrace:
       - "C:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake:188 (find_program)"
       - "C:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake:621 (z_vcpkg_set_powershell_path)"
-      - "src/CMakeLists.txt:7 (add_executable)"
+      - "src/CMakeLists.txt:5 (add_executable)"
     mode: "program"
     variable: "Z_VCPKG_PWSH_PATH"
     description: "Path to a program."
@@ -7291,7 +7287,7 @@ events:
     backtrace:
       - "C:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake:193 (find_program)"
       - "C:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake:621 (z_vcpkg_set_powershell_path)"
-      - "src/CMakeLists.txt:7 (add_executable)"
+      - "src/CMakeLists.txt:5 (add_executable)"
     mode: "program"
     variable: "Z_VCPKG_BUILTIN_POWERSHELL_PATH"
     description: "Path to a program."

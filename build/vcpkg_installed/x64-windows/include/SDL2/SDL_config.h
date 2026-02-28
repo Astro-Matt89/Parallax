@@ -482,7 +482,7 @@
 /* #undef SDL_VIDEO_OPENGL_OSMESA_DYNAMIC */
 
 /* Enable Vulkan support */
-/* #undef SDL_VIDEO_VULKAN */
+#define SDL_VIDEO_VULKAN 1
 
 /* Enable Metal support */
 /* #undef SDL_VIDEO_METAL */

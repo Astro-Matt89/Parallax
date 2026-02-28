@@ -20,45 +20,76 @@ layout(location = 0) out float v_brightness;
 layout(location = 1) out vec3 v_color;
 
 // -----------------------------------------------------------------
-// B-V color index → approximate RGB via blackbody temperature
+// B-V color index → RGB color
 //
-// Step 1: B-V → effective temperature (Ballesteros 2012 approximation)
-// Step 2: Temperature → RGB (simplified Planckian locus)
+// Uses a piecewise polynomial fit to the Planckian locus.
+// Input: B-V in [-0.4, 2.0]
+// Output: RGB color in [0, 1]^3
+//
+// Reference: Mitchell Charity's "What color are the stars?"
+// http://www.vendian.org/mncharity/dir3/starcolor/
 // -----------------------------------------------------------------
 vec3 bv_to_rgb(float bv)
 {
-    // Clamp B-V to valid range
     bv = clamp(bv, -0.4, 2.0);
 
-    // B-V → effective temperature (Kelvin)
-    float t = 4600.0 / (1.7 * bv + 1.8) + 4600.0 / (0.92 * bv + 1.7);
-    t = clamp(t, 1000.0, 40000.0);
-
-    // Temperature → RGB (simplified blackbody approximation)
-    float x = t / 1000.0;
     float r, g, b;
 
-    if (t < 6600.0)
+    // Red channel
+    if (bv < 0.0)
+    {
+        // Hot blue-white stars: slight reduction from pure white
+        r = 0.83 + 0.17 * (bv + 0.4) / 0.4;
+    }
+    else if (bv < 0.4)
     {
         r = 1.0;
-        g = clamp(0.39 * log(x) - 0.634, 0.0, 1.0);
-        if (x > 1.0)
-        {
-            b = clamp(0.543 * log(x - 1.0) - 1.185, 0.0, 1.0);
-        }
-        else
-        {
-            b = 0.0;
-        }
     }
     else
     {
-        r = clamp(1.269 * pow(x - 6.0, -0.1332), 0.0, 1.0);
-        g = clamp(1.144 * pow(x - 6.0, -0.0755), 0.0, 1.0);
-        b = 1.0;
+        r = 1.0;
     }
 
-    return vec3(r, g, b);
+    // Green channel
+    if (bv < 0.0)
+    {
+        g = 0.87 + 0.13 * (bv + 0.4) / 0.4;
+    }
+    else if (bv < 0.4)
+    {
+        g = 1.0 - 0.2 * bv / 0.4;
+    }
+    else if (bv < 1.5)
+    {
+        g = 0.8 - 0.55 * (bv - 0.4) / 1.1;
+    }
+    else
+    {
+        g = 0.25 - 0.15 * (bv - 1.5) / 0.5;
+        g = max(g, 0.1);
+    }
+
+    // Blue channel
+    if (bv < -0.2)
+    {
+        b = 1.0;
+    }
+    else if (bv < 0.4)
+    {
+        b = 1.0 - 0.6 * (bv + 0.2) / 0.6;
+    }
+    else if (bv < 1.0)
+    {
+        b = 0.4 - 0.35 * (bv - 0.4) / 0.6;
+    }
+    else
+    {
+        b = 0.05;
+    }
+
+    return vec3(clamp(r, 0.0, 1.0),
+                clamp(g, 0.0, 1.0),
+                clamp(b, 0.0, 1.0));
 }
 
 void main()
@@ -72,8 +103,9 @@ void main()
     float brightness = star.z * brightness_scale;
 
     // Point size: sqrt scaling gives perceptually correct brightness-to-area
+    // Brighter stars get bigger points
     float size = max(1.0, point_size_scale * sqrt(brightness));
-    gl_PointSize = min(size, 8.0);
+    gl_PointSize = min(size, 10.0);
 
     // Output to fragment shader
     v_brightness = clamp(brightness, 0.0, 1.0);

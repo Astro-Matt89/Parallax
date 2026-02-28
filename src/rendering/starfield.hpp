@@ -122,7 +122,7 @@ namespace parallax::rendering
 
         // Frame state
         u32 m_visible_count = 0;
-        StarfieldPushConstants m_push_constants = {4.0f, 1.0f};
+        StarfieldPushConstants m_push_constants = {6.0f, 1.5f};
 
         // Magnitude zero-point (Vega system: Vega ≈ mag 0)
         static constexpr f64 kMagZero = 0.0;

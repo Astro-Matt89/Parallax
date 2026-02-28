@@ -143,7 +143,19 @@ void Starfield::update(std::span<const catalog::StarEntry> stars,
 
         // Magnitude → brightness (Pogson formula)
         // brightness = 10^(-0.4 * (mag - mag_zero))
-        const f64 brightness = std::pow(10.0, -0.4 * (static_cast<f64>(star.mag_v) - kMagZero));
+        //
+        // Normalize so mag=0 → brightness=1.0 (Vega system).
+        // Brighter stars (negative mag) get values > 1.0,
+        // fainter stars get values < 1.0.
+        // We normalize in the shader via the brightness_scale push constant.
+        const f64 raw_brightness = std::pow(10.0, -0.4 * (static_cast<f64>(star.mag_v) - kMagZero));
+
+        // Normalize to [0, 1] range using a reference:
+        // Sirius at mag -1.46 gives ~3.84, we want that to map to ~1.0
+        // Use a simple normalization: brightness / max_expected_brightness
+        // max_expected is for mag = -1.5 → pow(10, 0.6) ≈ 3.98
+        constexpr f64 kMaxBrightness = 3.98;
+        const f64 brightness = std::min(raw_brightness / kMaxBrightness, 1.0);
 
         vertices.push_back(StarVertex{
             .screen_x   = screen_pos->x,

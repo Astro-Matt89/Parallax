@@ -1,6 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <CustomBuild Include="C:\Parallax-dev\Parallax\build\CMakeFiles\3d8c1758119fe9be1bc83335e3a11d21\starfield.frag.spv.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Parallax-dev\Parallax\build\CMakeFiles\3d8c1758119fe9be1bc83335e3a11d21\starfield.vert.spv.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
     <CustomBuild Include="C:\Parallax-dev\Parallax\build\CMakeFiles\3d8c1758119fe9be1bc83335e3a11d21\test_star.frag.spv.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>

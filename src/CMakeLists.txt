@@ -14,6 +14,7 @@ add_executable(parallax
     astro/coordinates.cpp
     catalog/catalog_loader.cpp
     rendering/camera.cpp
+    rendering/starfield.cpp
 )
 
 target_include_directories(parallax PRIVATE

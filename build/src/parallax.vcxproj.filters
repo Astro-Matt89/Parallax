@@ -34,6 +34,9 @@
     <ClCompile Include="C:\Parallax-dev\Parallax\src\rendering\camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Parallax-dev\Parallax\src\rendering\starfield.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Parallax-dev\Parallax\src\CMakeLists.txt" />

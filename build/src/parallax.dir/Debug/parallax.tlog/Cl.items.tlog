@@ -9,3 +9,4 @@ C:\Parallax-dev\Parallax\src\astro\time_system.cpp;C:\Parallax-dev\Parallax\buil
 C:\Parallax-dev\Parallax\src\astro\coordinates.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\coordinates.obj
 C:\Parallax-dev\Parallax\src\catalog\catalog_loader.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\catalog_loader.obj
 C:\Parallax-dev\Parallax\src\rendering\camera.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\camera.obj
+C:\Parallax-dev\Parallax\src\rendering\starfield.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\starfield.obj

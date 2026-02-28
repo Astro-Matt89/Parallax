@@ -1,3 +1,23 @@
+^C:\PARALLAX-DEV\PARALLAX\BUILD\CMAKEFILES\3D8C1758119FE9BE1BC83335E3A11D21\STARFIELD.FRAG.SPV.RULE
+setlocal
+C:\VulkanSDK\1.4.341.1\Bin\glslangValidator.exe -V C:/Parallax-dev/Parallax/shaders/starfield.frag -o C:/Parallax-dev/Parallax/build/shaders/starfield.frag.spv
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\PARALLAX-DEV\PARALLAX\BUILD\CMAKEFILES\3D8C1758119FE9BE1BC83335E3A11D21\STARFIELD.VERT.SPV.RULE
+setlocal
+C:\VulkanSDK\1.4.341.1\Bin\glslangValidator.exe -V C:/Parallax-dev/Parallax/shaders/starfield.vert -o C:/Parallax-dev/Parallax/build/shaders/starfield.vert.spv
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
 ^C:\PARALLAX-DEV\PARALLAX\BUILD\CMAKEFILES\3D8C1758119FE9BE1BC83335E3A11D21\TEST_STAR.FRAG.SPV.RULE
 setlocal
 C:\VulkanSDK\1.4.341.1\Bin\glslangValidator.exe -V C:/Parallax-dev/Parallax/shaders/test_star.frag -o C:/Parallax-dev/Parallax/build/shaders/test_star.frag.spv

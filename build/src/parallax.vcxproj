@@ -441,6 +441,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Parallax-dev\Parallax\src\core\logger.cpp" />
     <ClCompile Include="C:\Parallax-dev\Parallax\src\core\window.cpp" />
     <ClCompile Include="C:\Parallax-dev\Parallax\src\vulkan\context.cpp" />
+    <ClCompile Include="C:\Parallax-dev\Parallax\src\vulkan\swapchain.cpp" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

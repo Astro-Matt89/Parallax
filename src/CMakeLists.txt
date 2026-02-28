@@ -7,6 +7,7 @@ add_executable(parallax
     core/logger.cpp
     core/window.cpp
     vulkan/context.cpp
+    vulkan/swapchain.cpp
 )
 
 target_include_directories(parallax PRIVATE

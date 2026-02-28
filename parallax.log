@@ -91,3 +91,104 @@
 [09:36:07.683] [PARALLAX] [trace] Vulkan instance destroyed
 [09:36:07.696] [PARALLAX] [info] Window destroyed
 [09:36:07.701] [PARALLAX] [info] Parallax shutdown complete.
+[10:32:13.500] [PARALLAX] [info] Parallax v0.1.0 starting...
+[10:32:13.644] [PARALLAX] [info] Window created: "Parallax" (1280x720) [Vulkan | resizable]
+[10:32:13.647] [PARALLAX] [trace] SDL2 requires 2 Vulkan instance extension(s):
+[10:32:13.648] [PARALLAX] [trace]   - VK_KHR_surface
+[10:32:13.650] [PARALLAX] [trace]   - VK_KHR_win32_surface
+[10:32:13.661] [PARALLAX] [info] Requesting 3 instance extension(s):
+[10:32:13.662] [PARALLAX] [info]   - VK_KHR_surface
+[10:32:13.663] [PARALLAX] [info]   - VK_KHR_win32_surface
+[10:32:13.666] [PARALLAX] [info]   - VK_EXT_debug_utils
+[10:32:13.667] [PARALLAX] [info] Validation layers enabled: VK_LAYER_KHRONOS_validation
+[10:32:13.669] [PARALLAX] [trace] [Vulkan] windows_get_device_registry_files: GUID for 3 is not SoftwareComponent skipping
+[10:32:13.672] [PARALLAX] [trace] [Vulkan] Searching for ICD drivers named .\nvoglv64.dll
+[10:32:13.675] [PARALLAX] [trace] [Vulkan] Loading layer library C:\VulkanSDK\1.4.341.1\Bin\.\VkLayer_khronos_validation.dll
+[10:32:13.676] [PARALLAX] [trace] [Vulkan] Loading layer library C:\ProgramData\obs-studio-hook\.\graphics-hook64.dll
+[10:32:13.678] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[10:32:13.679] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[10:32:13.765] [PARALLAX] [info] Vulkan instance created (API 1.3)
+[10:32:13.766] [PARALLAX] [info] Vulkan debug messenger created
+[10:32:13.767] [PARALLAX] [info] Vulkan surface created
+[10:32:13.770] [PARALLAX] [info] Found 1 Vulkan-capable GPU(s):
+[10:32:13.770] [PARALLAX] [info]   - NVIDIA GeForce GTX 1660 (type: discrete)
+[10:32:13.778] [PARALLAX] [info] Selected GPU: NVIDIA GeForce GTX 1660
+[10:32:13.779] [PARALLAX] [info]   Driver version: 79.344.0
+[10:32:13.784] [PARALLAX] [info]   Vulkan API: 1.4.325
+[10:32:13.785] [PARALLAX] [info]   VRAM: 6180 MB
+[10:32:13.786] [PARALLAX] [info]   Graphics queue family: 0
+[10:32:13.787] [PARALLAX] [info]   Present queue family: 0
+[10:32:13.851] [PARALLAX] [info] Vulkan logical device created
+[10:32:13.854] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[10:32:13.854] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[10:32:15.967] [PARALLAX] [info] Swapchain created: 1280x720, 3 images, format 50, MAILBOX (triple buffer)
+[10:32:20.861] [PARALLAX] [trace] Window resized: 1920x1057
+[10:32:21.001] [PARALLAX] [trace] Swapchain destroyed
+[10:32:21.005] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[10:32:21.005] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[10:32:21.012] [PARALLAX] [info] Swapchain created: 1920x1057, 3 images, format 50, MAILBOX (triple buffer)
+[10:32:21.013] [PARALLAX] [info] Swapchain recreated: 1920x1057
+[10:32:23.431] [PARALLAX] [trace] Window resized: 1280x720
+[10:32:23.432] [PARALLAX] [trace] Window restored: 1280x720
+[10:32:23.434] [PARALLAX] [trace] Swapchain destroyed
+[10:32:23.441] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[10:32:23.442] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[10:32:23.450] [PARALLAX] [info] Swapchain created: 1280x720, 3 images, format 50, MAILBOX (triple buffer)
+[10:32:23.452] [PARALLAX] [info] Swapchain recreated: 1280x720
+[10:32:27.541] [PARALLAX] [trace] Window resized: 1920x1057
+[10:32:27.542] [PARALLAX] [trace] Swapchain destroyed
+[10:32:27.547] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[10:32:27.547] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[10:32:27.554] [PARALLAX] [info] Swapchain created: 1920x1057, 3 images, format 50, MAILBOX (triple buffer)
+[10:32:27.554] [PARALLAX] [info] Swapchain recreated: 1920x1057
+[10:32:33.535] [PARALLAX] [trace] Window resized: 1280x720
+[10:32:33.537] [PARALLAX] [trace] Window restored: 1280x720
+[10:32:33.539] [PARALLAX] [trace] Swapchain destroyed
+[10:32:33.545] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[10:32:33.545] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[10:32:33.552] [PARALLAX] [info] Swapchain created: 1280x720, 3 images, format 50, MAILBOX (triple buffer)
+[10:32:33.553] [PARALLAX] [info] Swapchain recreated: 1280x720
+[10:32:42.305] [PARALLAX] [trace] Window resized: 1174x886
+[10:32:42.305] [PARALLAX] [trace] Window resized: 1174x886
+[10:32:42.307] [PARALLAX] [trace] Swapchain destroyed
+[10:32:42.311] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[10:32:42.312] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[10:32:42.318] [PARALLAX] [info] Swapchain created: 1174x886, 3 images, format 50, MAILBOX (triple buffer)
+[10:32:42.319] [PARALLAX] [info] Swapchain recreated: 1174x886
+[10:32:48.947] [PARALLAX] [trace] Window resized: 1920x1057
+[10:32:48.949] [PARALLAX] [trace] Swapchain destroyed
+[10:32:48.953] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[10:32:48.954] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[10:32:48.960] [PARALLAX] [info] Swapchain created: 1920x1057, 3 images, format 50, MAILBOX (triple buffer)
+[10:32:48.960] [PARALLAX] [info] Swapchain recreated: 1920x1057
+[10:32:51.050] [PARALLAX] [trace] Window resized: 1174x886
+[10:32:51.051] [PARALLAX] [trace] Window restored: 1174x886
+[10:32:51.053] [PARALLAX] [trace] Swapchain destroyed
+[10:32:51.058] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[10:32:51.058] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[10:32:51.066] [PARALLAX] [info] Swapchain created: 1174x886, 3 images, format 50, MAILBOX (triple buffer)
+[10:32:51.066] [PARALLAX] [info] Swapchain recreated: 1174x886
+[10:32:52.227] [PARALLAX] [trace] Window resized: 1920x1057
+[10:32:52.229] [PARALLAX] [trace] Swapchain destroyed
+[10:32:52.233] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[10:32:52.233] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[10:32:52.239] [PARALLAX] [info] Swapchain created: 1920x1057, 3 images, format 50, MAILBOX (triple buffer)
+[10:32:52.239] [PARALLAX] [info] Swapchain recreated: 1920x1057
+[10:32:53.306] [PARALLAX] [trace] Window resized: 1174x886
+[10:32:53.307] [PARALLAX] [trace] Window restored: 1174x886
+[10:32:53.308] [PARALLAX] [trace] Swapchain destroyed
+[10:32:53.312] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[10:32:53.313] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[10:32:53.319] [PARALLAX] [info] Swapchain created: 1174x886, 3 images, format 50, MAILBOX (triple buffer)
+[10:32:53.320] [PARALLAX] [info] Swapchain recreated: 1174x886
+[10:32:55.648] [PARALLAX] [trace] Swapchain destroyed
+[10:32:55.672] [PARALLAX] [trace] Vulkan logical device destroyed
+[10:32:55.672] [PARALLAX] [trace] Vulkan debug messenger destroyed
+[10:32:55.673] [PARALLAX] [trace] Vulkan surface destroyed
+[10:32:55.674] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\nvoglv64.dll
+[10:32:55.675] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\nvoglv64.dll
+[10:32:55.675] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\ProgramData\obs-studio-hook\graphics-hook64.dll
+[10:32:55.677] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\VulkanSDK\1.4.341.1\Bin\VkLayer_khronos_validation.dll
+[10:32:55.678] [PARALLAX] [trace] Vulkan instance destroyed
+[10:32:55.693] [PARALLAX] [info] Window destroyed
+[10:32:55.702] [PARALLAX] [info] Parallax shutdown complete.

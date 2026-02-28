@@ -6,6 +6,7 @@
 #include "core/logger.hpp"
 #include "core/window.hpp"
 #include "vulkan/context.hpp"
+#include "vulkan/swapchain.hpp"
 
 #include <cstdlib>
 
@@ -15,18 +16,34 @@ int main()
     PLX_CORE_INFO("Parallax v0.1.0 starting...");
 
     {
-        // Task 1.3: Window
+        // Window
         parallax::core::Window window({.title = "Parallax", .width = 1280, .height = 720});
 
-        // Task 1.4: Vulkan context — instance, surface, device, queues
+        // Vulkan context
         parallax::vulkan::Context context(
             {.app_name = "Parallax", .enable_validation = true},
             window);
 
-        // Main loop — just poll events until close
+        // Swapchain
+        parallax::vulkan::Swapchain swapchain(context, window.get_width(), window.get_height());
+
+        // Main loop
         while (!window.should_close())
         {
             window.poll_events();
+
+            // Handle resize
+            if (window.was_resized())
+            {
+                uint32_t w = window.get_width();
+                uint32_t h = window.get_height();
+
+                if (w > 0 && h > 0)
+                {
+                    swapchain.recreate(w, h);
+                    PLX_CORE_INFO("Swapchain recreated: {}x{}", w, h);
+                }
+            }
         }
 
         context.wait_idle();

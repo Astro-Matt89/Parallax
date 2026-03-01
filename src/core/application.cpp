@@ -7,6 +7,7 @@
 
 #include <glm/trigonometric.hpp>
 
+#include <cmath>
 #include <cstdlib>
 #include <filesystem>
 #include <limits>
@@ -309,39 +310,143 @@ void Application::process_input()
         m_camera->zoom(zoom_factor);
     }
 
-    // -----------------------------------------------------------------
-    // Space → toggle pause/resume
-    // -----------------------------------------------------------------
-    if (m_input->is_key_pressed(SDL_SCANCODE_SPACE))
+    // =================================================================
+    // Time scale controls                                              ← SPRINT 03 Task 3.7
+    // =================================================================
+
+    // 1 → ×1 (real-time)
+    if (m_input->is_key_pressed(SDL_SCANCODE_1))
     {
-        m_time_scale = (m_time_scale > 0.0) ? 0.0 : 1.0;
-        PLX_CORE_INFO("Time {}", m_time_scale > 0.0 ? "resumed" : "paused");
+        m_time_scale = 1.0;
+        PLX_CORE_INFO("Time scale: x1 (real-time)");
     }
 
-    // -----------------------------------------------------------------
+    // 2 → ×10
+    if (m_input->is_key_pressed(SDL_SCANCODE_2))
+    {
+        m_time_scale = 10.0;
+        PLX_CORE_INFO("Time scale: x10");
+    }
+
+    // 3 → ×100
+    if (m_input->is_key_pressed(SDL_SCANCODE_3))
+    {
+        m_time_scale = 100.0;
+        PLX_CORE_INFO("Time scale: x100");
+    }
+
+    // 4 → ×1000
+    if (m_input->is_key_pressed(SDL_SCANCODE_4))
+    {
+        m_time_scale = 1000.0;
+        PLX_CORE_INFO("Time scale: x1000");
+    }
+
+    // 5 → ×10000
+    if (m_input->is_key_pressed(SDL_SCANCODE_5))
+    {
+        m_time_scale = 10000.0;
+        PLX_CORE_INFO("Time scale: x10000");
+    }
+
+    // 0 / Space → pause
+    if (m_input->is_key_pressed(SDL_SCANCODE_0) ||
+        m_input->is_key_pressed(SDL_SCANCODE_SPACE))
+    {
+        if (m_time_scale != 0.0)
+        {
+            m_time_scale = 0.0;
+            PLX_CORE_INFO("Time paused");
+        }
+        else
+        {
+            m_time_scale = 1.0;
+            PLX_CORE_INFO("Time resumed: x1");
+        }
+    }
+
+   // Minus → reverse time                                   ← FIX
+   if (m_input->is_key_pressed(SDL_SCANCODE_Z))
+   {
+      if (m_time_scale == 0.0)
+      {
+         m_time_scale = -1.0;          // Paused → start reverse at x-1
+      }
+      else if (m_time_scale > 0.0)
+      {
+          m_time_scale = -m_time_scale;  // Forward → negate to reverse
+      }
+      // else: already negative → keep current reverse speed
+    
+      PLX_CORE_INFO("Time scale: x{}", static_cast<int>(m_time_scale));
+  }
+
+    // Equals → reset to current real time
+    if (m_input->is_key_pressed(SDL_SCANCODE_EQUALS))
+    {
+        m_julian_date = astro::TimeSystem::now_as_jd();
+        m_time_scale = 1.0;
+
+        const auto dt = astro::TimeSystem::from_julian_date(m_julian_date);
+        PLX_CORE_INFO("Time reset to now: {:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02.0f} UTC (x1)",
+                      dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second);
+    }
+
+    // =================================================================
+    // UI controls                                                      ← SPRINT 03 Task 3.7
+    // =================================================================
+
+    // H → toggle HUD visibility
+    if (m_input->is_key_pressed(SDL_SCANCODE_H))
+    {
+        m_hud->toggle_visible();
+        PLX_CORE_INFO("HUD {}", m_hud->is_visible() ? "shown" : "hidden");
+    }
+
+    // T → toggle time display format (UTC → LST → JD → UTC)
+    if (m_input->is_key_pressed(SDL_SCANCODE_T))
+    {
+        m_hud->toggle_time_format();
+
+        const char* format_names[] = {"UTC", "LST", "JD"};
+        const auto fmt = static_cast<int>(m_hud->get_time_format());
+        PLX_CORE_INFO("Time display: {}", format_names[fmt]);
+    }
+
+    // B → cycle Bortle scale (1 → 2 → ... → 9 → 1)
+    if (m_input->is_key_pressed(SDL_SCANCODE_B))
+    {
+        f32 bortle = m_sky_params.bortle_scale + 1.0f;
+        if (bortle > 9.0f)
+        {
+            bortle = 1.0f;
+        }
+
+        m_sky_params.bortle_scale = bortle;
+
+        // Sync atmosphere Bortle scale
+        auto atmo_params = m_atmosphere.get_params();
+        atmo_params.bortle_scale = bortle;
+        m_atmosphere.set_params(atmo_params);
+
+        PLX_CORE_INFO("Bortle scale: {}", static_cast<int>(bortle));
+    }
+
+    // =================================================================
+    // Camera controls
+    // =================================================================
+
     // R → reset camera to defaults
-    // -----------------------------------------------------------------
     if (m_input->is_key_pressed(SDL_SCANCODE_R))
     {
         m_camera->reset();
         PLX_CORE_INFO("Camera reset to defaults");
     }
 
-    // -----------------------------------------------------------------
     // Escape → quit
-    // -----------------------------------------------------------------
     if (m_input->is_key_pressed(SDL_SCANCODE_ESCAPE))
     {
         m_window->request_close();
-    }
-
-    // -----------------------------------------------------------------
-    // H → toggle HUD visibility                                         ← SPRINT 03 Task 3.6
-    // -----------------------------------------------------------------
-    if (m_input->is_key_pressed(SDL_SCANCODE_H))
-    {
-        m_hud->toggle_visible();
-        PLX_CORE_INFO("HUD {}", m_hud->is_visible() ? "shown" : "hidden");
     }
 }
 
@@ -571,21 +676,16 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
 
     // -----------------------------------------------------------------
     // Pass 1: Sky background (fullscreen gradient — rendered first)       ← SPRINT 03
-    // SkyBackground::draw() binds its own pipeline, descriptor set,
-    // and issues vkCmdDraw(3, 1, 0, 0) for the fullscreen triangle.
     // -----------------------------------------------------------------
     m_sky_background->draw(cmd);
 
     // -----------------------------------------------------------------
     // Pass 2: Starfield (additive over sky background)
-    // Starfield::draw() binds its own pipeline, descriptor set, push
-    // constants, and issues vkCmdDraw(1, star_count, 0, 0)
     // -----------------------------------------------------------------
     m_starfield->draw(cmd);
 
     // -----------------------------------------------------------------
     // Pass 3: HUD overlay (alpha-blended over everything)                 ← SPRINT 03 Task 3.6
-    // Hud::render() batches text quads and issues a single draw call.
     // -----------------------------------------------------------------
     m_hud->render(cmd, extent);
 

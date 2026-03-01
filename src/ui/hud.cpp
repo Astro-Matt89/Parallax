@@ -159,8 +159,23 @@ bool Hud::is_visible() const
     return m_visible;
 }
 
+void Hud::toggle_time_format()                                          // ← Task 3.7
+{
+    auto next = static_cast<u8>(m_time_format) + 1;
+    if (next >= static_cast<u8>(TimeDisplayFormat::kCount))
+    {
+        next = 0;
+    }
+    m_time_format = static_cast<TimeDisplayFormat>(next);
+}
+
+TimeDisplayFormat Hud::get_time_format() const                          // ← Task 3.7
+{
+    return m_time_format;
+}
+
 // =================================================================
-// Top-left: title + time
+// Top-left: title + time (respects m_time_format)                 ← Task 3.7
 // =================================================================
 
 void Hud::draw_time_panel(f32 /*vw*/, f32 /*vh*/)
@@ -176,6 +191,10 @@ void Hud::draw_time_panel(f32 /*vw*/, f32 /*vh*/)
     m_font.draw_text("------------------", x, y, kScale, kColorDim);
     y += kLineSpacing;
 
+    // -----------------------------------------------------------------
+    // Time display — show all three, highlight the active format         ← Task 3.7
+    // -----------------------------------------------------------------
+
     // UTC date/time from Julian Date
     const auto dt = astro::TimeSystem::from_julian_date(m_data.julian_date);
 
@@ -184,22 +203,28 @@ void Hud::draw_time_panel(f32 /*vw*/, f32 /*vh*/)
                   dt.year, dt.month, dt.day, dt.hour, dt.minute,
                   static_cast<int>(dt.second));
 
+    const Vec3f utc_color = (m_time_format == TimeDisplayFormat::kUtc)
+        ? kColorValue : kColorDim;
     m_font.draw_text("UTC  ", x, y, kScale, kColorLabel);
-    m_font.draw_text(utc_buf, x + kGlyphW * 5, y, kScale, kColorValue);
+    m_font.draw_text(utc_buf, x + kGlyphW * 5, y, kScale, utc_color);
     y += kLineSpacing;
 
     // LST
     const std::string lst_str = format_ra(m_data.local_sidereal_time_rad);
+    const Vec3f lst_color = (m_time_format == TimeDisplayFormat::kLst)
+        ? kColorValue : kColorDim;
     m_font.draw_text("LST  ", x, y, kScale, kColorLabel);
-    m_font.draw_text(lst_str, x + kGlyphW * 5, y, kScale, kColorValue);
+    m_font.draw_text(lst_str, x + kGlyphW * 5, y, kScale, lst_color);
     y += kLineSpacing;
 
     // Julian Date
     char jd_buf[32];
     std::snprintf(jd_buf, sizeof(jd_buf), "%.3f", m_data.julian_date);
 
+    const Vec3f jd_color = (m_time_format == TimeDisplayFormat::kJd)
+        ? kColorValue : kColorDim;
     m_font.draw_text("JD   ", x, y, kScale, kColorLabel);
-    m_font.draw_text(jd_buf, x + kGlyphW * 5, y, kScale, kColorValue);
+    m_font.draw_text(jd_buf, x + kGlyphW * 5, y, kScale, jd_color);
 }
 
 // =================================================================
@@ -309,10 +334,22 @@ void Hud::draw_performance_panel(f32 vw, f32 vh)
     m_font.draw_text(star_buf, x_value + kGlyphW * 5, y, kScale, kColorDim);
     y += kLineSpacing;
 
-    // TIME scale
+    // TIME scale — highlight in bright green, or use warning color for paused/reverse
     const std::string ts = format_time_scale(m_data.time_scale);
+
+    // Paused = dim, reverse = warning amber, forward = bright green              ← Task 3.7
+    Vec3f time_color = kColorValue;
+    if (m_data.time_scale == 0.0)
+    {
+        time_color = kColorDim;         // Paused → dim green
+    }
+    else if (m_data.time_scale < 0.0)
+    {
+        time_color = {1.0f, 0.5f, 0.0f};  // Reverse → amber warning
+    }
+
     m_font.draw_text("TIME ", x_label, y, kScale, kColorLabel);
-    m_font.draw_text(ts, x_value, y, kScale, kColorValue);
+    m_font.draw_text(ts, x_value, y, kScale, time_color);
 }
 
 } // namespace parallax::ui

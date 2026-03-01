@@ -18,6 +18,15 @@
 
 namespace parallax::ui
 {
+    /// @brief Time display format for the HUD time panel.
+    enum class TimeDisplayFormat : u8
+    {
+        kUtc = 0,   ///< Show UTC date/time
+        kLst,       ///< Show Local Sidereal Time
+        kJd,        ///< Show Julian Date
+        kCount      ///< Sentinel for cycling
+    };
+
     /// @brief All data the HUD needs to display each frame.
     struct HudData
     {
@@ -85,6 +94,12 @@ namespace parallax::ui
         /// @brief Check if the HUD is currently visible.
         [[nodiscard]] bool is_visible() const;
 
+        /// @brief Cycle time display format: UTC → LST → JD → UTC.       ← Task 3.7
+        void toggle_time_format();
+
+        /// @brief Get the current time display format.                    ← Task 3.7
+        [[nodiscard]] TimeDisplayFormat get_time_format() const;
+
     private:
         /// @brief Draw the top-left panel (title + time).
         void draw_time_panel(f32 vw, f32 vh);
@@ -101,6 +116,7 @@ namespace parallax::ui
         BitmapFont m_font;
         HudData m_data{};
         bool m_visible = true;
+        TimeDisplayFormat m_time_format = TimeDisplayFormat::kUtc;  ///< ← Task 3.7
 
         // -----------------------------------------------------------------
         // Layout constants

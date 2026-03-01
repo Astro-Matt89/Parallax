@@ -5,6 +5,12 @@
 //
 // Reads star data from a storage buffer (one vec4 per star).
 // Computes point size from brightness, converts B-V to RGB color.
+//
+// The brightness values from the CPU are Pogson-scale linear:
+//   mag 0 → ~0.25, mag 3 → ~0.016, mag 6 → ~0.001
+// After multiplying by brightness_scale, we apply a pow() curve
+// to compress the huge dynamic range so faint stars are still
+// visible while bright stars remain dominant.
 // -----------------------------------------------------------------
 
 layout(set = 0, binding = 0) readonly buffer StarBuffer {
@@ -99,13 +105,32 @@ void main()
     // Screen position (already in NDC [-1, 1])
     gl_Position = vec4(star.xy, 0.0, 1.0);
 
-    // Brightness with configurable scaling
-    float brightness = star.z * brightness_scale;
+    // Raw brightness scaled by push constant
+    float raw_brightness = star.z * brightness_scale;
 
-    // Point size: sqrt scaling gives perceptually correct brightness-to-area
-    // Brighter stars get bigger points
-    float size = max(1.0, point_size_scale * sqrt(brightness));
-    gl_PointSize = min(size, 10.0);
+    // -----------------------------------------------------------------
+    // Perceptual brightness compression using pow(x, 0.4)
+    //
+    // The Pogson scale produces a huge dynamic range:
+    //   mag 0 → 0.25, mag 6 → 0.001  (250:1 ratio)
+    //
+    // After scaling by brightness_scale (6.0):
+    //   mag 0 → 1.5,  mag 6 → 0.006
+    //
+    // pow(x, 0.4) compresses this:
+    //   1.5   → 1.18  (bright star: still bright)
+    //   0.006 → 0.052 (faint star: now visible!)
+    //   0.04  → 0.14  (mag 4: clearly visible)
+    //
+    // This gives a perceptually natural brightness curve where
+    // faint stars are visible dots and bright stars are dominant.
+    // -----------------------------------------------------------------
+    float brightness = pow(clamp(raw_brightness, 0.0, 10.0), 0.4);
+
+    // Point size: sqrt scaling for perceptually correct brightness-to-area
+    // Brighter stars get bigger points, faint stars stay at 1px
+    float size = max(1.0, point_size_scale * sqrt(brightness) * 0.5);
+    gl_PointSize = min(size, 12.0);
 
     // Output to fragment shader
     v_brightness = clamp(brightness, 0.0, 1.0);

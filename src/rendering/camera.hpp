@@ -57,6 +57,8 @@ namespace parallax::rendering
         /// At 60° FOV (naked eye): ~6.5
         /// At 5° FOV (binoculars): ~10
         /// At 0.5° FOV (telescope): ~14
+        /// Clamped to [kMinMagLimit, kMaxMagLimit] so wide FOVs still show
+        /// enough stars for a realistic sky.
         [[nodiscard]] f32 get_magnitude_limit() const;
 
     private:
@@ -94,6 +96,7 @@ namespace parallax::rendering
         static constexpr f64 kBaseMagLimit    = 6.5;    ///< Naked-eye limit at 60° FOV
         static constexpr f64 kReferenceFovDeg = 60.0;   ///< FOV for base magnitude limit
         static constexpr f32 kMaxMagLimit     = 20.0f;  ///< Absolute upper clamp
+        static constexpr f32 kMinMagLimit     = 6.0f;   ///< Floor: never below 6.0 even at wide FOV
     };
 
 } // namespace parallax::rendering

@@ -5,6 +5,10 @@
 //
 // Renders circular star points with soft-edge falloff.
 // Discards fragments outside the unit circle for round stars.
+//
+// For 1px points (gl_PointSize = 1.0), gl_PointCoord is always
+// (0.5, 0.5), so dist_sq = 0 and alpha = v_brightness.
+// This ensures faint stars are a single bright pixel.
 // -----------------------------------------------------------------
 
 layout(location = 0) in float v_brightness;
@@ -24,8 +28,15 @@ void main()
         discard;
     }
 
-    // Soft edge falloff: quadratic fade from center to edge
-    float alpha = v_brightness * (1.0 - dist_sq * dist_sq);
+    // Soft edge falloff: smoother quadratic fade
+    // For bright multi-pixel stars: nice circular glow
+    // For 1px stars (dist_sq ≈ 0): full brightness preserved
+    float falloff = 1.0 - dist_sq;
+    float alpha = v_brightness * falloff;
+
+    // Ensure a minimum alpha so faint 1px stars are still visible
+    // against the dark sky background (additive blending)
+    alpha = max(alpha, v_brightness * 0.5);
 
     frag_color = vec4(v_color * alpha, alpha);
 }

@@ -110,6 +110,11 @@ f64 Camera::get_fov_deg() const
 //
 // This models the increase in limiting magnitude as the FOV narrows
 // (i.e., zooming in with optics concentrates more light per pixel).
+//
+// Clamped to [kMinMagLimit, kMaxMagLimit]:
+//   - kMinMagLimit (6.0) ensures wide-FOV views still show enough stars
+//     for a realistic naked-eye sky (prevents aggressive culling at 120°)
+//   - kMaxMagLimit (20.0) prevents absurd values at extreme zoom
 // -----------------------------------------------------------------
 
 f32 Camera::get_magnitude_limit() const
@@ -119,7 +124,9 @@ f32 Camera::get_magnitude_limit() const
     const f64 mag_limit = kBaseMagLimit
                         + 5.0 * std::log10(kReferenceFovDeg / fov_deg);
 
-    return static_cast<f32>(std::min(mag_limit, static_cast<f64>(kMaxMagLimit)));
+    return std::clamp(static_cast<f32>(mag_limit),
+                      kMinMagLimit,
+                      kMaxMagLimit);
 }
 
 // -----------------------------------------------------------------

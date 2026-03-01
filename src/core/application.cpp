@@ -1,5 +1,9 @@
 /// @file application.cpp
 /// @brief Application implementation — init, main loop, frame rendering, shutdown.
+///
+/// Task 3.8: Full Sprint 03 integration.
+/// Frame loop: input → time → atmosphere → sky → prefilter → starfield → HUD → render → present.
+/// Render order: sky background → starfield (additive) → HUD (alpha blend).
 
 #include "core/application.hpp"
 
@@ -72,23 +76,23 @@ void Application::init()
     m_swapchain = std::make_unique<vulkan::Swapchain>(
         *m_context, m_window->get_width(), m_window->get_height());
 
-    // 5. Pipeline (render pass + framebuffers — kept from Sprint 01)
+    // 5. Pipeline (render pass + framebuffers)
     std::filesystem::path shader_dir{PLX_SHADER_DIR};
     PLX_CORE_INFO("Shader directory: {}", shader_dir.string());
     m_pipeline = std::make_unique<vulkan::Pipeline>(*m_context, *m_swapchain, shader_dir);
 
-    // 6. Sky background renderer (fullscreen pass before starfield)      ← SPRINT 03
+    // 6. Sky background renderer (fullscreen pass before starfield)
     m_sky_background = std::make_unique<rendering::SkyBackground>(
         *m_context, m_pipeline->get_render_pass(), shader_dir, m_swapchain->get_extent());
 
-    // 7. Starfield renderer (uses Pipeline's render pass)
+    // 7. Starfield renderer
     m_starfield = std::make_unique<rendering::Starfield>(
         *m_context, m_pipeline->get_render_pass(), shader_dir);
 
     // 8. Camera
     m_camera = std::make_unique<rendering::Camera>();
 
-    // 9. HUD overlay (uses Pipeline's render pass)                        ← SPRINT 03 Task 3.6
+    // 9. HUD overlay
     m_hud = std::make_unique<ui::Hud>(
         *m_context, m_pipeline->get_render_pass(), shader_dir);
 
@@ -139,15 +143,15 @@ void Application::init()
                       -glm::degrees(m_observer.longitude_rad));
     }
 
-    // 13. Default sky parameters: Bortle 4, astronomical night              ← SPRINT 03
+    // 13. Default sky parameters: Bortle 4, astronomical night
     m_sky_params = rendering::SkyParams{
         .bortle_scale = 4.0f,
-        .sun_altitude_deg = -30.0f,
+        .sun_altitude_deg = -30.0f,    // Deep night (placeholder until solar position calc)
         .moon_altitude_deg = -90.0f,
         .moon_phase = 0.0f,
     };
 
-    // 14. Atmosphere model: standard conditions, Bortle 4                   ← SPRINT 03 Task 3.3
+    // 14. Atmosphere model: standard conditions, synced to sky Bortle
     m_atmosphere.set_params(astro::AtmosphereParams{
         .pressure_mbar = 1013.25f,
         .temperature_c = 15.0f,
@@ -194,16 +198,14 @@ void Application::shutdown()
         PLX_CORE_TRACE("Command pool destroyed");
     }
 
-    // Reverse creation order: hud → starfield → sky → pipeline → swapchain → context → window
-    m_hud.reset();                                                           // ← SPRINT 03 Task 3.6
+    // Reverse creation order
+    m_hud.reset();
     m_starfield.reset();
-    m_sky_background.reset();                                               // ← SPRINT 03
+    m_sky_background.reset();
     m_pipeline.reset();
     m_swapchain.reset();
     m_context.reset();
 
-    // Clear the event callback before destroying the window
-    // (callback captures `this`, which references m_input)
     if (m_window)
     {
         m_window->set_event_callback(nullptr);
@@ -213,21 +215,24 @@ void Application::shutdown()
 }
 
 // =================================================================
-// Main loop
+// Main loop — Task 3.8 frame pipeline
+//
+// Steps map to sprint_03.md Task 3.8 "Updated frame loop":
+//   1. Input new_frame + poll events
+//   2. Process input (mouse, scroll, keyboard → time/camera/HUD/Bortle)
+//   3-4. Update simulation time, compute LST
+//   5-6. Update atmosphere + sky params
+//   7-8. Prefilter → transform → atmosphere → screen → upload
+//   9. Render: sky → starfield → HUD
+//   10. Present
 // =================================================================
 
 void Application::main_loop()
 {
     while (!m_window->should_close())
     {
-        // -----------------------------------------------------------------
-        // 1. Reset per-frame input state
-        // -----------------------------------------------------------------
+        // ----- Step 1: Input -----
         m_input->new_frame();
-
-        // -----------------------------------------------------------------
-        // 2. Poll SDL events (Window handles SDL_QUIT/resize; callback → Input)
-        // -----------------------------------------------------------------
         m_window->poll_events();
 
         if (m_window->was_resized())
@@ -235,38 +240,25 @@ void Application::main_loop()
             m_framebuffer_resized = true;
         }
 
-        // Skip drawing when minimized (zero extent)
         if (m_window->get_width() == 0 || m_window->get_height() == 0)
         {
             continue;
         }
 
-        // -----------------------------------------------------------------
-        // 3. Compute delta time
-        // -----------------------------------------------------------------
+        // ----- Delta time -----
         auto now = std::chrono::steady_clock::now();
         const f64 delta_time_sec = std::chrono::duration<f64>(now - m_last_frame_time).count();
         m_last_frame_time = now;
-
-        // Clamp delta to avoid huge jumps (e.g., after a breakpoint)
         const f64 clamped_dt = std::min(delta_time_sec, 0.1);
-
-        // Store for FPS display                                             ← SPRINT 03 Task 3.6
         m_delta_time = delta_time_sec;
 
-        // -----------------------------------------------------------------
-        // 4. Process input → Camera/simulation
-        // -----------------------------------------------------------------
+        // ----- Step 2: Process input -----
         process_input();
 
-        // -----------------------------------------------------------------
-        // 5. Update simulation time + star transforms
-        // -----------------------------------------------------------------
+        // ----- Steps 3-8: Update simulation -----
         update_simulation(clamped_dt);
 
-        // -----------------------------------------------------------------
-        // 6. Render
-        // -----------------------------------------------------------------
+        // ----- Steps 9-10: Render + present -----
         draw_frame();
     }
 
@@ -274,17 +266,16 @@ void Application::main_loop()
 }
 
 // =================================================================
-// Input processing — translates Input state to Camera/simulation actions
+// Input processing — Task 3.7 + 3.8 keybindings
+//
+// All simulation/camera/UI controls. The Input system tracks
+// is_key_pressed() (single-frame) and is_key_held() (continuous).
 // =================================================================
 
 void Application::process_input()
 {
     // -----------------------------------------------------------------
     // Mouse drag → Camera pan
-    //
-    // Convert pixel delta to radians: pixels × (FOV / window_width)
-    // Negate X so dragging right pans the view left (sky moves right)
-    // Negate Y so dragging down pans up (natural inversion)
     // -----------------------------------------------------------------
     if (m_input->is_mouse_dragging())
     {
@@ -299,9 +290,6 @@ void Application::process_input()
 
     // -----------------------------------------------------------------
     // Scroll wheel → Camera zoom
-    //
-    // scroll > 0 → zoom in (decrease FOV) → factor < 1.0
-    // scroll < 0 → zoom out (increase FOV) → factor > 1.0
     // -----------------------------------------------------------------
     const f32 scroll = m_input->get_scroll_delta();
     if (scroll != 0.0f)
@@ -311,45 +299,40 @@ void Application::process_input()
     }
 
     // =================================================================
-    // Time scale controls                                              ← SPRINT 03 Task 3.7
+    // Time scale controls                                    ← Task 3.7
     // =================================================================
 
-    // 1 → ×1 (real-time)
     if (m_input->is_key_pressed(SDL_SCANCODE_1))
     {
         m_time_scale = 1.0;
         PLX_CORE_INFO("Time scale: x1 (real-time)");
     }
 
-    // 2 → ×10
     if (m_input->is_key_pressed(SDL_SCANCODE_2))
     {
         m_time_scale = 10.0;
         PLX_CORE_INFO("Time scale: x10");
     }
 
-    // 3 → ×100
     if (m_input->is_key_pressed(SDL_SCANCODE_3))
     {
         m_time_scale = 100.0;
         PLX_CORE_INFO("Time scale: x100");
     }
 
-    // 4 → ×1000
     if (m_input->is_key_pressed(SDL_SCANCODE_4))
     {
         m_time_scale = 1000.0;
         PLX_CORE_INFO("Time scale: x1000");
     }
 
-    // 5 → ×10000
     if (m_input->is_key_pressed(SDL_SCANCODE_5))
     {
         m_time_scale = 10000.0;
         PLX_CORE_INFO("Time scale: x10000");
     }
 
-    // 0 / Space → pause
+    // 0 / Space → pause/resume toggle
     if (m_input->is_key_pressed(SDL_SCANCODE_0) ||
         m_input->is_key_pressed(SDL_SCANCODE_SPACE))
     {
@@ -365,21 +348,21 @@ void Application::process_input()
         }
     }
 
-   // Minus → reverse time                                   ← FIX
-   if (m_input->is_key_pressed(SDL_SCANCODE_Z))
-   {
-      if (m_time_scale == 0.0)
-      {
-         m_time_scale = -1.0;          // Paused → start reverse at x-1
-      }
-      else if (m_time_scale > 0.0)
-      {
-          m_time_scale = -m_time_scale;  // Forward → negate to reverse
-      }
-      // else: already negative → keep current reverse speed
-    
-      PLX_CORE_INFO("Time scale: x{}", static_cast<int>(m_time_scale));
-  }
+    // Minus → reverse time
+    if (m_input->is_key_pressed(SDL_SCANCODE_MINUS))
+    {
+        if (m_time_scale == 0.0)
+        {
+            m_time_scale = -1.0;
+        }
+        else if (m_time_scale > 0.0)
+        {
+            m_time_scale = -m_time_scale;
+        }
+        // Already negative → keep current reverse speed
+
+        PLX_CORE_INFO("Time scale: x{}", static_cast<int>(m_time_scale));
+    }
 
     // Equals → reset to current real time
     if (m_input->is_key_pressed(SDL_SCANCODE_EQUALS))
@@ -393,7 +376,7 @@ void Application::process_input()
     }
 
     // =================================================================
-    // UI controls                                                      ← SPRINT 03 Task 3.7
+    // UI controls                                            ← Task 3.7
     // =================================================================
 
     // H → toggle HUD visibility
@@ -403,7 +386,7 @@ void Application::process_input()
         PLX_CORE_INFO("HUD {}", m_hud->is_visible() ? "shown" : "hidden");
     }
 
-    // T → toggle time display format (UTC → LST → JD → UTC)
+    // T → cycle time display format (UTC → LST → JD → UTC)
     if (m_input->is_key_pressed(SDL_SCANCODE_T))
     {
         m_hud->toggle_time_format();
@@ -414,6 +397,7 @@ void Application::process_input()
     }
 
     // B → cycle Bortle scale (1 → 2 → ... → 9 → 1)
+    // Syncs both sky_params AND atmosphere to keep Bortle consistent
     if (m_input->is_key_pressed(SDL_SCANCODE_B))
     {
         f32 bortle = m_sky_params.bortle_scale + 1.0f;
@@ -422,14 +406,15 @@ void Application::process_input()
             bortle = 1.0f;
         }
 
+        // Update sky params (affects sky background gradient)
         m_sky_params.bortle_scale = bortle;
 
-        // Sync atmosphere Bortle scale
+        // Sync atmosphere Bortle (affects extinction, limiting magnitude)
         auto atmo_params = m_atmosphere.get_params();
         atmo_params.bortle_scale = bortle;
         m_atmosphere.set_params(atmo_params);
 
-        PLX_CORE_INFO("Bortle scale: {}", static_cast<int>(bortle));
+        PLX_CORE_INFO("Bortle scale: {} (sky + atmosphere synced)", static_cast<int>(bortle));
     }
 
     // =================================================================
@@ -451,35 +436,47 @@ void Application::process_input()
 }
 
 // =================================================================
-// Simulation update — advance time, compute LST, transform stars
+// Simulation update — Task 3.8 steps 3-8
+//
+// 3. Advance Julian Date by delta × time_scale
+// 4. Compute Local Sidereal Time
+// 5. (Atmosphere params updated via B key in process_input)
+// 6. Update sky background UBO
+// 7a. Visibility prefilter (VisibilityFilter::filter)
+// 7b-i + 8. Transform + atmosphere + screen projection + GPU upload
+//           (all inside Starfield::update)
 // =================================================================
 
 void Application::update_simulation(f64 delta_time_sec)
 {
-    // Advance Julian Date
+    // Step 3: Advance Julian Date
     m_julian_date += (delta_time_sec * m_time_scale) / 86400.0;
 
-    // Compute Local Sidereal Time
+    // Step 4: Compute Local Sidereal Time
     const f64 lst = astro::TimeSystem::lmst(m_julian_date, m_observer.longitude_rad);
 
-    // Update sky background
+    // Step 6: Update sky background with current params + camera
     m_sky_background->update_params(m_sky_params, *m_camera);
 
-    // -----------------------------------------------------------------
-    // Visibility prefilter: reduce 118k → ~30-50k candidates
-    // -----------------------------------------------------------------
+    // Step 7a: Visibility prefilter — reduce 118k → ~30-50k candidates
     catalog::PrefilterStats prefilter_stats{};
     const auto candidates = catalog::VisibilityFilter::filter(
         m_stars, m_observer, lst, m_camera->get_magnitude_limit(), &prefilter_stats);
 
-    // -----------------------------------------------------------------
-    // Transform only candidate stars (with atmosphere)
-    // -----------------------------------------------------------------
+    // Steps 7b-i + 8: Transform candidates with atmosphere, upload to GPU
+    // Starfield::update handles:
+    //   - RA/Dec → Alt/Az
+    //   - Atmospheric refraction → apparent altitude
+    //   - Skip if apparent alt < -0.5°
+    //   - Extinction factor at this altitude
+    //   - Adjusted brightness = base × extinction_factor
+    //   - Skip if too faint
+    //   - Reddening near horizon (B-V shift by airmass)
+    //   - Project to screen coords
+    //   - Upload StarVertex array to GPU storage buffer
     m_starfield->update(m_stars, candidates, m_observer, lst, *m_camera, m_atmosphere);
 
-    // -----------------------------------------------------------------
-    // Update HUD data                                                     ← SPRINT 03 Task 3.6
-    // -----------------------------------------------------------------
+    // Update HUD data
     const auto pointing = m_camera->get_pointing();
 
     const f32 fps = (m_delta_time > 0.0)
@@ -503,9 +500,7 @@ void Application::update_simulation(f64 delta_time_sec)
         .time_scale              = m_time_scale,
     });
 
-    // -----------------------------------------------------------------
-    // Log performance stats (every ~60 frames to avoid log spam)
-    // -----------------------------------------------------------------
+    // Periodic performance logging
     ++m_frame_counter;
     if (m_frame_counter % 60 == 0)
     {
@@ -533,16 +528,10 @@ void Application::draw_frame()
 {
     VkDevice device = m_context->get_device();
 
-    // -----------------------------------------------------------------
-    // 1. Wait for this frame slot's fence (previous use of this slot)
-    // -----------------------------------------------------------------
     check_vk(
         vkWaitForFences(device, 1, &m_in_flight_fences[m_current_frame], VK_TRUE, std::numeric_limits<uint64_t>::max()),
         "vkWaitForFences");
 
-    // -----------------------------------------------------------------
-    // 2. Acquire next swapchain image
-    // -----------------------------------------------------------------
     uint32_t image_index = 0;
     VkResult acquire_result = vkAcquireNextImageKHR(
         device,
@@ -563,21 +552,14 @@ void Application::draw_frame()
         std::abort();
     }
 
-    // Only reset the fence if we are actually going to submit work
     check_vk(vkResetFences(device, 1, &m_in_flight_fences[m_current_frame]), "vkResetFences");
 
-    // -----------------------------------------------------------------
-    // 3. Record command buffer
-    // -----------------------------------------------------------------
     check_vk(
         vkResetCommandBuffer(m_command_buffers[m_current_frame], 0),
         "vkResetCommandBuffer");
 
     record_command_buffer(m_command_buffers[m_current_frame], image_index);
 
-    // -----------------------------------------------------------------
-    // 4. Submit to graphics queue
-    // -----------------------------------------------------------------
     VkSemaphore wait_semaphores[] = {m_image_available_semaphores[m_current_frame]};
     VkPipelineStageFlags wait_stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
     VkSemaphore signal_semaphores[] = {m_render_finished_semaphores[image_index]};
@@ -596,9 +578,6 @@ void Application::draw_frame()
         vkQueueSubmit(m_context->get_graphics_queue(), 1, &submit_info, m_in_flight_fences[m_current_frame]),
         "vkQueueSubmit");
 
-    // -----------------------------------------------------------------
-    // 5. Present
-    // -----------------------------------------------------------------
     VkSwapchainKHR swapchains[] = {m_swapchain->get_handle()};
 
     VkPresentInfoKHR present_info{};
@@ -624,14 +603,14 @@ void Application::draw_frame()
         std::abort();
     }
 
-    // -----------------------------------------------------------------
-    // 6. Advance frame-in-flight index
-    // -----------------------------------------------------------------
     m_current_frame = (m_current_frame + 1) % kMaxFramesInFlight;
 }
 
 // =================================================================
-// Command buffer recording — sky background → starfield → HUD
+// Command buffer recording — Task 3.8 render order:
+//   Pass 1: Sky background (fullscreen triangle, replaces clear color)
+//   Pass 2: Starfield (additive blend over sky)
+//   Pass 3: HUD overlay (alpha blend over everything)
 // =================================================================
 
 void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_index)
@@ -641,7 +620,7 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
 
     check_vk(vkBeginCommandBuffer(cmd, &begin_info), "vkBeginCommandBuffer");
 
-    // Clear to pure black — sky background will paint over this          ← SPRINT 03
+    // Clear to pure black — sky background will paint over this immediately
     VkClearValue clear_color{};
     clear_color.color = {{0.0f, 0.0f, 0.0f, 1.0f}};
 
@@ -658,7 +637,7 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
 
     vkCmdBeginRenderPass(cmd, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
 
-    // Dynamic viewport
+    // Dynamic viewport + scissor
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
@@ -668,24 +647,23 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
     viewport.maxDepth = 1.0f;
     vkCmdSetViewport(cmd, 0, 1, &viewport);
 
-    // Dynamic scissor
     VkRect2D scissor{};
     scissor.offset = {0, 0};
     scissor.extent = extent;
     vkCmdSetScissor(cmd, 0, 1, &scissor);
 
     // -----------------------------------------------------------------
-    // Pass 1: Sky background (fullscreen gradient — rendered first)       ← SPRINT 03
+    // Pass 1: Sky background (fullscreen gradient, replaces clear)
     // -----------------------------------------------------------------
     m_sky_background->draw(cmd);
 
     // -----------------------------------------------------------------
-    // Pass 2: Starfield (additive over sky background)
+    // Pass 2: Starfield (additive blend over sky background)
     // -----------------------------------------------------------------
     m_starfield->draw(cmd);
 
     // -----------------------------------------------------------------
-    // Pass 3: HUD overlay (alpha-blended over everything)                 ← SPRINT 03 Task 3.6
+    // Pass 3: HUD overlay (alpha blend, rendered last)
     // -----------------------------------------------------------------
     m_hud->render(cmd, extent);
 
@@ -710,7 +688,6 @@ void Application::recreate_swapchain()
         return;
     }
 
-    // Destroy old per-image semaphores before swapchain recreation changes image count
     VkDevice device = m_context->get_device();
     for (auto sem : m_render_finished_semaphores)
     {
@@ -724,10 +701,9 @@ void Application::recreate_swapchain()
     m_swapchain->recreate(w, h);
     m_pipeline->recreate_framebuffers(*m_swapchain);
 
-    // Update sky background extent after swapchain recreation              ← SPRINT 03
+    // Keep sky background extent in sync
     m_sky_background->set_extent(m_swapchain->get_extent());
 
-    // Recreate per-image semaphores for the new swapchain image count
     uint32_t image_count = m_swapchain->get_image_count();
     m_render_finished_semaphores.resize(image_count);
 
@@ -794,7 +770,6 @@ void Application::create_sync_objects()
     fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fence_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-    // Per-frame-in-flight: image_available semaphores + fences
     for (uint32_t i = 0; i < kMaxFramesInFlight; ++i)
     {
         check_vk(
@@ -805,7 +780,6 @@ void Application::create_sync_objects()
             "vkCreateFence (in flight)");
     }
 
-    // Per-swapchain-image: render_finished semaphores
     uint32_t image_count = m_swapchain->get_image_count();
     m_render_finished_semaphores.resize(image_count);
 

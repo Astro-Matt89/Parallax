@@ -1948,3 +1948,223 @@ The Vulkan spec states: Each binary semaphore element of the pSignalSemaphores m
 [18:35:53.938] [PARALLAX] [trace] Vulkan instance destroyed
 [18:35:53.963] [PARALLAX] [info] Window destroyed
 [18:35:53.967] [PARALLAX] [info] Parallax shutdown complete.
+[18:56:56.262] [PARALLAX] [info] Parallax v0.1.0 starting...
+[18:56:56.408] [PARALLAX] [info] Window created: "Parallax" (1280x720) [Vulkan | resizable]
+[18:56:56.409] [PARALLAX] [trace] SDL2 requires 2 Vulkan instance extension(s):
+[18:56:56.409] [PARALLAX] [trace]   - VK_KHR_surface
+[18:56:56.409] [PARALLAX] [trace]   - VK_KHR_win32_surface
+[18:56:56.421] [PARALLAX] [info] Requesting 3 instance extension(s):
+[18:56:56.421] [PARALLAX] [info]   - VK_KHR_surface
+[18:56:56.421] [PARALLAX] [info]   - VK_KHR_win32_surface
+[18:56:56.421] [PARALLAX] [info]   - VK_EXT_debug_utils
+[18:56:56.422] [PARALLAX] [info] Validation layers enabled: VK_LAYER_KHRONOS_validation
+[18:56:56.423] [PARALLAX] [trace] [Vulkan] windows_get_device_registry_files: GUID for 3 is not SoftwareComponent skipping
+[18:56:56.427] [PARALLAX] [trace] [Vulkan] Searching for ICD drivers named .\nvoglv64.dll
+[18:56:56.430] [PARALLAX] [trace] [Vulkan] Loading layer library C:\VulkanSDK\1.4.341.1\Bin\.\VkLayer_khronos_validation.dll
+[18:56:56.432] [PARALLAX] [trace] [Vulkan] Loading layer library C:\ProgramData\obs-studio-hook\.\graphics-hook64.dll
+[18:56:56.433] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[18:56:56.433] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[18:56:56.517] [PARALLAX] [info] Vulkan instance created (API 1.3)
+[18:56:56.518] [PARALLAX] [info] Vulkan debug messenger created
+[18:56:56.518] [PARALLAX] [info] Vulkan surface created
+[18:56:56.520] [PARALLAX] [info] Found 1 Vulkan-capable GPU(s):
+[18:56:56.520] [PARALLAX] [info]   - NVIDIA GeForce GTX 1660 (type: discrete)
+[18:56:56.527] [PARALLAX] [info] Selected GPU: NVIDIA GeForce GTX 1660
+[18:56:56.527] [PARALLAX] [info]   Driver version: 79.344.0
+[18:56:56.528] [PARALLAX] [info]   Vulkan API: 1.4.325
+[18:56:56.528] [PARALLAX] [info]   VRAM: 6180 MB
+[18:56:56.529] [PARALLAX] [info]   Graphics queue family: 0
+[18:56:56.529] [PARALLAX] [info]   Present queue family: 0
+[18:56:56.593] [PARALLAX] [info] Vulkan logical device created
+[18:56:56.598] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[18:56:56.598] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[18:56:56.625] [PARALLAX] [info] Swapchain created: 1280x720, 3 images, format 50, MAILBOX (triple buffer)
+[18:56:56.626] [PARALLAX] [info] Shader directory: C:/Parallax-dev/Parallax/build/shaders
+[18:56:56.627] [PARALLAX] [info] Render pass created
+[18:56:56.628] [PARALLAX] [trace] Shader module loaded: test_star.vert.spv
+[18:56:56.629] [PARALLAX] [trace] Shader module loaded: test_star.frag.spv
+[18:56:56.631] [PARALLAX] [info] Graphics pipeline created (POINT_LIST, dynamic viewport/scissor)
+[18:56:56.632] [PARALLAX] [info] Framebuffers created: 3 (1280x720)
+[18:56:56.633] [PARALLAX] [trace] Sky background UBO created: 32 bytes
+[18:56:56.634] [PARALLAX] [trace] Shader module loaded: sky_background.vert.spv
+[18:56:56.635] [PARALLAX] [trace] Shader module loaded: sky_background.frag.spv
+[18:56:56.637] [PARALLAX] [info] Sky background pipeline created (fullscreen triangle, UBO)
+[18:56:56.637] [PARALLAX] [info] Sky background renderer initialized
+[18:56:56.638] [PARALLAX] [trace] Starfield storage buffer created: 3200000 bytes (200000 stars)
+[18:56:56.639] [PARALLAX] [trace] Shader module loaded: starfield.vert.spv
+[18:56:56.642] [PARALLAX] [trace] Shader module loaded: starfield.frag.spv
+[18:56:56.643] [PARALLAX] [info] Starfield pipeline created (POINT_LIST, additive blend, storage buffer)
+[18:56:56.643] [PARALLAX] [info] Starfield renderer initialized (buffer capacity: 200000 stars)
+[18:56:58.055] [PARALLAX] [info] CatalogLoader: Loaded 116812 stars from data/catalogs/hipparcos.csv
+[18:56:58.056] [PARALLAX] [info] Hipparcos catalog loaded: 116812 stars from data/catalogs/hipparcos.csv
+[18:56:58.057] [PARALLAX] [info] Simulation start: JD 2461101.247894 (2026-03-01 17:56:58.1 UTC)
+[18:56:58.058] [PARALLAX] [info] Observer: La Palma (28.76N, 17.89W)
+[18:56:58.058] [PARALLAX] [info] Atmosphere initialized: k=0.2, Bortle 4
+[18:56:58.058] [PARALLAX] [info] Command pool created
+[18:56:58.059] [PARALLAX] [info] Command buffers allocated: 2
+[18:56:58.059] [PARALLAX] [info] Sync objects created: 2 frames in flight, 3 image semaphores
+[18:56:58.060] [PARALLAX] [info] Application initialized — all subsystems ready
+[18:56:58.060] [PARALLAX] [info] Entering main loop...
+[18:56:58.294] [PARALLAX] [trace] Stars: 116812 total | 5040 candidates (4%) | 315 visible | prefilter: 592 never-rises, 3235 below-hz, 107945 mag-cull
+[18:56:58.522] [PARALLAX] [trace] Stars: 116812 total | 5041 candidates (4%) | 315 visible | prefilter: 592 never-rises, 3234 below-hz, 107945 mag-cull
+[18:56:58.748] [PARALLAX] [trace] Stars: 116812 total | 5041 candidates (4%) | 315 visible | prefilter: 592 never-rises, 3234 below-hz, 107945 mag-cull
+[18:56:58.978] [PARALLAX] [trace] Stars: 116812 total | 5041 candidates (4%) | 315 visible | prefilter: 592 never-rises, 3234 below-hz, 107945 mag-cull
+[18:56:59.209] [PARALLAX] [trace] Stars: 116812 total | 5041 candidates (4%) | 315 visible | prefilter: 592 never-rises, 3234 below-hz, 107945 mag-cull
+[18:56:59.446] [PARALLAX] [trace] Stars: 116812 total | 5041 candidates (4%) | 315 visible | prefilter: 592 never-rises, 3234 below-hz, 107945 mag-cull
+[18:56:59.692] [PARALLAX] [trace] Stars: 116812 total | 5041 candidates (4%) | 315 visible | prefilter: 592 never-rises, 3234 below-hz, 107945 mag-cull
+[18:56:59.933] [PARALLAX] [trace] Stars: 116812 total | 5041 candidates (4%) | 315 visible | prefilter: 592 never-rises, 3234 below-hz, 107945 mag-cull
+[18:57:00.195] [PARALLAX] [trace] Stars: 116812 total | 5040 candidates (4%) | 315 visible | prefilter: 592 never-rises, 3235 below-hz, 107945 mag-cull
+[18:57:00.448] [PARALLAX] [trace] Stars: 116812 total | 5040 candidates (4%) | 315 visible | prefilter: 592 never-rises, 3235 below-hz, 107945 mag-cull
+[18:57:00.710] [PARALLAX] [trace] Stars: 116812 total | 5040 candidates (4%) | 315 visible | prefilter: 592 never-rises, 3235 below-hz, 107945 mag-cull
+[18:57:00.966] [PARALLAX] [trace] Stars: 116812 total | 5040 candidates (4%) | 315 visible | prefilter: 592 never-rises, 3235 below-hz, 107945 mag-cull
+[18:57:01.132] [PARALLAX] [info] Main loop exited
+[18:57:01.133] [PARALLAX] [trace] Sync objects destroyed
+[18:57:01.134] [PARALLAX] [trace] Command pool destroyed
+[18:57:01.135] [PARALLAX] [trace] Starfield renderer destroyed
+[18:57:01.136] [PARALLAX] [trace] Sky background renderer destroyed
+[18:57:01.136] [PARALLAX] [trace] Graphics pipeline destroyed
+[18:57:01.137] [PARALLAX] [trace] Render pass destroyed
+[18:57:01.137] [PARALLAX] [trace] Swapchain destroyed
+[18:57:01.160] [PARALLAX] [trace] Vulkan logical device destroyed
+[18:57:01.160] [PARALLAX] [trace] Vulkan debug messenger destroyed
+[18:57:01.160] [PARALLAX] [trace] Vulkan surface destroyed
+[18:57:01.161] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\nvoglv64.dll
+[18:57:01.161] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\nvoglv64.dll
+[18:57:01.161] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\ProgramData\obs-studio-hook\graphics-hook64.dll
+[18:57:01.163] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\VulkanSDK\1.4.341.1\Bin\VkLayer_khronos_validation.dll
+[18:57:01.163] [PARALLAX] [trace] Vulkan instance destroyed
+[18:57:01.173] [PARALLAX] [info] Window destroyed
+[18:57:01.177] [PARALLAX] [info] Parallax shutdown complete.
+[18:57:17.240] [PARALLAX] [info] Parallax v0.1.0 starting...
+[18:57:17.387] [PARALLAX] [info] Window created: "Parallax" (1280x720) [Vulkan | resizable]
+[18:57:17.388] [PARALLAX] [trace] SDL2 requires 2 Vulkan instance extension(s):
+[18:57:17.388] [PARALLAX] [trace]   - VK_KHR_surface
+[18:57:17.388] [PARALLAX] [trace]   - VK_KHR_win32_surface
+[18:57:17.399] [PARALLAX] [info] Requesting 3 instance extension(s):
+[18:57:17.400] [PARALLAX] [info]   - VK_KHR_surface
+[18:57:17.402] [PARALLAX] [info]   - VK_KHR_win32_surface
+[18:57:17.402] [PARALLAX] [info]   - VK_EXT_debug_utils
+[18:57:17.402] [PARALLAX] [info] Validation layers enabled: VK_LAYER_KHRONOS_validation
+[18:57:17.403] [PARALLAX] [trace] [Vulkan] windows_get_device_registry_files: GUID for 3 is not SoftwareComponent skipping
+[18:57:17.407] [PARALLAX] [trace] [Vulkan] Searching for ICD drivers named .\nvoglv64.dll
+[18:57:17.410] [PARALLAX] [trace] [Vulkan] Loading layer library C:\VulkanSDK\1.4.341.1\Bin\.\VkLayer_khronos_validation.dll
+[18:57:17.412] [PARALLAX] [trace] [Vulkan] Loading layer library C:\ProgramData\obs-studio-hook\.\graphics-hook64.dll
+[18:57:17.412] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[18:57:17.413] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[18:57:17.493] [PARALLAX] [info] Vulkan instance created (API 1.3)
+[18:57:17.494] [PARALLAX] [info] Vulkan debug messenger created
+[18:57:17.494] [PARALLAX] [info] Vulkan surface created
+[18:57:17.496] [PARALLAX] [info] Found 1 Vulkan-capable GPU(s):
+[18:57:17.496] [PARALLAX] [info]   - NVIDIA GeForce GTX 1660 (type: discrete)
+[18:57:17.502] [PARALLAX] [info] Selected GPU: NVIDIA GeForce GTX 1660
+[18:57:17.503] [PARALLAX] [info]   Driver version: 79.344.0
+[18:57:17.503] [PARALLAX] [info]   Vulkan API: 1.4.325
+[18:57:17.504] [PARALLAX] [info]   VRAM: 6180 MB
+[18:57:17.504] [PARALLAX] [info]   Graphics queue family: 0
+[18:57:17.504] [PARALLAX] [info]   Present queue family: 0
+[18:57:17.563] [PARALLAX] [info] Vulkan logical device created
+[18:57:17.567] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[18:57:17.568] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[18:57:17.593] [PARALLAX] [info] Swapchain created: 1280x720, 3 images, format 50, MAILBOX (triple buffer)
+[18:57:17.593] [PARALLAX] [info] Shader directory: C:/Parallax-dev/Parallax/build/shaders
+[18:57:17.594] [PARALLAX] [info] Render pass created
+[18:57:17.595] [PARALLAX] [trace] Shader module loaded: test_star.vert.spv
+[18:57:17.595] [PARALLAX] [trace] Shader module loaded: test_star.frag.spv
+[18:57:17.597] [PARALLAX] [info] Graphics pipeline created (POINT_LIST, dynamic viewport/scissor)
+[18:57:17.599] [PARALLAX] [info] Framebuffers created: 3 (1280x720)
+[18:57:17.599] [PARALLAX] [trace] Sky background UBO created: 32 bytes
+[18:57:17.600] [PARALLAX] [trace] Shader module loaded: sky_background.vert.spv
+[18:57:17.601] [PARALLAX] [trace] Shader module loaded: sky_background.frag.spv
+[18:57:17.603] [PARALLAX] [info] Sky background pipeline created (fullscreen triangle, UBO)
+[18:57:17.603] [PARALLAX] [info] Sky background renderer initialized
+[18:57:17.603] [PARALLAX] [trace] Starfield storage buffer created: 3200000 bytes (200000 stars)
+[18:57:17.604] [PARALLAX] [trace] Shader module loaded: starfield.vert.spv
+[18:57:17.604] [PARALLAX] [trace] Shader module loaded: starfield.frag.spv
+[18:57:17.605] [PARALLAX] [info] Starfield pipeline created (POINT_LIST, additive blend, storage buffer)
+[18:57:17.605] [PARALLAX] [info] Starfield renderer initialized (buffer capacity: 200000 stars)
+[18:57:19.041] [PARALLAX] [info] CatalogLoader: Loaded 116812 stars from data/catalogs/hipparcos.csv
+[18:57:19.042] [PARALLAX] [info] Hipparcos catalog loaded: 116812 stars from data/catalogs/hipparcos.csv
+[18:57:19.042] [PARALLAX] [info] Simulation start: JD 2461101.248137 (2026-03-01 17:57:19.0 UTC)
+[18:57:19.043] [PARALLAX] [info] Observer: La Palma (28.76N, 17.89W)
+[18:57:19.043] [PARALLAX] [info] Atmosphere initialized: k=0.2, Bortle 4
+[18:57:19.043] [PARALLAX] [info] Command pool created
+[18:57:19.044] [PARALLAX] [info] Command buffers allocated: 2
+[18:57:19.044] [PARALLAX] [info] Sync objects created: 2 frames in flight, 3 image semaphores
+[18:57:19.044] [PARALLAX] [info] Application initialized — all subsystems ready
+[18:57:19.044] [PARALLAX] [info] Entering main loop...
+[18:57:19.278] [PARALLAX] [trace] Stars: 116812 total | 5039 candidates (4%) | 315 visible | prefilter: 592 never-rises, 3236 below-hz, 107945 mag-cull
+[18:57:19.514] [PARALLAX] [trace] Stars: 116812 total | 5039 candidates (4%) | 315 visible | prefilter: 592 never-rises, 3236 below-hz, 107945 mag-cull
+[18:57:19.742] [PARALLAX] [trace] Stars: 116812 total | 5039 candidates (4%) | 315 visible | prefilter: 592 never-rises, 3236 below-hz, 107945 mag-cull
+[18:57:19.980] [PARALLAX] [trace] Stars: 116812 total | 5039 candidates (4%) | 315 visible | prefilter: 592 never-rises, 3236 below-hz, 107945 mag-cull
+[18:57:20.235] [PARALLAX] [trace] Stars: 116812 total | 5039 candidates (4%) | 314 visible | prefilter: 592 never-rises, 3236 below-hz, 107945 mag-cull
+[18:57:20.486] [PARALLAX] [trace] Stars: 116812 total | 5039 candidates (4%) | 333 visible | prefilter: 592 never-rises, 3236 below-hz, 107945 mag-cull
+[18:57:20.743] [PARALLAX] [trace] Stars: 116812 total | 5039 candidates (4%) | 326 visible | prefilter: 592 never-rises, 3236 below-hz, 107945 mag-cull
+[18:57:21.006] [PARALLAX] [trace] Stars: 116812 total | 5039 candidates (4%) | 331 visible | prefilter: 592 never-rises, 3236 below-hz, 107945 mag-cull
+[18:57:21.261] [PARALLAX] [trace] Stars: 116812 total | 5039 candidates (4%) | 378 visible | prefilter: 592 never-rises, 3236 below-hz, 107945 mag-cull
+[18:57:21.523] [PARALLAX] [trace] Stars: 116812 total | 5039 candidates (4%) | 375 visible | prefilter: 592 never-rises, 3236 below-hz, 107945 mag-cull
+[18:57:21.782] [PARALLAX] [trace] Stars: 116812 total | 5039 candidates (4%) | 321 visible | prefilter: 592 never-rises, 3236 below-hz, 107945 mag-cull
+[18:57:22.043] [PARALLAX] [trace] Stars: 116812 total | 3938 candidates (3%) | 398 visible | prefilter: 461 never-rises, 2543 below-hz, 109870 mag-cull
+[18:57:22.201] [PARALLAX] [trace] Stars: 116812 total | 1538 candidates (1%) | 570 visible | prefilter: 183 never-rises, 1009 below-hz, 114082 mag-cull
+[18:57:22.339] [PARALLAX] [trace] Stars: 116812 total | 1220 candidates (1%) | 502 visible | prefilter: 137 never-rises, 815 below-hz, 114640 mag-cull
+[18:57:22.460] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 436 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:22.568] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 436 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:22.686] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 436 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:22.807] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 436 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:22.924] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 444 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:23.044] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 436 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:23.181] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 436 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:23.300] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 450 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:23.415] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 456 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:23.535] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 456 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:23.646] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 456 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:23.752] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 456 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:23.861] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 450 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:23.967] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 441 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:24.069] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 437 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:24.187] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 433 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:24.304] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 451 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:24.424] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 447 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:24.543] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 447 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:24.673] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 447 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:24.794] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 451 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:24.913] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 450 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:25.025] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 450 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:25.158] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 450 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:25.277] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 450 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:25.401] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 451 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:25.516] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 431 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:25.635] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 429 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:25.755] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 424 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:25.892] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 424 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:26.008] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 391 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:26.128] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 336 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:26.244] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 332 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:26.386] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 332 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:26.520] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 332 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:26.652] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 332 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:26.767] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 332 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:26.874] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 332 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:27.002] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 332 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:27.128] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 332 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:27.252] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 332 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:27.378] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 332 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:27.498] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 332 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:27.608] [PARALLAX] [trace] Stars: 116812 total | 885 candidates (1%) | 332 visible | prefilter: 99 never-rises, 621 below-hz, 115207 mag-cull
+[18:57:27.848] [PARALLAX] [info] Main loop exited
+[18:57:27.849] [PARALLAX] [trace] Sync objects destroyed
+[18:57:27.850] [PARALLAX] [trace] Command pool destroyed
+[18:57:27.851] [PARALLAX] [trace] Starfield renderer destroyed
+[18:57:27.852] [PARALLAX] [trace] Sky background renderer destroyed
+[18:57:27.853] [PARALLAX] [trace] Graphics pipeline destroyed
+[18:57:27.853] [PARALLAX] [trace] Render pass destroyed
+[18:57:27.854] [PARALLAX] [trace] Swapchain destroyed
+[18:57:27.876] [PARALLAX] [trace] Vulkan logical device destroyed
+[18:57:27.876] [PARALLAX] [trace] Vulkan debug messenger destroyed
+[18:57:27.876] [PARALLAX] [trace] Vulkan surface destroyed
+[18:57:27.877] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\nvoglv64.dll
+[18:57:27.877] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\nvoglv64.dll
+[18:57:27.878] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\ProgramData\obs-studio-hook\graphics-hook64.dll
+[18:57:27.879] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\VulkanSDK\1.4.341.1\Bin\VkLayer_khronos_validation.dll
+[18:57:27.880] [PARALLAX] [trace] Vulkan instance destroyed
+[18:57:27.894] [PARALLAX] [info] Window destroyed
+[18:57:27.898] [PARALLAX] [info] Parallax shutdown complete.

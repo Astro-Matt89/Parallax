@@ -58,6 +58,26 @@ endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
+^C:\PARALLAX-DEV\PARALLAX\BUILD\CMAKEFILES\3D8C1758119FE9BE1BC83335E3A11D21\TEXT.FRAG.SPV.RULE
+setlocal
+C:\VulkanSDK\1.4.341.1\Bin\glslangValidator.exe -V C:/Parallax-dev/Parallax/shaders/text.frag -o C:/Parallax-dev/Parallax/build/shaders/text.frag.spv
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\PARALLAX-DEV\PARALLAX\BUILD\CMAKEFILES\3D8C1758119FE9BE1BC83335E3A11D21\TEXT.VERT.SPV.RULE
+setlocal
+C:\VulkanSDK\1.4.341.1\Bin\glslangValidator.exe -V C:/Parallax-dev/Parallax/shaders/text.vert -o C:/Parallax-dev/Parallax/build/shaders/text.vert.spv
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
 ^C:\PARALLAX-DEV\PARALLAX\BUILD\CMAKEFILES\F3CE5FE29BA837A1ADA6F4C67994E6CD\COMPILE_SHADERS.RULE
 setlocal
 :cmEnd

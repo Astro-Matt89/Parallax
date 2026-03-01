@@ -19,6 +19,7 @@ add_executable(parallax
     rendering/camera.cpp
     rendering/sky_background.cpp
     rendering/starfield.cpp
+    ui/font.cpp
 )
 
 target_include_directories(parallax PRIVATE

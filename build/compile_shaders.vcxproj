@@ -441,6 +441,118 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <CustomBuild Include="C:\Parallax-dev\Parallax\build\CMakeFiles\3d8c1758119fe9be1bc83335e3a11d21\text.frag.spv.rule">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compiling shader: text.frag -^&gt; text.frag.spv</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+C:\VulkanSDK\1.4.341.1\Bin\glslangValidator.exe -V C:/Parallax-dev/Parallax/shaders/text.frag -o C:/Parallax-dev/Parallax/build/shaders/text.frag.spv
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Parallax-dev\Parallax\shaders\text.frag;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Parallax-dev\Parallax\build\shaders\text.frag.spv</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compiling shader: text.frag -^&gt; text.frag.spv</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+C:\VulkanSDK\1.4.341.1\Bin\glslangValidator.exe -V C:/Parallax-dev/Parallax/shaders/text.frag -o C:/Parallax-dev/Parallax/build/shaders/text.frag.spv
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Parallax-dev\Parallax\shaders\text.frag;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Parallax-dev\Parallax\build\shaders\text.frag.spv</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Compiling shader: text.frag -^&gt; text.frag.spv</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+C:\VulkanSDK\1.4.341.1\Bin\glslangValidator.exe -V C:/Parallax-dev/Parallax/shaders/text.frag -o C:/Parallax-dev/Parallax/build/shaders/text.frag.spv
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Parallax-dev\Parallax\shaders\text.frag;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Parallax-dev\Parallax\build\shaders\text.frag.spv</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Compiling shader: text.frag -^&gt; text.frag.spv</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+C:\VulkanSDK\1.4.341.1\Bin\glslangValidator.exe -V C:/Parallax-dev/Parallax/shaders/text.frag -o C:/Parallax-dev/Parallax/build/shaders/text.frag.spv
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Parallax-dev\Parallax\shaders\text.frag;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Parallax-dev\Parallax\build\shaders\text.frag.spv</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Parallax-dev\Parallax\build\CMakeFiles\3d8c1758119fe9be1bc83335e3a11d21\text.vert.spv.rule">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compiling shader: text.vert -^&gt; text.vert.spv</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+C:\VulkanSDK\1.4.341.1\Bin\glslangValidator.exe -V C:/Parallax-dev/Parallax/shaders/text.vert -o C:/Parallax-dev/Parallax/build/shaders/text.vert.spv
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Parallax-dev\Parallax\shaders\text.vert;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Parallax-dev\Parallax\build\shaders\text.vert.spv</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compiling shader: text.vert -^&gt; text.vert.spv</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+C:\VulkanSDK\1.4.341.1\Bin\glslangValidator.exe -V C:/Parallax-dev/Parallax/shaders/text.vert -o C:/Parallax-dev/Parallax/build/shaders/text.vert.spv
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Parallax-dev\Parallax\shaders\text.vert;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Parallax-dev\Parallax\build\shaders\text.vert.spv</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Compiling shader: text.vert -^&gt; text.vert.spv</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+C:\VulkanSDK\1.4.341.1\Bin\glslangValidator.exe -V C:/Parallax-dev/Parallax/shaders/text.vert -o C:/Parallax-dev/Parallax/build/shaders/text.vert.spv
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Parallax-dev\Parallax\shaders\text.vert;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Parallax-dev\Parallax\build\shaders\text.vert.spv</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Compiling shader: text.vert -^&gt; text.vert.spv</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+C:\VulkanSDK\1.4.341.1\Bin\glslangValidator.exe -V C:/Parallax-dev/Parallax/shaders/text.vert -o C:/Parallax-dev/Parallax/build/shaders/text.vert.spv
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Parallax-dev\Parallax\shaders\text.vert;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Parallax-dev\Parallax\build\shaders\text.vert.spv</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
     <CustomBuild Include="C:\Parallax-dev\Parallax\build\CMakeFiles\f3ce5fe29ba837a1ada6f4c67994e6cd\compile_shaders.rule">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"></Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
@@ -450,7 +562,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Parallax-dev\Parallax\build\shaders\sky_background.frag.spv;C:\Parallax-dev\Parallax\build\shaders\sky_background.vert.spv;C:\Parallax-dev\Parallax\build\shaders\starfield.frag.spv;C:\Parallax-dev\Parallax\build\shaders\starfield.vert.spv;C:\Parallax-dev\Parallax\build\shaders\test_star.frag.spv;C:\Parallax-dev\Parallax\build\shaders\test_star.vert.spv;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Parallax-dev\Parallax\build\shaders\sky_background.frag.spv;C:\Parallax-dev\Parallax\build\shaders\sky_background.vert.spv;C:\Parallax-dev\Parallax\build\shaders\starfield.frag.spv;C:\Parallax-dev\Parallax\build\shaders\starfield.vert.spv;C:\Parallax-dev\Parallax\build\shaders\test_star.frag.spv;C:\Parallax-dev\Parallax\build\shaders\test_star.vert.spv;C:\Parallax-dev\Parallax\build\shaders\text.frag.spv;C:\Parallax-dev\Parallax\build\shaders\text.vert.spv;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Parallax-dev\Parallax\build\CMakeFiles\compile_shaders</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
       <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</VerifyInputsAndOutputsExist>
@@ -462,7 +574,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Parallax-dev\Parallax\build\shaders\sky_background.frag.spv;C:\Parallax-dev\Parallax\build\shaders\sky_background.vert.spv;C:\Parallax-dev\Parallax\build\shaders\starfield.frag.spv;C:\Parallax-dev\Parallax\build\shaders\starfield.vert.spv;C:\Parallax-dev\Parallax\build\shaders\test_star.frag.spv;C:\Parallax-dev\Parallax\build\shaders\test_star.vert.spv;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Parallax-dev\Parallax\build\shaders\sky_background.frag.spv;C:\Parallax-dev\Parallax\build\shaders\sky_background.vert.spv;C:\Parallax-dev\Parallax\build\shaders\starfield.frag.spv;C:\Parallax-dev\Parallax\build\shaders\starfield.vert.spv;C:\Parallax-dev\Parallax\build\shaders\test_star.frag.spv;C:\Parallax-dev\Parallax\build\shaders\test_star.vert.spv;C:\Parallax-dev\Parallax\build\shaders\text.frag.spv;C:\Parallax-dev\Parallax\build\shaders\text.vert.spv;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Parallax-dev\Parallax\build\CMakeFiles\compile_shaders</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
       <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</VerifyInputsAndOutputsExist>
@@ -474,7 +586,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Parallax-dev\Parallax\build\shaders\sky_background.frag.spv;C:\Parallax-dev\Parallax\build\shaders\sky_background.vert.spv;C:\Parallax-dev\Parallax\build\shaders\starfield.frag.spv;C:\Parallax-dev\Parallax\build\shaders\starfield.vert.spv;C:\Parallax-dev\Parallax\build\shaders\test_star.frag.spv;C:\Parallax-dev\Parallax\build\shaders\test_star.vert.spv;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Parallax-dev\Parallax\build\shaders\sky_background.frag.spv;C:\Parallax-dev\Parallax\build\shaders\sky_background.vert.spv;C:\Parallax-dev\Parallax\build\shaders\starfield.frag.spv;C:\Parallax-dev\Parallax\build\shaders\starfield.vert.spv;C:\Parallax-dev\Parallax\build\shaders\test_star.frag.spv;C:\Parallax-dev\Parallax\build\shaders\test_star.vert.spv;C:\Parallax-dev\Parallax\build\shaders\text.frag.spv;C:\Parallax-dev\Parallax\build\shaders\text.vert.spv;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Parallax-dev\Parallax\build\CMakeFiles\compile_shaders</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
       <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</VerifyInputsAndOutputsExist>
@@ -486,7 +598,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Parallax-dev\Parallax\build\shaders\sky_background.frag.spv;C:\Parallax-dev\Parallax\build\shaders\sky_background.vert.spv;C:\Parallax-dev\Parallax\build\shaders\starfield.frag.spv;C:\Parallax-dev\Parallax\build\shaders\starfield.vert.spv;C:\Parallax-dev\Parallax\build\shaders\test_star.frag.spv;C:\Parallax-dev\Parallax\build\shaders\test_star.vert.spv;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Parallax-dev\Parallax\build\shaders\sky_background.frag.spv;C:\Parallax-dev\Parallax\build\shaders\sky_background.vert.spv;C:\Parallax-dev\Parallax\build\shaders\starfield.frag.spv;C:\Parallax-dev\Parallax\build\shaders\starfield.vert.spv;C:\Parallax-dev\Parallax\build\shaders\test_star.frag.spv;C:\Parallax-dev\Parallax\build\shaders\test_star.vert.spv;C:\Parallax-dev\Parallax\build\shaders\text.frag.spv;C:\Parallax-dev\Parallax\build\shaders\text.vert.spv;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Parallax-dev\Parallax\build\CMakeFiles\compile_shaders</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
       <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</VerifyInputsAndOutputsExist>

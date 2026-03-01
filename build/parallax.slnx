@@ -11,6 +11,7 @@
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="compile_shaders.vcxproj"/>
 		<BuildDependency Project="src/parallax.vcxproj"/>
+		<BuildDependency Project="tests/test_atmosphere.vcxproj"/>
 		<BuildDependency Project="tests/test_catalog_loader.vcxproj"/>
 		<BuildDependency Project="tests/test_coordinates.vcxproj"/>
 		<BuildDependency Project="tests/test_time_system.vcxproj"/>
@@ -33,6 +34,9 @@
 	<Project Path="src/parallax.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="072af682-e785-3102-b06d-6bd32136ad49">
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 		<BuildDependency Project="compile_shaders.vcxproj"/>
+	</Project>
+	<Project Path="tests/test_atmosphere.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="b735dc00-b556-3d15-8885-cf9b25bd6e36">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 	</Project>
 	<Project Path="tests/test_catalog_loader.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="c9879e85-7c3d-38e0-8fc2-66243ef020b2">
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>

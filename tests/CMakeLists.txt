@@ -63,3 +63,22 @@ target_link_libraries(test_catalog_loader PRIVATE
 )
 
 add_test(NAME CatalogLoader COMMAND test_catalog_loader)
+
+# -----------------------------------------------------------------
+# Test: Atmosphere
+# -----------------------------------------------------------------
+add_executable(test_atmosphere
+    test_atmosphere.cpp
+    "${CMAKE_SOURCE_DIR}/src/astro/atmosphere.cpp"
+)
+
+target_include_directories(test_atmosphere PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_atmosphere PRIVATE
+    doctest::doctest
+    glm::glm
+)
+
+add_test(NAME Atmosphere COMMAND test_atmosphere)

@@ -184,6 +184,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Project>{072AF682-E785-3102-B06D-6BD32136AD49}</Project>
       <Name>parallax</Name>
     </ProjectReference>
+    <ProjectReference Include="C:\Parallax-dev\Parallax\build\tests\test_atmosphere.vcxproj">
+      <Project>{B735DC00-B556-3D15-8885-CF9B25BD6E36}</Project>
+      <Name>test_atmosphere</Name>
+    </ProjectReference>
     <ProjectReference Include="C:\Parallax-dev\Parallax\build\tests\test_catalog_loader.vcxproj">
       <Project>{C9879E85-7C3D-38E0-8FC2-66243EF020B2}</Project>
       <Name>test_catalog_loader</Name>

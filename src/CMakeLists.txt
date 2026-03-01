@@ -13,6 +13,7 @@ add_executable(parallax
     vulkan/pipeline.cpp
     astro/time_system.cpp
     astro/coordinates.cpp
+    astro/atmosphere.cpp
     catalog/catalog_loader.cpp
     rendering/camera.cpp
     rendering/sky_background.cpp

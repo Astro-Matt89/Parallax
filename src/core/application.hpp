@@ -7,16 +7,17 @@
 #include "astro/coordinates.hpp"
 #include "astro/time_system.hpp"
 #include "catalog/star_entry.hpp"
+#include "catalog/visibility_filter.hpp"
 #include "core/input.hpp"
 #include "core/types.hpp"
 #include "core/window.hpp"
 #include "rendering/camera.hpp"
 #include "rendering/sky_background.hpp"
 #include "rendering/starfield.hpp"
+#include "ui/hud.hpp"
 #include "vulkan/context.hpp"
 #include "vulkan/pipeline.hpp"
 #include "vulkan/swapchain.hpp"
-#include "catalog/visibility_filter.hpp"
 
 #include <vulkan/vulkan.h>
 
@@ -71,7 +72,7 @@ namespace parallax::core
 
         static constexpr uint32_t kMaxFramesInFlight = 2;
 
-	u32 m_frame_counter = 0;  ///< Frame counter for periodic logging
+        u32 m_frame_counter = 0;  ///< Frame counter for periodic logging
 
         // -----------------------------------------------------------------
         // Subsystems (created in init order, destroyed in reverse)
@@ -84,6 +85,7 @@ namespace parallax::core
         std::unique_ptr<rendering::Starfield> m_starfield;
         std::unique_ptr<rendering::Camera> m_camera;
         std::unique_ptr<Input> m_input;
+        std::unique_ptr<ui::Hud> m_hud;                     ///< Retro HUD overlay  ← SPRINT 03 Task 3.6
 
         // -----------------------------------------------------------------
         // Star catalog
@@ -95,6 +97,7 @@ namespace parallax::core
         // -----------------------------------------------------------------
         f64 m_julian_date = 0.0;            ///< Current simulation time (JD)
         f64 m_time_scale = 1.0;             ///< 1.0 = real-time, 0.0 = paused
+        f64 m_delta_time = 0.0;             ///< Last frame delta for FPS display
         astro::ObserverLocation m_observer;  ///< Observer geographic location
 
         // -----------------------------------------------------------------

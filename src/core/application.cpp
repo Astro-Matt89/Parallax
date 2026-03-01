@@ -87,7 +87,11 @@ void Application::init()
     // 8. Camera
     m_camera = std::make_unique<rendering::Camera>();
 
-    // 9. Load star catalog — prefer full Hipparcos, fall back to bright stars
+    // 9. HUD overlay (uses Pipeline's render pass)                        ← SPRINT 03 Task 3.6
+    m_hud = std::make_unique<ui::Hud>(
+        *m_context, m_pipeline->get_render_pass(), shader_dir);
+
+    // 10. Load star catalog — prefer full Hipparcos, fall back to bright stars
     const std::filesystem::path hipparcos_path{"data/catalogs/hipparcos.csv"};
     const std::filesystem::path bright_path{"data/catalogs/bright_stars.csv"};
 
@@ -116,13 +120,13 @@ void Application::init()
         }
     }
 
-    // 10. Observer location: La Palma, Canary Islands (28.76°N, 17.89°W)
+    // 11. Observer location: La Palma, Canary Islands (28.76°N, 17.89°W)
     m_observer = astro::ObserverLocation{
         .latitude_rad  = glm::radians(28.76),
         .longitude_rad = glm::radians(-17.89),
     };
 
-    // 11. Simulation time: current system UTC
+    // 12. Simulation time: current system UTC
     m_julian_date = astro::TimeSystem::now_as_jd();
     m_time_scale = 1.0;
     {
@@ -134,7 +138,7 @@ void Application::init()
                       -glm::degrees(m_observer.longitude_rad));
     }
 
-    // 12. Default sky parameters: Bortle 4, astronomical night              ← SPRINT 03
+    // 13. Default sky parameters: Bortle 4, astronomical night              ← SPRINT 03
     m_sky_params = rendering::SkyParams{
         .bortle_scale = 4.0f,
         .sun_altitude_deg = -30.0f,
@@ -142,7 +146,7 @@ void Application::init()
         .moon_phase = 0.0f,
     };
 
-    // 13. Atmosphere model: standard conditions, Bortle 4                   ← SPRINT 03 Task 3.3
+    // 14. Atmosphere model: standard conditions, Bortle 4                   ← SPRINT 03 Task 3.3
     m_atmosphere.set_params(astro::AtmosphereParams{
         .pressure_mbar = 1013.25f,
         .temperature_c = 15.0f,
@@ -153,14 +157,14 @@ void Application::init()
                   m_atmosphere.get_params().extinction_coeff,
                   m_atmosphere.get_params().bortle_scale);
 
-    // 14. Command pool + buffers
+    // 15. Command pool + buffers
     create_command_pool();
     create_command_buffers();
 
-    // 15. Synchronization objects
+    // 16. Synchronization objects
     create_sync_objects();
 
-    // 16. Initialize frame time
+    // 17. Initialize frame time
     m_last_frame_time = std::chrono::steady_clock::now();
 
     PLX_CORE_INFO("Application initialized — all subsystems ready");
@@ -189,7 +193,8 @@ void Application::shutdown()
         PLX_CORE_TRACE("Command pool destroyed");
     }
 
-    // Reverse creation order: starfield → sky → pipeline → swapchain → context → window
+    // Reverse creation order: hud → starfield → sky → pipeline → swapchain → context → window
+    m_hud.reset();                                                           // ← SPRINT 03 Task 3.6
     m_starfield.reset();
     m_sky_background.reset();                                               // ← SPRINT 03
     m_pipeline.reset();
@@ -244,6 +249,9 @@ void Application::main_loop()
 
         // Clamp delta to avoid huge jumps (e.g., after a breakpoint)
         const f64 clamped_dt = std::min(delta_time_sec, 0.1);
+
+        // Store for FPS display                                             ← SPRINT 03 Task 3.6
+        m_delta_time = delta_time_sec;
 
         // -----------------------------------------------------------------
         // 4. Process input → Camera/simulation
@@ -326,6 +334,15 @@ void Application::process_input()
     {
         m_window->request_close();
     }
+
+    // -----------------------------------------------------------------
+    // H → toggle HUD visibility                                         ← SPRINT 03 Task 3.6
+    // -----------------------------------------------------------------
+    if (m_input->is_key_pressed(SDL_SCANCODE_H))
+    {
+        m_hud->toggle_visible();
+        PLX_CORE_INFO("HUD {}", m_hud->is_visible() ? "shown" : "hidden");
+    }
 }
 
 // =================================================================
@@ -354,6 +371,32 @@ void Application::update_simulation(f64 delta_time_sec)
     // Transform only candidate stars (with atmosphere)
     // -----------------------------------------------------------------
     m_starfield->update(m_stars, candidates, m_observer, lst, *m_camera, m_atmosphere);
+
+    // -----------------------------------------------------------------
+    // Update HUD data                                                     ← SPRINT 03 Task 3.6
+    // -----------------------------------------------------------------
+    const auto pointing = m_camera->get_pointing();
+
+    const f32 fps = (m_delta_time > 0.0)
+        ? static_cast<f32>(1.0 / m_delta_time)
+        : 0.0f;
+
+    m_hud->update(ui::HudData{
+        .julian_date             = m_julian_date,
+        .local_sidereal_time_rad = lst,
+        .utc_hours               = 0.0,
+        .altitude_deg            = pointing.alt * astro_constants::kRadToDeg,
+        .azimuth_deg             = pointing.az * astro_constants::kRadToDeg,
+        .fov_deg                 = m_camera->get_fov_deg(),
+        .magnitude_limit         = m_camera->get_magnitude_limit(),
+        .latitude_deg            = m_observer.latitude_rad * astro_constants::kRadToDeg,
+        .longitude_deg           = m_observer.longitude_rad * astro_constants::kRadToDeg,
+        .bortle_scale            = m_sky_params.bortle_scale,
+        .fps                     = fps,
+        .visible_stars           = m_starfield->get_visible_count(),
+        .total_stars             = static_cast<u32>(m_stars.size()),
+        .time_scale              = m_time_scale,
+    });
 
     // -----------------------------------------------------------------
     // Log performance stats (every ~60 frames to avoid log spam)
@@ -483,7 +526,7 @@ void Application::draw_frame()
 }
 
 // =================================================================
-// Command buffer recording — sky background → starfield
+// Command buffer recording — sky background → starfield → HUD
 // =================================================================
 
 void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_index)
@@ -539,6 +582,12 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
     // constants, and issues vkCmdDraw(1, star_count, 0, 0)
     // -----------------------------------------------------------------
     m_starfield->draw(cmd);
+
+    // -----------------------------------------------------------------
+    // Pass 3: HUD overlay (alpha-blended over everything)                 ← SPRINT 03 Task 3.6
+    // Hud::render() batches text quads and issues a single draw call.
+    // -----------------------------------------------------------------
+    m_hud->render(cmd, extent);
 
     vkCmdEndRenderPass(cmd);
 

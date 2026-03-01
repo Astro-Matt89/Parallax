@@ -15,3 +15,4 @@ C:\Parallax-dev\Parallax\src\rendering\camera.cpp;C:\Parallax-dev\Parallax\build
 C:\Parallax-dev\Parallax\src\rendering\sky_background.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\sky_background.obj
 C:\Parallax-dev\Parallax\src\rendering\starfield.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\starfield.obj
 C:\Parallax-dev\Parallax\src\ui\font.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\font.obj
+C:\Parallax-dev\Parallax\src\ui\hud.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\hud.obj

@@ -2168,3 +2168,172 @@ The Vulkan spec states: Each binary semaphore element of the pSignalSemaphores m
 [18:57:27.880] [PARALLAX] [trace] Vulkan instance destroyed
 [18:57:27.894] [PARALLAX] [info] Window destroyed
 [18:57:27.898] [PARALLAX] [info] Parallax shutdown complete.
+[19:10:46.994] [PARALLAX] [info] Parallax v0.1.0 starting...
+[19:10:47.145] [PARALLAX] [info] Window created: "Parallax" (1280x720) [Vulkan | resizable]
+[19:10:47.146] [PARALLAX] [trace] SDL2 requires 2 Vulkan instance extension(s):
+[19:10:47.146] [PARALLAX] [trace]   - VK_KHR_surface
+[19:10:47.146] [PARALLAX] [trace]   - VK_KHR_win32_surface
+[19:10:47.157] [PARALLAX] [info] Requesting 3 instance extension(s):
+[19:10:47.157] [PARALLAX] [info]   - VK_KHR_surface
+[19:10:47.158] [PARALLAX] [info]   - VK_KHR_win32_surface
+[19:10:47.159] [PARALLAX] [info]   - VK_EXT_debug_utils
+[19:10:47.159] [PARALLAX] [info] Validation layers enabled: VK_LAYER_KHRONOS_validation
+[19:10:47.162] [PARALLAX] [trace] [Vulkan] windows_get_device_registry_files: GUID for 3 is not SoftwareComponent skipping
+[19:10:47.166] [PARALLAX] [trace] [Vulkan] Searching for ICD drivers named .\nvoglv64.dll
+[19:10:47.169] [PARALLAX] [trace] [Vulkan] Loading layer library C:\VulkanSDK\1.4.341.1\Bin\.\VkLayer_khronos_validation.dll
+[19:10:47.170] [PARALLAX] [trace] [Vulkan] Loading layer library C:\ProgramData\obs-studio-hook\.\graphics-hook64.dll
+[19:10:47.171] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[19:10:47.171] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[19:10:47.253] [PARALLAX] [info] Vulkan instance created (API 1.3)
+[19:10:47.254] [PARALLAX] [info] Vulkan debug messenger created
+[19:10:47.254] [PARALLAX] [info] Vulkan surface created
+[19:10:47.256] [PARALLAX] [info] Found 1 Vulkan-capable GPU(s):
+[19:10:47.256] [PARALLAX] [info]   - NVIDIA GeForce GTX 1660 (type: discrete)
+[19:10:47.263] [PARALLAX] [info] Selected GPU: NVIDIA GeForce GTX 1660
+[19:10:47.265] [PARALLAX] [info]   Driver version: 79.344.0
+[19:10:47.265] [PARALLAX] [info]   Vulkan API: 1.4.325
+[19:10:47.265] [PARALLAX] [info]   VRAM: 6180 MB
+[19:10:47.266] [PARALLAX] [info]   Graphics queue family: 0
+[19:10:47.266] [PARALLAX] [info]   Present queue family: 0
+[19:10:47.340] [PARALLAX] [info] Vulkan logical device created
+[19:10:47.345] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[19:10:47.346] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[19:10:47.373] [PARALLAX] [info] Swapchain created: 1280x720, 3 images, format 50, MAILBOX (triple buffer)
+[19:10:47.373] [PARALLAX] [info] Shader directory: C:/Parallax-dev/Parallax/build/shaders
+[19:10:47.374] [PARALLAX] [info] Render pass created
+[19:10:47.375] [PARALLAX] [trace] Shader module loaded: test_star.vert.spv
+[19:10:47.376] [PARALLAX] [trace] Shader module loaded: test_star.frag.spv
+[19:10:47.377] [PARALLAX] [info] Graphics pipeline created (POINT_LIST, dynamic viewport/scissor)
+[19:10:47.378] [PARALLAX] [info] Framebuffers created: 3 (1280x720)
+[19:10:47.378] [PARALLAX] [trace] Sky background UBO created: 32 bytes
+[19:10:47.380] [PARALLAX] [trace] Shader module loaded: sky_background.vert.spv
+[19:10:47.380] [PARALLAX] [trace] Shader module loaded: sky_background.frag.spv
+[19:10:47.382] [PARALLAX] [info] Sky background pipeline created (fullscreen triangle, UBO)
+[19:10:47.382] [PARALLAX] [info] Sky background renderer initialized
+[19:10:47.383] [PARALLAX] [trace] Starfield storage buffer created: 3200000 bytes (200000 stars)
+[19:10:47.384] [PARALLAX] [trace] Shader module loaded: starfield.vert.spv
+[19:10:47.386] [PARALLAX] [trace] Shader module loaded: starfield.frag.spv
+[19:10:47.387] [PARALLAX] [info] Starfield pipeline created (POINT_LIST, additive blend, storage buffer)
+[19:10:47.387] [PARALLAX] [info] Starfield renderer initialized (buffer capacity: 200000 stars)
+[19:10:47.709] [PARALLAX] [trace] Font atlas created: 128x96 R8_UNORM, 95 glyphs
+[19:10:47.729] [PARALLAX] [trace] Shader module loaded: text.vert.spv
+[19:10:47.761] [PARALLAX] [trace] Shader module loaded: text.frag.spv
+[19:10:48.824] [PARALLAX] [info] Text pipeline created (alpha blend, vertex-colored)
+[19:10:48.826] [PARALLAX] [info] BitmapFont initialized (128x96 atlas, 4096 max chars/frame)
+[19:10:50.236] [PARALLAX] [info] CatalogLoader: Loaded 116812 stars from data/catalogs/hipparcos.csv
+[19:10:50.237] [PARALLAX] [info] Hipparcos catalog loaded: 116812 stars from data/catalogs/hipparcos.csv
+[19:10:50.238] [PARALLAX] [info] Simulation start: JD 2461101.257526 (2026-03-01 18:10:50.2 UTC)
+[19:10:50.239] [PARALLAX] [info] Observer: La Palma (28.76N, 17.89W)
+[19:10:50.240] [PARALLAX] [info] Atmosphere initialized: k=0.2, Bortle 4
+[19:10:50.241] [PARALLAX] [info] Command pool created
+[19:10:50.241] [PARALLAX] [info] Command buffers allocated: 2
+[19:10:50.242] [PARALLAX] [info] Sync objects created: 2 frames in flight, 3 image semaphores
+[19:10:50.242] [PARALLAX] [info] Application initialized — all subsystems ready
+[19:10:50.243] [PARALLAX] [info] Entering main loop...
+[19:10:50.581] [PARALLAX] [trace] Stars: 116812 total | 5029 candidates (4%) | 314 visible | prefilter: 592 never-rises, 3246 below-hz, 107945 mag-cull
+[19:10:50.822] [PARALLAX] [trace] Stars: 116812 total | 5029 candidates (4%) | 314 visible | prefilter: 592 never-rises, 3246 below-hz, 107945 mag-cull
+[19:10:51.071] [PARALLAX] [trace] Stars: 116812 total | 5029 candidates (4%) | 314 visible | prefilter: 592 never-rises, 3246 below-hz, 107945 mag-cull
+[19:10:51.322] [PARALLAX] [trace] Stars: 116812 total | 5029 candidates (4%) | 314 visible | prefilter: 592 never-rises, 3246 below-hz, 107945 mag-cull
+[19:10:51.584] [PARALLAX] [trace] Stars: 116812 total | 5029 candidates (4%) | 314 visible | prefilter: 592 never-rises, 3246 below-hz, 107945 mag-cull
+[19:10:51.839] [PARALLAX] [trace] Stars: 116812 total | 5029 candidates (4%) | 314 visible | prefilter: 592 never-rises, 3246 below-hz, 107945 mag-cull
+[19:10:52.101] [PARALLAX] [trace] Stars: 116812 total | 5029 candidates (4%) | 314 visible | prefilter: 592 never-rises, 3246 below-hz, 107945 mag-cull
+[19:10:52.356] [PARALLAX] [trace] Stars: 116812 total | 5029 candidates (4%) | 314 visible | prefilter: 592 never-rises, 3246 below-hz, 107945 mag-cull
+[19:10:52.610] [PARALLAX] [trace] Stars: 116812 total | 5029 candidates (4%) | 314 visible | prefilter: 592 never-rises, 3246 below-hz, 107945 mag-cull
+[19:10:52.864] [PARALLAX] [trace] Stars: 116812 total | 5029 candidates (4%) | 314 visible | prefilter: 592 never-rises, 3246 below-hz, 107945 mag-cull
+[19:10:53.113] [PARALLAX] [trace] Stars: 116812 total | 5029 candidates (4%) | 314 visible | prefilter: 592 never-rises, 3246 below-hz, 107945 mag-cull
+[19:10:53.364] [PARALLAX] [trace] Stars: 116812 total | 5029 candidates (4%) | 314 visible | prefilter: 592 never-rises, 3246 below-hz, 107945 mag-cull
+[19:10:53.618] [PARALLAX] [trace] Stars: 116812 total | 5029 candidates (4%) | 314 visible | prefilter: 592 never-rises, 3246 below-hz, 107945 mag-cull
+[19:10:53.890] [PARALLAX] [trace] Stars: 116812 total | 5029 candidates (4%) | 314 visible | prefilter: 592 never-rises, 3246 below-hz, 107945 mag-cull
+[19:10:54.147] [PARALLAX] [trace] Stars: 116812 total | 5029 candidates (4%) | 314 visible | prefilter: 592 never-rises, 3246 below-hz, 107945 mag-cull
+[19:10:54.413] [PARALLAX] [trace] Stars: 116812 total | 5029 candidates (4%) | 314 visible | prefilter: 592 never-rises, 3246 below-hz, 107945 mag-cull
+[19:10:54.694] [PARALLAX] [trace] Stars: 116812 total | 5029 candidates (4%) | 314 visible | prefilter: 592 never-rises, 3246 below-hz, 107945 mag-cull
+[19:10:54.952] [PARALLAX] [trace] Stars: 116812 total | 5029 candidates (4%) | 312 visible | prefilter: 592 never-rises, 3246 below-hz, 107945 mag-cull
+[19:10:55.215] [PARALLAX] [trace] Stars: 116812 total | 5029 candidates (4%) | 321 visible | prefilter: 592 never-rises, 3246 below-hz, 107945 mag-cull
+[19:10:55.482] [PARALLAX] [trace] Stars: 116812 total | 5030 candidates (4%) | 341 visible | prefilter: 592 never-rises, 3245 below-hz, 107945 mag-cull
+[19:10:55.756] [PARALLAX] [trace] Stars: 116812 total | 5030 candidates (4%) | 354 visible | prefilter: 592 never-rises, 3245 below-hz, 107945 mag-cull
+[19:10:56.022] [PARALLAX] [trace] Stars: 116812 total | 5030 candidates (4%) | 370 visible | prefilter: 592 never-rises, 3245 below-hz, 107945 mag-cull
+[19:10:56.282] [PARALLAX] [trace] Stars: 116812 total | 5030 candidates (4%) | 353 visible | prefilter: 592 never-rises, 3245 below-hz, 107945 mag-cull
+[19:10:56.551] [PARALLAX] [trace] Stars: 116812 total | 5030 candidates (4%) | 319 visible | prefilter: 592 never-rises, 3245 below-hz, 107945 mag-cull
+[19:10:56.826] [PARALLAX] [trace] Stars: 116812 total | 5030 candidates (4%) | 283 visible | prefilter: 592 never-rises, 3245 below-hz, 107945 mag-cull
+[19:10:57.099] [PARALLAX] [trace] Stars: 116812 total | 5030 candidates (4%) | 283 visible | prefilter: 592 never-rises, 3245 below-hz, 107945 mag-cull
+[19:10:57.385] [PARALLAX] [trace] Stars: 116812 total | 5030 candidates (4%) | 283 visible | prefilter: 592 never-rises, 3245 below-hz, 107945 mag-cull
+[19:10:57.656] [PARALLAX] [trace] Stars: 116812 total | 5030 candidates (4%) | 281 visible | prefilter: 592 never-rises, 3245 below-hz, 107945 mag-cull
+[19:10:57.922] [PARALLAX] [trace] Stars: 116812 total | 5030 candidates (4%) | 232 visible | prefilter: 592 never-rises, 3245 below-hz, 107945 mag-cull
+[19:10:58.192] [PARALLAX] [trace] Stars: 116812 total | 5030 candidates (4%) | 181 visible | prefilter: 592 never-rises, 3245 below-hz, 107945 mag-cull
+[19:10:58.471] [PARALLAX] [trace] Stars: 116812 total | 5030 candidates (4%) | 180 visible | prefilter: 592 never-rises, 3245 below-hz, 107945 mag-cull
+[19:10:58.858] [PARALLAX] [trace] Stars: 116812 total | 13624 candidates (12%) | 80 visible | prefilter: 1483 never-rises, 8420 below-hz, 93285 mag-cull
+[19:11:00.100] [PARALLAX] [trace] Stars: 116812 total | 36539 candidates (31%) | 34 visible | prefilter: 4297 never-rises, 22956 below-hz, 53020 mag-cull
+[19:11:00.663] [PARALLAX] [trace] Stars: 116812 total | 7849 candidates (7%) | 127 visible | prefilter: 897 never-rises, 5016 below-hz, 103050 mag-cull
+[19:11:00.892] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 272 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:01.093] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 272 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:01.310] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 271 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:01.516] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 260 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:01.719] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 268 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:01.927] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 263 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:02.136] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 263 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:02.351] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 263 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:02.563] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 263 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:02.780] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 263 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:02.984] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 263 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:03.177] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 263 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:03.367] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 263 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:03.553] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 263 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:03.742] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 262 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:03.942] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 236 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:04.135] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 207 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:04.338] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 186 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:04.534] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 171 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:04.726] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 174 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:04.924] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 255 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:05.130] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 278 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:05.342] [PARALLAX] [trace] Stars: 116812 total | 3032 candidates (3%) | 324 visible | prefilter: 364 never-rises, 1964 below-hz, 111452 mag-cull
+[19:11:05.544] [PARALLAX] [trace] Stars: 116812 total | 3033 candidates (3%) | 365 visible | prefilter: 364 never-rises, 1963 below-hz, 111452 mag-cull
+[19:11:05.751] [PARALLAX] [trace] Stars: 116812 total | 3033 candidates (3%) | 365 visible | prefilter: 364 never-rises, 1963 below-hz, 111452 mag-cull
+[19:11:05.937] [PARALLAX] [trace] Stars: 116812 total | 3033 candidates (3%) | 363 visible | prefilter: 364 never-rises, 1963 below-hz, 111452 mag-cull
+[19:11:06.134] [PARALLAX] [trace] Stars: 116812 total | 3033 candidates (3%) | 362 visible | prefilter: 364 never-rises, 1963 below-hz, 111452 mag-cull
+[19:11:06.334] [PARALLAX] [trace] Stars: 116812 total | 3033 candidates (3%) | 366 visible | prefilter: 364 never-rises, 1963 below-hz, 111452 mag-cull
+[19:11:06.531] [PARALLAX] [trace] Stars: 116812 total | 3033 candidates (3%) | 365 visible | prefilter: 364 never-rises, 1963 below-hz, 111452 mag-cull
+[19:11:06.737] [PARALLAX] [trace] Stars: 116812 total | 3033 candidates (3%) | 365 visible | prefilter: 364 never-rises, 1963 below-hz, 111452 mag-cull
+[19:11:06.951] [PARALLAX] [trace] Stars: 116812 total | 3033 candidates (3%) | 365 visible | prefilter: 364 never-rises, 1963 below-hz, 111452 mag-cull
+[19:11:07.158] [PARALLAX] [trace] Stars: 116812 total | 3033 candidates (3%) | 268 visible | prefilter: 364 never-rises, 1963 below-hz, 111452 mag-cull
+[19:11:07.379] [PARALLAX] [trace] Stars: 116812 total | 3033 candidates (3%) | 239 visible | prefilter: 364 never-rises, 1963 below-hz, 111452 mag-cull
+[19:11:07.592] [PARALLAX] [trace] Stars: 116812 total | 3033 candidates (3%) | 239 visible | prefilter: 364 never-rises, 1963 below-hz, 111452 mag-cull
+[19:11:07.810] [PARALLAX] [trace] Stars: 116812 total | 3033 candidates (3%) | 239 visible | prefilter: 364 never-rises, 1963 below-hz, 111452 mag-cull
+[19:11:08.015] [PARALLAX] [trace] Stars: 116812 total | 3033 candidates (3%) | 239 visible | prefilter: 364 never-rises, 1963 below-hz, 111452 mag-cull
+[19:11:08.217] [PARALLAX] [trace] Stars: 116812 total | 3033 candidates (3%) | 233 visible | prefilter: 364 never-rises, 1963 below-hz, 111452 mag-cull
+[19:11:08.420] [PARALLAX] [trace] Stars: 116812 total | 3033 candidates (3%) | 136 visible | prefilter: 364 never-rises, 1963 below-hz, 111452 mag-cull
+[19:11:08.619] [PARALLAX] [trace] Stars: 116812 total | 3033 candidates (3%) | 133 visible | prefilter: 364 never-rises, 1963 below-hz, 111452 mag-cull
+[19:11:08.829] [PARALLAX] [trace] Stars: 116812 total | 3033 candidates (3%) | 133 visible | prefilter: 364 never-rises, 1963 below-hz, 111452 mag-cull
+[19:11:09.052] [PARALLAX] [trace] Stars: 116812 total | 5150 candidates (4%) | 88 visible | prefilter: 601 never-rises, 3335 below-hz, 107726 mag-cull
+[19:11:09.348] [PARALLAX] [trace] Stars: 116812 total | 6719 candidates (6%) | 65 visible | prefilter: 768 never-rises, 4299 below-hz, 105026 mag-cull
+[19:11:09.852] [PARALLAX] [trace] Stars: 116812 total | 21741 candidates (19%) | 13 visible | prefilter: 2385 never-rises, 13329 below-hz, 79357 mag-cull
+[19:11:10.484] [PARALLAX] [trace] Stars: 116812 total | 17995 candidates (15%) | 18 visible | prefilter: 1966 never-rises, 11060 below-hz, 85791 mag-cull
+[19:11:11.108] [PARALLAX] [trace] Stars: 116812 total | 17995 candidates (15%) | 18 visible | prefilter: 1966 never-rises, 11060 below-hz, 85791 mag-cull
+[19:11:11.724] [PARALLAX] [trace] Stars: 116812 total | 17995 candidates (15%) | 18 visible | prefilter: 1966 never-rises, 11060 below-hz, 85791 mag-cull
+[19:11:12.349] [PARALLAX] [trace] Stars: 116812 total | 17995 candidates (15%) | 18 visible | prefilter: 1966 never-rises, 11060 below-hz, 85791 mag-cull
+[19:11:12.976] [PARALLAX] [trace] Stars: 116812 total | 17994 candidates (15%) | 18 visible | prefilter: 1966 never-rises, 11061 below-hz, 85791 mag-cull
+[19:11:13.595] [PARALLAX] [trace] Stars: 116812 total | 17994 candidates (15%) | 18 visible | prefilter: 1966 never-rises, 11061 below-hz, 85791 mag-cull
+[19:11:14.228] [PARALLAX] [trace] Stars: 116812 total | 17994 candidates (15%) | 6 visible | prefilter: 1966 never-rises, 11061 below-hz, 85791 mag-cull
+[19:11:14.882] [PARALLAX] [trace] Stars: 116812 total | 17994 candidates (15%) | 19 visible | prefilter: 1966 never-rises, 11061 below-hz, 85791 mag-cull
+[19:11:15.526] [PARALLAX] [trace] Stars: 116812 total | 17994 candidates (15%) | 34 visible | prefilter: 1966 never-rises, 11061 below-hz, 85791 mag-cull
+[19:11:16.185] [PARALLAX] [trace] Stars: 116812 total | 17993 candidates (15%) | 34 visible | prefilter: 1966 never-rises, 11062 below-hz, 85791 mag-cull
+[19:11:16.819] [PARALLAX] [trace] Stars: 116812 total | 17993 candidates (15%) | 34 visible | prefilter: 1966 never-rises, 11062 below-hz, 85791 mag-cull
+[19:11:17.357] [PARALLAX] [info] Main loop exited
+[19:11:17.359] [PARALLAX] [trace] Sync objects destroyed
+[19:11:17.359] [PARALLAX] [trace] Command pool destroyed
+[19:11:17.361] [PARALLAX] [trace] BitmapFont destroyed
+[19:11:17.363] [PARALLAX] [trace] Starfield renderer destroyed
+[19:11:17.364] [PARALLAX] [trace] Sky background renderer destroyed
+[19:11:17.365] [PARALLAX] [trace] Graphics pipeline destroyed
+[19:11:17.365] [PARALLAX] [trace] Render pass destroyed
+[19:11:17.366] [PARALLAX] [trace] Swapchain destroyed
+[19:11:17.389] [PARALLAX] [trace] Vulkan logical device destroyed
+[19:11:17.390] [PARALLAX] [trace] Vulkan debug messenger destroyed
+[19:11:17.390] [PARALLAX] [trace] Vulkan surface destroyed
+[19:11:17.391] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\nvoglv64.dll
+[19:11:17.391] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\nvoglv64.dll
+[19:11:17.391] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\ProgramData\obs-studio-hook\graphics-hook64.dll
+[19:11:17.393] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\VulkanSDK\1.4.341.1\Bin\VkLayer_khronos_validation.dll
+[19:11:17.394] [PARALLAX] [trace] Vulkan instance destroyed
+[19:11:17.407] [PARALLAX] [info] Window destroyed
+[19:11:17.412] [PARALLAX] [info] Parallax shutdown complete.

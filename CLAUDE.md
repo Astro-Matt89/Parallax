@@ -359,12 +359,12 @@ Star Entry (compact, 32 bytes):
 
 ## 8. Current Sprint
 
-**Sprint:** 02 — Planetarium Core
-**Goal:** Real starfield from catalog data, coordinate transforms, camera, time simulation
+**Sprint:** 03 — Sky, Atmosphere & Full Catalog
+**Goal:** Realistic sky background, atmospheric effects, full Hipparcos catalog, retro HUD
 
-See: `docs/sprints/sprint_02.md`
+See: `docs/sprints/sprint_03.md`
 
-**Previous:** Sprint 01 ✅ — Vulkan pipeline, SDL2 window, test render
+**Previous:** Sprint 01 ✅ — Vulkan pipeline | Sprint 02 ✅ — Planetarium core
 
 ---
 

@@ -87,18 +87,33 @@ void Application::init()
     // 8. Camera
     m_camera = std::make_unique<rendering::Camera>();
 
-    // 9. Load star catalog
-    const std::filesystem::path catalog_path{"data/catalogs/bright_stars.csv"};
-    auto loaded_stars = catalog::CatalogLoader::load_bright_star_csv(catalog_path);
+    // 9. Load star catalog — prefer full Hipparcos, fall back to bright stars
+    const std::filesystem::path hipparcos_path{"data/catalogs/hipparcos.csv"};
+    const std::filesystem::path bright_path{"data/catalogs/bright_stars.csv"};
+
+    auto loaded_stars = catalog::CatalogLoader::load_hipparcos_csv(hipparcos_path);
     if (loaded_stars.has_value())
     {
         m_stars = std::move(loaded_stars.value());
-        PLX_CORE_INFO("Star catalog loaded: {} stars from {}", m_stars.size(), catalog_path.string());
+        PLX_CORE_INFO("Hipparcos catalog loaded: {} stars from {}",
+                      m_stars.size(), hipparcos_path.string());
     }
     else
     {
-        PLX_CORE_WARN("Failed to load star catalog from {}. Rendering will show no stars.",
-                      catalog_path.string());
+        PLX_CORE_WARN("Hipparcos catalog not found at {}. Trying bright star fallback...",
+                      hipparcos_path.string());
+
+        auto fallback = catalog::CatalogLoader::load_bright_star_csv(bright_path);
+        if (fallback.has_value())
+        {
+            m_stars = std::move(fallback.value());
+            PLX_CORE_INFO("Bright star catalog loaded: {} stars from {}",
+                          m_stars.size(), bright_path.string());
+        }
+        else
+        {
+            PLX_CORE_WARN("No catalog found. Rendering will show no stars.");
+        }
     }
 
     // 10. Observer location: La Palma, Canary Islands (28.76°N, 17.89°W)
@@ -127,14 +142,25 @@ void Application::init()
         .moon_phase = 0.0f,
     };
 
-    // 13. Command pool + buffers
+    // 13. Atmosphere model: standard conditions, Bortle 4                   ← SPRINT 03 Task 3.3
+    m_atmosphere.set_params(astro::AtmosphereParams{
+        .pressure_mbar = 1013.25f,
+        .temperature_c = 15.0f,
+        .extinction_coeff = 0.20f,
+        .bortle_scale = m_sky_params.bortle_scale,
+    });
+    PLX_CORE_INFO("Atmosphere initialized: k={}, Bortle {}",
+                  m_atmosphere.get_params().extinction_coeff,
+                  m_atmosphere.get_params().bortle_scale);
+
+    // 14. Command pool + buffers
     create_command_pool();
     create_command_buffers();
 
-    // 14. Synchronization objects
+    // 15. Synchronization objects
     create_sync_objects();
 
-    // 15. Initialize frame time
+    // 16. Initialize frame time
     m_last_frame_time = std::chrono::steady_clock::now();
 
     PLX_CORE_INFO("Application initialized — all subsystems ready");
@@ -308,26 +334,47 @@ void Application::process_input()
 
 void Application::update_simulation(f64 delta_time_sec)
 {
-    // -----------------------------------------------------------------
-    // Advance Julian Date (JD is in days, delta_time is in seconds)
-    // -----------------------------------------------------------------
+    // Advance Julian Date
     m_julian_date += (delta_time_sec * m_time_scale) / 86400.0;
 
-    // -----------------------------------------------------------------
     // Compute Local Sidereal Time
-    // -----------------------------------------------------------------
     const f64 lst = astro::TimeSystem::lmst(m_julian_date, m_observer.longitude_rad);
 
-    // -----------------------------------------------------------------
-    // Update sky background parameters                                     ← SPRINT 03
-    // -----------------------------------------------------------------
+    // Update sky background
     m_sky_background->update_params(m_sky_params, *m_camera);
 
     // -----------------------------------------------------------------
-    // Transform all catalog stars and upload to GPU
-    // (Starfield::update does: RA/Dec → Alt/Az → screen + brightness)
+    // Visibility prefilter: reduce 118k → ~30-50k candidates
     // -----------------------------------------------------------------
-    m_starfield->update(m_stars, m_observer, lst, *m_camera);
+    catalog::PrefilterStats prefilter_stats{};
+    const auto candidates = catalog::VisibilityFilter::filter(
+        m_stars, m_observer, lst, m_camera->get_magnitude_limit(), &prefilter_stats);
+
+    // -----------------------------------------------------------------
+    // Transform only candidate stars (with atmosphere)
+    // -----------------------------------------------------------------
+    m_starfield->update(m_stars, candidates, m_observer, lst, *m_camera, m_atmosphere);
+
+    // -----------------------------------------------------------------
+    // Log performance stats (every ~60 frames to avoid log spam)
+    // -----------------------------------------------------------------
+    ++m_frame_counter;
+    if (m_frame_counter % 60 == 0)
+    {
+        PLX_CORE_TRACE(
+            "Stars: {} total | {} candidates ({:.0f}%) | {} visible | "
+            "prefilter: {} never-rises, {} below-hz, {} mag-cull",
+            prefilter_stats.total,
+            prefilter_stats.passed,
+            prefilter_stats.total > 0
+                ? 100.0 * static_cast<f64>(prefilter_stats.passed)
+                    / static_cast<f64>(prefilter_stats.total)
+                : 0.0,
+            m_starfield->get_visible_count(),
+            prefilter_stats.skipped_never_rises,
+            prefilter_stats.skipped_below_hz,
+            prefilter_stats.skipped_mag);
+    }
 }
 
 // =================================================================

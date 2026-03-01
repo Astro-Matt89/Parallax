@@ -101,70 +101,86 @@ Starfield::~Starfield()
 }
 
 // -----------------------------------------------------------------
-// update() — CPU-side transform pipeline
+// update() — CPU-side transform pipeline with atmospheric effects
+//            Now iterates only prefiltered candidates.
 // -----------------------------------------------------------------
 
 void Starfield::update(std::span<const catalog::StarEntry> stars,
+                       std::span<const u32> candidate_indices,
                        const astro::ObserverLocation& observer,
                        f64 lst,
-                       const Camera& camera)
+                       const Camera& camera,
+                       const astro::Atmosphere& atmosphere)
 {
     const auto pointing = camera.get_pointing();
     const f64 fov_rad = camera.get_fov_rad();
     const f32 mag_limit = camera.get_magnitude_limit();
 
     std::vector<StarVertex> vertices;
-    vertices.reserve(std::min(static_cast<u32>(stars.size()), m_buffer_capacity));
+    vertices.reserve(std::min(static_cast<u32>(candidate_indices.size()), m_buffer_capacity));
 
-    for (const auto& star : stars)
+    for (const u32 idx : candidate_indices)
     {
-        // Skip stars fainter than the magnitude limit
+        const auto& star = stars[idx];
+
+        // 1. Skip if fainter than mag limit (redundant safety — prefilter already checks)
         if (star.mag_v > mag_limit)
         {
             continue;
         }
 
-        // RA/Dec → Alt/Az
+        // 2. RA/Dec → Alt/Az
         const astro::EquatorialCoord eq{.ra = star.ra, .dec = star.dec};
         const auto hz = astro::Coordinates::equatorial_to_horizontal(eq, observer, lst);
 
-        // Skip stars below the horizon
-        if (hz.alt < 0.0)
+        // 3. Atmospheric refraction → apparent altitude
+        const f64 refraction_rad = atmosphere.refraction(hz.alt);
+        const f64 apparent_alt = hz.alt + refraction_rad;
+
+        // 4. Skip if apparent altitude below visibility threshold
+        if (apparent_alt < kMinApparentAltRad)
         {
             continue;
         }
 
-        // Alt/Az → screen projection
-        const auto screen_pos = astro::Coordinates::horizontal_to_screen(hz, pointing, fov_rad);
+        // 5. Extinction factor
+        const f32 ext_factor = atmosphere.extinction_factor(apparent_alt);
+
+        // 6. Pogson brightness
+        const f64 raw_brightness = std::pow(10.0, -0.4 * (static_cast<f64>(star.mag_v) - kMagZero));
+        constexpr f64 kMaxBrightness = 3.98;
+        const f64 base_brightness = std::min(raw_brightness / kMaxBrightness, 1.0);
+
+        // 7. Apply extinction
+        const f32 adjusted_brightness = static_cast<f32>(base_brightness) * ext_factor;
+
+        // 8. Skip if too dim
+        if (adjusted_brightness < kMinBrightness)
+        {
+            continue;
+        }
+
+        // 9. Project apparent Alt/Az → screen
+        const astro::HorizontalCoord apparent_hz{.alt = apparent_alt, .az = hz.az};
+        const auto screen_pos = astro::Coordinates::horizontal_to_screen(apparent_hz, pointing, fov_rad);
         if (!screen_pos.has_value())
         {
             continue;
         }
 
-        // Magnitude → brightness (Pogson formula)
-        // brightness = 10^(-0.4 * (mag - mag_zero))
-        //
-        // Normalize so mag=0 → brightness=1.0 (Vega system).
-        // Brighter stars (negative mag) get values > 1.0,
-        // fainter stars get values < 1.0.
-        // We normalize in the shader via the brightness_scale push constant.
-        const f64 raw_brightness = std::pow(10.0, -0.4 * (static_cast<f64>(star.mag_v) - kMagZero));
+        // 10. Color reddening
+        const f64 x = atmosphere.airmass(apparent_alt);
+        const f32 reddening = kReddeningPerAirmass * static_cast<f32>(x - 1.0);
+        const f32 effective_bv = std::clamp(star.color_bv + reddening, kMinBV, kMaxBV);
 
-        // Normalize to [0, 1] range using a reference:
-        // Sirius at mag -1.46 gives ~3.84, we want that to map to ~1.0
-        // Use a simple normalization: brightness / max_expected_brightness
-        // max_expected is for mag = -1.5 → pow(10, 0.6) ≈ 3.98
-        constexpr f64 kMaxBrightness = 3.98;
-        const f64 brightness = std::min(raw_brightness / kMaxBrightness, 1.0);
-
+        // 11. Pack vertex
         vertices.push_back(StarVertex{
             .screen_x   = screen_pos->x,
             .screen_y   = screen_pos->y,
-            .brightness = static_cast<f32>(brightness),
-            .color_bv   = star.color_bv,
+            .brightness = adjusted_brightness,
+            .color_bv   = effective_bv,
         });
 
-        // Don't exceed buffer capacity
         if (vertices.size() >= m_buffer_capacity)
         {
             break;

@@ -37,6 +37,9 @@
     <ClCompile Include="C:\Parallax-dev\Parallax\src\catalog\catalog_loader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Parallax-dev\Parallax\src\catalog\visibility_filter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Parallax-dev\Parallax\src\rendering\camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

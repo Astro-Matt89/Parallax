@@ -3,6 +3,7 @@
 /// @file application.hpp
 /// @brief Main application class — lifecycle, main loop, frame rendering.
 
+#include "astro/atmosphere.hpp"
 #include "astro/coordinates.hpp"
 #include "astro/time_system.hpp"
 #include "catalog/star_entry.hpp"
@@ -15,6 +16,7 @@
 #include "vulkan/context.hpp"
 #include "vulkan/pipeline.hpp"
 #include "vulkan/swapchain.hpp"
+#include "catalog/visibility_filter.hpp"
 
 #include <vulkan/vulkan.h>
 
@@ -69,6 +71,8 @@ namespace parallax::core
 
         static constexpr uint32_t kMaxFramesInFlight = 2;
 
+	u32 m_frame_counter = 0;  ///< Frame counter for periodic logging
+
         // -----------------------------------------------------------------
         // Subsystems (created in init order, destroyed in reverse)
         // -----------------------------------------------------------------
@@ -92,6 +96,11 @@ namespace parallax::core
         f64 m_julian_date = 0.0;            ///< Current simulation time (JD)
         f64 m_time_scale = 1.0;             ///< 1.0 = real-time, 0.0 = paused
         astro::ObserverLocation m_observer;  ///< Observer geographic location
+
+        // -----------------------------------------------------------------
+        // Atmosphere model                                                    ← SPRINT 03 Task 3.3
+        // -----------------------------------------------------------------
+        astro::Atmosphere m_atmosphere;
 
         // -----------------------------------------------------------------
         // Sky parameters

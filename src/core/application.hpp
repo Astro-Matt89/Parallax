@@ -10,6 +10,7 @@
 #include "core/types.hpp"
 #include "core/window.hpp"
 #include "rendering/camera.hpp"
+#include "rendering/sky_background.hpp"
 #include "rendering/starfield.hpp"
 #include "vulkan/context.hpp"
 #include "vulkan/pipeline.hpp"
@@ -75,6 +76,7 @@ namespace parallax::core
         std::unique_ptr<vulkan::Context> m_context;
         std::unique_ptr<vulkan::Swapchain> m_swapchain;
         std::unique_ptr<vulkan::Pipeline> m_pipeline;       ///< Render pass + framebuffers (from Sprint 01)
+        std::unique_ptr<rendering::SkyBackground> m_sky_background;
         std::unique_ptr<rendering::Starfield> m_starfield;
         std::unique_ptr<rendering::Camera> m_camera;
         std::unique_ptr<Input> m_input;
@@ -90,6 +92,11 @@ namespace parallax::core
         f64 m_julian_date = 0.0;            ///< Current simulation time (JD)
         f64 m_time_scale = 1.0;             ///< 1.0 = real-time, 0.0 = paused
         astro::ObserverLocation m_observer;  ///< Observer geographic location
+
+        // -----------------------------------------------------------------
+        // Sky parameters
+        // -----------------------------------------------------------------
+        rendering::SkyParams m_sky_params;
 
         /// @brief Wall-clock time tracking for delta_time computation.
         std::chrono::steady_clock::time_point m_last_frame_time;

@@ -15,6 +15,7 @@ add_executable(parallax
     astro/coordinates.cpp
     catalog/catalog_loader.cpp
     rendering/camera.cpp
+    rendering/sky_background.cpp
     rendering/starfield.cpp
 )
 

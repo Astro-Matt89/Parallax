@@ -76,14 +76,18 @@ void Application::init()
     PLX_CORE_INFO("Shader directory: {}", shader_dir.string());
     m_pipeline = std::make_unique<vulkan::Pipeline>(*m_context, *m_swapchain, shader_dir);
 
-    // 6. Starfield renderer (uses Pipeline's render pass)
+    // 6. Sky background renderer (fullscreen pass before starfield)      ← SPRINT 03
+    m_sky_background = std::make_unique<rendering::SkyBackground>(
+        *m_context, m_pipeline->get_render_pass(), shader_dir, m_swapchain->get_extent());
+
+    // 7. Starfield renderer (uses Pipeline's render pass)
     m_starfield = std::make_unique<rendering::Starfield>(
         *m_context, m_pipeline->get_render_pass(), shader_dir);
 
-    // 7. Camera
+    // 8. Camera
     m_camera = std::make_unique<rendering::Camera>();
 
-    // 8. Load star catalog
+    // 9. Load star catalog
     const std::filesystem::path catalog_path{"data/catalogs/bright_stars.csv"};
     auto loaded_stars = catalog::CatalogLoader::load_bright_star_csv(catalog_path);
     if (loaded_stars.has_value())
@@ -97,13 +101,13 @@ void Application::init()
                       catalog_path.string());
     }
 
-    // 9. Observer location: La Palma, Canary Islands (28.76°N, 17.89°W)
+    // 10. Observer location: La Palma, Canary Islands (28.76°N, 17.89°W)
     m_observer = astro::ObserverLocation{
         .latitude_rad  = glm::radians(28.76),
         .longitude_rad = glm::radians(-17.89),
     };
 
-    // 10. Simulation time: current system UTC
+    // 11. Simulation time: current system UTC
     m_julian_date = astro::TimeSystem::now_as_jd();
     m_time_scale = 1.0;
     {
@@ -115,14 +119,22 @@ void Application::init()
                       -glm::degrees(m_observer.longitude_rad));
     }
 
-    // 11. Command pool + buffers
+    // 12. Default sky parameters: Bortle 4, astronomical night              ← SPRINT 03
+    m_sky_params = rendering::SkyParams{
+        .bortle_scale = 4.0f,
+        .sun_altitude_deg = -30.0f,
+        .moon_altitude_deg = -90.0f,
+        .moon_phase = 0.0f,
+    };
+
+    // 13. Command pool + buffers
     create_command_pool();
     create_command_buffers();
 
-    // 12. Synchronization objects
+    // 14. Synchronization objects
     create_sync_objects();
 
-    // 13. Initialize frame time
+    // 15. Initialize frame time
     m_last_frame_time = std::chrono::steady_clock::now();
 
     PLX_CORE_INFO("Application initialized — all subsystems ready");
@@ -151,8 +163,9 @@ void Application::shutdown()
         PLX_CORE_TRACE("Command pool destroyed");
     }
 
-    // Reverse creation order: starfield → pipeline → swapchain → context → window
+    // Reverse creation order: starfield → sky → pipeline → swapchain → context → window
     m_starfield.reset();
+    m_sky_background.reset();                                               // ← SPRINT 03
     m_pipeline.reset();
     m_swapchain.reset();
     m_context.reset();
@@ -306,6 +319,11 @@ void Application::update_simulation(f64 delta_time_sec)
     const f64 lst = astro::TimeSystem::lmst(m_julian_date, m_observer.longitude_rad);
 
     // -----------------------------------------------------------------
+    // Update sky background parameters                                     ← SPRINT 03
+    // -----------------------------------------------------------------
+    m_sky_background->update_params(m_sky_params, *m_camera);
+
+    // -----------------------------------------------------------------
     // Transform all catalog stars and upload to GPU
     // (Starfield::update does: RA/Dec → Alt/Az → screen + brightness)
     // -----------------------------------------------------------------
@@ -418,7 +436,7 @@ void Application::draw_frame()
 }
 
 // =================================================================
-// Command buffer recording — now uses Starfield instead of test draw
+// Command buffer recording — sky background → starfield
 // =================================================================
 
 void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_index)
@@ -428,9 +446,9 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
 
     check_vk(vkBeginCommandBuffer(cmd, &begin_info), "vkBeginCommandBuffer");
 
-    // Clear to near-black with a hint of deep blue
+    // Clear to pure black — sky background will paint over this          ← SPRINT 03
     VkClearValue clear_color{};
-    clear_color.color = {{0.0f, 0.0f, 0.02f, 1.0f}};
+    clear_color.color = {{0.0f, 0.0f, 0.0f, 1.0f}};
 
     VkExtent2D extent = m_swapchain->get_extent();
 
@@ -462,7 +480,14 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
     vkCmdSetScissor(cmd, 0, 1, &scissor);
 
     // -----------------------------------------------------------------
-    // Draw the starfield (replaces the old test_star draw)
+    // Pass 1: Sky background (fullscreen gradient — rendered first)       ← SPRINT 03
+    // SkyBackground::draw() binds its own pipeline, descriptor set,
+    // and issues vkCmdDraw(3, 1, 0, 0) for the fullscreen triangle.
+    // -----------------------------------------------------------------
+    m_sky_background->draw(cmd);
+
+    // -----------------------------------------------------------------
+    // Pass 2: Starfield (additive over sky background)
     // Starfield::draw() binds its own pipeline, descriptor set, push
     // constants, and issues vkCmdDraw(1, star_count, 0, 0)
     // -----------------------------------------------------------------
@@ -502,6 +527,9 @@ void Application::recreate_swapchain()
 
     m_swapchain->recreate(w, h);
     m_pipeline->recreate_framebuffers(*m_swapchain);
+
+    // Update sky background extent after swapchain recreation              ← SPRINT 03
+    m_sky_background->set_extent(m_swapchain->get_extent());
 
     // Recreate per-image semaphores for the new swapchain image count
     uint32_t image_count = m_swapchain->get_image_count();

@@ -39,3 +39,9 @@
 
 # debug information files
 *.dwo
+
+# Build directory
+build/
+
+# CodeQL
+_codeql_detected_source_root

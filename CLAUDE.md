@@ -264,7 +264,48 @@ parallax/
 
 No circular dependencies. Each module testable in isolation.
 
-### 5.3 Data Flow (Single Frame)
+### 5.4 Skychart vs Imaging (Architectural Separation)
+
+Parallax has two distinct rendering modes with separate pipelines:
+
+**Skychart Mode** (Phase 1-2):
+Clean planetarium atlas. Used for target selection and coordinate readout.
+- Stars rendered as schematic points (magnitude → size/brightness, linear mapping)
+- No atmospheric effects on stars (no extinction, no refraction, no reddening)
+- Visibility controlled solely by user-adjustable magnitude limit
+- Horizon culling (stars below alt 0° hidden — physical obstruction, not atmosphere)
+- Sky background gradient provides visual context only
+- Think: Stellarium, Cartes du Ciel
+
+**Imaging Mode** (Phase 2-3):
+Instrument simulation. Shows what the telescope/sensor actually captures.
+- Full atmospheric model: refraction, extinction, seeing, scintillation
+- Optical simulation: PSF, diffraction, aberrations
+- Sensor simulation: noise, dark current, exposure stacking
+- Think: what appears on the CCD after a real exposure
+
+These two modes share the Catalog and Astro modules but have separate rendering pipelines.
+The Atmosphere class exists in the codebase but is only used by the Imaging pipeline.
+
+### 5.5 Data Flow — Skychart Mode (Single Frame)
+
+```
+1. Timer tick → delta time
+2. Input poll (SDL2 events)
+3. Update simulation time (JD += dt × time_scale / 86400)
+4. Compute LST
+5. Catalog query: all stars with Vmag ≤ magnitude_limit
+6. For each star:
+   a. RA/Dec → Alt/Az (current epoch, observer location, LST)
+   b. Skip if Alt < 0° (below horizon)
+   c. Alt/Az → screen coords (stereographic projection vs camera pointing)
+   d. Magnitude → size + brightness (linear mapping, schematic)
+   e. B-V → color (real stellar color)
+   f. Add to GPU star buffer
+7. Upload star buffer
+8. Render: sky background → starfield (additive) → HUD (alpha)
+9. Present
+```
 
 ```
 1. Timer tick → delta time

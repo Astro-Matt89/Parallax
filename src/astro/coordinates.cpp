@@ -102,16 +102,24 @@ EquatorialCoord Coordinates::horizontal_to_equatorial(
 }
 
 // -----------------------------------------------------------------
-// Horizontal (Alt/Az) → Stereographic screen projection
+// Horizontal (Alt/Az) → Gnomonic screen projection
 //
-// 1. Convert both star and pointing to Cartesian unit vectors
-// 2. Compute angular separation via dot product
-// 3. If separation > FOV/2: return nullopt (off screen)
-// 4. Gnomonic-like tangent-plane projection:
-//    dx = cos(alt_star) × sin(Δaz)
-//    dy = sin(alt_star) × cos(alt_center) - cos(alt_star) × sin(alt_center) × cos(Δaz)
-//    denom = sin(alt_star) × sin(alt_center) + cos(alt_star) × cos(alt_center) × cos(Δaz)
-// 5. Scale by 2/FOV to normalize to [-1, 1]
+// Projects a star's horizontal position onto a 2D tangent plane
+// centered on the camera pointing direction.
+//
+// Gnomonic projection (tangent-plane):
+//   dx =  cos(alt_s) × sin(Δaz)
+//   dy =  sin(alt_s) × cos(alt_p) - cos(alt_s) × sin(alt_p) × cos(Δaz)
+//   denom = cos(angular_sep) = dot product of unit vectors
+//
+// Screen conventions:
+//   +X = East (increasing azimuth) = right on screen
+//   +Y = higher altitude = up on screen
+//
+// IMPORTANT: Vulkan NDC has +Y pointing DOWN. We negate the Y
+// output so that higher altitude maps to negative NDC Y (upward
+// on screen). Without this, stars appear to follow the camera
+// when panning because the Y axis is inverted.
 // -----------------------------------------------------------------
 
 std::optional<Vec2f> Coordinates::horizontal_to_screen(
@@ -134,36 +142,33 @@ std::optional<Vec2f> Coordinates::horizontal_to_screen(
     // Clamp for numerical safety, then check FOV boundary
     const f64 separation = std::acos(std::clamp(cos_sep, -1.0, 1.0));
 
-    // Use a generous margin (half diagonal ≈ FOV * 0.71) to avoid clipping corners
-    // but the sprint spec says FOV/2, so we use a slightly expanded check:
-    // screen diagonal of a square FOV is FOV * sqrt(2)/2 ≈ FOV * 0.707
-    // We use 0.75 as a safe margin
+    // Use a generous margin: screen diagonal of a square FOV is FOV * sqrt(2)/2.
+    // We use 0.75 as a safe margin to avoid clipping corners.
     if (separation > fov_rad * 0.75)
     {
         return std::nullopt;
     }
 
-    // Tangent-plane projection
-    // denom = cos(angular separation) — the dot product we already computed
     // Guard against division by zero (star directly behind the observer)
     if (cos_sep <= 0.0)
     {
         return std::nullopt;
     }
 
+    // Gnomonic tangent-plane projection
     const f64 dx = cos_alt_s * sin_daz;
     const f64 dy = sin_alt_s * cos_alt_p - cos_alt_s * sin_alt_p * cos_daz;
 
-    // Gnomonic projection: divide by cos_sep for true gnomonic
     const f64 proj_x = dx / cos_sep;
     const f64 proj_y = dy / cos_sep;
 
-    // Scale: at the edge of the FOV, the tangent-plane distance is tan(FOV/2)
-    // Normalize so that FOV/2 maps to screen edge (±1)
+    // Scale: normalize so that FOV/2 maps to screen edge (±1)
     const f64 scale = 1.0 / std::tan(fov_rad * 0.5);
 
-    const auto screen_x = static_cast<f32>(proj_x * scale);
-    const auto screen_y = static_cast<f32>(proj_y * scale);
+    // +X = East (right on screen in observer's view)
+    // -Y = Vulkan NDC correction: negate so higher altitude = screen up
+    const auto screen_x = static_cast<f32>( proj_x * scale);
+    const auto screen_y = static_cast<f32>(-proj_y * scale);
 
     // Final bounds check in normalized screen space
     if (std::abs(screen_x) > 1.0f || std::abs(screen_y) > 1.0f)

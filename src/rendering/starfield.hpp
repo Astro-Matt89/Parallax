@@ -1,9 +1,11 @@
 #pragma once
 
 /// @file starfield.hpp
-/// @brief Starfield renderer: CPU-side star processing + GPU storage buffer + instanced draw.
+/// @brief Starfield renderer: skychart mode.
+///
+/// SKYCHART: No atmospheric effects on stars. Visibility controlled
+/// solely by magnitude limit. Horizon culling (alt < 0°) remains.
 
-#include "astro/atmosphere.hpp"
 #include "astro/coordinates.hpp"
 #include "catalog/star_entry.hpp"
 #include "core/types.hpp"
@@ -24,24 +26,28 @@ namespace parallax::rendering
     {
         f32 screen_x;      ///< Normalized device coords [-1, 1]
         f32 screen_y;      ///< Normalized device coords [-1, 1]
-        f32 brightness;    ///< Linear brightness (Pogson formula × extinction)
-        f32 color_bv;      ///< B-V color index (reddened near horizon)
+        f32 mag_v;          ///< Visual magnitude (raw, for GPU normalization)
+        f32 color_bv;       ///< B-V color index (real catalog data, no reddening)
     };
 
     /// @brief Push constants for starfield rendering parameters.
     struct StarfieldPushConstants
     {
-        f32 point_size_scale;   ///< Scaling factor for gl_PointSize
-        f32 brightness_scale;   ///< Scaling factor for brightness
+        f32 point_size_scale;   ///< Base point size for brightest star
+        f32 mag_limit;          ///< Current magnitude limit (for shader normalization)
+        f32 brightest_mag;      ///< Brightest magnitude in buffer (or fixed reference)
+        f32 padding;            ///< Alignment padding
     };
 
-    /// @brief Manages starfield rendering: CPU-side transform pipeline + GPU resources.
+    /// @brief Manages starfield rendering for skychart mode.
     ///
     /// Each frame:
-    /// 1. CPU: Prefilter catalog (visibility_filter) → candidate indices
-    /// 2. CPU: Transform candidates (RA/Dec → Alt/Az → refraction → extinction → screen)
+    /// 1. CPU: Prefilter catalog (VisibilityFilter) → candidate indices
+    /// 2. CPU: Transform candidates (RA/Dec → Alt/Az → horizon cull → screen project)
     /// 3. CPU: Upload StarVertex array to GPU storage buffer
     /// 4. GPU: Instanced point draw with additive blending
+    ///
+    /// NO atmospheric effects: no extinction, no refraction, no reddening.
     class Starfield
     {
     public:
@@ -59,28 +65,18 @@ namespace parallax::rendering
 
         /// @brief Process prefiltered star indices and upload visible ones to GPU.
         ///
-        /// Only transforms stars at the given indices (output of VisibilityFilter).
-        /// Applies atmospheric refraction, extinction, and reddening.
-        ///
-        /// @param stars The full star catalog.
-        /// @param candidate_indices Indices into stars[] from the prefilter.
-        /// @param observer Observer geographic location.
-        /// @param lst Local sidereal time in radians.
-        /// @param camera The camera (pointing + FOV + magnitude limit).
-        /// @param atmosphere Atmospheric model for refraction and extinction.
+        /// Skychart pipeline:
+        ///   RA/Dec → Alt/Az → horizon cull (alt < 0°) → screen project → upload
+        ///   No refraction, no extinction, no reddening.
         void update(std::span<const catalog::StarEntry> stars,
                     std::span<const u32> candidate_indices,
                     const astro::ObserverLocation& observer,
                     f64 lst,
-                    const Camera& camera,
-                    const astro::Atmosphere& atmosphere);
+                    const Camera& camera);
 
-        /// @brief Record draw commands into a command buffer.
         void draw(VkCommandBuffer cmd) const;
 
-        /// @brief Number of visible stars after the last update().
         [[nodiscard]] u32 get_visible_count() const;
-
         [[nodiscard]] VkPipeline get_pipeline() const;
         [[nodiscard]] VkPipelineLayout get_pipeline_layout() const;
 
@@ -112,29 +108,10 @@ namespace parallax::rendering
 
         u32 m_visible_count = 0;
 
-        /// Push constants: tuned so that the full Hipparcos magnitude range
-        /// produces visible stars on screen.
-        ///
-        /// Old values {6.0, 1.5} made anything fainter than mag ~2 invisible
-        /// because the Pogson brightness at mag 5 is only ~0.002 and the
-        /// fragment shader alpha was near-zero.
-        ///
-        /// New values:
-        ///   point_size_scale = 8.0 → brighter stars get larger points
-        ///   brightness_scale = 6.0 → mag 4 star: 0.006 × 6.0 = 0.038 → visible
-        ///                            mag 6 star: 0.001 × 6.0 = 0.006 → faint dot
-        StarfieldPushConstants m_push_constants = {8.0f, 6.0f};
+        StarfieldPushConstants m_push_constants = {6.0f, 6.5f, -1.5f, 0.0f};
 
-        static constexpr f64 kMagZero = 0.0;
-        static constexpr f64 kMinApparentAltRad = -0.5 * astro_constants::kDegToRad;
-
-        /// Minimum brightness threshold after extinction.
-        /// Lowered to allow faint stars near the horizon to survive culling.
-        static constexpr f32 kMinBrightness = 0.0003f;
-
-        static constexpr f32 kReddeningPerAirmass = 0.1f;
-        static constexpr f32 kMinBV = -0.4f;
-        static constexpr f32 kMaxBV = 2.0f;
+        /// Fixed reference magnitude for normalization (Sirius-class).
+        static constexpr f32 kReferenceMag = -1.5f;
     };
 
 } // namespace parallax::rendering

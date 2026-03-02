@@ -13,20 +13,13 @@
 namespace parallax::rendering
 {
 
-// -----------------------------------------------------------------
-// Construction
-// -----------------------------------------------------------------
-
 Camera::Camera()
     : m_altitude(kDefaultAltitude)
     , m_azimuth(kDefaultAzimuth)
     , m_fov(kDefaultFov)
+    , m_magnitude_limit(kDefaultMagLimit)
 {
 }
-
-// -----------------------------------------------------------------
-// set_pointing — absolute Alt/Az
-// -----------------------------------------------------------------
 
 void Camera::set_pointing(f64 altitude_rad, f64 azimuth_rad)
 {
@@ -37,19 +30,11 @@ void Camera::set_pointing(f64 altitude_rad, f64 azimuth_rad)
     normalize_azimuth();
 }
 
-// -----------------------------------------------------------------
-// set_fov — in degrees, converted to radians
-// -----------------------------------------------------------------
-
 void Camera::set_fov(f64 fov_deg)
 {
     m_fov = glm::radians(fov_deg);
     clamp_fov();
 }
-
-// -----------------------------------------------------------------
-// pan — delta adjustment for mouse drag
-// -----------------------------------------------------------------
 
 void Camera::pan(f64 delta_az_rad, f64 delta_alt_rad)
 {
@@ -60,30 +45,19 @@ void Camera::pan(f64 delta_az_rad, f64 delta_alt_rad)
     normalize_azimuth();
 }
 
-// -----------------------------------------------------------------
-// zoom — multiply FOV by factor
-// -----------------------------------------------------------------
-
 void Camera::zoom(f64 factor)
 {
     m_fov *= factor;
     clamp_fov();
 }
 
-// -----------------------------------------------------------------
-// reset — back to defaults
-// -----------------------------------------------------------------
-
 void Camera::reset()
 {
     m_altitude = kDefaultAltitude;
     m_azimuth = kDefaultAzimuth;
     m_fov = kDefaultFov;
+    m_magnitude_limit = kDefaultMagLimit;
 }
-
-// -----------------------------------------------------------------
-// Getters
-// -----------------------------------------------------------------
 
 astro::HorizontalCoord Camera::get_pointing() const
 {
@@ -103,35 +77,20 @@ f64 Camera::get_fov_deg() const
     return glm::degrees(m_fov);
 }
 
-// -----------------------------------------------------------------
-// Magnitude limit heuristic
-//
-// mag_limit = 6.5 + 5 × log10(60.0 / fov_degrees)
-//
-// This models the increase in limiting magnitude as the FOV narrows
-// (i.e., zooming in with optics concentrates more light per pixel).
-//
-// Clamped to [kMinMagLimit, kMaxMagLimit]:
-//   - kMinMagLimit (6.0) ensures wide-FOV views still show enough stars
-//     for a realistic naked-eye sky (prevents aggressive culling at 120°)
-//   - kMaxMagLimit (20.0) prevents absurd values at extreme zoom
-// -----------------------------------------------------------------
-
 f32 Camera::get_magnitude_limit() const
 {
-    const f64 fov_deg = glm::degrees(m_fov);
-
-    const f64 mag_limit = kBaseMagLimit
-                        + 5.0 * std::log10(kReferenceFovDeg / fov_deg);
-
-    return std::clamp(static_cast<f32>(mag_limit),
-                      kMinMagLimit,
-                      kMaxMagLimit);
+    return m_magnitude_limit;
 }
 
-// -----------------------------------------------------------------
-// Internal helpers
-// -----------------------------------------------------------------
+void Camera::set_magnitude_limit(f32 mag)
+{
+    m_magnitude_limit = std::clamp(mag, kMinMagLimit, kMaxMagLimit);
+}
+
+void Camera::adjust_magnitude_limit(f32 delta)
+{
+    set_magnitude_limit(m_magnitude_limit + delta);
+}
 
 void Camera::clamp_altitude()
 {

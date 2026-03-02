@@ -1,5 +1,8 @@
 /// @file starfield.cpp
-/// @brief Starfield renderer implementation: CPU transforms + GPU buffer + pipeline.
+/// @brief Starfield renderer implementation: skychart mode.
+///
+/// No atmospheric effects. Stars are rendered with their catalog magnitude
+/// and B-V color. Horizon culling (alt < 0°) is the only physical filter.
 
 #include "rendering/starfield.hpp"
 
@@ -11,6 +14,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <limits>
 
 namespace
 {
@@ -24,7 +28,6 @@ void check_vk(VkResult result, const char* operation)
     }
 }
 
-/// @brief Find a suitable memory type for the given requirements.
 uint32_t find_memory_type(VkPhysicalDevice physical_device,
                           uint32_t type_filter,
                           VkMemoryPropertyFlags properties)
@@ -65,121 +68,89 @@ Starfield::Starfield(const vulkan::Context& context,
     create_descriptor_pool_and_set();
     create_pipeline(render_pass, shader_dir);
 
-    PLX_CORE_INFO("Starfield renderer initialized (buffer capacity: {} stars)", max_stars);
+    PLX_CORE_INFO("Starfield renderer initialized (skychart mode, {} max stars)", max_stars);
 }
 
 Starfield::~Starfield()
 {
     VkDevice device = m_context.get_device();
 
-    if (m_pipeline != VK_NULL_HANDLE)
-    {
-        vkDestroyPipeline(device, m_pipeline, nullptr);
-    }
-    if (m_pipeline_layout != VK_NULL_HANDLE)
-    {
-        vkDestroyPipelineLayout(device, m_pipeline_layout, nullptr);
-    }
-    if (m_descriptor_pool != VK_NULL_HANDLE)
-    {
-        vkDestroyDescriptorPool(device, m_descriptor_pool, nullptr);
-    }
+    if (m_pipeline != VK_NULL_HANDLE)        vkDestroyPipeline(device, m_pipeline, nullptr);
+    if (m_pipeline_layout != VK_NULL_HANDLE) vkDestroyPipelineLayout(device, m_pipeline_layout, nullptr);
+    if (m_descriptor_pool != VK_NULL_HANDLE) vkDestroyDescriptorPool(device, m_descriptor_pool, nullptr);
     if (m_descriptor_set_layout != VK_NULL_HANDLE)
-    {
         vkDestroyDescriptorSetLayout(device, m_descriptor_set_layout, nullptr);
-    }
-    if (m_storage_buffer != VK_NULL_HANDLE)
-    {
-        vkDestroyBuffer(device, m_storage_buffer, nullptr);
-    }
-    if (m_storage_memory != VK_NULL_HANDLE)
-    {
-        vkFreeMemory(device, m_storage_memory, nullptr);
-    }
+    if (m_storage_buffer != VK_NULL_HANDLE)  vkDestroyBuffer(device, m_storage_buffer, nullptr);
+    if (m_storage_memory != VK_NULL_HANDLE)  vkFreeMemory(device, m_storage_memory, nullptr);
 
     PLX_CORE_TRACE("Starfield renderer destroyed");
 }
 
 // -----------------------------------------------------------------
-// update() — CPU-side transform pipeline with atmospheric effects
-//            Now iterates only prefiltered candidates.
+// update() — Skychart transform pipeline (NO atmosphere)
+//
+// Pipeline: RA/Dec → Alt/Az → horizon cull → screen project → upload
 // -----------------------------------------------------------------
 
 void Starfield::update(std::span<const catalog::StarEntry> stars,
                        std::span<const u32> candidate_indices,
                        const astro::ObserverLocation& observer,
                        f64 lst,
-                       const Camera& camera,
-                       const astro::Atmosphere& atmosphere)
+                       const Camera& camera)
 {
     const auto pointing = camera.get_pointing();
     const f64 fov_rad = camera.get_fov_rad();
     const f32 mag_limit = camera.get_magnitude_limit();
 
+    // Diagnostic counters
+    u32 diag_pass_mag     = 0;
+    u32 diag_pass_horizon = 0;
+    u32 diag_pass_fov     = 0;
+
     std::vector<StarVertex> vertices;
     vertices.reserve(std::min(static_cast<u32>(candidate_indices.size()), m_buffer_capacity));
+
+    f32 min_mag = std::numeric_limits<f32>::max();
 
     for (const u32 idx : candidate_indices)
     {
         const auto& star = stars[idx];
 
-        // 1. Skip if fainter than mag limit (redundant safety — prefilter already checks)
+        // 1. Magnitude limit — the ONLY brightness filter
         if (star.mag_v > mag_limit)
         {
             continue;
         }
+        ++diag_pass_mag;
 
-        // 2. RA/Dec → Alt/Az
+        // 2. RA/Dec → Alt/Az (no refraction — true geometric position)
         const astro::EquatorialCoord eq{.ra = star.ra, .dec = star.dec};
         const auto hz = astro::Coordinates::equatorial_to_horizontal(eq, observer, lst);
 
-        // 3. Atmospheric refraction → apparent altitude
-        const f64 refraction_rad = atmosphere.refraction(hz.alt);
-        const f64 apparent_alt = hz.alt + refraction_rad;
-
-        // 4. Skip if apparent altitude below visibility threshold
-        if (apparent_alt < kMinApparentAltRad)
+        // 3. Horizon cull — physical obstruction, not atmospheric
+        if (hz.alt < 0.0)
         {
             continue;
         }
+        ++diag_pass_horizon;
 
-        // 5. Extinction factor
-        const f32 ext_factor = atmosphere.extinction_factor(apparent_alt);
-
-        // 6. Pogson brightness
-        const f64 raw_brightness = std::pow(10.0, -0.4 * (static_cast<f64>(star.mag_v) - kMagZero));
-        constexpr f64 kMaxBrightness = 3.98;
-        const f64 base_brightness = std::min(raw_brightness / kMaxBrightness, 1.0);
-
-        // 7. Apply extinction
-        const f32 adjusted_brightness = static_cast<f32>(base_brightness) * ext_factor;
-
-        // 8. Skip if too dim
-        if (adjusted_brightness < kMinBrightness)
-        {
-            continue;
-        }
-
-        // 9. Project apparent Alt/Az → screen
-        const astro::HorizontalCoord apparent_hz{.alt = apparent_alt, .az = hz.az};
-        const auto screen_pos = astro::Coordinates::horizontal_to_screen(apparent_hz, pointing, fov_rad);
+        // 4. Project Alt/Az → screen (gnomonic projection)
+        const auto screen_pos = astro::Coordinates::horizontal_to_screen(hz, pointing, fov_rad);
         if (!screen_pos.has_value())
         {
             continue;
         }
+        ++diag_pass_fov;
 
-        // 10. Color reddening
-        const f64 x = atmosphere.airmass(apparent_alt);
-        const f32 reddening = kReddeningPerAirmass * static_cast<f32>(x - 1.0);
-        const f32 effective_bv = std::clamp(star.color_bv + reddening, kMinBV, kMaxBV);
-
-        // 11. Pack vertex
+        // 5. Pack vertex — raw catalog data, no atmospheric modification
         vertices.push_back(StarVertex{
-            .screen_x   = screen_pos->x,
-            .screen_y   = screen_pos->y,
-            .brightness = adjusted_brightness,
-            .color_bv   = effective_bv,
+            .screen_x = screen_pos->x,
+            .screen_y = screen_pos->y,
+            .mag_v    = star.mag_v,
+            .color_bv = star.color_bv,  // Real B-V, no reddening
         });
+
+        if (star.mag_v < min_mag) min_mag = star.mag_v;
 
         if (vertices.size() >= m_buffer_capacity)
         {
@@ -189,59 +160,54 @@ void Starfield::update(std::span<const catalog::StarEntry> stars,
 
     m_visible_count = static_cast<u32>(vertices.size());
 
+    // Update push constants
+    m_push_constants.brightest_mag = (m_visible_count > 0) ? min_mag : kReferenceMag;
+    m_push_constants.mag_limit = mag_limit;
+
     if (m_visible_count > 0)
     {
         upload_star_data(vertices);
     }
+
+    // Diagnostic log — once per second (~60 frames)
+    static u32 diag_frame_counter = 0;
+    if (++diag_frame_counter >= 60)
+    {
+        diag_frame_counter = 0;
+        PLX_CORE_INFO("=== Skychart Pipeline ===");
+        PLX_CORE_INFO("  Catalog: {} | Candidates: {} | Mag passed: {} (MLIM {:.1f})",
+                      stars.size(), candidate_indices.size(), diag_pass_mag, mag_limit);
+        PLX_CORE_INFO("  Horizon passed: {} | FOV projected: {} | GPU: {}",
+                      diag_pass_horizon, diag_pass_fov, m_visible_count);
+        PLX_CORE_INFO("  Camera: alt={:.1f} az={:.1f} fov={:.1f}",
+                      pointing.alt * astro_constants::kRadToDeg,
+                      pointing.az * astro_constants::kRadToDeg,
+                      fov_rad * astro_constants::kRadToDeg);
+    }
 }
 
 // -----------------------------------------------------------------
-// draw() — record draw commands
+// draw()
 // -----------------------------------------------------------------
 
 void Starfield::draw(VkCommandBuffer cmd) const
 {
-    if (m_visible_count == 0)
-    {
-        return;
-    }
+    if (m_visible_count == 0) return;
 
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
-
     vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                            m_pipeline_layout, 0, 1,
-                            &m_descriptor_set, 0, nullptr);
-
-    vkCmdPushConstants(cmd, m_pipeline_layout,
-                       VK_SHADER_STAGE_VERTEX_BIT,
-                       0, sizeof(StarfieldPushConstants),
-                       &m_push_constants);
-
-    // Instanced draw: 1 vertex per instance, m_visible_count instances
+                            m_pipeline_layout, 0, 1, &m_descriptor_set, 0, nullptr);
+    vkCmdPushConstants(cmd, m_pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT,
+                       0, sizeof(StarfieldPushConstants), &m_push_constants);
     vkCmdDraw(cmd, 1, m_visible_count, 0, 0);
 }
 
-// -----------------------------------------------------------------
-// Accessors
-// -----------------------------------------------------------------
-
-u32 Starfield::get_visible_count() const
-{
-    return m_visible_count;
-}
-
-VkPipeline Starfield::get_pipeline() const
-{
-    return m_pipeline;
-}
-
-VkPipelineLayout Starfield::get_pipeline_layout() const
-{
-    return m_pipeline_layout;
-}
+u32 Starfield::get_visible_count() const { return m_visible_count; }
+VkPipeline Starfield::get_pipeline() const { return m_pipeline; }
+VkPipelineLayout Starfield::get_pipeline_layout() const { return m_pipeline_layout; }
 
 // -----------------------------------------------------------------
-// Storage buffer (host-visible, persistently mapped)
+// Vulkan resource creation (unchanged from previous)
 // -----------------------------------------------------------------
 
 void Starfield::create_storage_buffer(u32 max_stars)
@@ -256,7 +222,6 @@ void Starfield::create_storage_buffer(u32 max_stars)
     buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
     VkDevice device = m_context.get_device();
-
     check_vk(vkCreateBuffer(device, &buffer_info, nullptr, &m_storage_buffer),
              "vkCreateBuffer (starfield storage)");
 
@@ -267,27 +232,16 @@ void Starfield::create_storage_buffer(u32 max_stars)
     alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     alloc_info.allocationSize = mem_requirements.size;
     alloc_info.memoryTypeIndex = find_memory_type(
-        m_context.get_physical_device(),
-        mem_requirements.memoryTypeBits,
+        m_context.get_physical_device(), mem_requirements.memoryTypeBits,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
     check_vk(vkAllocateMemory(device, &alloc_info, nullptr, &m_storage_memory),
              "vkAllocateMemory (starfield storage)");
-
     check_vk(vkBindBufferMemory(device, m_storage_buffer, m_storage_memory, 0),
              "vkBindBufferMemory (starfield storage)");
-
-    // Persistently map the buffer
     check_vk(vkMapMemory(device, m_storage_memory, 0, buffer_size, 0, &m_mapped_ptr),
              "vkMapMemory (starfield storage)");
-
-    PLX_CORE_TRACE("Starfield storage buffer created: {} bytes ({} stars)",
-                   buffer_size, max_stars);
 }
-
-// -----------------------------------------------------------------
-// Descriptor set layout: single storage buffer at binding 0
-// -----------------------------------------------------------------
 
 void Starfield::create_descriptor_set_layout()
 {
@@ -302,21 +256,15 @@ void Starfield::create_descriptor_set_layout()
     layout_info.bindingCount = 1;
     layout_info.pBindings = &binding;
 
-    check_vk(
-        vkCreateDescriptorSetLayout(m_context.get_device(), &layout_info, nullptr,
-                                    &m_descriptor_set_layout),
-        "vkCreateDescriptorSetLayout (starfield)");
+    check_vk(vkCreateDescriptorSetLayout(m_context.get_device(), &layout_info, nullptr,
+                                         &m_descriptor_set_layout),
+             "vkCreateDescriptorSetLayout (starfield)");
 }
-
-// -----------------------------------------------------------------
-// Descriptor pool + set
-// -----------------------------------------------------------------
 
 void Starfield::create_descriptor_pool_and_set()
 {
     VkDevice device = m_context.get_device();
 
-    // Pool
     VkDescriptorPoolSize pool_size{};
     pool_size.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     pool_size.descriptorCount = 1;
@@ -330,7 +278,6 @@ void Starfield::create_descriptor_pool_and_set()
     check_vk(vkCreateDescriptorPool(device, &pool_info, nullptr, &m_descriptor_pool),
              "vkCreateDescriptorPool (starfield)");
 
-    // Allocate set
     VkDescriptorSetAllocateInfo alloc_info{};
     alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     alloc_info.descriptorPool = m_descriptor_pool;
@@ -340,7 +287,6 @@ void Starfield::create_descriptor_pool_and_set()
     check_vk(vkAllocateDescriptorSets(device, &alloc_info, &m_descriptor_set),
              "vkAllocateDescriptorSets (starfield)");
 
-    // Write the storage buffer into the descriptor set
     VkDescriptorBufferInfo buffer_desc{};
     buffer_desc.buffer = m_storage_buffer;
     buffer_desc.offset = 0;
@@ -350,7 +296,6 @@ void Starfield::create_descriptor_pool_and_set()
     write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     write.dstSet = m_descriptor_set;
     write.dstBinding = 0;
-    write.dstArrayElement = 0;
     write.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     write.descriptorCount = 1;
     write.pBufferInfo = &buffer_desc;
@@ -358,16 +303,11 @@ void Starfield::create_descriptor_pool_and_set()
     vkUpdateDescriptorSets(device, 1, &write, 0, nullptr);
 }
 
-// -----------------------------------------------------------------
-// Graphics pipeline: starfield shaders, additive blending, push constants
-// -----------------------------------------------------------------
-
 void Starfield::create_pipeline(VkRenderPass render_pass,
                                 const std::filesystem::path& shader_dir)
 {
     VkDevice device = m_context.get_device();
 
-    // Shader modules
     VkShaderModule vert_module = create_shader_module(shader_dir / "starfield.vert.spv");
     VkShaderModule frag_module = create_shader_module(shader_dir / "starfield.frag.spv");
 
@@ -385,19 +325,15 @@ void Starfield::create_pipeline(VkRenderPass render_pass,
 
     VkPipelineShaderStageCreateInfo shader_stages[] = {vert_stage, frag_stage};
 
-    // No vertex input (data from storage buffer)
     VkPipelineVertexInputStateCreateInfo vertex_input{};
     vertex_input.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
-    // POINT_LIST topology
     VkPipelineInputAssemblyStateCreateInfo input_assembly{};
     input_assembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     input_assembly.topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
     input_assembly.primitiveRestartEnable = VK_FALSE;
 
-    // Dynamic viewport + scissor
     VkDynamicState dynamic_states[] = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
-
     VkPipelineDynamicStateCreateInfo dynamic_state{};
     dynamic_state.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
     dynamic_state.dynamicStateCount = 2;
@@ -408,32 +344,20 @@ void Starfield::create_pipeline(VkRenderPass render_pass,
     viewport_state.viewportCount = 1;
     viewport_state.scissorCount = 1;
 
-    // Rasterizer
     VkPipelineRasterizationStateCreateInfo rasterizer{};
     rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-    rasterizer.depthClampEnable = VK_FALSE;
-    rasterizer.rasterizerDiscardEnable = VK_FALSE;
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
     rasterizer.cullMode = VK_CULL_MODE_NONE;
     rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
-    rasterizer.depthBiasEnable = VK_FALSE;
 
-    // Multisampling: off
     VkPipelineMultisampleStateCreateInfo multisampling{};
     multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-    multisampling.sampleShadingEnable = VK_FALSE;
     multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
 
-    // -----------------------------------------------------------------
-    // Additive blending: src.rgb * srcAlpha + dst.rgb * 1
-    // Stars accumulate light on top of the dark background.
-    // -----------------------------------------------------------------
     VkPipelineColorBlendAttachmentState color_blend_attachment{};
-    color_blend_attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT
-                                          | VK_COLOR_COMPONENT_G_BIT
-                                          | VK_COLOR_COMPONENT_B_BIT
-                                          | VK_COLOR_COMPONENT_A_BIT;
+    color_blend_attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT
+                                          | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
     color_blend_attachment.blendEnable = VK_TRUE;
     color_blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
     color_blend_attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE;
@@ -444,13 +368,9 @@ void Starfield::create_pipeline(VkRenderPass render_pass,
 
     VkPipelineColorBlendStateCreateInfo color_blending{};
     color_blending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-    color_blending.logicOpEnable = VK_FALSE;
     color_blending.attachmentCount = 1;
     color_blending.pAttachments = &color_blend_attachment;
 
-    // -----------------------------------------------------------------
-    // Pipeline layout: descriptor set (storage buffer) + push constants
-    // -----------------------------------------------------------------
     VkPushConstantRange push_range{};
     push_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
     push_range.offset = 0;
@@ -466,9 +386,6 @@ void Starfield::create_pipeline(VkRenderPass render_pass,
     check_vk(vkCreatePipelineLayout(device, &layout_info, nullptr, &m_pipeline_layout),
              "vkCreatePipelineLayout (starfield)");
 
-    // -----------------------------------------------------------------
-    // Create the graphics pipeline
-    // -----------------------------------------------------------------
     VkGraphicsPipelineCreateInfo pipeline_info{};
     pipeline_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipeline_info.stageCount = 2;
@@ -478,27 +395,20 @@ void Starfield::create_pipeline(VkRenderPass render_pass,
     pipeline_info.pViewportState = &viewport_state;
     pipeline_info.pRasterizationState = &rasterizer;
     pipeline_info.pMultisampleState = &multisampling;
-    pipeline_info.pDepthStencilState = nullptr;
     pipeline_info.pColorBlendState = &color_blending;
     pipeline_info.pDynamicState = &dynamic_state;
     pipeline_info.layout = m_pipeline_layout;
     pipeline_info.renderPass = render_pass;
     pipeline_info.subpass = 0;
 
-    check_vk(
-        vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &m_pipeline),
-        "vkCreateGraphicsPipelines (starfield)");
+    check_vk(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &m_pipeline),
+             "vkCreateGraphicsPipelines (starfield)");
 
-    PLX_CORE_INFO("Starfield pipeline created (POINT_LIST, additive blend, storage buffer)");
+    PLX_CORE_INFO("Starfield pipeline created (skychart, additive blend)");
 
-    // Clean up shader modules
     vkDestroyShaderModule(device, frag_module, nullptr);
     vkDestroyShaderModule(device, vert_module, nullptr);
 }
-
-// -----------------------------------------------------------------
-// Shader module loader
-// -----------------------------------------------------------------
 
 VkShaderModule Starfield::create_shader_module(const std::filesystem::path& path) const
 {
@@ -512,8 +422,7 @@ VkShaderModule Starfield::create_shader_module(const std::filesystem::path& path
     auto file_size = static_cast<std::size_t>(file.tellg());
     if (file_size == 0 || file_size % 4 != 0)
     {
-        PLX_CORE_CRITICAL("Invalid SPIR-V file (size {} not aligned to 4): {}",
-                          file_size, path.string());
+        PLX_CORE_CRITICAL("Invalid SPIR-V file (size {} not aligned to 4): {}", file_size, path.string());
         std::abort();
     }
 
@@ -530,19 +439,12 @@ VkShaderModule Starfield::create_shader_module(const std::filesystem::path& path
     VkShaderModule module = VK_NULL_HANDLE;
     check_vk(vkCreateShaderModule(m_context.get_device(), &create_info, nullptr, &module),
              "vkCreateShaderModule (starfield)");
-
-    PLX_CORE_TRACE("Shader module loaded: {}", path.filename().string());
     return module;
 }
 
-// -----------------------------------------------------------------
-// Upload star data to persistently mapped buffer
-// -----------------------------------------------------------------
-
 void Starfield::upload_star_data(const std::vector<StarVertex>& vertices)
 {
-    const std::size_t byte_size = vertices.size() * sizeof(StarVertex);
-    std::memcpy(m_mapped_ptr, vertices.data(), byte_size);
+    std::memcpy(m_mapped_ptr, vertices.data(), vertices.size() * sizeof(StarVertex));
 }
 
 } // namespace parallax::rendering

@@ -58,14 +58,12 @@ TEST_CASE("Polaris near zenith from North Pole")
 
 TEST_CASE("Star transiting at zenith: RA=LST, Dec=Lat → alt≈90°")
 {
-    // If a star's RA equals the LST and its Dec equals the observer latitude,
-    // it is transiting directly overhead (altitude ≈ 90°).
     const f64 lat = 45.0 * astro_constants::kDegToRad;
-    const f64 lst = 6.0 * astro_constants::kHourToRad;  // 6h = 90°
+    const f64 lst = 6.0 * astro_constants::kHourToRad;
 
     const EquatorialCoord eq = {
-        .ra  = lst,   // RA = LST → hour angle = 0
-        .dec = lat,   // Dec = latitude
+        .ra  = lst,
+        .dec = lat,
     };
 
     const ObserverLocation observer = {
@@ -75,21 +73,17 @@ TEST_CASE("Star transiting at zenith: RA=LST, Dec=Lat → alt≈90°")
 
     const auto hz = Coordinates::equatorial_to_horizontal(eq, observer, lst);
 
-    // Altitude should be 90° (zenith)
     CHECK(hz.alt == doctest::Approx(astro_constants::kHalfPi).epsilon(kArcSecRad));
 }
 
 TEST_CASE("Star on celestial equator due south at transit")
 {
-    // Observer at lat 45°N, star with Dec=0 at transit (HA=0)
-    // Expected altitude = 90° - |lat| = 45°
-    // Expected azimuth = 180° (due south)
     const f64 lat = 45.0 * astro_constants::kDegToRad;
-    const f64 lst = 3.0 * astro_constants::kHourToRad;  // 45°
+    const f64 lst = 3.0 * astro_constants::kHourToRad;
 
     const EquatorialCoord eq = {
-        .ra  = lst,   // RA = LST → transit
-        .dec = 0.0,   // Celestial equator
+        .ra  = lst,
+        .dec = 0.0,
     };
 
     const ObserverLocation observer = {
@@ -99,17 +93,12 @@ TEST_CASE("Star on celestial equator due south at transit")
 
     const auto hz = Coordinates::equatorial_to_horizontal(eq, observer, lst);
 
-    // Altitude = 90° - 45° = 45°
     CHECK(hz.alt == doctest::Approx(45.0 * astro_constants::kDegToRad).epsilon(kArcSecRad));
-
-    // Azimuth = 180° (due south)
     CHECK(hz.az == doctest::Approx(astro_constants::kPi).epsilon(kDegTol));
 }
 
 TEST_CASE("Star below horizon has negative altitude")
 {
-    // Circumpolar check: star at Dec = -60° from lat 45°N should be below horizon
-    // when it transits (HA = 0): alt = 90° - |lat - dec| = 90° - 105° = -15°
     const f64 lat = 45.0 * astro_constants::kDegToRad;
     const f64 lst = 0.0;
 
@@ -137,7 +126,6 @@ TEST_CASE("Altitude is always in [-π/2, π/2]")
 
     const f64 lst = 12.0 * astro_constants::kHourToRad;
 
-    // Test a range of RA/Dec values
     for (f64 ra_deg = 0.0; ra_deg < 360.0; ra_deg += 45.0)
     {
         for (f64 dec_deg = -80.0; dec_deg <= 80.0; dec_deg += 40.0)
@@ -164,13 +152,12 @@ TEST_CASE("Altitude is always in [-π/2, π/2]")
 TEST_CASE("Round-trip: eq → hz → eq preserves RA/Dec")
 {
     const ObserverLocation observer = {
-        .latitude_rad  = 51.48 * astro_constants::kDegToRad,  // London
+        .latitude_rad  = 51.48 * astro_constants::kDegToRad,
         .longitude_rad = -0.0077 * astro_constants::kDegToRad,
     };
 
     const f64 lst = 18.0 * astro_constants::kHourToRad;
 
-    // Vega: RA = 279.235°, Dec = +38.784°
     const EquatorialCoord original = {
         .ra  = 279.235 * astro_constants::kDegToRad,
         .dec = 38.784 * astro_constants::kDegToRad,
@@ -179,16 +166,12 @@ TEST_CASE("Round-trip: eq → hz → eq preserves RA/Dec")
     const auto hz = Coordinates::equatorial_to_horizontal(original, observer, lst);
     const auto result = Coordinates::horizontal_to_equatorial(hz, observer, lst);
 
-    // RA must match within 1 arcsecond
-    // Handle wrap-around for RA near 0/360 boundary
     f64 ra_diff = std::abs(result.ra - original.ra);
     if (ra_diff > astro_constants::kPi)
     {
         ra_diff = astro_constants::kTwoPi - ra_diff;
     }
     CHECK(ra_diff < 10.0 * kArcSecRad);
-
-    // Dec must match within 1 arcsecond
     CHECK(result.dec == doctest::Approx(original.dec).epsilon(10.0 * kArcSecRad));
 }
 
@@ -203,10 +186,10 @@ TEST_CASE("Round-trip for multiple stars at different locations")
     };
 
     const TestCase cases[] = {
-        {101.287, -16.716, 30.67, 6.0},    // Sirius from McDonald Observatory
-        {213.915,  19.182, -33.86, 14.0},   // Arcturus from Sydney
-        {37.954,   89.264, 60.0, 0.0},      // Polaris from lat 60°N
-        {310.358,  45.280, 45.0, 20.0},     // Deneb from lat 45°N
+        {101.287, -16.716, 30.67, 6.0},
+        {213.915,  19.182, -33.86, 14.0},
+        {37.954,   89.264, 60.0, 0.0},
+        {310.358,  45.280, 45.0, 20.0},
     };
 
     for (const auto& tc : cases)
@@ -225,7 +208,6 @@ TEST_CASE("Round-trip for multiple stars at different locations")
 
         const auto hz = Coordinates::equatorial_to_horizontal(original, observer, lst);
 
-        // Only test round-trip if star is above horizon
         if (hz.alt < -10.0 * astro_constants::kDegToRad)
         {
             continue;
@@ -245,6 +227,10 @@ TEST_CASE("Round-trip for multiple stars at different locations")
 
 // =================================================================
 // Screen projection tests
+//
+// NOTE: horizontal_to_screen() outputs Vulkan NDC coordinates:
+//   +X = East (right on screen)
+//   -Y = higher altitude (up on screen in Vulkan where +Y is down)
 // =================================================================
 
 TEST_CASE("Star at camera center projects to (0, 0)")
@@ -270,7 +256,6 @@ TEST_CASE("Star far off screen returns nullopt")
         .az  = 0.0,
     };
 
-    // Star 90° away from pointing direction
     const HorizontalCoord star = {
         .alt = 45.0 * astro_constants::kDegToRad,
         .az  = 180.0 * astro_constants::kDegToRad,
@@ -301,13 +286,12 @@ TEST_CASE("Star slightly to the right of center projects to positive x")
     const auto result = Coordinates::horizontal_to_screen(star, pointing, fov);
 
     REQUIRE(result.has_value());
-    // 5° offset in a 60° FOV should be well within screen
-    CHECK(result->x > 0.0f);     // East → positive x
-    CHECK(result->x < 1.0f);     // Within bounds
-    CHECK(std::abs(result->y) < 0.1f);  // Near horizontal center
+    CHECK(result->x > 0.0f);     // East → positive x (right on screen)
+    CHECK(result->x < 1.0f);
+    CHECK(std::abs(result->y) < 0.1f);  // Near vertical center
 }
 
-TEST_CASE("Star above pointing direction projects to positive y")
+TEST_CASE("Star above pointing direction projects to negative y (Vulkan NDC: up = -Y)")
 {
     const HorizontalCoord pointing = {
         .alt = 45.0 * astro_constants::kDegToRad,
@@ -325,8 +309,9 @@ TEST_CASE("Star above pointing direction projects to positive y")
     const auto result = Coordinates::horizontal_to_screen(star, pointing, fov);
 
     REQUIRE(result.has_value());
-    CHECK(result->y > 0.0f);     // Higher altitude → positive y
-    CHECK(result->y < 1.0f);     // Within bounds
+    // Higher altitude → negative Y in Vulkan NDC (upward on screen)
+    CHECK(result->y < 0.0f);
+    CHECK(result->y > -1.0f);
     CHECK(std::abs(result->x) < 0.01f);  // Same azimuth → near x center
 }
 
@@ -337,7 +322,6 @@ TEST_CASE("Narrow FOV rejects stars at moderate angular distance")
         .az  = 180.0 * astro_constants::kDegToRad,
     };
 
-    // Star 5° away — should be off screen with a 2° FOV
     const HorizontalCoord star = {
         .alt = 50.0 * astro_constants::kDegToRad,
         .az  = 180.0 * astro_constants::kDegToRad,
@@ -375,10 +359,8 @@ TEST_CASE("Screen projection symmetric: equal offsets left/right give equal magn
     REQUIRE(result_east.has_value());
     REQUIRE(result_west.has_value());
 
-    // Magnitudes should be approximately equal
     CHECK(std::abs(result_east->x) == doctest::Approx(std::abs(result_west->x)).epsilon(0.01f));
 
-    // Signs should be opposite
     CHECK(result_east->x > 0.0f);
     CHECK(result_west->x < 0.0f);
 }
@@ -389,7 +371,6 @@ TEST_CASE("Screen projection symmetric: equal offsets left/right give equal magn
 
 TEST_CASE("Full pipeline: Polaris visible from lat 45°N looking north/up")
 {
-    // Polaris
     const EquatorialCoord polaris = {
         .ra  = 37.954 * astro_constants::kDegToRad,
         .dec = 89.264 * astro_constants::kDegToRad,
@@ -400,12 +381,10 @@ TEST_CASE("Full pipeline: Polaris visible from lat 45°N looking north/up")
         .longitude_rad = 0.0,
     };
 
-    // LST chosen so Polaris is above horizon (always is from 45°N)
     const f64 lst = 37.954 * astro_constants::kDegToRad;
 
     const auto hz = Coordinates::equatorial_to_horizontal(polaris, observer, lst);
 
-    // Polaris should be at altitude ≈ latitude ≈ 45° from lat 45°N
     CHECK(hz.alt > 0.0);
     CHECK(hz.alt == doctest::Approx(45.0 * astro_constants::kDegToRad).epsilon(2.0 * astro_constants::kDegToRad));
 

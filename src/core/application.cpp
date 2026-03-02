@@ -1,9 +1,8 @@
 /// @file application.cpp
-/// @brief Application implementation — init, main loop, frame rendering, shutdown.
+/// @brief Application implementation — skychart mode.
 ///
-/// Task 3.8: Full Sprint 03 integration.
-/// Frame loop: input → time → atmosphere → sky → prefilter → starfield → HUD → render → present.
-/// Render order: sky background → starfield (additive) → HUD (alpha blend).
+/// Frame loop: input → time → sky → prefilter → starfield → HUD → render → present.
+/// NO atmospheric effects on star rendering.
 
 #include "core/application.hpp"
 
@@ -59,15 +58,13 @@ void Application::init()
     // 1. Window
     m_window = std::make_unique<Window>(WindowConfig{.title = "Parallax", .width = 1280, .height = 720});
 
-    // 2. Input (must exist before setting the event callback)
+    // 2. Input
     m_input = std::make_unique<Input>();
-
-    // Wire SDL events → Input system
     m_window->set_event_callback([this](const SDL_Event& event) {
         m_input->process_event(event);
     });
 
-    // 3. Vulkan context (instance, surface, device, queues)
+    // 3. Vulkan context
     m_context = std::make_unique<vulkan::Context>(
         vulkan::ContextConfig{.app_name = "Parallax", .enable_validation = true},
         *m_window);
@@ -76,16 +73,16 @@ void Application::init()
     m_swapchain = std::make_unique<vulkan::Swapchain>(
         *m_context, m_window->get_width(), m_window->get_height());
 
-    // 5. Pipeline (render pass + framebuffers)
+    // 5. Pipeline
     std::filesystem::path shader_dir{PLX_SHADER_DIR};
     PLX_CORE_INFO("Shader directory: {}", shader_dir.string());
     m_pipeline = std::make_unique<vulkan::Pipeline>(*m_context, *m_swapchain, shader_dir);
 
-    // 6. Sky background renderer (fullscreen pass before starfield)
+    // 6. Sky background
     m_sky_background = std::make_unique<rendering::SkyBackground>(
         *m_context, m_pipeline->get_render_pass(), shader_dir, m_swapchain->get_extent());
 
-    // 7. Starfield renderer
+    // 7. Starfield renderer (skychart mode — no atmosphere parameter)
     m_starfield = std::make_unique<rendering::Starfield>(
         *m_context, m_pipeline->get_render_pass(), shader_dir);
 
@@ -96,7 +93,7 @@ void Application::init()
     m_hud = std::make_unique<ui::Hud>(
         *m_context, m_pipeline->get_render_pass(), shader_dir);
 
-    // 10. Load star catalog — prefer full Hipparcos, fall back to bright stars
+    // 10. Load star catalog
     const std::filesystem::path hipparcos_path{"data/catalogs/hipparcos.csv"};
     const std::filesystem::path bright_path{"data/catalogs/bright_stars.csv"};
 
@@ -111,7 +108,6 @@ void Application::init()
     {
         PLX_CORE_WARN("Hipparcos catalog not found at {}. Trying bright star fallback...",
                       hipparcos_path.string());
-
         auto fallback = catalog::CatalogLoader::load_bright_star_csv(bright_path);
         if (fallback.has_value())
         {
@@ -125,13 +121,13 @@ void Application::init()
         }
     }
 
-    // 11. Observer location: La Palma, Canary Islands (28.76°N, 17.89°W)
+    // 11. Observer: La Palma, Canary Islands
     m_observer = astro::ObserverLocation{
         .latitude_rad  = glm::radians(28.76),
         .longitude_rad = glm::radians(-17.89),
     };
 
-    // 12. Simulation time: current system UTC
+    // 12. Simulation time
     m_julian_date = astro::TimeSystem::now_as_jd();
     m_time_scale = 1.0;
     {
@@ -143,36 +139,31 @@ void Application::init()
                       -glm::degrees(m_observer.longitude_rad));
     }
 
-    // 13. Default sky parameters: Bortle 4, astronomical night
+    // 13. Sky parameters (visual context only — NOT applied to stars)
     m_sky_params = rendering::SkyParams{
         .bortle_scale = 4.0f,
-        .sun_altitude_deg = -30.0f,    // Deep night (placeholder until solar position calc)
+        .sun_altitude_deg = -30.0f,
         .moon_altitude_deg = -90.0f,
         .moon_phase = 0.0f,
     };
 
-    // 14. Atmosphere model: standard conditions, synced to sky Bortle
+    // 14. Atmosphere model: KEPT for future imaging mode, not used in skychart
     m_atmosphere.set_params(astro::AtmosphereParams{
         .pressure_mbar = 1013.25f,
         .temperature_c = 15.0f,
         .extinction_coeff = 0.20f,
         .bortle_scale = m_sky_params.bortle_scale,
     });
-    PLX_CORE_INFO("Atmosphere initialized: k={}, Bortle {}",
-                  m_atmosphere.get_params().extinction_coeff,
-                  m_atmosphere.get_params().bortle_scale);
+    PLX_CORE_INFO("Atmosphere model initialized (dormant — skychart mode)");
 
-    // 15. Command pool + buffers
+    // 15-17. Command pool, sync, frame time
     create_command_pool();
     create_command_buffers();
-
-    // 16. Synchronization objects
     create_sync_objects();
-
-    // 17. Initialize frame time
     m_last_frame_time = std::chrono::steady_clock::now();
 
-    PLX_CORE_INFO("Application initialized — all subsystems ready");
+    PLX_CORE_INFO("Application initialized — skychart mode, MLIM {:.1f}",
+                  m_camera->get_magnitude_limit());
 }
 
 // =================================================================
@@ -181,24 +172,17 @@ void Application::init()
 
 void Application::shutdown()
 {
-    if (!m_context)
-    {
-        return;
-    }
+    if (!m_context) return;
 
     m_context->wait_idle();
-
     destroy_sync_objects();
 
-    // Command pool (implicitly frees command buffers)
     if (m_command_pool != VK_NULL_HANDLE)
     {
         vkDestroyCommandPool(m_context->get_device(), m_command_pool, nullptr);
         m_command_pool = VK_NULL_HANDLE;
-        PLX_CORE_TRACE("Command pool destroyed");
     }
 
-    // Reverse creation order
     m_hud.reset();
     m_starfield.reset();
     m_sky_background.reset();
@@ -206,59 +190,33 @@ void Application::shutdown()
     m_swapchain.reset();
     m_context.reset();
 
-    if (m_window)
-    {
-        m_window->set_event_callback(nullptr);
-    }
+    if (m_window) m_window->set_event_callback(nullptr);
     m_input.reset();
     m_window.reset();
 }
 
 // =================================================================
-// Main loop — Task 3.8 frame pipeline
-//
-// Steps map to sprint_03.md Task 3.8 "Updated frame loop":
-//   1. Input new_frame + poll events
-//   2. Process input (mouse, scroll, keyboard → time/camera/HUD/Bortle)
-//   3-4. Update simulation time, compute LST
-//   5-6. Update atmosphere + sky params
-//   7-8. Prefilter → transform → atmosphere → screen → upload
-//   9. Render: sky → starfield → HUD
-//   10. Present
+// Main loop
 // =================================================================
 
 void Application::main_loop()
 {
     while (!m_window->should_close())
     {
-        // ----- Step 1: Input -----
         m_input->new_frame();
         m_window->poll_events();
 
-        if (m_window->was_resized())
-        {
-            m_framebuffer_resized = true;
-        }
+        if (m_window->was_resized()) m_framebuffer_resized = true;
+        if (m_window->get_width() == 0 || m_window->get_height() == 0) continue;
 
-        if (m_window->get_width() == 0 || m_window->get_height() == 0)
-        {
-            continue;
-        }
-
-        // ----- Delta time -----
         auto now = std::chrono::steady_clock::now();
         const f64 delta_time_sec = std::chrono::duration<f64>(now - m_last_frame_time).count();
         m_last_frame_time = now;
         const f64 clamped_dt = std::min(delta_time_sec, 0.1);
         m_delta_time = delta_time_sec;
 
-        // ----- Step 2: Process input -----
         process_input();
-
-        // ----- Steps 3-8: Update simulation -----
         update_simulation(clamped_dt);
-
-        // ----- Steps 9-10: Render + present -----
         draw_frame();
     }
 
@@ -266,17 +224,12 @@ void Application::main_loop()
 }
 
 // =================================================================
-// Input processing — Task 3.7 + 3.8 keybindings
-//
-// All simulation/camera/UI controls. The Input system tracks
-// is_key_pressed() (single-frame) and is_key_held() (continuous).
+// Input processing — includes [ ] for magnitude limit
 // =================================================================
 
 void Application::process_input()
 {
-    // -----------------------------------------------------------------
     // Mouse drag → Camera pan
-    // -----------------------------------------------------------------
     if (m_input->is_mouse_dragging())
     {
         const auto drag = m_input->get_mouse_drag_delta();
@@ -288,9 +241,7 @@ void Application::process_input()
         m_camera->pan(delta_az, delta_alt);
     }
 
-    // -----------------------------------------------------------------
-    // Scroll wheel → Camera zoom
-    // -----------------------------------------------------------------
+    // Scroll → Camera zoom
     const f32 scroll = m_input->get_scroll_delta();
     if (scroll != 0.0f)
     {
@@ -299,136 +250,86 @@ void Application::process_input()
     }
 
     // =================================================================
-    // Time scale controls                                    ← Task 3.7
+    // Magnitude limit: [ and ] keys (or PageUp / PageDown)
     // =================================================================
 
-    if (m_input->is_key_pressed(SDL_SCANCODE_1))
+    if (m_input->is_key_pressed(SDL_SCANCODE_RIGHTBRACKET) ||
+        m_input->is_key_pressed(SDL_SCANCODE_PAGEDOWN))
     {
-        m_time_scale = 1.0;
-        PLX_CORE_INFO("Time scale: x1 (real-time)");
+        m_camera->adjust_magnitude_limit(0.5f);
+        PLX_CORE_INFO("Magnitude limit: {:.1f} (fainter)", m_camera->get_magnitude_limit());
     }
 
-    if (m_input->is_key_pressed(SDL_SCANCODE_2))
+    if (m_input->is_key_pressed(SDL_SCANCODE_LEFTBRACKET) ||
+        m_input->is_key_pressed(SDL_SCANCODE_PAGEUP))
     {
-        m_time_scale = 10.0;
-        PLX_CORE_INFO("Time scale: x10");
+        m_camera->adjust_magnitude_limit(-0.5f);
+        PLX_CORE_INFO("Magnitude limit: {:.1f} (brighter)", m_camera->get_magnitude_limit());
     }
 
-    if (m_input->is_key_pressed(SDL_SCANCODE_3))
-    {
-        m_time_scale = 100.0;
-        PLX_CORE_INFO("Time scale: x100");
-    }
+    // Time scale controls
+    if (m_input->is_key_pressed(SDL_SCANCODE_1)) { m_time_scale = 1.0;     PLX_CORE_INFO("Time scale: x1"); }
+    if (m_input->is_key_pressed(SDL_SCANCODE_2)) { m_time_scale = 10.0;    PLX_CORE_INFO("Time scale: x10"); }
+    if (m_input->is_key_pressed(SDL_SCANCODE_3)) { m_time_scale = 100.0;   PLX_CORE_INFO("Time scale: x100"); }
+    if (m_input->is_key_pressed(SDL_SCANCODE_4)) { m_time_scale = 1000.0;  PLX_CORE_INFO("Time scale: x1000"); }
+    if (m_input->is_key_pressed(SDL_SCANCODE_5)) { m_time_scale = 10000.0; PLX_CORE_INFO("Time scale: x10000"); }
 
-    if (m_input->is_key_pressed(SDL_SCANCODE_4))
-    {
-        m_time_scale = 1000.0;
-        PLX_CORE_INFO("Time scale: x1000");
-    }
-
-    if (m_input->is_key_pressed(SDL_SCANCODE_5))
-    {
-        m_time_scale = 10000.0;
-        PLX_CORE_INFO("Time scale: x10000");
-    }
-
-    // 0 / Space → pause/resume toggle
     if (m_input->is_key_pressed(SDL_SCANCODE_0) ||
         m_input->is_key_pressed(SDL_SCANCODE_SPACE))
     {
-        if (m_time_scale != 0.0)
-        {
-            m_time_scale = 0.0;
-            PLX_CORE_INFO("Time paused");
-        }
-        else
-        {
-            m_time_scale = 1.0;
-            PLX_CORE_INFO("Time resumed: x1");
-        }
+        if (m_time_scale != 0.0) { m_time_scale = 0.0; PLX_CORE_INFO("Time paused"); }
+        else { m_time_scale = 1.0; PLX_CORE_INFO("Time resumed: x1"); }
     }
 
-    // Minus → reverse time
     if (m_input->is_key_pressed(SDL_SCANCODE_MINUS))
     {
-        if (m_time_scale == 0.0)
-        {
-            m_time_scale = -1.0;
-        }
-        else if (m_time_scale > 0.0)
-        {
-            m_time_scale = -m_time_scale;
-        }
-        // Already negative → keep current reverse speed
-
+        if (m_time_scale == 0.0) m_time_scale = -1.0;
+        else if (m_time_scale > 0.0) m_time_scale = -m_time_scale;
         PLX_CORE_INFO("Time scale: x{}", static_cast<int>(m_time_scale));
     }
 
-    // Equals → reset to current real time
     if (m_input->is_key_pressed(SDL_SCANCODE_EQUALS))
     {
         m_julian_date = astro::TimeSystem::now_as_jd();
         m_time_scale = 1.0;
-
         const auto dt = astro::TimeSystem::from_julian_date(m_julian_date);
         PLX_CORE_INFO("Time reset to now: {:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02.0f} UTC (x1)",
                       dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second);
     }
 
-    // =================================================================
-    // UI controls                                            ← Task 3.7
-    // =================================================================
-
-    // H → toggle HUD visibility
+    // UI controls
     if (m_input->is_key_pressed(SDL_SCANCODE_H))
     {
         m_hud->toggle_visible();
         PLX_CORE_INFO("HUD {}", m_hud->is_visible() ? "shown" : "hidden");
     }
 
-    // T → cycle time display format (UTC → LST → JD → UTC)
     if (m_input->is_key_pressed(SDL_SCANCODE_T))
     {
         m_hud->toggle_time_format();
-
         const char* format_names[] = {"UTC", "LST", "JD"};
-        const auto fmt = static_cast<int>(m_hud->get_time_format());
-        PLX_CORE_INFO("Time display: {}", format_names[fmt]);
+        PLX_CORE_INFO("Time display: {}", format_names[static_cast<int>(m_hud->get_time_format())]);
     }
 
-    // B → cycle Bortle scale (1 → 2 → ... → 9 → 1)
-    // Syncs both sky_params AND atmosphere to keep Bortle consistent
     if (m_input->is_key_pressed(SDL_SCANCODE_B))
     {
         f32 bortle = m_sky_params.bortle_scale + 1.0f;
-        if (bortle > 9.0f)
-        {
-            bortle = 1.0f;
-        }
-
-        // Update sky params (affects sky background gradient)
+        if (bortle > 9.0f) bortle = 1.0f;
         m_sky_params.bortle_scale = bortle;
 
-        // Sync atmosphere Bortle (affects extinction, limiting magnitude)
         auto atmo_params = m_atmosphere.get_params();
         atmo_params.bortle_scale = bortle;
         m_atmosphere.set_params(atmo_params);
 
-        PLX_CORE_INFO("Bortle scale: {} (sky + atmosphere synced)", static_cast<int>(bortle));
+        PLX_CORE_INFO("Bortle scale: {}", static_cast<int>(bortle));
     }
 
-    // =================================================================
-    // Camera controls
-    // =================================================================
-
-    // R → reset camera to defaults
     if (m_input->is_key_pressed(SDL_SCANCODE_R))
     {
         m_camera->reset();
-        PLX_CORE_INFO("Camera reset to defaults");
+        PLX_CORE_INFO("Camera reset (MLIM {:.1f})", m_camera->get_magnitude_limit());
     }
 
-    // Escape → quit
     if (m_input->is_key_pressed(SDL_SCANCODE_ESCAPE))
     {
         m_window->request_close();
@@ -436,52 +337,31 @@ void Application::process_input()
 }
 
 // =================================================================
-// Simulation update — Task 3.8 steps 3-8
-//
-// 3. Advance Julian Date by delta × time_scale
-// 4. Compute Local Sidereal Time
-// 5. (Atmosphere params updated via B key in process_input)
-// 6. Update sky background UBO
-// 7a. Visibility prefilter (VisibilityFilter::filter)
-// 7b-i + 8. Transform + atmosphere + screen projection + GPU upload
-//           (all inside Starfield::update)
+// Simulation update — skychart mode (no atmosphere on stars)
 // =================================================================
 
 void Application::update_simulation(f64 delta_time_sec)
 {
-    // Step 3: Advance Julian Date
+    // Advance Julian Date
     m_julian_date += (delta_time_sec * m_time_scale) / 86400.0;
 
-    // Step 4: Compute Local Sidereal Time
+    // Compute Local Sidereal Time
     const f64 lst = astro::TimeSystem::lmst(m_julian_date, m_observer.longitude_rad);
 
-    // Step 6: Update sky background with current params + camera
+    // Update sky background (visual context only)
     m_sky_background->update_params(m_sky_params, *m_camera);
 
-    // Step 7a: Visibility prefilter — reduce 118k → ~30-50k candidates
+    // Visibility prefilter
     catalog::PrefilterStats prefilter_stats{};
     const auto candidates = catalog::VisibilityFilter::filter(
         m_stars, m_observer, lst, m_camera->get_magnitude_limit(), &prefilter_stats);
 
-    // Steps 7b-i + 8: Transform candidates with atmosphere, upload to GPU
-    // Starfield::update handles:
-    //   - RA/Dec → Alt/Az
-    //   - Atmospheric refraction → apparent altitude
-    //   - Skip if apparent alt < -0.5°
-    //   - Extinction factor at this altitude
-    //   - Adjusted brightness = base × extinction_factor
-    //   - Skip if too faint
-    //   - Reddening near horizon (B-V shift by airmass)
-    //   - Project to screen coords
-    //   - Upload StarVertex array to GPU storage buffer
-    m_starfield->update(m_stars, candidates, m_observer, lst, *m_camera, m_atmosphere);
+    // Starfield update — NO atmosphere parameter
+    m_starfield->update(m_stars, candidates, m_observer, lst, *m_camera);
 
-    // Update HUD data
+    // Update HUD
     const auto pointing = m_camera->get_pointing();
-
-    const f32 fps = (m_delta_time > 0.0)
-        ? static_cast<f32>(1.0 / m_delta_time)
-        : 0.0f;
+    const f32 fps = (m_delta_time > 0.0) ? static_cast<f32>(1.0 / m_delta_time) : 0.0f;
 
     m_hud->update(ui::HudData{
         .julian_date             = m_julian_date,
@@ -500,52 +380,36 @@ void Application::update_simulation(f64 delta_time_sec)
         .time_scale              = m_time_scale,
     });
 
-    // Periodic performance logging
+    // Periodic logging
     ++m_frame_counter;
     if (m_frame_counter % 60 == 0)
     {
         PLX_CORE_TRACE(
-            "Stars: {} total | {} candidates ({:.0f}%) | {} visible | "
-            "prefilter: {} never-rises, {} below-hz, {} mag-cull",
+            "Stars: {} total | {} candidates | {} visible | MLIM {:.1f}",
             prefilter_stats.total,
             prefilter_stats.passed,
-            prefilter_stats.total > 0
-                ? 100.0 * static_cast<f64>(prefilter_stats.passed)
-                    / static_cast<f64>(prefilter_stats.total)
-                : 0.0,
             m_starfield->get_visible_count(),
-            prefilter_stats.skipped_never_rises,
-            prefilter_stats.skipped_below_hz,
-            prefilter_stats.skipped_mag);
+            m_camera->get_magnitude_limit());
     }
 }
 
 // =================================================================
-// Frame rendering
+// Frame rendering (unchanged structure)
 // =================================================================
 
 void Application::draw_frame()
 {
     VkDevice device = m_context->get_device();
 
-    check_vk(
-        vkWaitForFences(device, 1, &m_in_flight_fences[m_current_frame], VK_TRUE, std::numeric_limits<uint64_t>::max()),
-        "vkWaitForFences");
+    check_vk(vkWaitForFences(device, 1, &m_in_flight_fences[m_current_frame], VK_TRUE,
+                             std::numeric_limits<uint64_t>::max()), "vkWaitForFences");
 
     uint32_t image_index = 0;
-    VkResult acquire_result = vkAcquireNextImageKHR(
-        device,
-        m_swapchain->get_handle(),
-        std::numeric_limits<uint64_t>::max(),
-        m_image_available_semaphores[m_current_frame],
-        VK_NULL_HANDLE,
-        &image_index);
+    VkResult acquire_result = vkAcquireNextImageKHR(device, m_swapchain->get_handle(),
+        std::numeric_limits<uint64_t>::max(), m_image_available_semaphores[m_current_frame],
+        VK_NULL_HANDLE, &image_index);
 
-    if (acquire_result == VK_ERROR_OUT_OF_DATE_KHR)
-    {
-        recreate_swapchain();
-        return;
-    }
+    if (acquire_result == VK_ERROR_OUT_OF_DATE_KHR) { recreate_swapchain(); return; }
     if (acquire_result != VK_SUCCESS && acquire_result != VK_SUBOPTIMAL_KHR)
     {
         PLX_CORE_CRITICAL("Failed to acquire swapchain image: {}", static_cast<int>(acquire_result));
@@ -553,10 +417,7 @@ void Application::draw_frame()
     }
 
     check_vk(vkResetFences(device, 1, &m_in_flight_fences[m_current_frame]), "vkResetFences");
-
-    check_vk(
-        vkResetCommandBuffer(m_command_buffers[m_current_frame], 0),
-        "vkResetCommandBuffer");
+    check_vk(vkResetCommandBuffer(m_command_buffers[m_current_frame], 0), "vkResetCommandBuffer");
 
     record_command_buffer(m_command_buffers[m_current_frame], image_index);
 
@@ -574,12 +435,10 @@ void Application::draw_frame()
     submit_info.signalSemaphoreCount = 1;
     submit_info.pSignalSemaphores = signal_semaphores;
 
-    check_vk(
-        vkQueueSubmit(m_context->get_graphics_queue(), 1, &submit_info, m_in_flight_fences[m_current_frame]),
-        "vkQueueSubmit");
+    check_vk(vkQueueSubmit(m_context->get_graphics_queue(), 1, &submit_info,
+                           m_in_flight_fences[m_current_frame]), "vkQueueSubmit");
 
     VkSwapchainKHR swapchains[] = {m_swapchain->get_handle()};
-
     VkPresentInfoKHR present_info{};
     present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
     present_info.waitSemaphoreCount = 1;
@@ -590,8 +449,7 @@ void Application::draw_frame()
 
     VkResult present_result = vkQueuePresentKHR(m_context->get_present_queue(), &present_info);
 
-    if (present_result == VK_ERROR_OUT_OF_DATE_KHR
-        || present_result == VK_SUBOPTIMAL_KHR
+    if (present_result == VK_ERROR_OUT_OF_DATE_KHR || present_result == VK_SUBOPTIMAL_KHR
         || m_framebuffer_resized)
     {
         m_framebuffer_resized = false;
@@ -599,130 +457,73 @@ void Application::draw_frame()
     }
     else if (present_result != VK_SUCCESS)
     {
-        PLX_CORE_CRITICAL("Failed to present swapchain image: {}", static_cast<int>(present_result));
+        PLX_CORE_CRITICAL("Failed to present: {}", static_cast<int>(present_result));
         std::abort();
     }
 
     m_current_frame = (m_current_frame + 1) % kMaxFramesInFlight;
 }
 
-// =================================================================
-// Command buffer recording — Task 3.8 render order:
-//   Pass 1: Sky background (fullscreen triangle, replaces clear color)
-//   Pass 2: Starfield (additive blend over sky)
-//   Pass 3: HUD overlay (alpha blend over everything)
-// =================================================================
-
 void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_index)
 {
     VkCommandBufferBeginInfo begin_info{};
     begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
     check_vk(vkBeginCommandBuffer(cmd, &begin_info), "vkBeginCommandBuffer");
 
-    // Clear to pure black — sky background will paint over this immediately
     VkClearValue clear_color{};
     clear_color.color = {{0.0f, 0.0f, 0.0f, 1.0f}};
-
     VkExtent2D extent = m_swapchain->get_extent();
 
     VkRenderPassBeginInfo render_pass_info{};
     render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     render_pass_info.renderPass = m_pipeline->get_render_pass();
     render_pass_info.framebuffer = m_pipeline->get_framebuffer(image_index);
-    render_pass_info.renderArea.offset = {0, 0};
-    render_pass_info.renderArea.extent = extent;
+    render_pass_info.renderArea = {{0, 0}, extent};
     render_pass_info.clearValueCount = 1;
     render_pass_info.pClearValues = &clear_color;
 
     vkCmdBeginRenderPass(cmd, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
 
-    // Dynamic viewport + scissor
-    VkViewport viewport{};
-    viewport.x = 0.0f;
-    viewport.y = 0.0f;
-    viewport.width = static_cast<float>(extent.width);
-    viewport.height = static_cast<float>(extent.height);
-    viewport.minDepth = 0.0f;
-    viewport.maxDepth = 1.0f;
+    VkViewport viewport{0.0f, 0.0f, static_cast<float>(extent.width),
+                        static_cast<float>(extent.height), 0.0f, 1.0f};
     vkCmdSetViewport(cmd, 0, 1, &viewport);
-
-    VkRect2D scissor{};
-    scissor.offset = {0, 0};
-    scissor.extent = extent;
+    VkRect2D scissor{{0, 0}, extent};
     vkCmdSetScissor(cmd, 0, 1, &scissor);
 
-    // -----------------------------------------------------------------
-    // Pass 1: Sky background (fullscreen gradient, replaces clear)
-    // -----------------------------------------------------------------
     m_sky_background->draw(cmd);
-
-    // -----------------------------------------------------------------
-    // Pass 2: Starfield (additive blend over sky background)
-    // -----------------------------------------------------------------
     m_starfield->draw(cmd);
-
-    // -----------------------------------------------------------------
-    // Pass 3: HUD overlay (alpha blend, rendered last)
-    // -----------------------------------------------------------------
     m_hud->render(cmd, extent);
 
     vkCmdEndRenderPass(cmd);
-
     check_vk(vkEndCommandBuffer(cmd), "vkEndCommandBuffer");
 }
-
-// =================================================================
-// Swapchain recreation
-// =================================================================
 
 void Application::recreate_swapchain()
 {
     m_context->wait_idle();
-
     uint32_t w = m_window->get_width();
     uint32_t h = m_window->get_height();
-
-    if (w == 0 || h == 0)
-    {
-        return;
-    }
+    if (w == 0 || h == 0) return;
 
     VkDevice device = m_context->get_device();
     for (auto sem : m_render_finished_semaphores)
-    {
-        if (sem != VK_NULL_HANDLE)
-        {
-            vkDestroySemaphore(device, sem, nullptr);
-        }
-    }
+        if (sem != VK_NULL_HANDLE) vkDestroySemaphore(device, sem, nullptr);
     m_render_finished_semaphores.clear();
 
     m_swapchain->recreate(w, h);
     m_pipeline->recreate_framebuffers(*m_swapchain);
-
-    // Keep sky background extent in sync
     m_sky_background->set_extent(m_swapchain->get_extent());
 
     uint32_t image_count = m_swapchain->get_image_count();
     m_render_finished_semaphores.resize(image_count);
-
     VkSemaphoreCreateInfo sem_info{};
     sem_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-
     for (uint32_t i = 0; i < image_count; ++i)
-    {
-        check_vk(
-            vkCreateSemaphore(device, &sem_info, nullptr, &m_render_finished_semaphores[i]),
-            "vkCreateSemaphore (render finished, recreate)");
-    }
+        check_vk(vkCreateSemaphore(device, &sem_info, nullptr, &m_render_finished_semaphores[i]),
+                 "vkCreateSemaphore (recreate)");
 
-    PLX_CORE_INFO("Swapchain + framebuffers recreated: {}x{} ({} images)", w, h, image_count);
+    PLX_CORE_INFO("Swapchain recreated: {}x{}", w, h);
 }
-
-// =================================================================
-// Command pool + buffers
-// =================================================================
 
 void Application::create_command_pool()
 {
@@ -730,98 +531,60 @@ void Application::create_command_pool()
     pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     pool_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
     pool_info.queueFamilyIndex = m_context->get_graphics_queue_family();
-
-    check_vk(
-        vkCreateCommandPool(m_context->get_device(), &pool_info, nullptr, &m_command_pool),
-        "vkCreateCommandPool");
-
-    PLX_CORE_INFO("Command pool created");
+    check_vk(vkCreateCommandPool(m_context->get_device(), &pool_info, nullptr, &m_command_pool),
+             "vkCreateCommandPool");
 }
 
 void Application::create_command_buffers()
 {
     m_command_buffers.resize(kMaxFramesInFlight);
-
     VkCommandBufferAllocateInfo alloc_info{};
     alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     alloc_info.commandPool = m_command_pool;
     alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     alloc_info.commandBufferCount = kMaxFramesInFlight;
-
-    check_vk(
-        vkAllocateCommandBuffers(m_context->get_device(), &alloc_info, m_command_buffers.data()),
-        "vkAllocateCommandBuffers");
-
-    PLX_CORE_INFO("Command buffers allocated: {}", kMaxFramesInFlight);
+    check_vk(vkAllocateCommandBuffers(m_context->get_device(), &alloc_info, m_command_buffers.data()),
+             "vkAllocateCommandBuffers");
 }
-
-// =================================================================
-// Synchronization objects
-// =================================================================
 
 void Application::create_sync_objects()
 {
     VkDevice device = m_context->get_device();
-
     VkSemaphoreCreateInfo semaphore_info{};
     semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-
     VkFenceCreateInfo fence_info{};
     fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fence_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
     for (uint32_t i = 0; i < kMaxFramesInFlight; ++i)
     {
-        check_vk(
-            vkCreateSemaphore(device, &semaphore_info, nullptr, &m_image_available_semaphores[i]),
-            "vkCreateSemaphore (image available)");
-        check_vk(
-            vkCreateFence(device, &fence_info, nullptr, &m_in_flight_fences[i]),
-            "vkCreateFence (in flight)");
+        check_vk(vkCreateSemaphore(device, &semaphore_info, nullptr, &m_image_available_semaphores[i]),
+                 "vkCreateSemaphore (image available)");
+        check_vk(vkCreateFence(device, &fence_info, nullptr, &m_in_flight_fences[i]),
+                 "vkCreateFence (in flight)");
     }
 
     uint32_t image_count = m_swapchain->get_image_count();
     m_render_finished_semaphores.resize(image_count);
-
     for (uint32_t i = 0; i < image_count; ++i)
-    {
-        check_vk(
-            vkCreateSemaphore(device, &semaphore_info, nullptr, &m_render_finished_semaphores[i]),
-            "vkCreateSemaphore (render finished)");
-    }
-
-    PLX_CORE_INFO("Sync objects created: {} frames in flight, {} image semaphores",
-                  kMaxFramesInFlight, image_count);
+        check_vk(vkCreateSemaphore(device, &semaphore_info, nullptr, &m_render_finished_semaphores[i]),
+                 "vkCreateSemaphore (render finished)");
 }
 
 void Application::destroy_sync_objects()
 {
     VkDevice device = m_context->get_device();
-
     for (auto sem : m_render_finished_semaphores)
-    {
-        if (sem != VK_NULL_HANDLE)
-        {
-            vkDestroySemaphore(device, sem, nullptr);
-        }
-    }
+        if (sem != VK_NULL_HANDLE) vkDestroySemaphore(device, sem, nullptr);
     m_render_finished_semaphores.clear();
 
     for (uint32_t i = 0; i < kMaxFramesInFlight; ++i)
     {
         if (m_image_available_semaphores[i] != VK_NULL_HANDLE)
-        {
-            vkDestroySemaphore(device, m_image_available_semaphores[i], nullptr);
-            m_image_available_semaphores[i] = VK_NULL_HANDLE;
-        }
+        { vkDestroySemaphore(device, m_image_available_semaphores[i], nullptr); m_image_available_semaphores[i] = VK_NULL_HANDLE; }
         if (m_in_flight_fences[i] != VK_NULL_HANDLE)
-        {
-            vkDestroyFence(device, m_in_flight_fences[i], nullptr);
-            m_in_flight_fences[i] = VK_NULL_HANDLE;
-        }
+        { vkDestroyFence(device, m_in_flight_fences[i], nullptr); m_in_flight_fences[i] = VK_NULL_HANDLE; }
     }
-
-    PLX_CORE_TRACE("Sync objects destroyed");
 }
 
 } // namespace parallax::core

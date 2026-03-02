@@ -400,12 +400,14 @@ Star Entry (compact, 32 bytes):
 
 ## 8. Current Sprint
 
-**Sprint:** 03 — Sky, Atmosphere & Full Catalog
-**Goal:** Realistic sky background, atmospheric effects, full Hipparcos catalog, retro HUD
+**Sprint:** 04 — Catalogs & Sky Overlays
+**Goal:** Constellations, coordinate grids, Messier DSOs, Tycho-2 catalog, horizon markers
 
-See: `docs/sprints/sprint_03.md`
+See: `docs/sprints/sprint_04.md`
 
-**Previous:** Sprint 01 ✅ — Vulkan pipeline | Sprint 02 ✅ — Planetarium core
+**Next:** Sprint 05 — Interactive UI (toolbar, panels, object selection, Stellarium-style)
+
+**Previous:** Sprint 01 ✅ Vulkan pipeline | Sprint 02 ✅ Planetarium core | Sprint 03 ✅ Sky, atmosphere, HUD
 
 ---
 

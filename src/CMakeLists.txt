@@ -19,6 +19,7 @@ add_executable(parallax
     rendering/camera.cpp
     rendering/sky_background.cpp
     rendering/starfield.cpp
+    rendering/line_renderer.cpp
     ui/font.cpp
     ui/hud.cpp
 )

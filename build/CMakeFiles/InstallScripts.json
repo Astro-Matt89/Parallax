@@ -1,9 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"C:/Parallax-dev/Parallax/build/cmake_install.cmake",
-		"C:/Parallax-dev/Parallax/build/src/cmake_install.cmake",
-		"C:/Parallax-dev/Parallax/build/tests/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

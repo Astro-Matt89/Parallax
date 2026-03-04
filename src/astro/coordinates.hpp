@@ -76,6 +76,32 @@ namespace parallax::astro
             f64 fov_rad
         );
 
+        /// @brief Full RA/Dec → screen NDC projection pipeline.                ← SPRINT 04
+        ///
+        /// Single shared function used by BOTH the starfield renderer AND
+        /// constellation overlays to guarantee identical screen positions.
+        ///
+        /// Pipeline:
+        ///   1. equatorial_to_horizontal(ra, dec, observer, lst)
+        ///   2. Horizon cull: alt < 0 → nullopt
+        ///   3. horizontal_to_screen(hz, pointing, fov)
+        ///
+        /// @param ra_rad Right ascension in radians.
+        /// @param dec_rad Declination in radians.
+        /// @param observer Observer geographic location.
+        /// @param lst_rad Local Mean Sidereal Time in radians.
+        /// @param pointing Camera pointing direction (Alt/Az).
+        /// @param fov_rad Camera field of view in radians.
+        /// @return Screen NDC in [-1, 1], or std::nullopt if below horizon or off screen.
+        [[nodiscard]] static std::optional<Vec2f> project_radec_to_screen(
+            f64 ra_rad,
+            f64 dec_rad,
+            const ObserverLocation& observer,
+            f64 lst_rad,
+            const HorizontalCoord& pointing,
+            f64 fov_rad
+        );
+
     private:
         /// @brief Normalize an angle to the range [0, 2π).
         [[nodiscard]] static f64 normalize_radians(f64 angle);

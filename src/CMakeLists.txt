@@ -20,6 +20,7 @@ add_executable(parallax
     rendering/sky_background.cpp
     rendering/starfield.cpp
     rendering/line_renderer.cpp
+    overlay/constellations.cpp
     ui/font.cpp
     ui/hud.cpp
 )

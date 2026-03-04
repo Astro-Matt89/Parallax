@@ -174,6 +174,11 @@ TimeDisplayFormat Hud::get_time_format() const                          // ← T
     return m_time_format;
 }
 
+BitmapFont& Hud::get_font()                                            // ← SPRINT 04 Task 4.2
+{
+    return m_font;
+}
+
 // =================================================================
 // Top-left: title + time (respects m_time_format)                 ← Task 3.7
 // =================================================================

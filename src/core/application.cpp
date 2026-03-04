@@ -1,7 +1,7 @@
 /// @file application.cpp
 /// @brief Application implementation — skychart mode.
 ///
-/// Frame loop: input → time → sky → prefilter → starfield → HUD → render → present.
+/// Frame loop: input → time → sky → prefilter → starfield → overlays → HUD → render → present.
 /// NO atmospheric effects on star rendering.
 
 #include "core/application.hpp"
@@ -86,6 +86,10 @@ void Application::init()
     m_starfield = std::make_unique<rendering::Starfield>(
         *m_context, m_pipeline->get_render_pass(), shader_dir);
 
+    // 7b. Line renderer for overlays (constellations, grids, horizon)  ← SPRINT 04 Task 4.1
+    m_line_renderer = std::make_unique<rendering::LineRenderer>(
+        *m_context, m_pipeline->get_render_pass(), shader_dir);
+
     // 8. Camera
     m_camera = std::make_unique<rendering::Camera>();
 
@@ -118,6 +122,16 @@ void Application::init()
         else
         {
             PLX_CORE_WARN("No catalog found. Rendering will show no stars.");
+        }
+    }
+
+    // 10b. Load constellation overlay                                   ← SPRINT 04 Task 4.2
+    {
+        const std::filesystem::path const_lines{"data/catalogs/constellation_lines.csv"};
+        const std::filesystem::path const_names{"data/catalogs/constellation_names.csv"};
+        if (m_constellations.load(const_lines, const_names))
+        {
+            m_constellations.resolve_stars(m_stars);
         }
     }
 
@@ -184,6 +198,7 @@ void Application::shutdown()
     }
 
     m_hud.reset();
+    m_line_renderer.reset();    // ← SPRINT 04 Task 4.1 (destroy before starfield)
     m_starfield.reset();
     m_sky_background.reset();
     m_pipeline.reset();
@@ -324,6 +339,14 @@ void Application::process_input()
         PLX_CORE_INFO("Bortle scale: {}", static_cast<int>(bortle));
     }
 
+    // Constellation overlay toggle                                      ← SPRINT 04 Task 4.2
+    if (m_input->is_key_pressed(SDL_SCANCODE_C))
+    {
+        m_constellations.toggle_visible();
+        PLX_CORE_INFO("Constellations {}",
+                      m_constellations.is_visible() ? "shown" : "hidden");
+    }
+
     if (m_input->is_key_pressed(SDL_SCANCODE_R))
     {
         m_camera->reset();
@@ -351,6 +374,9 @@ void Application::update_simulation(f64 delta_time_sec)
     // Update sky background (visual context only)
     m_sky_background->update_params(m_sky_params, *m_camera);
 
+    // Clear line renderer for this frame                               ← SPRINT 04 Task 4.1
+    m_line_renderer->begin_frame();
+
     // Visibility prefilter
     catalog::PrefilterStats prefilter_stats{};
     const auto candidates = catalog::VisibilityFilter::filter(
@@ -358,6 +384,11 @@ void Application::update_simulation(f64 delta_time_sec)
 
     // Starfield update — NO atmosphere parameter
     m_starfield->update(m_stars, candidates, m_observer, lst, *m_camera);
+
+    // Constellation overlay — lines + labels                           ← SPRINT 04 Task 4.2
+    m_constellations.update(*m_camera, m_observer, lst,
+                            *m_line_renderer, m_hud->get_font(),
+                            m_swapchain->get_extent());
 
     // Update HUD
     const auto pointing = m_camera->get_pointing();
@@ -394,7 +425,7 @@ void Application::update_simulation(f64 delta_time_sec)
 }
 
 // =================================================================
-// Frame rendering (unchanged structure)
+// Frame rendering — draw order: sky → stars → overlays → HUD
 // =================================================================
 
 void Application::draw_frame()
@@ -492,6 +523,7 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
 
     m_sky_background->draw(cmd);
     m_starfield->draw(cmd);
+    m_line_renderer->render(cmd);   // Overlays: AFTER starfield, BEFORE HUD  ← SPRINT 04 Task 4.1
     m_hud->render(cmd, extent);
 
     vkCmdEndRenderPass(cmd);

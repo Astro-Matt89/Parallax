@@ -3,6 +3,9 @@
 ///
 /// No atmospheric effects. Stars are rendered with their catalog magnitude
 /// and B-V color. Horizon culling (alt < 0°) is the only physical filter.
+///
+/// Uses Coordinates::project_radec_to_screen() — the SAME shared function
+/// as constellation overlays — to guarantee identical screen positions.
 
 #include "rendering/starfield.hpp"
 
@@ -89,7 +92,8 @@ Starfield::~Starfield()
 // -----------------------------------------------------------------
 // update() — Skychart transform pipeline (NO atmosphere)
 //
-// Pipeline: RA/Dec → Alt/Az → horizon cull → screen project → upload
+// Uses Coordinates::project_radec_to_screen() — the SAME shared
+// function as constellation overlays.
 // -----------------------------------------------------------------
 
 void Starfield::update(std::span<const catalog::StarEntry> stars,
@@ -104,8 +108,7 @@ void Starfield::update(std::span<const catalog::StarEntry> stars,
 
     // Diagnostic counters
     u32 diag_pass_mag     = 0;
-    u32 diag_pass_horizon = 0;
-    u32 diag_pass_fov     = 0;
+    u32 diag_pass_project = 0;
 
     std::vector<StarVertex> vertices;
     vertices.reserve(std::min(static_cast<u32>(candidate_indices.size()), m_buffer_capacity));
@@ -123,24 +126,15 @@ void Starfield::update(std::span<const catalog::StarEntry> stars,
         }
         ++diag_pass_mag;
 
-        // 2. RA/Dec → Alt/Az (no refraction — true geometric position)
-        const astro::EquatorialCoord eq{.ra = star.ra, .dec = star.dec};
-        const auto hz = astro::Coordinates::equatorial_to_horizontal(eq, observer, lst);
+        // 2-4. RA/Dec → screen NDC via SHARED projection function
+        const auto screen_pos = astro::Coordinates::project_radec_to_screen(
+            star.ra, star.dec, observer, lst, pointing, fov_rad);
 
-        // 3. Horizon cull — physical obstruction, not atmospheric
-        if (hz.alt < 0.0)
-        {
-            continue;
-        }
-        ++diag_pass_horizon;
-
-        // 4. Project Alt/Az → screen (gnomonic projection)
-        const auto screen_pos = astro::Coordinates::horizontal_to_screen(hz, pointing, fov_rad);
         if (!screen_pos.has_value())
         {
             continue;
         }
-        ++diag_pass_fov;
+        ++diag_pass_project;
 
         // 5. Pack vertex — raw catalog data, no atmospheric modification
         vertices.push_back(StarVertex{
@@ -177,8 +171,8 @@ void Starfield::update(std::span<const catalog::StarEntry> stars,
         PLX_CORE_INFO("=== Skychart Pipeline ===");
         PLX_CORE_INFO("  Catalog: {} | Candidates: {} | Mag passed: {} (MLIM {:.1f})",
                       stars.size(), candidate_indices.size(), diag_pass_mag, mag_limit);
-        PLX_CORE_INFO("  Horizon passed: {} | FOV projected: {} | GPU: {}",
-                      diag_pass_horizon, diag_pass_fov, m_visible_count);
+        PLX_CORE_INFO("  Projected: {} | GPU: {}",
+                      diag_pass_project, m_visible_count);
         PLX_CORE_INFO("  Camera: alt={:.1f} az={:.1f} fov={:.1f}",
                       pointing.alt * astro_constants::kRadToDeg,
                       pointing.az * astro_constants::kRadToDeg,
@@ -207,7 +201,7 @@ VkPipeline Starfield::get_pipeline() const { return m_pipeline; }
 VkPipelineLayout Starfield::get_pipeline_layout() const { return m_pipeline_layout; }
 
 // -----------------------------------------------------------------
-// Vulkan resource creation (unchanged from previous)
+// Vulkan resource creation (unchanged)
 // -----------------------------------------------------------------
 
 void Starfield::create_storage_buffer(u32 max_stars)

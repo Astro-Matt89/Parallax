@@ -100,6 +100,9 @@ namespace parallax::ui
         /// @brief Get the current time display format.                    ← Task 3.7
         [[nodiscard]] TimeDisplayFormat get_time_format() const;
 
+        /// @brief Access the internal BitmapFont for overlay label rendering.  ← SPRINT 04 Task 4.2
+        [[nodiscard]] BitmapFont& get_font();
+
     private:
         /// @brief Draw the top-left panel (title + time).
         void draw_time_panel(f32 vw, f32 vh);

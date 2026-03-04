@@ -52,6 +52,9 @@
     <ClCompile Include="C:\Parallax-dev\Parallax\src\rendering\line_renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Parallax-dev\Parallax\src\overlay\constellations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Parallax-dev\Parallax\src\ui\font.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

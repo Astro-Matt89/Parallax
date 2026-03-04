@@ -59,16 +59,6 @@ HorizontalCoord Coordinates::equatorial_to_horizontal(
 
 // -----------------------------------------------------------------
 // Horizontal (Alt/Az) → Equatorial (RA/Dec)
-//
-// Inverse of the above transform:
-//   sin(dec) = sin(alt) × sin(lat) + cos(alt) × cos(lat) × cos(az)
-//
-//   Hour angle:
-//     sin(H) × cos(dec) = -cos(alt) × sin(az)
-//     cos(H) × cos(dec) =  sin(alt) × cos(lat) - cos(alt) × sin(lat) × cos(az)
-//     H = atan2(-cos(alt)×sin(az), sin(alt)×cos(lat) - cos(alt)×sin(lat)×cos(az))
-//
-//   RA = LST - H, normalized to [0, 2π)
 // -----------------------------------------------------------------
 
 EquatorialCoord Coordinates::horizontal_to_equatorial(
@@ -103,23 +93,6 @@ EquatorialCoord Coordinates::horizontal_to_equatorial(
 
 // -----------------------------------------------------------------
 // Horizontal (Alt/Az) → Gnomonic screen projection
-//
-// Projects a star's horizontal position onto a 2D tangent plane
-// centered on the camera pointing direction.
-//
-// Gnomonic projection (tangent-plane):
-//   dx =  cos(alt_s) × sin(Δaz)
-//   dy =  sin(alt_s) × cos(alt_p) - cos(alt_s) × sin(alt_p) × cos(Δaz)
-//   denom = cos(angular_sep) = dot product of unit vectors
-//
-// Screen conventions:
-//   +X = East (increasing azimuth) = right on screen
-//   +Y = higher altitude = up on screen
-//
-// IMPORTANT: Vulkan NDC has +Y pointing DOWN. We negate the Y
-// output so that higher altitude maps to negative NDC Y (upward
-// on screen). Without this, stars appear to follow the camera
-// when panning because the Y axis is inverted.
 // -----------------------------------------------------------------
 
 std::optional<Vec2f> Coordinates::horizontal_to_screen(
@@ -177,6 +150,36 @@ std::optional<Vec2f> Coordinates::horizontal_to_screen(
     }
 
     return Vec2f{screen_x, screen_y};
+}
+
+// -----------------------------------------------------------------
+// Full RA/Dec → screen NDC — SHARED projection pipeline       ← SPRINT 04
+//
+// This is THE canonical function for going from catalog RA/Dec to
+// screen position. Both the starfield and all overlays MUST use it
+// (or call the same sub-steps in the same order).
+// -----------------------------------------------------------------
+
+std::optional<Vec2f> Coordinates::project_radec_to_screen(
+    f64 ra_rad,
+    f64 dec_rad,
+    const ObserverLocation& observer,
+    f64 lst_rad,
+    const HorizontalCoord& pointing,
+    f64 fov_rad)
+{
+    // Step 1: RA/Dec → Alt/Az
+    const EquatorialCoord eq{.ra = ra_rad, .dec = dec_rad};
+    const auto hz = equatorial_to_horizontal(eq, observer, lst_rad);
+
+    // Step 2: Horizon cull
+    if (hz.alt < 0.0)
+    {
+        return std::nullopt;
+    }
+
+    // Step 3: Alt/Az → screen NDC
+    return horizontal_to_screen(hz, pointing, fov_rad);
 }
 
 // -----------------------------------------------------------------

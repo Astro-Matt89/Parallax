@@ -11,7 +11,9 @@
 #include "core/input.hpp"
 #include "core/types.hpp"
 #include "core/window.hpp"
+#include "overlay/constellations.hpp"                     // ← SPRINT 04 Task 4.2
 #include "rendering/camera.hpp"
+#include "rendering/line_renderer.hpp"                    // ← SPRINT 04 Task 4.1
 #include "rendering/sky_background.hpp"
 #include "rendering/starfield.hpp"
 #include "ui/hud.hpp"
@@ -83,9 +85,15 @@ namespace parallax::core
         std::unique_ptr<vulkan::Pipeline> m_pipeline;       ///< Render pass + framebuffers (from Sprint 01)
         std::unique_ptr<rendering::SkyBackground> m_sky_background;
         std::unique_ptr<rendering::Starfield> m_starfield;
+        std::unique_ptr<rendering::LineRenderer> m_line_renderer;  // ← SPRINT 04 Task 4.1
         std::unique_ptr<rendering::Camera> m_camera;
         std::unique_ptr<Input> m_input;
         std::unique_ptr<ui::Hud> m_hud;                     ///< Retro HUD overlay  ← SPRINT 03 Task 3.6
+
+        // -----------------------------------------------------------------
+        // Overlays                                          ← SPRINT 04 Task 4.2
+        // -----------------------------------------------------------------
+        overlay::Constellations m_constellations;
 
         // -----------------------------------------------------------------
         // Star catalog

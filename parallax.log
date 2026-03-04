@@ -15585,3 +15585,161 @@
 [09:36:40.549] [PARALLAX] [trace] Vulkan instance destroyed
 [09:36:40.572] [PARALLAX] [info] Window destroyed
 [09:36:40.600] [PARALLAX] [info] Parallax shutdown complete.
+[10:17:34.905] [PARALLAX] [info] Parallax v0.1.0 starting...
+[10:17:35.073] [PARALLAX] [info] Window created: "Parallax" (1280x720) [Vulkan | resizable]
+[10:17:35.073] [PARALLAX] [trace] SDL2 requires 2 Vulkan instance extension(s):
+[10:17:35.074] [PARALLAX] [trace]   - VK_KHR_surface
+[10:17:35.074] [PARALLAX] [trace]   - VK_KHR_win32_surface
+[10:17:35.086] [PARALLAX] [info] Requesting 3 instance extension(s):
+[10:17:35.087] [PARALLAX] [info]   - VK_KHR_surface
+[10:17:35.087] [PARALLAX] [info]   - VK_KHR_win32_surface
+[10:17:35.087] [PARALLAX] [info]   - VK_EXT_debug_utils
+[10:17:35.088] [PARALLAX] [info] Validation layers enabled: VK_LAYER_KHRONOS_validation
+[10:17:35.089] [PARALLAX] [trace] [Vulkan] windows_get_device_registry_files: GUID for 3 is not SoftwareComponent skipping
+[10:17:35.093] [PARALLAX] [trace] [Vulkan] Searching for ICD drivers named .\nvoglv64.dll
+[10:17:35.097] [PARALLAX] [trace] [Vulkan] Loading layer library C:\VulkanSDK\1.4.341.1\Bin\.\VkLayer_khronos_validation.dll
+[10:17:35.099] [PARALLAX] [trace] [Vulkan] Loading layer library C:\ProgramData\obs-studio-hook\.\graphics-hook64.dll
+[10:17:35.101] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[10:17:35.102] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[10:17:35.190] [PARALLAX] [info] Vulkan instance created (API 1.3)
+[10:17:35.191] [PARALLAX] [info] Vulkan debug messenger created
+[10:17:35.191] [PARALLAX] [info] Vulkan surface created
+[10:17:35.192] [PARALLAX] [info] Found 1 Vulkan-capable GPU(s):
+[10:17:35.193] [PARALLAX] [info]   - NVIDIA GeForce GTX 1660 (type: discrete)
+[10:17:35.200] [PARALLAX] [info] Selected GPU: NVIDIA GeForce GTX 1660
+[10:17:35.200] [PARALLAX] [info]   Driver version: 79.344.0
+[10:17:35.200] [PARALLAX] [info]   Vulkan API: 1.4.325
+[10:17:35.200] [PARALLAX] [info]   VRAM: 6180 MB
+[10:17:35.200] [PARALLAX] [info]   Graphics queue family: 0
+[10:17:35.201] [PARALLAX] [info]   Present queue family: 0
+[10:17:35.264] [PARALLAX] [info] Vulkan logical device created
+[10:17:35.268] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[10:17:35.268] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[10:17:35.378] [PARALLAX] [info] Swapchain created: 1280x720, 3 images, format 50, MAILBOX (triple buffer)
+[10:17:35.379] [PARALLAX] [info] Shader directory: C:/Parallax-dev/Parallax/build/shaders
+[10:17:35.380] [PARALLAX] [info] Render pass created
+[10:17:35.381] [PARALLAX] [trace] Shader module loaded: test_star.vert.spv
+[10:17:35.382] [PARALLAX] [trace] Shader module loaded: test_star.frag.spv
+[10:17:35.384] [PARALLAX] [info] Graphics pipeline created (POINT_LIST, dynamic viewport/scissor)
+[10:17:35.385] [PARALLAX] [info] Framebuffers created: 3 (1280x720)
+[10:17:35.385] [PARALLAX] [trace] Sky background UBO created: 32 bytes
+[10:17:35.386] [PARALLAX] [trace] Shader module loaded: sky_background.vert.spv
+[10:17:35.387] [PARALLAX] [trace] Shader module loaded: sky_background.frag.spv
+[10:17:35.390] [PARALLAX] [info] Sky background pipeline created (fullscreen triangle, UBO)
+[10:17:35.391] [PARALLAX] [info] Sky background renderer initialized
+[10:17:35.393] [PARALLAX] [info] Starfield pipeline created (skychart, additive blend)
+[10:17:35.393] [PARALLAX] [info] Starfield renderer initialized (skychart mode, 200000 max stars)
+[10:17:35.395] [PARALLAX] [info] LineRenderer pipeline created (LINE_LIST, standard alpha blend)
+[10:17:35.396] [PARALLAX] [info] LineRenderer initialized (131072 max vertices)
+[10:17:35.399] [PARALLAX] [trace] Font atlas created: 128x96 R8_UNORM, 95 glyphs
+[10:17:35.400] [PARALLAX] [trace] Shader module loaded: text.vert.spv
+[10:17:35.401] [PARALLAX] [trace] Shader module loaded: text.frag.spv
+[10:17:35.401] [PARALLAX] [info] Text pipeline created (alpha blend, vertex-colored)
+[10:17:35.402] [PARALLAX] [info] BitmapFont initialized (128x96 atlas, 4096 max chars/frame)
+[10:17:36.883] [PARALLAX] [info] CatalogLoader: Loaded 116812 stars from data/catalogs/hipparcos.csv
+[10:17:36.884] [PARALLAX] [info] Hipparcos catalog loaded: 116812 stars from data/catalogs/hipparcos.csv
+[10:17:36.891] [PARALLAX] [info] Constellation names matched: 88/88
+[10:17:36.892] [PARALLAX] [info] Constellations loaded: 88 constellations, 756 segments
+[10:17:36.949] [PARALLAX] [info] Constellation HIP resolution: 1511 resolved, 1 missing
+[10:17:36.950] [PARALLAX] [info] === Orion Reference Star Verification ===
+[10:17:36.950] [PARALLAX] [info]   HIP 27989 (Betelgeuse): RA=88.79 Dec=7.41 (expect 88.79, 7.41) OK
+[10:17:36.951] [PARALLAX] [info]   HIP 24436 (Rigel): RA=78.63 Dec=-8.20 (expect 78.63, -8.20) OK
+[10:17:36.952] [PARALLAX] [info]   HIP 25336 (Bellatrix): RA=81.28 Dec=6.35 (expect 81.28, 6.35) OK
+[10:17:36.952] [PARALLAX] [info] Simulation start: JD 2461103.887233 (2026-03-04 09:17:37.0 UTC)
+[10:17:36.953] [PARALLAX] [info] Observer: La Palma (28.76N, 17.89W)
+[10:17:36.953] [PARALLAX] [info] Atmosphere model initialized (dormant — skychart mode)
+[10:17:36.954] [PARALLAX] [info] Application initialized — skychart mode, MLIM 6.5
+[10:17:36.954] [PARALLAX] [info] Entering main loop...
+[10:17:37.253] [PARALLAX] [info] === Skychart Pipeline ===
+[10:17:37.254] [PARALLAX] [info]   Catalog: 116812 | Candidates: 4809 | Mag passed: 4809 (MLIM 6.5)
+[10:17:37.254] [PARALLAX] [info]   Projected: 767 | GPU: 767
+[10:17:37.255] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[10:17:37.256] [PARALLAX] [trace] Stars: 116812 total | 4809 candidates | 767 visible | MLIM 6.5
+[10:17:37.555] [PARALLAX] [info] === Skychart Pipeline ===
+[10:17:37.556] [PARALLAX] [info]   Catalog: 116812 | Candidates: 4809 | Mag passed: 4809 (MLIM 6.5)
+[10:17:37.556] [PARALLAX] [info]   Projected: 767 | GPU: 767
+[10:17:37.556] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[10:17:37.557] [PARALLAX] [trace] Stars: 116812 total | 4809 candidates | 767 visible | MLIM 6.5
+[10:17:37.857] [PARALLAX] [info] === Skychart Pipeline ===
+[10:17:37.858] [PARALLAX] [info]   Catalog: 116812 | Candidates: 4809 | Mag passed: 4809 (MLIM 6.5)
+[10:17:37.858] [PARALLAX] [info]   Projected: 767 | GPU: 767
+[10:17:37.858] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[10:17:37.860] [PARALLAX] [trace] Stars: 116812 total | 4809 candidates | 767 visible | MLIM 6.5
+[10:17:38.166] [PARALLAX] [info] === Skychart Pipeline ===
+[10:17:38.167] [PARALLAX] [info]   Catalog: 116812 | Candidates: 4809 | Mag passed: 4809 (MLIM 6.5)
+[10:17:38.168] [PARALLAX] [info]   Projected: 767 | GPU: 767
+[10:17:38.168] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[10:17:38.170] [PARALLAX] [trace] Stars: 116812 total | 4809 candidates | 767 visible | MLIM 6.5
+[10:17:38.470] [PARALLAX] [info] === Skychart Pipeline ===
+[10:17:38.471] [PARALLAX] [info]   Catalog: 116812 | Candidates: 4809 | Mag passed: 4809 (MLIM 6.5)
+[10:17:38.471] [PARALLAX] [info]   Projected: 770 | GPU: 770
+[10:17:38.472] [PARALLAX] [info]   Camera: alt=45.0 az=360.0 fov=60.0
+[10:17:38.473] [PARALLAX] [trace] Stars: 116812 total | 4809 candidates | 770 visible | MLIM 6.5
+[10:17:38.781] [PARALLAX] [info] === Skychart Pipeline ===
+[10:17:38.782] [PARALLAX] [info]   Catalog: 116812 | Candidates: 4809 | Mag passed: 4809 (MLIM 6.5)
+[10:17:38.782] [PARALLAX] [info]   Projected: 746 | GPU: 746
+[10:17:38.783] [PARALLAX] [info]   Camera: alt=45.4 az=358.0 fov=60.0
+[10:17:38.784] [PARALLAX] [trace] Stars: 116812 total | 4809 candidates | 746 visible | MLIM 6.5
+[10:17:39.086] [PARALLAX] [info] === Skychart Pipeline ===
+[10:17:39.086] [PARALLAX] [info]   Catalog: 116812 | Candidates: 4809 | Mag passed: 4809 (MLIM 6.5)
+[10:17:39.087] [PARALLAX] [info]   Projected: 746 | GPU: 746
+[10:17:39.087] [PARALLAX] [info]   Camera: alt=45.4 az=358.0 fov=60.0
+[10:17:39.088] [PARALLAX] [trace] Stars: 116812 total | 4809 candidates | 746 visible | MLIM 6.5
+[10:17:39.392] [PARALLAX] [info] === Skychart Pipeline ===
+[10:17:39.393] [PARALLAX] [info]   Catalog: 116812 | Candidates: 4809 | Mag passed: 4809 (MLIM 6.5)
+[10:17:39.393] [PARALLAX] [info]   Projected: 746 | GPU: 746
+[10:17:39.394] [PARALLAX] [info]   Camera: alt=45.4 az=358.0 fov=60.0
+[10:17:39.396] [PARALLAX] [trace] Stars: 116812 total | 4809 candidates | 746 visible | MLIM 6.5
+[10:17:39.699] [PARALLAX] [info] === Skychart Pipeline ===
+[10:17:39.700] [PARALLAX] [info]   Catalog: 116812 | Candidates: 4809 | Mag passed: 4809 (MLIM 6.5)
+[10:17:39.701] [PARALLAX] [info]   Projected: 746 | GPU: 746
+[10:17:39.701] [PARALLAX] [info]   Camera: alt=45.4 az=358.0 fov=60.0
+[10:17:39.702] [PARALLAX] [trace] Stars: 116812 total | 4809 candidates | 746 visible | MLIM 6.5
+[10:17:40.004] [PARALLAX] [info] === Skychart Pipeline ===
+[10:17:40.005] [PARALLAX] [info]   Catalog: 116812 | Candidates: 4809 | Mag passed: 4809 (MLIM 6.5)
+[10:17:40.005] [PARALLAX] [info]   Projected: 746 | GPU: 746
+[10:17:40.006] [PARALLAX] [info]   Camera: alt=45.4 az=358.0 fov=60.0
+[10:17:40.007] [PARALLAX] [trace] Stars: 116812 total | 4809 candidates | 746 visible | MLIM 6.5
+[10:17:40.305] [PARALLAX] [info] === Skychart Pipeline ===
+[10:17:40.306] [PARALLAX] [info]   Catalog: 116812 | Candidates: 4809 | Mag passed: 4809 (MLIM 6.5)
+[10:17:40.306] [PARALLAX] [info]   Projected: 746 | GPU: 746
+[10:17:40.307] [PARALLAX] [info]   Camera: alt=45.4 az=358.0 fov=60.0
+[10:17:40.308] [PARALLAX] [trace] Stars: 116812 total | 4809 candidates | 746 visible | MLIM 6.5
+[10:17:40.613] [PARALLAX] [info] === Skychart Pipeline ===
+[10:17:40.614] [PARALLAX] [info]   Catalog: 116812 | Candidates: 4809 | Mag passed: 4809 (MLIM 6.5)
+[10:17:40.614] [PARALLAX] [info]   Projected: 746 | GPU: 746
+[10:17:40.615] [PARALLAX] [info]   Camera: alt=45.4 az=358.0 fov=60.0
+[10:17:40.616] [PARALLAX] [trace] Stars: 116812 total | 4809 candidates | 746 visible | MLIM 6.5
+[10:17:40.929] [PARALLAX] [info] === Skychart Pipeline ===
+[10:17:40.930] [PARALLAX] [info]   Catalog: 116812 | Candidates: 4809 | Mag passed: 4809 (MLIM 6.5)
+[10:17:40.930] [PARALLAX] [info]   Projected: 746 | GPU: 746
+[10:17:40.930] [PARALLAX] [info]   Camera: alt=45.4 az=358.0 fov=60.0
+[10:17:40.932] [PARALLAX] [trace] Stars: 116812 total | 4809 candidates | 746 visible | MLIM 6.5
+[10:17:41.257] [PARALLAX] [info] === Skychart Pipeline ===
+[10:17:41.257] [PARALLAX] [info]   Catalog: 116812 | Candidates: 4809 | Mag passed: 4809 (MLIM 6.5)
+[10:17:41.257] [PARALLAX] [info]   Projected: 745 | GPU: 745
+[10:17:41.258] [PARALLAX] [info]   Camera: alt=45.4 az=358.0 fov=60.0
+[10:17:41.259] [PARALLAX] [trace] Stars: 116812 total | 4809 candidates | 745 visible | MLIM 6.5
+[10:17:41.564] [PARALLAX] [info] === Skychart Pipeline ===
+[10:17:41.565] [PARALLAX] [info]   Catalog: 116812 | Candidates: 4809 | Mag passed: 4809 (MLIM 6.5)
+[10:17:41.565] [PARALLAX] [info]   Projected: 745 | GPU: 745
+[10:17:41.565] [PARALLAX] [info]   Camera: alt=45.4 az=358.0 fov=60.0
+[10:17:41.567] [PARALLAX] [trace] Stars: 116812 total | 4809 candidates | 745 visible | MLIM 6.5
+[10:17:41.721] [PARALLAX] [info] Main loop exited
+[10:17:41.723] [PARALLAX] [trace] BitmapFont destroyed
+[10:17:41.724] [PARALLAX] [trace] LineRenderer destroyed
+[10:17:41.726] [PARALLAX] [trace] Starfield renderer destroyed
+[10:17:41.726] [PARALLAX] [trace] Sky background renderer destroyed
+[10:17:41.727] [PARALLAX] [trace] Graphics pipeline destroyed
+[10:17:41.727] [PARALLAX] [trace] Render pass destroyed
+[10:17:41.728] [PARALLAX] [trace] Swapchain destroyed
+[10:17:41.756] [PARALLAX] [trace] Vulkan logical device destroyed
+[10:17:41.756] [PARALLAX] [trace] Vulkan debug messenger destroyed
+[10:17:41.757] [PARALLAX] [trace] Vulkan surface destroyed
+[10:17:41.757] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\nvoglv64.dll
+[10:17:41.758] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\nvoglv64.dll
+[10:17:41.758] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\ProgramData\obs-studio-hook\graphics-hook64.dll
+[10:17:41.760] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\VulkanSDK\1.4.341.1\Bin\VkLayer_khronos_validation.dll
+[10:17:41.760] [PARALLAX] [trace] Vulkan instance destroyed
+[10:17:41.778] [PARALLAX] [info] Window destroyed
+[10:17:41.802] [PARALLAX] [info] Parallax shutdown complete.

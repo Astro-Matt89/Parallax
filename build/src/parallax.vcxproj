@@ -456,6 +456,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Parallax-dev\Parallax\src\rendering\line_renderer.cpp" />
     <ClCompile Include="C:\Parallax-dev\Parallax\src\overlay\constellations.cpp" />
     <ClCompile Include="C:\Parallax-dev\Parallax\src\overlay\coord_grid.cpp" />
+    <ClCompile Include="C:\Parallax-dev\Parallax\src\overlay\horizon.cpp" />
     <ClCompile Include="C:\Parallax-dev\Parallax\src\ui\font.cpp" />
     <ClCompile Include="C:\Parallax-dev\Parallax\src\ui\hud.cpp" />
   </ItemGroup>

@@ -17,5 +17,6 @@ C:\Parallax-dev\Parallax\src\rendering\starfield.cpp;C:\Parallax-dev\Parallax\bu
 C:\Parallax-dev\Parallax\src\rendering\line_renderer.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\line_renderer.obj
 C:\Parallax-dev\Parallax\src\overlay\constellations.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\constellations.obj
 C:\Parallax-dev\Parallax\src\overlay\coord_grid.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\coord_grid.obj
+C:\Parallax-dev\Parallax\src\overlay\horizon.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\horizon.obj
 C:\Parallax-dev\Parallax\src\ui\font.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\font.obj
 C:\Parallax-dev\Parallax\src\ui\hud.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\hud.obj

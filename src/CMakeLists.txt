@@ -22,6 +22,7 @@ add_executable(parallax
     rendering/line_renderer.cpp
     overlay/constellations.cpp
     overlay/coord_grid.cpp
+    overlay/horizon.cpp
     ui/font.cpp
     ui/hud.cpp
 )

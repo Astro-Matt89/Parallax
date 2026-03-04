@@ -1,0 +1,111 @@
+Designation,Name,RA_deg,Dec_deg,Vmag,Size_arcmin,Type
+M1,Crab Nebula,83.633,22.014,8.4,6.0,SupernovaRemnant
+M2,Aquarius Globular,323.363,-0.823,6.5,16.0,GlobularCluster
+M3,Canes Venatici Globular,205.548,28.377,6.2,18.0,GlobularCluster
+M4,Scorpius Globular,245.897,-26.526,5.6,36.0,GlobularCluster
+M5,Serpens Globular,229.638,2.081,5.6,23.0,GlobularCluster
+M6,Butterfly Cluster,265.083,-32.217,4.2,33.0,OpenCluster
+M7,Ptolemy Cluster,268.466,-34.793,3.3,80.0,OpenCluster
+M8,Lagoon Nebula,270.924,-24.386,6.0,90.0,Nebula
+M9,Ophiuchus Globular,259.800,-18.516,7.7,12.0,GlobularCluster
+M10,Ophiuchus Globular,254.288,-4.100,6.6,20.0,GlobularCluster
+M11,Wild Duck Cluster,282.767,-6.267,6.3,14.0,OpenCluster
+M12,Ophiuchus Globular,251.809,-1.949,6.7,16.0,GlobularCluster
+M13,Hercules Cluster,250.423,36.461,5.8,20.0,GlobularCluster
+M14,Ophiuchus Globular,264.400,-3.245,7.6,11.0,GlobularCluster
+M15,Pegasus Globular,322.493,12.167,6.2,18.0,GlobularCluster
+M16,Eagle Nebula,274.700,-13.807,6.0,7.0,Nebula
+M17,Omega Nebula,275.196,-16.172,6.0,11.0,Nebula
+M18,Sagittarius Cluster,274.294,-17.120,7.5,9.0,OpenCluster
+M19,Ophiuchus Globular,255.657,-26.268,6.8,17.0,GlobularCluster
+M20,Trifid Nebula,270.622,-23.029,6.3,28.0,Nebula
+M21,Sagittarius Cluster,271.046,-22.492,6.5,13.0,OpenCluster
+M22,Sagittarius Globular,279.100,-23.905,5.1,32.0,GlobularCluster
+M23,Sagittarius Cluster,269.267,-19.017,6.9,27.0,OpenCluster
+M24,Sagittarius Star Cloud,274.526,-18.517,4.6,90.0,OpenCluster
+M25,Sagittarius Cluster,277.797,-19.117,4.6,40.0,OpenCluster
+M26,Scutum Cluster,281.312,-9.384,8.0,15.0,OpenCluster
+M27,Dumbbell Nebula,299.902,22.721,7.5,8.0,Nebula
+M28,Sagittarius Globular,276.137,-24.870,6.8,11.0,GlobularCluster
+M29,Cygnus Cluster,305.967,38.517,7.1,7.0,OpenCluster
+M30,Capricornus Globular,325.092,-23.180,7.2,12.0,GlobularCluster
+M31,Andromeda Galaxy,10.685,41.269,3.4,178.0,Galaxy
+M32,Andromeda Satellite,10.674,40.866,8.1,8.0,Galaxy
+M33,Triangulum Galaxy,23.462,30.660,5.7,73.0,Galaxy
+M34,Perseus Cluster,40.521,42.775,5.5,35.0,OpenCluster
+M35,Gemini Cluster,92.275,24.333,5.3,28.0,OpenCluster
+M36,Auriga Cluster,84.084,34.133,6.3,12.0,OpenCluster
+M37,Auriga Cluster,88.071,32.550,6.2,24.0,OpenCluster
+M38,Auriga Cluster,82.167,35.850,7.4,21.0,OpenCluster
+M39,Cygnus Cluster,322.317,48.433,4.6,32.0,OpenCluster
+M40,Winnecke 4,185.550,58.083,8.4,0.8,Other
+M41,Canis Major Cluster,101.504,-20.733,4.5,38.0,OpenCluster
+M42,Orion Nebula,83.822,-5.391,4.0,85.0,Nebula
+M43,De Mairan's Nebula,83.892,-5.268,9.0,20.0,Nebula
+M44,Beehive Cluster,130.025,19.983,3.7,95.0,OpenCluster
+M45,Pleiades,56.601,24.115,1.6,110.0,OpenCluster
+M46,Puppis Cluster,115.442,-14.817,6.1,27.0,OpenCluster
+M47,Puppis Cluster,114.150,-14.500,4.4,30.0,OpenCluster
+M48,Hydra Cluster,123.425,-5.800,5.8,54.0,OpenCluster
+M49,Virgo Galaxy,187.444,8.000,8.4,10.0,Galaxy
+M50,Monoceros Cluster,105.688,-8.350,5.9,16.0,OpenCluster
+M51,Whirlpool Galaxy,202.470,47.195,8.4,11.0,Galaxy
+M52,Cassiopeia Cluster,351.200,61.583,7.3,13.0,OpenCluster
+M53,Coma Berenices Globular,198.230,18.169,7.6,13.0,GlobularCluster
+M54,Sagittarius Globular,283.764,-30.480,7.6,12.0,GlobularCluster
+M55,Sagittarius Globular,294.999,-30.965,6.3,19.0,GlobularCluster
+M56,Lyra Globular,289.148,30.184,8.3,9.0,GlobularCluster
+M57,Ring Nebula,283.396,33.029,8.8,1.4,Nebula
+M58,Virgo Galaxy,189.431,11.818,9.7,6.0,Galaxy
+M59,Virgo Galaxy,190.509,11.647,9.6,5.0,Galaxy
+M60,Virgo Galaxy,190.917,11.553,8.8,7.0,Galaxy
+M61,Virgo Galaxy,185.479,4.474,9.7,6.0,Galaxy
+M62,Ophiuchus Globular,255.303,-30.114,6.5,15.0,GlobularCluster
+M63,Sunflower Galaxy,198.955,42.029,8.6,13.0,Galaxy
+M64,Black Eye Galaxy,194.182,21.681,8.5,10.0,Galaxy
+M65,Leo Triplet,169.733,13.092,9.3,10.0,Galaxy
+M66,Leo Triplet,170.063,12.992,8.9,9.0,Galaxy
+M67,Cancer Cluster,132.846,11.817,6.1,30.0,OpenCluster
+M68,Hydra Globular,189.867,-26.744,7.8,11.0,GlobularCluster
+M69,Sagittarius Globular,277.846,-32.348,7.6,9.0,GlobularCluster
+M70,Sagittarius Globular,280.803,-32.293,7.9,8.0,GlobularCluster
+M71,Sagitta Globular,298.444,18.779,8.2,7.0,GlobularCluster
+M72,Aquarius Globular,313.365,-12.537,9.3,6.0,GlobularCluster
+M73,Aquarius Asterism,314.750,-12.633,9.0,2.8,Other
+M74,Pisces Galaxy,24.174,15.783,9.4,10.0,Galaxy
+M75,Sagittarius Globular,301.520,-21.921,8.5,6.8,GlobularCluster
+M76,Little Dumbbell,25.582,51.575,10.1,2.7,Nebula
+M77,Cetus Galaxy,40.670,-0.014,8.9,7.0,Galaxy
+M78,Orion Nebula,86.650,0.050,8.3,8.0,Nebula
+M79,Lepus Globular,81.046,-24.525,7.7,9.0,GlobularCluster
+M80,Scorpius Globular,244.260,-22.976,7.3,10.0,GlobularCluster
+M81,Bode's Galaxy,148.888,69.065,6.9,27.0,Galaxy
+M82,Cigar Galaxy,148.968,69.680,8.4,11.0,Galaxy
+M83,Southern Pinwheel,204.254,-29.866,7.6,13.0,Galaxy
+M84,Virgo Galaxy,186.265,12.887,9.1,6.0,Galaxy
+M85,Coma Berenices Galaxy,186.350,18.191,9.1,7.0,Galaxy
+M86,Virgo Galaxy,186.549,12.946,8.9,9.0,Galaxy
+M87,Virgo A,187.706,12.391,8.6,8.0,Galaxy
+M88,Coma Berenices Galaxy,188.996,14.420,9.6,7.0,Galaxy
+M89,Virgo Galaxy,188.916,12.556,9.8,5.0,Galaxy
+M90,Virgo Galaxy,189.209,13.163,9.5,10.0,Galaxy
+M91,Coma Berenices Galaxy,188.860,14.497,10.2,5.0,Galaxy
+M92,Hercules Globular,259.281,43.136,6.4,14.0,GlobularCluster
+M93,Puppis Cluster,116.143,-23.858,6.0,22.0,OpenCluster
+M94,Cat's Eye Galaxy,192.721,41.120,8.2,11.0,Galaxy
+M95,Leo Galaxy,160.990,11.704,9.7,7.0,Galaxy
+M96,Leo Galaxy,161.693,11.820,9.2,7.0,Galaxy
+M97,Owl Nebula,168.699,55.019,9.9,3.4,Nebula
+M98,Coma Berenices Galaxy,183.451,14.900,10.1,10.0,Galaxy
+M99,Coma Berenices Galaxy,184.707,14.417,9.9,5.0,Galaxy
+M100,Coma Berenices Galaxy,185.729,15.822,9.3,7.0,Galaxy
+M101,Pinwheel Galaxy,210.802,54.349,7.9,29.0,Galaxy
+M102,Spindle Galaxy,226.623,55.763,9.9,6.0,Galaxy
+M103,Cassiopeia Cluster,23.342,60.700,7.4,6.0,OpenCluster
+M104,Sombrero Galaxy,189.998,-11.623,8.0,9.0,Galaxy
+M105,Leo Galaxy,161.957,12.582,9.3,5.0,Galaxy
+M106,Canes Venatici Galaxy,184.740,47.304,8.4,19.0,Galaxy
+M107,Ophiuchus Globular,248.133,-13.054,7.9,13.0,GlobularCluster
+M108,Ursa Major Galaxy,167.879,55.674,10.0,8.0,Galaxy
+M109,Ursa Major Galaxy,179.400,53.375,9.8,8.0,Galaxy
+M110,Andromeda Satellite,10.092,41.685,8.5,22.0,Galaxy

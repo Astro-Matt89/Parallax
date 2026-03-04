@@ -15,11 +15,13 @@ add_executable(parallax
     astro/coordinates.cpp
     astro/atmosphere.cpp
     catalog/catalog_loader.cpp
+    catalog/dso_loader.cpp
     catalog/visibility_filter.cpp
     rendering/camera.cpp
     rendering/sky_background.cpp
     rendering/starfield.cpp
     rendering/line_renderer.cpp
+    rendering/dso_renderer.cpp
     overlay/constellations.cpp
     overlay/coord_grid.cpp
     overlay/horizon.cpp

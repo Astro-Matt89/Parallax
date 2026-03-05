@@ -6,13 +6,18 @@
 #include "astro/atmosphere.hpp"
 #include "astro/coordinates.hpp"
 #include "astro/time_system.hpp"
+#include "catalog/dso_entry.hpp"
+#include "catalog/dso_loader.hpp"
 #include "catalog/star_entry.hpp"
 #include "catalog/visibility_filter.hpp"
 #include "core/input.hpp"
 #include "core/types.hpp"
 #include "core/window.hpp"
 #include "overlay/constellations.hpp"                     // ← SPRINT 04 Task 4.2
+#include "overlay/coord_grid.hpp"                         // ← SPRINT 04 Task 4.3
+#include "overlay/horizon.hpp"                            // ← SPRINT 04 Task 4.4
 #include "rendering/camera.hpp"
+#include "rendering/dso_renderer.hpp"                     // ← SPRINT 04 Task 4.5
 #include "rendering/line_renderer.hpp"                    // ← SPRINT 04 Task 4.1
 #include "rendering/sky_background.hpp"
 #include "rendering/starfield.hpp"
@@ -91,14 +96,22 @@ namespace parallax::core
         std::unique_ptr<ui::Hud> m_hud;                     ///< Retro HUD overlay  ← SPRINT 03 Task 3.6
 
         // -----------------------------------------------------------------
-        // Overlays                                          ← SPRINT 04 Task 4.2
+        // Overlays                                          ← SPRINT 04
         // -----------------------------------------------------------------
-        overlay::Constellations m_constellations;
+        overlay::Constellations m_constellations;            // Task 4.2
+        overlay::CoordGrid m_coord_grid;                     // Task 4.3
+        overlay::Horizon m_horizon;                          // Task 4.4
+        rendering::DsoRenderer m_dso_renderer;               // Task 4.5
 
         // -----------------------------------------------------------------
         // Star catalog
         // -----------------------------------------------------------------
         std::vector<catalog::StarEntry> m_stars;
+
+        // -----------------------------------------------------------------
+        // DSO catalog                                       ← SPRINT 04 Task 4.5
+        // -----------------------------------------------------------------
+        std::vector<catalog::DsoEntry> m_dsos;
 
         // -----------------------------------------------------------------
         // Simulation state

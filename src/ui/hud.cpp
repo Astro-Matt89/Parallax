@@ -14,12 +14,11 @@ namespace parallax::ui
 {
 
 // =================================================================
-// Formatting helpers
+// Formatting helpers (unchanged from Sprint 03)
 // =================================================================
 
 std::string format_ra(f64 ra_rad)
 {
-    // RA in radians → hours (0..24)
     f64 hours = ra_rad * astro_constants::kRadToHour;
     if (hours < 0.0)
     {
@@ -61,7 +60,6 @@ std::string format_az(f64 az_rad)
 {
     f64 deg = az_rad * astro_constants::kRadToDeg;
 
-    // Normalize to [0, 360)
     while (deg < 0.0)
     {
         deg += 360.0;
@@ -90,7 +88,6 @@ std::string format_time_scale(f64 scale)
 
     char buf[32];
 
-    // Show integer if close to a whole number, otherwise 1 decimal
     if (std::abs(scale - std::round(scale)) < 0.01)
     {
         std::snprintf(buf, sizeof(buf), "x%d", static_cast<int>(scale));
@@ -124,7 +121,7 @@ void Hud::update(const HudData& data)
 }
 
 // =================================================================
-// render() — draw all panels
+// render() — draw all panels including overlay status bar
 // =================================================================
 
 void Hud::render(VkCommandBuffer cmd, VkExtent2D viewport_extent)
@@ -141,6 +138,7 @@ void Hud::render(VkCommandBuffer cmd, VkExtent2D viewport_extent)
     draw_camera_panel(vw, vh);
     draw_observer_panel(vw, vh);
     draw_performance_panel(vw, vh);
+    draw_overlay_status(vw, vh);         // ← SPRINT 04 Task 4.7
 
     m_font.render(cmd, viewport_extent);
 }
@@ -159,7 +157,7 @@ bool Hud::is_visible() const
     return m_visible;
 }
 
-void Hud::toggle_time_format()                                          // ← Task 3.7
+void Hud::toggle_time_format()
 {
     auto next = static_cast<u8>(m_time_format) + 1;
     if (next >= static_cast<u8>(TimeDisplayFormat::kCount))
@@ -169,12 +167,12 @@ void Hud::toggle_time_format()                                          // ← T
     m_time_format = static_cast<TimeDisplayFormat>(next);
 }
 
-TimeDisplayFormat Hud::get_time_format() const                          // ← Task 3.7
+TimeDisplayFormat Hud::get_time_format() const
 {
     return m_time_format;
 }
 
-BitmapFont& Hud::get_font()                                            // ← SPRINT 04 Task 4.2
+BitmapFont& Hud::get_font()
 {
     return m_font;
 }
@@ -195,10 +193,6 @@ void Hud::draw_time_panel(f32 /*vw*/, f32 /*vh*/)
     // Separator
     m_font.draw_text("------------------", x, y, kScale, kColorDim);
     y += kLineSpacing;
-
-    // -----------------------------------------------------------------
-    // Time display — show all three, highlight the active format         ← Task 3.7
-    // -----------------------------------------------------------------
 
     // UTC date/time from Julian Date
     const auto dt = astro::TimeSystem::from_julian_date(m_data.julian_date);
@@ -238,8 +232,6 @@ void Hud::draw_time_panel(f32 /*vw*/, f32 /*vh*/)
 
 void Hud::draw_camera_panel(f32 vw, f32 /*vh*/)
 {
-    // Right-align: compute x from right edge
-    // Longest line: "ALT  +45 12' 33\"" = 17 chars
     constexpr f32 kPanelChars = 18.0f;
     const f32 x_label = vw - kMargin - kPanelChars * kGlyphW;
     const f32 x_value = x_label + kGlyphW * 5;
@@ -282,7 +274,7 @@ void Hud::draw_camera_panel(f32 vw, f32 /*vh*/)
 void Hud::draw_observer_panel(f32 /*vw*/, f32 vh)
 {
     const f32 x = kMargin;
-    f32 y = vh - kMargin - kLineSpacing * 3;
+    f32 y = vh - kMargin - kLineSpacing * 4;  // Extra line for overlay status
 
     // LAT
     const f64 lat_rad = m_data.latitude_deg * astro_constants::kDegToRad;
@@ -339,22 +331,90 @@ void Hud::draw_performance_panel(f32 vw, f32 vh)
     m_font.draw_text(star_buf, x_value + kGlyphW * 5, y, kScale, kColorDim);
     y += kLineSpacing;
 
-    // TIME scale — highlight in bright green, or use warning color for paused/reverse
+    // TIME scale
     const std::string ts = format_time_scale(m_data.time_scale);
 
-    // Paused = dim, reverse = warning amber, forward = bright green              ← Task 3.7
     Vec3f time_color = kColorValue;
     if (m_data.time_scale == 0.0)
     {
-        time_color = kColorDim;         // Paused → dim green
+        time_color = kColorDim;
     }
     else if (m_data.time_scale < 0.0)
     {
-        time_color = {1.0f, 0.5f, 0.0f};  // Reverse → amber warning
+        time_color = {1.0f, 0.5f, 0.0f};
     }
 
     m_font.draw_text("TIME ", x_label, y, kScale, kColorLabel);
     m_font.draw_text(ts, x_value, y, kScale, time_color);
+}
+
+// =================================================================
+// Bottom-center: overlay status bar                      ← SPRINT 04 Task 4.7
+//
+// Format: CONST ON  GRID EQ  DSO ON  HORIZ ON
+// Active overlays shown in bright green, inactive in dim.
+// =================================================================
+
+void Hud::draw_overlay_status(f32 vw, f32 vh)
+{
+    // Position: bottom of screen, centered horizontally
+    const f32 y = vh - kMargin;
+
+    // Build status tokens: label + value pairs
+    // Total width ≈ "CONST ON  GRID EQ    DSO ON  HORIZ ON" = ~40 chars
+    constexpr f32 kStatusChars = 44.0f;
+    f32 x = (vw - kStatusChars * kGlyphW) * 0.5f;
+
+    // Clamp to left margin if viewport is too narrow
+    if (x < kMargin)
+    {
+        x = kMargin;
+    }
+
+    // CONST
+    m_font.draw_text("CONST ", x, y, kScale, kColorLabel);
+    x += kGlyphW * 6;
+    {
+        const char* val = m_data.overlay_const ? "ON " : "OFF";
+        const Vec3f color = m_data.overlay_const ? kColorValue : kColorDim;
+        m_font.draw_text(val, x, y, kScale, color);
+        x += kGlyphW * 4;
+    }
+
+    // GRID
+    m_font.draw_text("GRID ", x, y, kScale, kColorLabel);
+    x += kGlyphW * 5;
+    {
+        const char* grid_name = m_data.overlay_grid_name ? m_data.overlay_grid_name : "None";
+        // Determine if grid is active (anything other than "None")
+        const bool grid_active = (grid_name[0] != 'N');  // "None" starts with N
+        const Vec3f color = grid_active ? kColorValue : kColorDim;
+
+        // Pad to 5 chars for alignment
+        char grid_buf[8];
+        std::snprintf(grid_buf, sizeof(grid_buf), "%-5s", grid_name);
+        m_font.draw_text(grid_buf, x, y, kScale, color);
+        x += kGlyphW * 6;
+    }
+
+    // DSO
+    m_font.draw_text("DSO ", x, y, kScale, kColorLabel);
+    x += kGlyphW * 4;
+    {
+        const char* val = m_data.overlay_dso ? "ON " : "OFF";
+        const Vec3f color = m_data.overlay_dso ? kColorValue : kColorDim;
+        m_font.draw_text(val, x, y, kScale, color);
+        x += kGlyphW * 4;
+    }
+
+    // HORIZ
+    m_font.draw_text("HORIZ ", x, y, kScale, kColorLabel);
+    x += kGlyphW * 6;
+    {
+        const char* val = m_data.overlay_horizon ? "ON " : "OFF";
+        const Vec3f color = m_data.overlay_horizon ? kColorValue : kColorDim;
+        m_font.draw_text(val, x, y, kScale, color);
+    }
 }
 
 } // namespace parallax::ui

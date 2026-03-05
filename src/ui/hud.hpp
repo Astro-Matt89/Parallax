@@ -3,8 +3,9 @@
 /// @file hud.hpp
 /// @brief Retro green terminal HUD overlay for the planetarium.
 ///
-/// Four panels: time (top-left), camera (top-right),
-/// observer (bottom-left), performance (bottom-right).
+/// Five panels: time (top-left), camera (top-right),
+/// observer (bottom-left), performance (bottom-right),
+/// overlay status bar (bottom-center).
 /// Uses the BitmapFont from Task 3.5.
 
 #include "core/types.hpp"
@@ -53,11 +54,17 @@ namespace parallax::ui
 
         // Simulation
         f64 time_scale = 1.0;
+
+        // Overlay status                                   ← SPRINT 04 Task 4.7
+        bool overlay_const = true;          ///< Constellation lines visible
+        const char* overlay_grid_name = "None"; ///< Grid type name string
+        bool overlay_dso = true;            ///< DSO icons visible
+        bool overlay_horizon = true;        ///< Horizon + cardinals visible
     };
 
     /// @brief Retro green terminal HUD overlay.
     ///
-    /// Renders four information panels over the starfield using the BitmapFont.
+    /// Renders five information panels over the starfield using the BitmapFont.
     /// Call update() with fresh data each frame, then render() inside the render pass.
     class Hud
     {
@@ -83,7 +90,7 @@ namespace parallax::ui
 
         /// @brief Render the HUD overlay.
         ///
-        /// Must be called inside an active render pass, AFTER sky + starfield.
+        /// Must be called inside an active render pass, AFTER sky + starfield + overlays.
         /// @param cmd The command buffer to record into.
         /// @param viewport_extent The current viewport dimensions.
         void render(VkCommandBuffer cmd, VkExtent2D viewport_extent);
@@ -115,6 +122,9 @@ namespace parallax::ui
 
         /// @brief Draw the bottom-right panel (FPS + star count + time scale).
         void draw_performance_panel(f32 vw, f32 vh);
+
+        /// @brief Draw the overlay status bar (bottom-center).            ← SPRINT 04 Task 4.7
+        void draw_overlay_status(f32 vw, f32 vh);
 
         BitmapFont m_font;
         HudData m_data{};

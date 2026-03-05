@@ -3,10 +3,21 @@
 ///
 /// Frame loop: input → time → sky → prefilter → starfield → overlays → HUD → render → present.
 /// NO atmospheric effects on star rendering.
+///
+/// SPRINT 04 Task 4.7: Full overlay integration.
+/// Render order:
+///   1. Sky background
+///   2. Coordinate grid (behind stars)
+///   3. Starfield (additive)
+///   4. Constellation lines + labels (over stars)
+///   5. DSO icons + labels (over stars)
+///   6. Horizon line + cardinal markers (over everything except HUD)
+///   7. HUD (always on top)
 
 #include "core/application.hpp"
 
 #include "catalog/catalog_loader.hpp"
+#include "catalog/dso_loader.hpp"
 
 #include <glm/trigonometric.hpp>
 
@@ -135,6 +146,22 @@ void Application::init()
         }
     }
 
+    // 10c. Load Messier DSO catalog                                     ← SPRINT 04 Task 4.5
+    {
+        const std::filesystem::path messier_path{"data/catalogs/messier.csv"};
+        auto loaded_dsos = catalog::DsoLoader::load_messier_csv(messier_path);
+        if (loaded_dsos.has_value())
+        {
+            m_dsos = std::move(loaded_dsos.value());
+            PLX_CORE_INFO("Messier catalog loaded: {} objects from {}",
+                          m_dsos.size(), messier_path.string());
+        }
+        else
+        {
+            PLX_CORE_WARN("Messier catalog not found at {}", messier_path.string());
+        }
+    }
+
     // 11. Observer: La Palma, Canary Islands
     m_observer = astro::ObserverLocation{
         .latitude_rad  = glm::radians(28.76),
@@ -175,6 +202,13 @@ void Application::init()
     create_command_buffers();
     create_sync_objects();
     m_last_frame_time = std::chrono::steady_clock::now();
+
+    // Log initial overlay states
+    PLX_CORE_INFO("Overlays: CONST={} GRID={} DSO={} HORIZ={}",
+                  m_constellations.is_visible() ? "ON" : "OFF",
+                  m_coord_grid.get_type_name(),
+                  m_dso_renderer.is_visible() ? "ON" : "OFF",
+                  m_horizon.is_visible() ? "ON" : "OFF");
 
     PLX_CORE_INFO("Application initialized — skychart mode, MLIM {:.1f}",
                   m_camera->get_magnitude_limit());
@@ -239,7 +273,7 @@ void Application::main_loop()
 }
 
 // =================================================================
-// Input processing — includes [ ] for magnitude limit
+// Input processing — all key bindings                   ← SPRINT 04 Task 4.7
 // =================================================================
 
 void Application::process_input()
@@ -312,7 +346,10 @@ void Application::process_input()
                       dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second);
     }
 
+    // =================================================================
     // UI controls
+    // =================================================================
+
     if (m_input->is_key_pressed(SDL_SCANCODE_H))
     {
         m_hud->toggle_visible();
@@ -339,13 +376,42 @@ void Application::process_input()
         PLX_CORE_INFO("Bortle scale: {}", static_cast<int>(bortle));
     }
 
-    // Constellation overlay toggle                                      ← SPRINT 04 Task 4.2
+    // =================================================================
+    // Overlay toggles                                   ← SPRINT 04 Task 4.7
+    // =================================================================
+
+    // C — Constellation lines + labels
     if (m_input->is_key_pressed(SDL_SCANCODE_C))
     {
         m_constellations.toggle_visible();
         PLX_CORE_INFO("Constellations {}",
                       m_constellations.is_visible() ? "shown" : "hidden");
     }
+
+    // G — Cycle coordinate grid (None → Eq → AltAz → Both → None)
+    if (m_input->is_key_pressed(SDL_SCANCODE_G))
+    {
+        m_coord_grid.cycle_type();
+        PLX_CORE_INFO("Coordinate grid: {}", m_coord_grid.get_type_name());
+    }
+
+    // D — Toggle deep sky objects (Messier)
+    if (m_input->is_key_pressed(SDL_SCANCODE_D))
+    {
+        m_dso_renderer.toggle_visible();
+        PLX_CORE_INFO("DSOs {}", m_dso_renderer.is_visible() ? "shown" : "hidden");
+    }
+
+    // O — Toggle horizon overlay + cardinal markers
+    if (m_input->is_key_pressed(SDL_SCANCODE_O))
+    {
+        m_horizon.toggle_visible();
+        PLX_CORE_INFO("Horizon {}", m_horizon.is_visible() ? "shown" : "hidden");
+    }
+
+    // =================================================================
+    // Camera reset + quit
+    // =================================================================
 
     if (m_input->is_key_pressed(SDL_SCANCODE_R))
     {
@@ -361,6 +427,21 @@ void Application::process_input()
 
 // =================================================================
 // Simulation update — skychart mode (no atmosphere on stars)
+//
+// Render order per sprint_04.md Task 4.7:
+//   1. Sky background   (updated first, drawn by record_command_buffer)
+//   2. Coordinate grid  (behind stars — submitted to line renderer)
+//   3. Starfield        (additive)
+//   4. Constellations   (over stars — lines + labels)
+//   5. DSO icons+labels (over stars)
+//   6. Horizon+cardinals(over everything except HUD)
+//   7. HUD              (always on top)
+//
+// All overlay geometry is submitted to the single m_line_renderer.
+// Labels are submitted to the BitmapFont inside m_hud.
+// The actual GPU draw order is:
+//   sky_bg → starfield → line_renderer (all overlays) → HUD
+// The submit order below controls Z-layering within the line batch.
 // =================================================================
 
 void Application::update_simulation(f64 delta_time_sec)
@@ -377,20 +458,38 @@ void Application::update_simulation(f64 delta_time_sec)
     // Clear line renderer for this frame                               ← SPRINT 04 Task 4.1
     m_line_renderer->begin_frame();
 
+    const VkExtent2D viewport = m_swapchain->get_extent();
+
+    // --- Step 2: Coordinate grid (behind stars visually, but all lines
+    //     are drawn in one batch after starfield in the render pass).
+    //     Submitted first so grid lines are "underneath" overlay lines. ---
+    m_coord_grid.update(*m_camera, m_observer, lst,
+                        *m_line_renderer, m_hud->get_font(),
+                        viewport);
+
     // Visibility prefilter
     catalog::PrefilterStats prefilter_stats{};
     const auto candidates = catalog::VisibilityFilter::filter(
         m_stars, m_observer, lst, m_camera->get_magnitude_limit(), &prefilter_stats);
 
-    // Starfield update — NO atmosphere parameter
+    // --- Step 3: Starfield update — NO atmosphere parameter ---
     m_starfield->update(m_stars, candidates, m_observer, lst, *m_camera);
 
-    // Constellation overlay — lines + labels                           ← SPRINT 04 Task 4.2
+    // --- Step 4: Constellation lines + labels (over stars) ---
     m_constellations.update(*m_camera, m_observer, lst,
                             *m_line_renderer, m_hud->get_font(),
-                            m_swapchain->get_extent());
+                            viewport);
 
-    // Update HUD
+    // --- Step 5: DSO icons + labels (over stars) ---
+    m_dso_renderer.update(*m_camera, m_observer, lst,
+                          m_dsos, *m_line_renderer, m_hud->get_font(),
+                          viewport);
+
+    // --- Step 6: Horizon line + cardinal markers (over everything except HUD) ---
+    m_horizon.update(*m_camera, *m_line_renderer, m_hud->get_font(),
+                     viewport);
+
+    // --- Step 7: Update HUD (drawn last in render pass) ---
     const auto pointing = m_camera->get_pointing();
     const f32 fps = (m_delta_time > 0.0) ? static_cast<f32>(1.0 / m_delta_time) : 0.0f;
 
@@ -409,6 +508,10 @@ void Application::update_simulation(f64 delta_time_sec)
         .visible_stars           = m_starfield->get_visible_count(),
         .total_stars             = static_cast<u32>(m_stars.size()),
         .time_scale              = m_time_scale,
+        .overlay_const           = m_constellations.is_visible(),
+        .overlay_grid_name       = m_coord_grid.get_type_name(),
+        .overlay_dso             = m_dso_renderer.is_visible(),
+        .overlay_horizon         = m_horizon.is_visible(),
     });
 
     // Periodic logging
@@ -418,82 +521,21 @@ void Application::update_simulation(f64 delta_time_sec)
         PLX_CORE_TRACE(
             "Stars: {} total | {} candidates | {} visible | MLIM {:.1f}",
             prefilter_stats.total,
-            prefilter_stats.passed,
+            prefilter_stats.candidates,
             m_starfield->get_visible_count(),
             m_camera->get_magnitude_limit());
     }
 }
 
 // =================================================================
-// Frame rendering — draw order: sky → stars → overlays → HUD
+// record_command_buffer — GPU draw order
+//
+// 1. Sky background (fullscreen triangle)
+// 2. Starfield (instanced points, additive)
+// 3. Line renderer (all overlay geometry: grid, constellations,
+//                    DSO icons, horizon — in submit order)
+// 4. HUD (bitmap font quads, alpha blended — always on top)
 // =================================================================
-
-void Application::draw_frame()
-{
-    VkDevice device = m_context->get_device();
-
-    check_vk(vkWaitForFences(device, 1, &m_in_flight_fences[m_current_frame], VK_TRUE,
-                             std::numeric_limits<uint64_t>::max()), "vkWaitForFences");
-
-    uint32_t image_index = 0;
-    VkResult acquire_result = vkAcquireNextImageKHR(device, m_swapchain->get_handle(),
-        std::numeric_limits<uint64_t>::max(), m_image_available_semaphores[m_current_frame],
-        VK_NULL_HANDLE, &image_index);
-
-    if (acquire_result == VK_ERROR_OUT_OF_DATE_KHR) { recreate_swapchain(); return; }
-    if (acquire_result != VK_SUCCESS && acquire_result != VK_SUBOPTIMAL_KHR)
-    {
-        PLX_CORE_CRITICAL("Failed to acquire swapchain image: {}", static_cast<int>(acquire_result));
-        std::abort();
-    }
-
-    check_vk(vkResetFences(device, 1, &m_in_flight_fences[m_current_frame]), "vkResetFences");
-    check_vk(vkResetCommandBuffer(m_command_buffers[m_current_frame], 0), "vkResetCommandBuffer");
-
-    record_command_buffer(m_command_buffers[m_current_frame], image_index);
-
-    VkSemaphore wait_semaphores[] = {m_image_available_semaphores[m_current_frame]};
-    VkPipelineStageFlags wait_stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-    VkSemaphore signal_semaphores[] = {m_render_finished_semaphores[image_index]};
-
-    VkSubmitInfo submit_info{};
-    submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submit_info.waitSemaphoreCount = 1;
-    submit_info.pWaitSemaphores = wait_semaphores;
-    submit_info.pWaitDstStageMask = wait_stages;
-    submit_info.commandBufferCount = 1;
-    submit_info.pCommandBuffers = &m_command_buffers[m_current_frame];
-    submit_info.signalSemaphoreCount = 1;
-    submit_info.pSignalSemaphores = signal_semaphores;
-
-    check_vk(vkQueueSubmit(m_context->get_graphics_queue(), 1, &submit_info,
-                           m_in_flight_fences[m_current_frame]), "vkQueueSubmit");
-
-    VkSwapchainKHR swapchains[] = {m_swapchain->get_handle()};
-    VkPresentInfoKHR present_info{};
-    present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-    present_info.waitSemaphoreCount = 1;
-    present_info.pWaitSemaphores = signal_semaphores;
-    present_info.swapchainCount = 1;
-    present_info.pSwapchains = swapchains;
-    present_info.pImageIndices = &image_index;
-
-    VkResult present_result = vkQueuePresentKHR(m_context->get_present_queue(), &present_info);
-
-    if (present_result == VK_ERROR_OUT_OF_DATE_KHR || present_result == VK_SUBOPTIMAL_KHR
-        || m_framebuffer_resized)
-    {
-        m_framebuffer_resized = false;
-        recreate_swapchain();
-    }
-    else if (present_result != VK_SUCCESS)
-    {
-        PLX_CORE_CRITICAL("Failed to present: {}", static_cast<int>(present_result));
-        std::abort();
-    }
-
-    m_current_frame = (m_current_frame + 1) % kMaxFramesInFlight;
-}
 
 void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_index)
 {
@@ -521,40 +563,133 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
     VkRect2D scissor{{0, 0}, extent};
     vkCmdSetScissor(cmd, 0, 1, &scissor);
 
+    // 1. Sky background
     m_sky_background->draw(cmd);
+
+    // 2. Starfield (additive blending)
     m_starfield->draw(cmd);
-    m_line_renderer->render(cmd);   // Overlays: AFTER starfield, BEFORE HUD  ← SPRINT 04 Task 4.1
+
+    // 3. All overlay lines: grid → constellations → DSOs → horizon
+    m_line_renderer->render(cmd);
+
+    // 4. HUD (always on top)
     m_hud->render(cmd, extent);
 
     vkCmdEndRenderPass(cmd);
+
     check_vk(vkEndCommandBuffer(cmd), "vkEndCommandBuffer");
+}
+
+// =================================================================
+// draw_frame, recreate_swapchain, create_command_pool, etc.
+// (UNCHANGED from previous sprint — kept as-is)
+// =================================================================
+
+void Application::draw_frame()
+{
+    // Wait for the previous frame using this slot to finish
+    vkWaitForFences(m_context->get_device(), 1,
+                    &m_in_flight_fences[m_current_frame],
+                    VK_TRUE, std::numeric_limits<uint64_t>::max());
+
+    uint32_t image_index = 0;
+    VkResult acquire_result = vkAcquireNextImageKHR(
+        m_context->get_device(), m_swapchain->get_swapchain(),
+        std::numeric_limits<uint64_t>::max(),
+        m_image_available_semaphores[m_current_frame],
+        VK_NULL_HANDLE, &image_index);
+
+    if (acquire_result == VK_ERROR_OUT_OF_DATE_KHR)
+    {
+        recreate_swapchain();
+        return;
+    }
+    if (acquire_result != VK_SUCCESS && acquire_result != VK_SUBOPTIMAL_KHR)
+    {
+        PLX_CORE_CRITICAL("Failed to acquire swapchain image: {}", static_cast<int>(acquire_result));
+        std::abort();
+    }
+
+    vkResetFences(m_context->get_device(), 1, &m_in_flight_fences[m_current_frame]);
+
+    VkCommandBuffer cmd = m_command_buffers[m_current_frame];
+    vkResetCommandBuffer(cmd, 0);
+    record_command_buffer(cmd, image_index);
+
+    VkSubmitInfo submit_info{};
+    submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+    VkSemaphore wait_semaphores[] = {m_image_available_semaphores[m_current_frame]};
+    VkPipelineStageFlags wait_stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+    submit_info.waitSemaphoreCount = 1;
+    submit_info.pWaitSemaphores = wait_semaphores;
+    submit_info.pWaitDstStageMask = wait_stages;
+    submit_info.commandBufferCount = 1;
+    submit_info.pCommandBuffers = &cmd;
+
+    VkSemaphore signal_semaphores[] = {m_render_finished_semaphores[image_index]};
+    submit_info.signalSemaphoreCount = 1;
+    submit_info.pSignalSemaphores = signal_semaphores;
+
+    check_vk(vkQueueSubmit(m_context->get_graphics_queue(), 1, &submit_info,
+                           m_in_flight_fences[m_current_frame]),
+             "vkQueueSubmit");
+
+    VkPresentInfoKHR present_info{};
+    present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    present_info.waitSemaphoreCount = 1;
+    present_info.pWaitSemaphores = signal_semaphores;
+    VkSwapchainKHR swapchains[] = {m_swapchain->get_swapchain()};
+    present_info.swapchainCount = 1;
+    present_info.pSwapchains = swapchains;
+    present_info.pImageIndices = &image_index;
+
+    VkResult present_result = vkQueuePresentKHR(m_context->get_present_queue(), &present_info);
+
+    if (present_result == VK_ERROR_OUT_OF_DATE_KHR ||
+        present_result == VK_SUBOPTIMAL_KHR || m_framebuffer_resized)
+    {
+        m_framebuffer_resized = false;
+        recreate_swapchain();
+    }
+    else if (present_result != VK_SUCCESS)
+    {
+        PLX_CORE_CRITICAL("Failed to present: {}", static_cast<int>(present_result));
+        std::abort();
+    }
+
+    m_current_frame = (m_current_frame + 1) % kMaxFramesInFlight;
 }
 
 void Application::recreate_swapchain()
 {
     m_context->wait_idle();
-    uint32_t w = m_window->get_width();
-    uint32_t h = m_window->get_height();
-    if (w == 0 || h == 0) return;
+    m_swapchain = std::make_unique<vulkan::Swapchain>(
+        *m_context, m_window->get_width(), m_window->get_height());
+    m_pipeline = std::make_unique<vulkan::Pipeline>(*m_context, *m_swapchain,
+        std::filesystem::path{PLX_SHADER_DIR});
 
-    VkDevice device = m_context->get_device();
+    const auto extent = m_swapchain->get_extent();
+    m_sky_background->set_extent(extent);
+
+    // Recreate per-image render-finished semaphores
     for (auto sem : m_render_finished_semaphores)
-        if (sem != VK_NULL_HANDLE) vkDestroySemaphore(device, sem, nullptr);
-    m_render_finished_semaphores.clear();
-
-    m_swapchain->recreate(w, h);
-    m_pipeline->recreate_framebuffers(*m_swapchain);
-    m_sky_background->set_extent(m_swapchain->get_extent());
-
-    uint32_t image_count = m_swapchain->get_image_count();
-    m_render_finished_semaphores.resize(image_count);
-    VkSemaphoreCreateInfo sem_info{};
-    sem_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-    for (uint32_t i = 0; i < image_count; ++i)
-        check_vk(vkCreateSemaphore(device, &sem_info, nullptr, &m_render_finished_semaphores[i]),
+    {
+        if (sem != VK_NULL_HANDLE)
+        {
+            vkDestroySemaphore(m_context->get_device(), sem, nullptr);
+        }
+    }
+    m_render_finished_semaphores.resize(m_swapchain->get_image_count());
+    for (auto& sem : m_render_finished_semaphores)
+    {
+        VkSemaphoreCreateInfo ci{};
+        ci.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+        check_vk(vkCreateSemaphore(m_context->get_device(), &ci, nullptr, &sem),
                  "vkCreateSemaphore (recreate)");
+    }
 
-    PLX_CORE_INFO("Swapchain recreated: {}x{}", w, h);
+    PLX_CORE_INFO("Swapchain recreated: {}x{}", extent.width, extent.height);
 }
 
 void Application::create_command_pool()
@@ -581,42 +716,53 @@ void Application::create_command_buffers()
 
 void Application::create_sync_objects()
 {
-    VkDevice device = m_context->get_device();
-    VkSemaphoreCreateInfo semaphore_info{};
-    semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    VkSemaphoreCreateInfo sem_info{};
+    sem_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
     VkFenceCreateInfo fence_info{};
     fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fence_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
     for (uint32_t i = 0; i < kMaxFramesInFlight; ++i)
     {
-        check_vk(vkCreateSemaphore(device, &semaphore_info, nullptr, &m_image_available_semaphores[i]),
+        check_vk(vkCreateSemaphore(m_context->get_device(), &sem_info, nullptr,
+                                   &m_image_available_semaphores[i]),
                  "vkCreateSemaphore (image available)");
-        check_vk(vkCreateFence(device, &fence_info, nullptr, &m_in_flight_fences[i]),
-                 "vkCreateFence (in flight)");
+        check_vk(vkCreateFence(m_context->get_device(), &fence_info, nullptr,
+                               &m_in_flight_fences[i]),
+                 "vkCreateFence");
     }
 
-    uint32_t image_count = m_swapchain->get_image_count();
-    m_render_finished_semaphores.resize(image_count);
-    for (uint32_t i = 0; i < image_count; ++i)
-        check_vk(vkCreateSemaphore(device, &semaphore_info, nullptr, &m_render_finished_semaphores[i]),
+    m_render_finished_semaphores.resize(m_swapchain->get_image_count());
+    for (auto& sem : m_render_finished_semaphores)
+    {
+        check_vk(vkCreateSemaphore(m_context->get_device(), &sem_info, nullptr, &sem),
                  "vkCreateSemaphore (render finished)");
+    }
 }
 
 void Application::destroy_sync_objects()
 {
-    VkDevice device = m_context->get_device();
-    for (auto sem : m_render_finished_semaphores)
-        if (sem != VK_NULL_HANDLE) vkDestroySemaphore(device, sem, nullptr);
-    m_render_finished_semaphores.clear();
-
     for (uint32_t i = 0; i < kMaxFramesInFlight; ++i)
     {
         if (m_image_available_semaphores[i] != VK_NULL_HANDLE)
-        { vkDestroySemaphore(device, m_image_available_semaphores[i], nullptr); m_image_available_semaphores[i] = VK_NULL_HANDLE; }
+        {
+            vkDestroySemaphore(m_context->get_device(), m_image_available_semaphores[i], nullptr);
+        }
         if (m_in_flight_fences[i] != VK_NULL_HANDLE)
-        { vkDestroyFence(device, m_in_flight_fences[i], nullptr); m_in_flight_fences[i] = VK_NULL_HANDLE; }
+        {
+            vkDestroyFence(m_context->get_device(), m_in_flight_fences[i], nullptr);
+        }
     }
+
+    for (auto sem : m_render_finished_semaphores)
+    {
+        if (sem != VK_NULL_HANDLE)
+        {
+            vkDestroySemaphore(m_context->get_device(), sem, nullptr);
+        }
+    }
+    m_render_finished_semaphores.clear();
 }
 
 } // namespace parallax::core

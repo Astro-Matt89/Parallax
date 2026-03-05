@@ -11,6 +11,7 @@ C:\Parallax-dev\Parallax\src\astro\coordinates.cpp;C:\Parallax-dev\Parallax\buil
 C:\Parallax-dev\Parallax\src\astro\atmosphere.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\atmosphere.obj
 C:\Parallax-dev\Parallax\src\catalog\catalog_loader.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\catalog_loader.obj
 C:\Parallax-dev\Parallax\src\catalog\dso_loader.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\dso_loader.obj
+C:\Parallax-dev\Parallax\src\catalog\spatial_index.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\spatial_index.obj
 C:\Parallax-dev\Parallax\src\catalog\visibility_filter.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\visibility_filter.obj
 C:\Parallax-dev\Parallax\src\rendering\camera.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\camera.obj
 C:\Parallax-dev\Parallax\src\rendering\sky_background.cpp;C:\Parallax-dev\Parallax\build\src\parallax.dir\Debug\sky_background.obj

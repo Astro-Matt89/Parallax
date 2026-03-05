@@ -40,6 +40,9 @@
     <ClCompile Include="C:\Parallax-dev\Parallax\src\catalog\dso_loader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Parallax-dev\Parallax\src\catalog\spatial_index.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Parallax-dev\Parallax\src\catalog\visibility_filter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

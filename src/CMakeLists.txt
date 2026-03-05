@@ -16,6 +16,7 @@ add_executable(parallax
     astro/atmosphere.cpp
     catalog/catalog_loader.cpp
     catalog/dso_loader.cpp
+    catalog/spatial_index.cpp
     catalog/visibility_filter.cpp
     rendering/camera.cpp
     rendering/sky_background.cpp

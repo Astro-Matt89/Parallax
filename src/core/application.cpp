@@ -468,7 +468,7 @@ void Application::update_simulation(f64 delta_time_sec)
                         viewport);
 
     // Visibility prefilter
-    catalog::PrefilterStats prefilter_stats{};
+    catalog::PrefilterStats prefilter_stats{}
     const auto candidates = catalog::VisibilityFilter::filter(
         m_stars, m_observer, lst, m_camera->get_magnitude_limit(), &prefilter_stats);
 

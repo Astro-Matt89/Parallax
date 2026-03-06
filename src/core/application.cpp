@@ -468,7 +468,7 @@ void Application::update_simulation(f64 delta_time_sec)
                         viewport);
 
     // Visibility prefilter
-    catalog::PrefilterStats prefilter_stats{}
+    catalog::PrefilterStats prefilter_stats{};  // ← FIX: added missing semicolon
     const auto candidates = catalog::VisibilityFilter::filter(
         m_stars, m_observer, lst, m_camera->get_magnitude_limit(), &prefilter_stats);
 
@@ -651,11 +651,42 @@ void Application::draw_frame()
     m_current_frame = (m_current_frame + 1) % kMaxFramesInFlight;
 }
 
+// =================================================================
+// recreate_swapchain — FIX: use in-place recreate() instead of
+// destroying and constructing a new Swapchain object.
+//
+// The old code did:
+//   m_swapchain = std::make_unique<vulkan::Swapchain>(...);
+// which destroyed the old VkSwapchainKHR *then* created a new one,
+// leaving oldSwapchain = VK_NULL_HANDLE.  On some drivers/platforms
+// this causes VK_ERROR_SURFACE_LOST_KHR (-1000000001) during resize.
+//
+// Swapchain::recreate() internally calls destroy() then create(),
+// keeping the same object alive and letting the driver retire the
+// old swapchain gracefully.
+// =================================================================
+
 void Application::recreate_swapchain()
 {
+    // Block until the window has a valid (non-zero) size.
+    // This handles the minimised-window case where extent would be 0×0,
+    // which Vulkan does not allow for swapchain creation.
+    uint32_t w = m_window->get_width();
+    uint32_t h = m_window->get_height();
+    while (w == 0 || h == 0)
+    {
+        m_window->poll_events();
+        w = m_window->get_width();
+        h = m_window->get_height();
+    }
+
     m_context->wait_idle();
-    m_swapchain = std::make_unique<vulkan::Swapchain>(
-        *m_context, m_window->get_width(), m_window->get_height());
+
+    // Recreate the swapchain IN PLACE — this calls vkDeviceWaitIdle,
+    // destroys image views + old swapchain, then creates new ones.
+    m_swapchain->recreate(w, h);
+
+    // Recreate pipeline (render pass + framebuffers) against new swapchain
     m_pipeline = std::make_unique<vulkan::Pipeline>(*m_context, *m_swapchain,
         std::filesystem::path{PLX_SHADER_DIR});
 

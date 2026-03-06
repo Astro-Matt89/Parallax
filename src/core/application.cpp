@@ -519,9 +519,9 @@ void Application::update_simulation(f64 delta_time_sec)
     if (m_frame_counter % 60 == 0)
     {
         PLX_CORE_TRACE(
-            "Stars: {} total | {} candidates | {} visible | MLIM {:.1f}",
+            "Stars: {} total | {} passed | {} visible | MLIM {:.1f}",
             prefilter_stats.total,
-            prefilter_stats.candidates,
+            prefilter_stats.passed,
             m_starfield->get_visible_count(),
             m_camera->get_magnitude_limit());
     }
@@ -581,73 +581,63 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
 }
 
 // =================================================================
-// draw_frame, recreate_swapchain, create_command_pool, etc.
-// (UNCHANGED from previous sprint — kept as-is)
+// draw_frame — acquire image, record, submit, present
 // =================================================================
 
 void Application::draw_frame()
 {
-    // Wait for the previous frame using this slot to finish
-    vkWaitForFences(m_context->get_device(), 1,
-                    &m_in_flight_fences[m_current_frame],
-                    VK_TRUE, std::numeric_limits<uint64_t>::max());
+    VkDevice device = m_context->get_device();
+
+    check_vk(vkWaitForFences(device, 1, &m_in_flight_fences[m_current_frame], VK_TRUE,
+                             std::numeric_limits<uint64_t>::max()), "vkWaitForFences");
 
     uint32_t image_index = 0;
-    VkResult acquire_result = vkAcquireNextImageKHR(
-        m_context->get_device(), m_swapchain->get_swapchain(),
-        std::numeric_limits<uint64_t>::max(),
-        m_image_available_semaphores[m_current_frame],
+    VkResult acquire_result = vkAcquireNextImageKHR(device, m_swapchain->get_handle(),
+        std::numeric_limits<uint64_t>::max(), m_image_available_semaphores[m_current_frame],
         VK_NULL_HANDLE, &image_index);
 
-    if (acquire_result == VK_ERROR_OUT_OF_DATE_KHR)
-    {
-        recreate_swapchain();
-        return;
-    }
+    if (acquire_result == VK_ERROR_OUT_OF_DATE_KHR) { recreate_swapchain(); return; }
     if (acquire_result != VK_SUCCESS && acquire_result != VK_SUBOPTIMAL_KHR)
     {
         PLX_CORE_CRITICAL("Failed to acquire swapchain image: {}", static_cast<int>(acquire_result));
         std::abort();
     }
 
-    vkResetFences(m_context->get_device(), 1, &m_in_flight_fences[m_current_frame]);
+    check_vk(vkResetFences(device, 1, &m_in_flight_fences[m_current_frame]), "vkResetFences");
+    check_vk(vkResetCommandBuffer(m_command_buffers[m_current_frame], 0), "vkResetCommandBuffer");
 
-    VkCommandBuffer cmd = m_command_buffers[m_current_frame];
-    vkResetCommandBuffer(cmd, 0);
-    record_command_buffer(cmd, image_index);
-
-    VkSubmitInfo submit_info{};
-    submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    record_command_buffer(m_command_buffers[m_current_frame], image_index);
 
     VkSemaphore wait_semaphores[] = {m_image_available_semaphores[m_current_frame]};
     VkPipelineStageFlags wait_stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+    VkSemaphore signal_semaphores[] = {m_render_finished_semaphores[image_index]};
+
+    VkSubmitInfo submit_info{};
+    submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submit_info.waitSemaphoreCount = 1;
     submit_info.pWaitSemaphores = wait_semaphores;
     submit_info.pWaitDstStageMask = wait_stages;
     submit_info.commandBufferCount = 1;
-    submit_info.pCommandBuffers = &cmd;
-
-    VkSemaphore signal_semaphores[] = {m_render_finished_semaphores[image_index]};
+    submit_info.pCommandBuffers = &m_command_buffers[m_current_frame];
     submit_info.signalSemaphoreCount = 1;
     submit_info.pSignalSemaphores = signal_semaphores;
 
     check_vk(vkQueueSubmit(m_context->get_graphics_queue(), 1, &submit_info,
-                           m_in_flight_fences[m_current_frame]),
-             "vkQueueSubmit");
+                           m_in_flight_fences[m_current_frame]), "vkQueueSubmit");
 
+    VkSwapchainKHR swapchains[] = {m_swapchain->get_handle()};
     VkPresentInfoKHR present_info{};
     present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
     present_info.waitSemaphoreCount = 1;
     present_info.pWaitSemaphores = signal_semaphores;
-    VkSwapchainKHR swapchains[] = {m_swapchain->get_swapchain()};
     present_info.swapchainCount = 1;
     present_info.pSwapchains = swapchains;
     present_info.pImageIndices = &image_index;
 
     VkResult present_result = vkQueuePresentKHR(m_context->get_present_queue(), &present_info);
 
-    if (present_result == VK_ERROR_OUT_OF_DATE_KHR ||
-        present_result == VK_SUBOPTIMAL_KHR || m_framebuffer_resized)
+    if (present_result == VK_ERROR_OUT_OF_DATE_KHR || present_result == VK_SUBOPTIMAL_KHR
+        || m_framebuffer_resized)
     {
         m_framebuffer_resized = false;
         recreate_swapchain();

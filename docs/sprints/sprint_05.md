@@ -1,14 +1,15 @@
 # Sprint 05 — Interactive UI
 
-**Prerequisite:** Sprint 04 complete (constellations, grids, DSOs, Tycho-2)
-**Goal:** Transform the skychart into an interactive tool with Stellarium-style UI, object selection, and clickable controls.
-**Deliverable:** A fully interactive planetarium with toolbar, side panels, object info, and mouse-driven workflow.
+**Prerequisite:** Sprint 04 complete (constellations, grids, DSOs, Tycho-2 converted but not yet integrated)
+**Goal:** Integrate Tycho-2 catalog, then transform the skychart into an interactive tool with Stellarium-style UI, object selection, and clickable controls.
+**Deliverable:** A fully interactive planetarium with 2.5M stars, toolbar, side panels, object info, and mouse-driven workflow.
 
 ---
 
 ## Overview
 
-Sprint 05 replaces keyboard-only interaction with a proper UI.
+Sprint 05 starts by completing the Tycho-2 integration left over from Sprint 04,
+then replaces keyboard-only interaction with a proper UI.
 The model is Stellarium: unobtrusive panels that appear on hover, toolbar at the bottom,
 info panel on selection, all in the retro terminal aesthetic.
 
@@ -17,6 +18,91 @@ After this sprint, the skychart is a complete observational planning tool.
 ---
 
 ## Tasks
+
+### Task 5.0 — Catalog: Tycho-2 Integration
+
+Integrate the already-converted Tycho-2 catalog (~2.5M stars) into the rendering pipeline with spatial indexing.
+
+**Carried over from Sprint 04 Task 4.6.**
+
+**Files:**
+- `src/catalog/spatial_index.hpp`, `src/catalog/spatial_index.cpp`
+- Updates to `src/catalog/catalog_loader.cpp`
+- Updates to Application frame loop
+
+**The Tycho-2 CSV is already prepared** by `tools/prepare_tycho2.py` from Sprint 04.
+This task integrates it into the runtime.
+
+**Spatial Index (declination bands):**
+```cpp
+namespace parallax::catalog
+{
+    class SpatialIndex
+    {
+    public:
+        /// Build index from star catalog, dividing into dec bands
+        void build(const std::vector<StarEntry>& stars, u32 num_bands = 180);
+
+        /// Query all stars in a sky region
+        /// Returns indices into the original star vector
+        [[nodiscard]] std::vector<u32> query(
+            f64 ra_center, f64 dec_center,
+            f64 radius_rad,
+            f32 mag_limit
+        ) const;
+
+    private:
+        struct Band
+        {
+            f64 dec_min, dec_max;
+            std::vector<u32> star_indices;  // Sorted by RA within band
+        };
+        std::vector<Band> m_bands;
+    };
+}
+```
+
+**Implementation:**
+- 180 bands (1° each) from Dec -90° to +90°
+- Stars sorted by RA within each band
+- Query: find bands overlapping FOV, binary search RA range within each
+- Stars filtered by magnitude limit during query
+
+**Integration into frame loop:**
+Replace the current full-catalog iteration with:
+```cpp
+auto visible_indices = m_spatial_index.query(
+    camera_ra, camera_dec, fov_radius, magnitude_limit);
+for (u32 idx : visible_indices)
+{
+    const auto& star = m_catalog[idx];
+    // transform and render as before
+}
+```
+
+**Performance targets:**
+- Full catalog load: < 2 seconds
+- Per-frame query (FOV 60°): < 5ms
+- Visible stars at MLIM 6.5: ~9,000
+- Visible stars at MLIM 10: ~200,000+
+- ≥ 60fps at MLIM 10 with FOV 60°
+
+**Constellation line resolution:**
+Constellation HIP IDs must still resolve correctly. The Tycho-2 catalog may or may not
+include all Hipparcos stars. Options:
+- A) Load both catalogs, deduplicate (prefer Hipparcos for bright stars)
+- B) Tycho-2 includes Hipparcos stars — verify HIP IDs are preserved
+- C) Keep Hipparcos loaded separately just for constellation resolution
+
+Choose the simplest approach that works. Log any constellation HIP IDs that fail to resolve.
+
+**Acceptance:**
+- 2.5M stars loaded, spatial index built
+- Dense star fields visible at MLIM > 8 (Milky Way band clearly denser)
+- Performance ≥ 60fps at MLIM 10
+- Query time logged per frame
+- Constellation lines still work correctly
+- No regression in existing rendering
 
 ### Task 5.1 — UI: Panel System
 
@@ -529,6 +615,9 @@ All keyboard shortcuts from previous sprints remain functional.
 The toolbar/panels are an ADDITION, not a replacement.
 
 **Acceptance (Sprint 05 Definition of Done):**
+- [ ] Tycho-2 catalog loaded (~2.5M stars) with spatial indexing
+- [ ] Dense star fields visible at high MLIM (Milky Way band)
+- [ ] ≥ 60fps at MLIM 10 with spatial index queries
 - [ ] Bottom toolbar appears on mouse hover
 - [ ] All overlay toggles work as toolbar buttons
 - [ ] Time control buttons work (play, pause, speed, reverse)
@@ -550,8 +639,8 @@ The toolbar/panels are an ADDITION, not a replacement.
 ## Task Order
 
 ```
-5.1 → 5.2 → 5.3 → 5.4 → 5.5 → 5.6 → 5.7
-(panels) (widgets) (toolbar) (side) (select) (mouse) (polish)
+5.0 → 5.1 → 5.2 → 5.3 → 5.4 → 5.5 → 5.6 → 5.7
+(tycho2) (panels) (widgets) (toolbar) (side) (select) (mouse) (polish)
 ```
 
 ---

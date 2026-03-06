@@ -400,14 +400,12 @@ Star Entry (compact, 32 bytes):
 
 ## 8. Current Sprint
 
-**Sprint:** 04 — Catalogs & Sky Overlays
-**Goal:** Constellations, coordinate grids, Messier DSOs, Tycho-2 catalog, horizon markers
+**Sprint:** 05 — Tycho-2 Integration & Interactive UI
+**Goal:** Integrate 2.5M star catalog with spatial indexing, then Stellarium-style interactive UI
 
-See: `docs/sprints/sprint_04.md`
+See: `docs/sprints/sprint_05.md`
 
-**Next:** Sprint 05 — Interactive UI (toolbar, panels, object selection, Stellarium-style)
-
-**Previous:** Sprint 01 ✅ Vulkan pipeline | Sprint 02 ✅ Planetarium core | Sprint 03 ✅ Sky, atmosphere, HUD
+**Previous:** Sprint 01 ✅ Vulkan pipeline | Sprint 02 ✅ Planetarium core | Sprint 03 ✅ Sky, HUD | Sprint 04 ✅ Overlays, constellations, Messier
 
 ---
 
@@ -431,6 +429,8 @@ When generating code for this project:
 14. **Document** public APIs with `///` Doxygen-style comments
 15. **Test** pure logic modules (astro, catalog) independently
 16. **Namespace** everything under `parallax::module_name`
+17. **Never** create pull requests or feature branches — work directly on the current branch
+18. **Never** generate constellation or catalog data from AI knowledge — use verified astronomical databases
 
 When unsure about an architectural decision, refer to Section 5 (layer model).
 When unsure about data formats, refer to Section 6.

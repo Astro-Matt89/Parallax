@@ -21919,3 +21919,917 @@
 [16:57:08.521] [PARALLAX] [trace] Vulkan instance destroyed
 [16:57:08.532] [PARALLAX] [info] Window destroyed
 [16:57:08.583] [PARALLAX] [info] Parallax shutdown complete.
+[17:04:20.236] [PARALLAX] [info] Parallax v0.1.0 starting...
+[17:04:20.412] [PARALLAX] [info] Window created: "Parallax" (1280x720) [Vulkan | resizable]
+[17:04:20.417] [PARALLAX] [trace] SDL2 requires 2 Vulkan instance extension(s):
+[17:04:20.418] [PARALLAX] [trace]   - VK_KHR_surface
+[17:04:20.419] [PARALLAX] [trace]   - VK_KHR_win32_surface
+[17:04:20.429] [PARALLAX] [info] Requesting 3 instance extension(s):
+[17:04:20.430] [PARALLAX] [info]   - VK_KHR_surface
+[17:04:20.431] [PARALLAX] [info]   - VK_KHR_win32_surface
+[17:04:20.431] [PARALLAX] [info]   - VK_EXT_debug_utils
+[17:04:20.431] [PARALLAX] [info] Validation layers enabled: VK_LAYER_KHRONOS_validation
+[17:04:20.433] [PARALLAX] [trace] [Vulkan] windows_get_device_registry_files: GUID for 3 is not SoftwareComponent skipping
+[17:04:20.437] [PARALLAX] [trace] [Vulkan] Searching for ICD drivers named .\nvoglv64.dll
+[17:04:20.440] [PARALLAX] [trace] [Vulkan] Loading layer library C:\VulkanSDK\1.4.341.1\Bin\.\VkLayer_khronos_validation.dll
+[17:04:20.442] [PARALLAX] [trace] [Vulkan] Loading layer library C:\ProgramData\obs-studio-hook\.\graphics-hook64.dll
+[17:04:20.442] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[17:04:20.442] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[17:04:20.523] [PARALLAX] [info] Vulkan instance created (API 1.3)
+[17:04:20.524] [PARALLAX] [info] Vulkan debug messenger created
+[17:04:20.524] [PARALLAX] [info] Vulkan surface created
+[17:04:20.526] [PARALLAX] [info] Found 1 Vulkan-capable GPU(s):
+[17:04:20.527] [PARALLAX] [info]   - NVIDIA GeForce GTX 1660 (type: discrete)
+[17:04:20.534] [PARALLAX] [info] Selected GPU: NVIDIA GeForce GTX 1660
+[17:04:20.536] [PARALLAX] [info]   Driver version: 79.344.0
+[17:04:20.536] [PARALLAX] [info]   Vulkan API: 1.4.325
+[17:04:20.536] [PARALLAX] [info]   VRAM: 6180 MB
+[17:04:20.537] [PARALLAX] [info]   Graphics queue family: 0
+[17:04:20.537] [PARALLAX] [info]   Present queue family: 0
+[17:04:20.606] [PARALLAX] [info] Vulkan logical device created
+[17:04:20.610] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[17:04:20.610] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[17:04:20.732] [PARALLAX] [info] Swapchain created: 1280x720, 3 images, format 50, MAILBOX (triple buffer)
+[17:04:20.733] [PARALLAX] [info] Shader directory: C:/Parallax-dev/Parallax/build/shaders
+[17:04:20.734] [PARALLAX] [info] Render pass created
+[17:04:20.734] [PARALLAX] [trace] Shader module loaded: test_star.vert.spv
+[17:04:20.735] [PARALLAX] [trace] Shader module loaded: test_star.frag.spv
+[17:04:20.736] [PARALLAX] [info] Graphics pipeline created (POINT_LIST, dynamic viewport/scissor)
+[17:04:20.736] [PARALLAX] [info] Framebuffers created: 3 (1280x720)
+[17:04:20.737] [PARALLAX] [trace] Sky background UBO created: 32 bytes
+[17:04:20.738] [PARALLAX] [trace] Shader module loaded: sky_background.vert.spv
+[17:04:20.739] [PARALLAX] [trace] Shader module loaded: sky_background.frag.spv
+[17:04:20.740] [PARALLAX] [info] Sky background pipeline created (fullscreen triangle, UBO)
+[17:04:20.740] [PARALLAX] [info] Sky background renderer initialized
+[17:04:20.743] [PARALLAX] [info] Starfield pipeline created (skychart, additive blend)
+[17:04:20.743] [PARALLAX] [info] Starfield renderer initialized (skychart mode, 300000 max stars)
+[17:04:20.744] [PARALLAX] [info] LineRenderer pipeline created (LINE_LIST, standard alpha blend)
+[17:04:20.745] [PARALLAX] [info] LineRenderer initialized (131072 max vertices)
+[17:04:20.749] [PARALLAX] [trace] Font atlas created: 128x96 R8_UNORM, 95 glyphs
+[17:04:20.750] [PARALLAX] [trace] Shader module loaded: text.vert.spv
+[17:04:20.751] [PARALLAX] [trace] Shader module loaded: text.frag.spv
+[17:04:20.752] [PARALLAX] [info] Text pipeline created (alpha blend, vertex-colored)
+[17:04:20.752] [PARALLAX] [info] BitmapFont initialized (128x96 atlas, 4096 max chars/frame)
+[17:04:25.479] [PARALLAX] [info] CatalogLoader: Loaded 2430254 Tycho-2 stars from data/catalogs/tycho2.csv in 4726.7ms
+[17:04:25.480] [PARALLAX] [info] Tycho-2 catalog loaded: 2430254 stars
+[17:04:25.480] [PARALLAX] [info] Building spatial index for 2430254 stars...
+[17:04:25.610] [PARALLAX] [info] SpatialIndex built: 2430254 stars, 180 bands (0 empty), band size 119-20023
+[17:04:25.845] [PARALLAX] [info] CatalogLoader: Loaded 116812 stars from data/catalogs/hipparcos.csv
+[17:04:25.846] [PARALLAX] [info] Hipparcos catalog loaded for constellation lookup: 116812 stars
+[17:04:25.848] [PARALLAX] [info] Constellation names matched: 88/88
+[17:04:25.849] [PARALLAX] [info] Constellations loaded: 88 constellations, 756 segments
+[17:04:25.861] [PARALLAX] [info] Constellation HIP resolution: 1511 resolved, 1 missing
+[17:04:25.863] [PARALLAX] [info] === Orion Reference Star Verification ===
+[17:04:25.863] [PARALLAX] [info]   HIP 27989 (Betelgeuse): RA=88.79 Dec=7.41 (expect 88.79, 7.41) OK
+[17:04:25.864] [PARALLAX] [info]   HIP 24436 (Rigel): RA=78.63 Dec=-8.20 (expect 78.63, -8.20) OK
+[17:04:25.864] [PARALLAX] [info]   HIP 25336 (Bellatrix): RA=81.28 Dec=6.35 (expect 81.28, 6.35) OK
+[17:04:25.865] [PARALLAX] [info] Constellations resolved against Hipparcos (116812 stars)
+[17:04:25.865] [PARALLAX] [info] DSO catalog loaded: 110 objects (0 skipped) from messier.csv
+[17:04:25.866] [PARALLAX] [info] Messier catalog loaded: 110 objects from data/catalogs/messier.csv
+[17:04:25.866] [PARALLAX] [info] Simulation start: JD 2461107.169744 (2026-03-07 16:04:25.9 UTC)
+[17:04:25.867] [PARALLAX] [info] Observer: La Palma (28.76N, 17.89W)
+[17:04:25.867] [PARALLAX] [info] Atmosphere model initialized (dormant — skychart mode)
+[17:04:25.867] [PARALLAX] [info] Overlays: CONST=ON GRID=OFF DSO=ON HORIZ=ON
+[17:04:25.867] [PARALLAX] [info] Application initialized — skychart mode, MLIM 6.5
+[17:04:25.868] [PARALLAX] [info] Entering main loop...
+[17:04:26.056] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:26.058] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1019 | Mag passed: 1019 (MLIM 6.5)
+[17:04:26.058] [PARALLAX] [info]   Projected: 711 | GPU: 711
+[17:04:26.058] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:26.059] [PARALLAX] [trace] SpatialQuery: 1.53ms | bands=62 candidates=354843 results=1019 | visible=711 | MLIM 6.5 | catalog=2430254
+[17:04:26.249] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:26.250] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1019 | Mag passed: 1019 (MLIM 6.5)
+[17:04:26.250] [PARALLAX] [info]   Projected: 711 | GPU: 711
+[17:04:26.250] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:26.251] [PARALLAX] [trace] SpatialQuery: 2.58ms | bands=62 candidates=354843 results=1019 | visible=711 | MLIM 6.5 | catalog=2430254
+[17:04:26.433] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:26.433] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1019 | Mag passed: 1019 (MLIM 6.5)
+[17:04:26.434] [PARALLAX] [info]   Projected: 711 | GPU: 711
+[17:04:26.434] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:26.435] [PARALLAX] [trace] SpatialQuery: 1.74ms | bands=62 candidates=354844 results=1019 | visible=711 | MLIM 6.5 | catalog=2430254
+[17:04:26.621] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:26.622] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1019 | Mag passed: 1019 (MLIM 6.5)
+[17:04:26.623] [PARALLAX] [info]   Projected: 711 | GPU: 711
+[17:04:26.623] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:26.624] [PARALLAX] [trace] SpatialQuery: 1.74ms | bands=62 candidates=354843 results=1019 | visible=711 | MLIM 6.5 | catalog=2430254
+[17:04:26.808] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:26.809] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1019 | Mag passed: 1019 (MLIM 6.5)
+[17:04:26.809] [PARALLAX] [info]   Projected: 711 | GPU: 711
+[17:04:26.810] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:26.810] [PARALLAX] [trace] SpatialQuery: 1.58ms | bands=62 candidates=354841 results=1019 | visible=711 | MLIM 6.5 | catalog=2430254
+[17:04:26.994] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:26.996] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1019 | Mag passed: 1019 (MLIM 6.5)
+[17:04:26.996] [PARALLAX] [info]   Projected: 711 | GPU: 711
+[17:04:26.996] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:26.997] [PARALLAX] [trace] SpatialQuery: 1.50ms | bands=62 candidates=354841 results=1019 | visible=711 | MLIM 6.5 | catalog=2430254
+[17:04:27.179] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:27.180] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1019 | Mag passed: 1019 (MLIM 6.5)
+[17:04:27.180] [PARALLAX] [info]   Projected: 711 | GPU: 711
+[17:04:27.181] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:27.181] [PARALLAX] [trace] SpatialQuery: 2.25ms | bands=62 candidates=354841 results=1019 | visible=711 | MLIM 6.5 | catalog=2430254
+[17:04:27.366] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:27.367] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1019 | Mag passed: 1019 (MLIM 6.5)
+[17:04:27.368] [PARALLAX] [info]   Projected: 711 | GPU: 711
+[17:04:27.368] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:27.369] [PARALLAX] [trace] SpatialQuery: 1.72ms | bands=62 candidates=354844 results=1019 | visible=711 | MLIM 6.5 | catalog=2430254
+[17:04:27.552] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:27.553] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1019 | Mag passed: 1019 (MLIM 6.5)
+[17:04:27.554] [PARALLAX] [info]   Projected: 711 | GPU: 711
+[17:04:27.554] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:27.555] [PARALLAX] [trace] SpatialQuery: 1.57ms | bands=62 candidates=354841 results=1019 | visible=711 | MLIM 6.5 | catalog=2430254
+[17:04:27.739] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:27.741] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1019 | Mag passed: 1019 (MLIM 6.5)
+[17:04:27.741] [PARALLAX] [info]   Projected: 711 | GPU: 711
+[17:04:27.742] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:27.742] [PARALLAX] [trace] SpatialQuery: 2.06ms | bands=62 candidates=354840 results=1019 | visible=711 | MLIM 6.5 | catalog=2430254
+[17:04:27.775] [PARALLAX] [info] Magnitude limit: 7.0 (fainter)
+[17:04:27.942] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:27.943] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1956 | Mag passed: 1956 (MLIM 7.0)
+[17:04:27.943] [PARALLAX] [info]   Projected: 1369 | GPU: 1369
+[17:04:27.944] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:27.945] [PARALLAX] [trace] SpatialQuery: 1.75ms | bands=62 candidates=354840 results=1956 | visible=1369 | MLIM 7.0 | catalog=2430254
+[17:04:28.036] [PARALLAX] [info] Magnitude limit: 7.5 (fainter)
+[17:04:28.151] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:28.152] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 3447 | Mag passed: 3447 (MLIM 7.5)
+[17:04:28.152] [PARALLAX] [info]   Projected: 2429 | GPU: 2429
+[17:04:28.153] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:28.153] [PARALLAX] [trace] SpatialQuery: 2.02ms | bands=62 candidates=354837 results=3447 | visible=2429 | MLIM 7.5 | catalog=2430254
+[17:04:28.292] [PARALLAX] [info] Magnitude limit: 8.0 (fainter)
+[17:04:28.392] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:28.393] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 6079 | Mag passed: 6079 (MLIM 8.0)
+[17:04:28.393] [PARALLAX] [info]   Projected: 4211 | GPU: 4211
+[17:04:28.393] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:28.394] [PARALLAX] [trace] SpatialQuery: 2.23ms | bands=62 candidates=354836 results=6079 | visible=4211 | MLIM 8.0 | catalog=2430254
+[17:04:28.480] [PARALLAX] [info] Magnitude limit: 8.5 (fainter)
+[17:04:28.719] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:28.720] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 10508 | Mag passed: 10508 (MLIM 8.5)
+[17:04:28.720] [PARALLAX] [info]   Projected: 7266 | GPU: 7266
+[17:04:28.720] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:28.721] [PARALLAX] [trace] SpatialQuery: 2.11ms | bands=62 candidates=354834 results=10508 | visible=7266 | MLIM 8.5 | catalog=2430254
+[17:04:29.037] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:29.038] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 10508 | Mag passed: 10508 (MLIM 8.5)
+[17:04:29.038] [PARALLAX] [info]   Projected: 7266 | GPU: 7266
+[17:04:29.038] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:29.039] [PARALLAX] [trace] SpatialQuery: 1.86ms | bands=62 candidates=354835 results=10508 | visible=7266 | MLIM 8.5 | catalog=2430254
+[17:04:29.046] [PARALLAX] [info] Magnitude limit: 8.0 (brighter)
+[17:04:29.236] [PARALLAX] [info] Magnitude limit: 7.5 (brighter)
+[17:04:29.290] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:29.291] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 3447 | Mag passed: 3447 (MLIM 7.5)
+[17:04:29.291] [PARALLAX] [info]   Projected: 2429 | GPU: 2429
+[17:04:29.292] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:29.292] [PARALLAX] [trace] SpatialQuery: 1.89ms | bands=62 candidates=354834 results=3447 | visible=2429 | MLIM 7.5 | catalog=2430254
+[17:04:29.478] [PARALLAX] [info] Magnitude limit: 7.0 (brighter)
+[17:04:29.514] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:29.515] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1956 | Mag passed: 1956 (MLIM 7.0)
+[17:04:29.515] [PARALLAX] [info]   Projected: 1369 | GPU: 1369
+[17:04:29.515] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:29.516] [PARALLAX] [trace] SpatialQuery: 2.02ms | bands=62 candidates=354834 results=1956 | visible=1369 | MLIM 7.0 | catalog=2430254
+[17:04:29.670] [PARALLAX] [info] Magnitude limit: 6.5 (brighter)
+[17:04:29.714] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:29.715] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1019 | Mag passed: 1019 (MLIM 6.5)
+[17:04:29.716] [PARALLAX] [info]   Projected: 711 | GPU: 711
+[17:04:29.716] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:29.716] [PARALLAX] [trace] SpatialQuery: 1.60ms | bands=62 candidates=354834 results=1019 | visible=711 | MLIM 6.5 | catalog=2430254
+[17:04:29.902] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:29.903] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1019 | Mag passed: 1019 (MLIM 6.5)
+[17:04:29.903] [PARALLAX] [info]   Projected: 711 | GPU: 711
+[17:04:29.904] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:29.904] [PARALLAX] [trace] SpatialQuery: 1.75ms | bands=62 candidates=354834 results=1019 | visible=711 | MLIM 6.5 | catalog=2430254
+[17:04:30.096] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:30.097] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1019 | Mag passed: 1019 (MLIM 6.5)
+[17:04:30.098] [PARALLAX] [info]   Projected: 711 | GPU: 711
+[17:04:30.098] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:30.099] [PARALLAX] [trace] SpatialQuery: 2.38ms | bands=62 candidates=354834 results=1019 | visible=711 | MLIM 6.5 | catalog=2430254
+[17:04:30.306] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:30.310] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1019 | Mag passed: 1019 (MLIM 6.5)
+[17:04:30.311] [PARALLAX] [info]   Projected: 711 | GPU: 711
+[17:04:30.313] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:30.314] [PARALLAX] [trace] SpatialQuery: 1.88ms | bands=62 candidates=354837 results=1019 | visible=711 | MLIM 6.5 | catalog=2430254
+[17:04:30.516] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:30.517] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1019 | Mag passed: 1019 (MLIM 6.5)
+[17:04:30.517] [PARALLAX] [info]   Projected: 711 | GPU: 711
+[17:04:30.518] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:30.519] [PARALLAX] [trace] SpatialQuery: 2.00ms | bands=62 candidates=354837 results=1019 | visible=711 | MLIM 6.5 | catalog=2430254
+[17:04:30.727] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:30.728] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1019 | Mag passed: 1019 (MLIM 6.5)
+[17:04:30.728] [PARALLAX] [info]   Projected: 711 | GPU: 711
+[17:04:30.729] [PARALLAX] [info]   Camera: alt=45.0 az=0.0 fov=60.0
+[17:04:30.730] [PARALLAX] [trace] SpatialQuery: 1.69ms | bands=62 candidates=354838 results=1019 | visible=711 | MLIM 6.5 | catalog=2430254
+[17:04:30.933] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:30.934] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1053 | Mag passed: 1053 (MLIM 6.5)
+[17:04:30.935] [PARALLAX] [info]   Projected: 731 | GPU: 731
+[17:04:30.935] [PARALLAX] [info]   Camera: alt=45.1 az=354.3 fov=60.0
+[17:04:30.936] [PARALLAX] [trace] SpatialQuery: 1.88ms | bands=62 candidates=370053 results=1053 | visible=731 | MLIM 6.5 | catalog=2430254
+[17:04:31.150] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:31.151] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1115 | Mag passed: 1115 (MLIM 6.5)
+[17:04:31.151] [PARALLAX] [info]   Projected: 775 | GPU: 775
+[17:04:31.152] [PARALLAX] [info]   Camera: alt=46.2 az=347.6 fov=60.0
+[17:04:31.152] [PARALLAX] [trace] SpatialQuery: 2.07ms | bands=65 candidates=404942 results=1115 | visible=775 | MLIM 6.5 | catalog=2430254
+[17:04:31.367] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:31.368] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1147 | Mag passed: 1147 (MLIM 6.5)
+[17:04:31.368] [PARALLAX] [info]   Projected: 784 | GPU: 784
+[17:04:31.369] [PARALLAX] [info]   Camera: alt=46.5 az=344.6 fov=60.0
+[17:04:31.369] [PARALLAX] [trace] SpatialQuery: 2.07ms | bands=67 candidates=423780 results=1147 | visible=784 | MLIM 6.5 | catalog=2430254
+[17:04:31.608] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:31.609] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1147 | Mag passed: 1147 (MLIM 6.5)
+[17:04:31.610] [PARALLAX] [info]   Projected: 784 | GPU: 784
+[17:04:31.610] [PARALLAX] [info]   Camera: alt=46.5 az=344.6 fov=60.0
+[17:04:31.611] [PARALLAX] [trace] SpatialQuery: 1.95ms | bands=67 candidates=423777 results=1147 | visible=784 | MLIM 6.5 | catalog=2430254
+[17:04:31.820] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:31.821] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1147 | Mag passed: 1147 (MLIM 6.5)
+[17:04:31.821] [PARALLAX] [info]   Projected: 784 | GPU: 784
+[17:04:31.821] [PARALLAX] [info]   Camera: alt=46.5 az=344.6 fov=60.0
+[17:04:31.822] [PARALLAX] [trace] SpatialQuery: 1.93ms | bands=67 candidates=423771 results=1147 | visible=784 | MLIM 6.5 | catalog=2430254
+[17:04:32.035] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:32.036] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1147 | Mag passed: 1147 (MLIM 6.5)
+[17:04:32.037] [PARALLAX] [info]   Projected: 784 | GPU: 784
+[17:04:32.037] [PARALLAX] [info]   Camera: alt=46.5 az=344.6 fov=60.0
+[17:04:32.038] [PARALLAX] [trace] SpatialQuery: 2.08ms | bands=67 candidates=423769 results=1147 | visible=784 | MLIM 6.5 | catalog=2430254
+[17:04:32.248] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:32.249] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1147 | Mag passed: 1147 (MLIM 6.5)
+[17:04:32.249] [PARALLAX] [info]   Projected: 784 | GPU: 784
+[17:04:32.250] [PARALLAX] [info]   Camera: alt=46.5 az=344.6 fov=60.0
+[17:04:32.250] [PARALLAX] [trace] SpatialQuery: 2.02ms | bands=67 candidates=423767 results=1147 | visible=784 | MLIM 6.5 | catalog=2430254
+[17:04:32.462] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:32.463] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1147 | Mag passed: 1147 (MLIM 6.5)
+[17:04:32.463] [PARALLAX] [info]   Projected: 784 | GPU: 784
+[17:04:32.463] [PARALLAX] [info]   Camera: alt=46.5 az=344.6 fov=60.0
+[17:04:32.464] [PARALLAX] [trace] SpatialQuery: 2.25ms | bands=67 candidates=423765 results=1147 | visible=784 | MLIM 6.5 | catalog=2430254
+[17:04:32.672] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:32.673] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1147 | Mag passed: 1147 (MLIM 6.5)
+[17:04:32.673] [PARALLAX] [info]   Projected: 784 | GPU: 784
+[17:04:32.673] [PARALLAX] [info]   Camera: alt=46.5 az=344.6 fov=60.0
+[17:04:32.674] [PARALLAX] [trace] SpatialQuery: 1.83ms | bands=67 candidates=423764 results=1147 | visible=784 | MLIM 6.5 | catalog=2430254
+[17:04:32.901] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:32.901] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1147 | Mag passed: 1147 (MLIM 6.5)
+[17:04:32.902] [PARALLAX] [info]   Projected: 784 | GPU: 784
+[17:04:32.902] [PARALLAX] [info]   Camera: alt=46.5 az=344.6 fov=60.0
+[17:04:32.902] [PARALLAX] [trace] SpatialQuery: 1.76ms | bands=67 candidates=423762 results=1147 | visible=784 | MLIM 6.5 | catalog=2430254
+[17:04:33.114] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:33.115] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1147 | Mag passed: 1147 (MLIM 6.5)
+[17:04:33.116] [PARALLAX] [info]   Projected: 784 | GPU: 784
+[17:04:33.116] [PARALLAX] [info]   Camera: alt=46.5 az=344.6 fov=60.0
+[17:04:33.118] [PARALLAX] [trace] SpatialQuery: 2.17ms | bands=67 candidates=423758 results=1147 | visible=784 | MLIM 6.5 | catalog=2430254
+[17:04:33.327] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:33.328] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1147 | Mag passed: 1147 (MLIM 6.5)
+[17:04:33.329] [PARALLAX] [info]   Projected: 784 | GPU: 784
+[17:04:33.329] [PARALLAX] [info]   Camera: alt=46.5 az=344.6 fov=60.0
+[17:04:33.330] [PARALLAX] [trace] SpatialQuery: 1.99ms | bands=67 candidates=423757 results=1147 | visible=784 | MLIM 6.5 | catalog=2430254
+[17:04:33.539] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:33.540] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1147 | Mag passed: 1147 (MLIM 6.5)
+[17:04:33.540] [PARALLAX] [info]   Projected: 784 | GPU: 784
+[17:04:33.540] [PARALLAX] [info]   Camera: alt=46.5 az=344.6 fov=60.0
+[17:04:33.541] [PARALLAX] [trace] SpatialQuery: 2.18ms | bands=67 candidates=423756 results=1147 | visible=784 | MLIM 6.5 | catalog=2430254
+[17:04:33.746] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:33.747] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1147 | Mag passed: 1147 (MLIM 6.5)
+[17:04:33.747] [PARALLAX] [info]   Projected: 784 | GPU: 784
+[17:04:33.748] [PARALLAX] [info]   Camera: alt=46.5 az=344.6 fov=60.0
+[17:04:33.749] [PARALLAX] [trace] SpatialQuery: 2.51ms | bands=67 candidates=423754 results=1147 | visible=784 | MLIM 6.5 | catalog=2430254
+[17:04:33.965] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:33.966] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1147 | Mag passed: 1147 (MLIM 6.5)
+[17:04:33.966] [PARALLAX] [info]   Projected: 784 | GPU: 784
+[17:04:33.966] [PARALLAX] [info]   Camera: alt=46.5 az=344.6 fov=60.0
+[17:04:33.967] [PARALLAX] [trace] SpatialQuery: 1.95ms | bands=67 candidates=423752 results=1147 | visible=784 | MLIM 6.5 | catalog=2430254
+[17:04:34.173] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:34.174] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1147 | Mag passed: 1147 (MLIM 6.5)
+[17:04:34.175] [PARALLAX] [info]   Projected: 784 | GPU: 784
+[17:04:34.175] [PARALLAX] [info]   Camera: alt=46.5 az=344.6 fov=60.0
+[17:04:34.176] [PARALLAX] [trace] SpatialQuery: 1.90ms | bands=67 candidates=423750 results=1147 | visible=784 | MLIM 6.5 | catalog=2430254
+[17:04:34.392] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:34.393] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1147 | Mag passed: 1147 (MLIM 6.5)
+[17:04:34.394] [PARALLAX] [info]   Projected: 785 | GPU: 785
+[17:04:34.394] [PARALLAX] [info]   Camera: alt=46.5 az=344.7 fov=60.0
+[17:04:34.395] [PARALLAX] [trace] SpatialQuery: 2.23ms | bands=67 candidates=423576 results=1147 | visible=785 | MLIM 6.5 | catalog=2430254
+[17:04:34.630] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:34.631] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1147 | Mag passed: 1147 (MLIM 6.5)
+[17:04:34.632] [PARALLAX] [info]   Projected: 785 | GPU: 785
+[17:04:34.633] [PARALLAX] [info]   Camera: alt=46.5 az=344.7 fov=60.0
+[17:04:34.633] [PARALLAX] [trace] SpatialQuery: 2.18ms | bands=67 candidates=423569 results=1147 | visible=785 | MLIM 6.5 | catalog=2430254
+[17:04:34.845] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:34.846] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1142 | Mag passed: 1142 (MLIM 6.5)
+[17:04:34.846] [PARALLAX] [info]   Projected: 781 | GPU: 781
+[17:04:34.847] [PARALLAX] [info]   Camera: alt=46.4 az=344.9 fov=60.0
+[17:04:34.848] [PARALLAX] [trace] SpatialQuery: 2.41ms | bands=67 candidates=423137 results=1142 | visible=781 | MLIM 6.5 | catalog=2430254
+[17:04:35.052] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:35.052] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1142 | Mag passed: 1142 (MLIM 6.5)
+[17:04:35.053] [PARALLAX] [info]   Projected: 781 | GPU: 781
+[17:04:35.053] [PARALLAX] [info]   Camera: alt=46.4 az=344.9 fov=60.0
+[17:04:35.053] [PARALLAX] [trace] SpatialQuery: 2.17ms | bands=67 candidates=423137 results=1142 | visible=781 | MLIM 6.5 | catalog=2430254
+[17:04:35.262] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:35.264] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1142 | Mag passed: 1142 (MLIM 6.5)
+[17:04:35.264] [PARALLAX] [info]   Projected: 781 | GPU: 781
+[17:04:35.264] [PARALLAX] [info]   Camera: alt=46.4 az=344.9 fov=60.0
+[17:04:35.265] [PARALLAX] [trace] SpatialQuery: 2.47ms | bands=67 candidates=423133 results=1142 | visible=781 | MLIM 6.5 | catalog=2430254
+[17:04:35.486] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:35.487] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1142 | Mag passed: 1142 (MLIM 6.5)
+[17:04:35.487] [PARALLAX] [info]   Projected: 781 | GPU: 781
+[17:04:35.488] [PARALLAX] [info]   Camera: alt=46.4 az=344.9 fov=60.0
+[17:04:35.488] [PARALLAX] [trace] SpatialQuery: 1.93ms | bands=67 candidates=423128 results=1142 | visible=781 | MLIM 6.5 | catalog=2430254
+[17:04:35.700] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:35.701] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1142 | Mag passed: 1142 (MLIM 6.5)
+[17:04:35.702] [PARALLAX] [info]   Projected: 781 | GPU: 781
+[17:04:35.702] [PARALLAX] [info]   Camera: alt=46.4 az=344.9 fov=60.0
+[17:04:35.702] [PARALLAX] [trace] SpatialQuery: 2.24ms | bands=67 candidates=423129 results=1142 | visible=781 | MLIM 6.5 | catalog=2430254
+[17:04:35.906] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:35.907] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1142 | Mag passed: 1142 (MLIM 6.5)
+[17:04:35.907] [PARALLAX] [info]   Projected: 781 | GPU: 781
+[17:04:35.908] [PARALLAX] [info]   Camera: alt=46.4 az=344.9 fov=60.0
+[17:04:35.908] [PARALLAX] [trace] SpatialQuery: 1.81ms | bands=67 candidates=423128 results=1142 | visible=781 | MLIM 6.5 | catalog=2430254
+[17:04:36.118] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:36.119] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1142 | Mag passed: 1142 (MLIM 6.5)
+[17:04:36.119] [PARALLAX] [info]   Projected: 781 | GPU: 781
+[17:04:36.120] [PARALLAX] [info]   Camera: alt=46.4 az=344.9 fov=60.0
+[17:04:36.120] [PARALLAX] [trace] SpatialQuery: 2.04ms | bands=67 candidates=423125 results=1142 | visible=781 | MLIM 6.5 | catalog=2430254
+[17:04:36.341] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:36.342] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1142 | Mag passed: 1142 (MLIM 6.5)
+[17:04:36.343] [PARALLAX] [info]   Projected: 781 | GPU: 781
+[17:04:36.343] [PARALLAX] [info]   Camera: alt=46.4 az=344.9 fov=60.0
+[17:04:36.344] [PARALLAX] [trace] SpatialQuery: 1.89ms | bands=67 candidates=423124 results=1142 | visible=781 | MLIM 6.5 | catalog=2430254
+[17:04:36.573] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:36.574] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1293 | Mag passed: 1293 (MLIM 6.5)
+[17:04:36.574] [PARALLAX] [info]   Projected: 809 | GPU: 809
+[17:04:36.574] [PARALLAX] [info]   Camera: alt=48.3 az=328.3 fov=60.0
+[17:04:36.575] [PARALLAX] [trace] SpatialQuery: 2.41ms | bands=77 candidates=500113 results=1293 | visible=809 | MLIM 6.5 | catalog=2430254
+[17:04:36.831] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:36.832] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1322 | Mag passed: 1322 (MLIM 6.5)
+[17:04:36.832] [PARALLAX] [info]   Projected: 784 | GPU: 784
+[17:04:36.833] [PARALLAX] [info]   Camera: alt=49.6 az=318.1 fov=60.0
+[17:04:36.834] [PARALLAX] [trace] SpatialQuery: 2.79ms | bands=83 candidates=532483 results=1322 | visible=784 | MLIM 6.5 | catalog=2430254
+[17:04:37.097] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:37.098] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1331 | Mag passed: 1331 (MLIM 6.5)
+[17:04:37.098] [PARALLAX] [info]   Projected: 781 | GPU: 781
+[17:04:37.099] [PARALLAX] [info]   Camera: alt=49.8 az=316.5 fov=60.0
+[17:04:37.099] [PARALLAX] [trace] SpatialQuery: 2.95ms | bands=84 candidates=537103 results=1331 | visible=781 | MLIM 6.5 | catalog=2430254
+[17:04:37.363] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:37.364] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1291 | Mag passed: 1291 (MLIM 6.5)
+[17:04:37.364] [PARALLAX] [info]   Projected: 693 | GPU: 693
+[17:04:37.365] [PARALLAX] [info]   Camera: alt=53.2 az=288.2 fov=60.0
+[17:04:37.365] [PARALLAX] [trace] SpatialQuery: 2.99ms | bands=91 candidates=568869 results=1291 | visible=693 | MLIM 6.5 | catalog=2430254
+[17:04:37.614] [PARALLAX] [info] Magnitude limit: 7.0 (fainter)
+[17:04:37.646] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:37.647] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2426 | Mag passed: 2426 (MLIM 7.0)
+[17:04:37.647] [PARALLAX] [info]   Projected: 1306 | GPU: 1306
+[17:04:37.648] [PARALLAX] [info]   Camera: alt=53.2 az=288.2 fov=60.0
+[17:04:37.648] [PARALLAX] [trace] SpatialQuery: 3.37ms | bands=91 candidates=568863 results=2426 | visible=1306 | MLIM 7.0 | catalog=2430254
+[17:04:37.797] [PARALLAX] [info] Magnitude limit: 7.5 (fainter)
+[17:04:37.939] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:37.940] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 4327 | Mag passed: 4327 (MLIM 7.5)
+[17:04:37.940] [PARALLAX] [info]   Projected: 2354 | GPU: 2354
+[17:04:37.941] [PARALLAX] [info]   Camera: alt=53.2 az=288.2 fov=60.0
+[17:04:37.941] [PARALLAX] [trace] SpatialQuery: 2.80ms | bands=91 candidates=568858 results=4327 | visible=2354 | MLIM 7.5 | catalog=2430254
+[17:04:37.960] [PARALLAX] [info] Magnitude limit: 8.0 (fainter)
+[17:04:38.293] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:38.294] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 7643 | Mag passed: 7643 (MLIM 8.0)
+[17:04:38.295] [PARALLAX] [info]   Projected: 4169 | GPU: 4169
+[17:04:38.295] [PARALLAX] [info]   Camera: alt=53.2 az=288.2 fov=60.0
+[17:04:38.295] [PARALLAX] [trace] SpatialQuery: 3.05ms | bands=91 candidates=568844 results=7643 | visible=4169 | MLIM 8.0 | catalog=2430254
+[17:04:38.647] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:38.648] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 7643 | Mag passed: 7643 (MLIM 8.0)
+[17:04:38.649] [PARALLAX] [info]   Projected: 4170 | GPU: 4170
+[17:04:38.649] [PARALLAX] [info]   Camera: alt=53.2 az=288.2 fov=60.0
+[17:04:38.649] [PARALLAX] [trace] SpatialQuery: 3.14ms | bands=91 candidates=568843 results=7643 | visible=4170 | MLIM 8.0 | catalog=2430254
+[17:04:38.991] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:38.992] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 7643 | Mag passed: 7643 (MLIM 8.0)
+[17:04:38.992] [PARALLAX] [info]   Projected: 4171 | GPU: 4171
+[17:04:38.993] [PARALLAX] [info]   Camera: alt=53.2 az=288.2 fov=60.0
+[17:04:38.993] [PARALLAX] [trace] SpatialQuery: 3.16ms | bands=91 candidates=568837 results=7643 | visible=4171 | MLIM 8.0 | catalog=2430254
+[17:04:39.013] [PARALLAX] [info] Magnitude limit: 8.5 (fainter)
+[17:04:39.207] [PARALLAX] [info] Magnitude limit: 9.0 (fainter)
+[17:04:39.348] [PARALLAX] [info] Magnitude limit: 9.5 (fainter)
+[17:04:39.544] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:39.545] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 37946 | Mag passed: 37946 (MLIM 9.5)
+[17:04:39.545] [PARALLAX] [info]   Projected: 20884 | GPU: 20884
+[17:04:39.545] [PARALLAX] [info]   Camera: alt=53.2 az=288.2 fov=60.0
+[17:04:39.546] [PARALLAX] [trace] SpatialQuery: 3.89ms | bands=91 candidates=568826 results=37946 | visible=20884 | MLIM 9.5 | catalog=2430254
+[17:04:39.756] [PARALLAX] [info] Magnitude limit: 10.0 (fainter)
+[17:04:39.942] [PARALLAX] [info] Magnitude limit: 10.5 (fainter)
+[17:04:40.107] [PARALLAX] [info] Magnitude limit: 11.0 (fainter)
+[17:04:40.269] [PARALLAX] [info] Magnitude limit: 11.5 (fainter)
+[17:04:40.623] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:04:40.935] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:04:41.180] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:04:41.340] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:04:41.501] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:04:42.055] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:42.064] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 359001 | Mag passed: 359001 (MLIM 12.0)
+[17:04:42.065] [PARALLAX] [info]   Projected: 212042 | GPU: 212042
+[17:04:42.065] [PARALLAX] [info]   Camera: alt=56.7 az=299.1 fov=60.0
+[17:04:42.074] [PARALLAX] [trace] SpatialQuery: 16.33ms | bands=91 candidates=549452 results=359001 | visible=212042 | MLIM 12.0 | catalog=2430254
+[17:04:44.674] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:04:44.920] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:04:45.078] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:04:45.240] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:04:46.799] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:46.801] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 408669 | Mag passed: 408669 (MLIM 12.0)
+[17:04:46.801] [PARALLAX] [info]   Projected: 245204 | GPU: 245204
+[17:04:46.802] [PARALLAX] [info]   Camera: alt=22.6 az=301.1 fov=60.0
+[17:04:46.803] [PARALLAX] [trace] SpatialQuery: 17.47ms | bands=91 candidates=619533 results=408669 | visible=245204 | MLIM 12.0 | catalog=2430254
+[17:04:48.308] [PARALLAX] [info] Bortle scale: 5
+[17:04:48.543] [PARALLAX] [info] Bortle scale: 6
+[17:04:48.702] [PARALLAX] [info] Bortle scale: 7
+[17:04:48.859] [PARALLAX] [info] Bortle scale: 8
+[17:04:49.022] [PARALLAX] [info] Bortle scale: 9
+[17:04:49.102] [PARALLAX] [info] Bortle scale: 1
+[17:04:49.339] [PARALLAX] [info] Bortle scale: 2
+[17:04:51.533] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:51.534] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 401407 | Mag passed: 401407 (MLIM 12.0)
+[17:04:51.534] [PARALLAX] [info]   Projected: 224715 | GPU: 224715
+[17:04:51.534] [PARALLAX] [info]   Camera: alt=20.1 az=313.5 fov=60.0
+[17:04:51.535] [PARALLAX] [trace] SpatialQuery: 17.33ms | bands=88 candidates=578098 results=401407 | visible=224715 | MLIM 12.0 | catalog=2430254
+[17:04:54.649] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:54.651] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 122815 | Mag passed: 122815 (MLIM 12.0)
+[17:04:54.651] [PARALLAX] [info]   Projected: 86415 | GPU: 86415
+[17:04:54.652] [PARALLAX] [info]   Camera: alt=24.3 az=0.5 fov=60.0
+[17:04:54.653] [PARALLAX] [trace] SpatialQuery: 5.34ms | bands=50 candidates=156351 results=122815 | visible=86415 | MLIM 12.0 | catalog=2430254
+[17:04:57.008] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:57.010] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 123303 | Mag passed: 123303 (MLIM 12.0)
+[17:04:57.010] [PARALLAX] [info]   Projected: 79377 | GPU: 79377
+[17:04:57.010] [PARALLAX] [info]   Camera: alt=31.9 az=4.8 fov=48.6
+[17:04:57.011] [PARALLAX] [trace] SpatialQuery: 5.26ms | bands=42 candidates=158538 results=123303 | visible=79377 | MLIM 12.0 | catalog=2430254
+[17:04:58.802] [PARALLAX] [info] === Skychart Pipeline ===
+[17:04:58.804] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 203833 | Mag passed: 203833 (MLIM 12.0)
+[17:04:58.805] [PARALLAX] [info]   Projected: 125857 | GPU: 125857
+[17:04:58.806] [PARALLAX] [info]   Camera: alt=31.4 az=343.1 fov=48.6
+[17:04:58.807] [PARALLAX] [trace] SpatialQuery: 9.46ms | bands=52 candidates=272952 results=203833 | visible=125857 | MLIM 12.0 | catalog=2430254
+[17:05:01.485] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:01.487] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 164463 | Mag passed: 164463 (MLIM 12.0)
+[17:05:01.488] [PARALLAX] [info]   Projected: 96153 | GPU: 96153
+[17:05:01.489] [PARALLAX] [info]   Camera: alt=31.3 az=353.5 fov=48.6
+[17:05:01.490] [PARALLAX] [trace] SpatialQuery: 6.96ms | bands=43 candidates=214131 results=164463 | visible=96153 | MLIM 12.0 | catalog=2430254
+[17:05:02.233] [PARALLAX] [info] Magnitude limit: 11.5 (brighter)
+[17:05:02.396] [PARALLAX] [info] Magnitude limit: 11.0 (brighter)
+[17:05:02.560] [PARALLAX] [info] Magnitude limit: 10.5 (brighter)
+[17:05:02.717] [PARALLAX] [info] Magnitude limit: 10.0 (brighter)
+[17:05:02.801] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:02.801] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 28478 | Mag passed: 28478 (MLIM 10.0)
+[17:05:02.801] [PARALLAX] [info]   Projected: 16953 | GPU: 16953
+[17:05:02.802] [PARALLAX] [info]   Camera: alt=31.3 az=354.7 fov=48.6
+[17:05:02.802] [PARALLAX] [trace] SpatialQuery: 2.14ms | bands=42 candidates=209410 results=28478 | visible=16953 | MLIM 10.0 | catalog=2430254
+[17:05:03.323] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:03.324] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 20638 | Mag passed: 20638 (MLIM 10.0)
+[17:05:03.324] [PARALLAX] [info]   Projected: 13678 | GPU: 13678
+[17:05:03.324] [PARALLAX] [info]   Camera: alt=30.1 az=4.7 fov=48.6
+[17:05:03.325] [PARALLAX] [trace] SpatialQuery: 1.76ms | bands=41 candidates=137845 results=20638 | visible=13678 | MLIM 10.0 | catalog=2430254
+[17:05:03.773] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:03.774] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 27797 | Mag passed: 27797 (MLIM 10.0)
+[17:05:03.775] [PARALLAX] [info]   Projected: 16810 | GPU: 16810
+[17:05:03.776] [PARALLAX] [info]   Camera: alt=28.6 az=23.6 fov=48.6
+[17:05:03.776] [PARALLAX] [trace] SpatialQuery: 2.00ms | bands=58 candidates=190606 results=27797 | visible=16810 | MLIM 10.0 | catalog=2430254
+[17:05:04.211] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:04.213] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 20332 | Mag passed: 20332 (MLIM 10.0)
+[17:05:04.213] [PARALLAX] [info]   Projected: 12792 | GPU: 12792
+[17:05:04.213] [PARALLAX] [info]   Camera: alt=29.6 az=1.6 fov=48.6
+[17:05:04.214] [PARALLAX] [trace] SpatialQuery: 1.68ms | bands=39 candidates=141742 results=20332 | visible=12792 | MLIM 10.0 | catalog=2430254
+[17:05:04.690] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:04.691] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 26889 | Mag passed: 26889 (MLIM 10.0)
+[17:05:04.692] [PARALLAX] [info]   Projected: 16348 | GPU: 16348
+[17:05:04.692] [PARALLAX] [info]   Camera: alt=29.9 az=354.3 fov=48.6
+[17:05:04.693] [PARALLAX] [trace] SpatialQuery: 2.05ms | bands=42 candidates=196778 results=26889 | visible=16348 | MLIM 10.0 | catalog=2430254
+[17:05:05.137] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:05.138] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 19868 | Mag passed: 19868 (MLIM 10.0)
+[17:05:05.138] [PARALLAX] [info]   Projected: 13817 | GPU: 13817
+[17:05:05.139] [PARALLAX] [info]   Camera: alt=28.9 az=7.0 fov=48.6
+[17:05:05.140] [PARALLAX] [trace] SpatialQuery: 1.45ms | bands=43 candidates=132086 results=19868 | visible=13817 | MLIM 10.0 | catalog=2430254
+[17:05:05.539] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:05.540] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 22181 | Mag passed: 22181 (MLIM 10.0)
+[17:05:05.540] [PARALLAX] [info]   Projected: 15483 | GPU: 15483
+[17:05:05.540] [PARALLAX] [info]   Camera: alt=28.5 az=12.5 fov=48.6
+[17:05:05.541] [PARALLAX] [trace] SpatialQuery: 1.84ms | bands=48 candidates=147368 results=22181 | visible=15483 | MLIM 10.0 | catalog=2430254
+[17:05:05.952] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:05.953] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 20637 | Mag passed: 20637 (MLIM 10.0)
+[17:05:05.953] [PARALLAX] [info]   Projected: 14268 | GPU: 14268
+[17:05:05.954] [PARALLAX] [info]   Camera: alt=29.5 az=8.0 fov=48.6
+[17:05:05.954] [PARALLAX] [trace] SpatialQuery: 1.40ms | bands=44 candidates=137978 results=20637 | visible=14268 | MLIM 10.0 | catalog=2430254
+[17:05:06.475] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:06.476] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 33880 | Mag passed: 33880 (MLIM 10.0)
+[17:05:06.477] [PARALLAX] [info]   Projected: 21424 | GPU: 21424
+[17:05:06.477] [PARALLAX] [info]   Camera: alt=31.2 az=345.7 fov=48.6
+[17:05:06.478] [PARALLAX] [trace] SpatialQuery: 2.45ms | bands=50 candidates=256360 results=33880 | visible=21424 | MLIM 10.0 | catalog=2430254
+[17:05:06.964] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:06.965] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 24576 | Mag passed: 24576 (MLIM 10.0)
+[17:05:06.965] [PARALLAX] [info]   Projected: 16483 | GPU: 16483
+[17:05:06.965] [PARALLAX] [info]   Camera: alt=28.9 az=17.3 fov=48.6
+[17:05:06.966] [PARALLAX] [trace] SpatialQuery: 1.83ms | bands=52 candidates=164585 results=24576 | visible=16483 | MLIM 10.0 | catalog=2430254
+[17:05:07.459] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:07.459] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 27971 | Mag passed: 27971 (MLIM 10.0)
+[17:05:07.460] [PARALLAX] [info]   Projected: 16835 | GPU: 16835
+[17:05:07.460] [PARALLAX] [info]   Camera: alt=28.5 az=24.0 fov=48.6
+[17:05:07.461] [PARALLAX] [trace] SpatialQuery: 1.99ms | bands=58 candidates=190452 results=27971 | visible=16835 | MLIM 10.0 | catalog=2430254
+[17:05:08.014] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:08.015] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 33544 | Mag passed: 33544 (MLIM 10.0)
+[17:05:08.016] [PARALLAX] [info]   Projected: 18818 | GPU: 18818
+[17:05:08.016] [PARALLAX] [info]   Camera: alt=27.6 az=43.9 fov=48.6
+[17:05:08.016] [PARALLAX] [trace] SpatialQuery: 2.74ms | bands=73 candidates=270670 results=33544 | visible=18818 | MLIM 10.0 | catalog=2430254
+[17:05:08.627] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:08.628] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 35403 | Mag passed: 35403 (MLIM 10.0)
+[17:05:08.628] [PARALLAX] [info]   Projected: 19697 | GPU: 19697
+[17:05:08.629] [PARALLAX] [info]   Camera: alt=34.4 az=43.9 fov=48.6
+[17:05:08.629] [PARALLAX] [trace] SpatialQuery: 3.28ms | bands=73 candidates=280291 results=35403 | visible=19697 | MLIM 10.0 | catalog=2430254
+[17:05:09.096] [PARALLAX] [info] Magnitude limit: 10.5 (fainter)
+[17:05:09.286] [PARALLAX] [info] Magnitude limit: 11.0 (fainter)
+[17:05:09.328] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:09.329] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 92831 | Mag passed: 92831 (MLIM 11.0)
+[17:05:09.330] [PARALLAX] [info]   Projected: 51484 | GPU: 51484
+[17:05:09.330] [PARALLAX] [info]   Camera: alt=36.9 az=42.5 fov=48.6
+[17:05:09.331] [PARALLAX] [trace] SpatialQuery: 5.30ms | bands=73 candidates=282353 results=92831 | visible=51484 | MLIM 11.0 | catalog=2430254
+[17:05:09.478] [PARALLAX] [info] Magnitude limit: 11.5 (fainter)
+[17:05:09.660] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:05:09.904] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:05:10.065] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:05:10.260] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:05:13.777] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:13.777] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 774663 | Mag passed: 552891 (MLIM 12.0)
+[17:05:13.778] [PARALLAX] [info]   Projected: 300000 | GPU: 300000
+[17:05:13.778] [PARALLAX] [info]   Camera: alt=47.2 az=4.5 fov=120.0
+[17:05:13.779] [PARALLAX] [trace] SpatialQuery: 32.94ms | bands=109 candidates=1033608 results=774663 | visible=300000 | MLIM 12.0 | catalog=2430254
+[17:05:17.983] [PARALLAX] [info] Magnitude limit: 11.5 (brighter)
+[17:05:18.135] [PARALLAX] [info] Magnitude limit: 11.0 (brighter)
+[17:05:18.332] [PARALLAX] [info] Magnitude limit: 10.5 (brighter)
+[17:05:20.176] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:20.177] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 274423 | Mag passed: 274423 (MLIM 10.5)
+[17:05:20.177] [PARALLAX] [info]   Projected: 134839 | GPU: 134839
+[17:05:20.178] [PARALLAX] [info]   Camera: alt=33.2 az=65.7 fov=120.0
+[17:05:20.179] [PARALLAX] [trace] SpatialQuery: 15.62ms | bands=146 candidates=1333562 results=274423 | visible=134839 | MLIM 10.5 | catalog=2430254
+[17:05:23.417] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:23.418] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 113198 | Mag passed: 113198 (MLIM 10.5)
+[17:05:23.419] [PARALLAX] [info]   Projected: 68735 | GPU: 68735
+[17:05:23.419] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=70.0
+[17:05:23.420] [PARALLAX] [trace] SpatialQuery: 6.52ms | bands=87 candidates=497804 results=113198 | visible=68735 | MLIM 10.5 | catalog=2430254
+[17:05:24.159] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:24.160] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 17088 | Mag passed: 17088 (MLIM 10.5)
+[17:05:24.160] [PARALLAX] [info]   Projected: 9140 | GPU: 9140
+[17:05:24.160] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=24.4
+[17:05:24.161] [PARALLAX] [trace] SpatialQuery: 1.08ms | bands=38 candidates=91547 results=17088 | visible=9140 | MLIM 10.5 | catalog=2430254
+[17:05:24.436] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:24.437] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 5434 | Mag passed: 5434 (MLIM 10.5)
+[17:05:24.437] [PARALLAX] [info]   Projected: 2951 | GPU: 2951
+[17:05:24.437] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=14.4
+[17:05:24.438] [PARALLAX] [trace] SpatialQuery: 0.41ms | bands=22 candidates=30225 results=5434 | visible=2951 | MLIM 10.5 | catalog=2430254
+[17:05:24.562] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:24.563] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 4347 | Mag passed: 4347 (MLIM 10.5)
+[17:05:24.563] [PARALLAX] [info]   Projected: 2349 | GPU: 2349
+[17:05:24.564] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=13.0
+[17:05:24.564] [PARALLAX] [trace] SpatialQuery: 0.30ms | bands=20 candidates=25150 results=4347 | visible=2349 | MLIM 10.5 | catalog=2430254
+[17:05:24.683] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:24.684] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1814 | Mag passed: 1814 (MLIM 10.5)
+[17:05:24.684] [PARALLAX] [info]   Projected: 1021 | GPU: 1021
+[17:05:24.685] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=8.5
+[17:05:24.685] [PARALLAX] [trace] SpatialQuery: 0.15ms | bands=14 candidates=12180 results=1814 | visible=1021 | MLIM 10.5 | catalog=2430254
+[17:05:24.759] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:24.760] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1439 | Mag passed: 1439 (MLIM 10.5)
+[17:05:24.760] [PARALLAX] [info]   Projected: 848 | GPU: 848
+[17:05:24.761] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=7.7
+[17:05:24.761] [PARALLAX] [trace] SpatialQuery: 0.11ms | bands=12 candidates=9451 results=1439 | visible=848 | MLIM 10.5 | catalog=2430254
+[17:05:24.836] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:24.837] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1439 | Mag passed: 1439 (MLIM 10.5)
+[17:05:24.837] [PARALLAX] [info]   Projected: 848 | GPU: 848
+[17:05:24.837] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=7.7
+[17:05:24.838] [PARALLAX] [trace] SpatialQuery: 0.13ms | bands=12 candidates=9452 results=1439 | visible=848 | MLIM 10.5 | catalog=2430254
+[17:05:24.916] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:24.916] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1171 | Mag passed: 1171 (MLIM 10.5)
+[17:05:24.917] [PARALLAX] [info]   Projected: 699 | GPU: 699
+[17:05:24.917] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=6.9
+[17:05:24.918] [PARALLAX] [trace] SpatialQuery: 0.11ms | bands=12 candidates=8544 results=1171 | visible=699 | MLIM 10.5 | catalog=2430254
+[17:05:24.983] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:24.984] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 799 | Mag passed: 799 (MLIM 10.5)
+[17:05:24.985] [PARALLAX] [info]   Projected: 474 | GPU: 474
+[17:05:24.985] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:24.985] [PARALLAX] [trace] SpatialQuery: 0.16ms | bands=10 candidates=5942 results=799 | visible=474 | MLIM 10.5 | catalog=2430254
+[17:05:25.004] [PARALLAX] [info] Magnitude limit: 11.0 (fainter)
+[17:05:25.051] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:25.052] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1193 | Mag passed: 1193 (MLIM 11.0)
+[17:05:25.052] [PARALLAX] [info]   Projected: 691 | GPU: 691
+[17:05:25.052] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:25.053] [PARALLAX] [trace] SpatialQuery: 0.11ms | bands=10 candidates=5942 results=1193 | visible=691 | MLIM 11.0 | catalog=2430254
+[17:05:25.121] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:25.122] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1193 | Mag passed: 1193 (MLIM 11.0)
+[17:05:25.123] [PARALLAX] [info]   Projected: 691 | GPU: 691
+[17:05:25.123] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:25.123] [PARALLAX] [trace] SpatialQuery: 0.12ms | bands=10 candidates=5942 results=1193 | visible=691 | MLIM 11.0 | catalog=2430254
+[17:05:25.188] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:25.188] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1193 | Mag passed: 1193 (MLIM 11.0)
+[17:05:25.189] [PARALLAX] [info]   Projected: 691 | GPU: 691
+[17:05:25.189] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:25.190] [PARALLAX] [trace] SpatialQuery: 0.18ms | bands=10 candidates=5943 results=1193 | visible=691 | MLIM 11.0 | catalog=2430254
+[17:05:25.197] [PARALLAX] [info] Magnitude limit: 11.5 (fainter)
+[17:05:25.269] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:25.269] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1896 | Mag passed: 1896 (MLIM 11.5)
+[17:05:25.270] [PARALLAX] [info]   Projected: 1116 | GPU: 1116
+[17:05:25.270] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:25.271] [PARALLAX] [trace] SpatialQuery: 0.16ms | bands=10 candidates=5943 results=1896 | visible=1116 | MLIM 11.5 | catalog=2430254
+[17:05:25.345] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:25.346] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1896 | Mag passed: 1896 (MLIM 11.5)
+[17:05:25.347] [PARALLAX] [info]   Projected: 1116 | GPU: 1116
+[17:05:25.347] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:25.348] [PARALLAX] [trace] SpatialQuery: 0.13ms | bands=10 candidates=5943 results=1896 | visible=1116 | MLIM 11.5 | catalog=2430254
+[17:05:25.356] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:05:25.435] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:25.436] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:25.436] [PARALLAX] [info]   Projected: 1511 | GPU: 1511
+[17:05:25.437] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:25.437] [PARALLAX] [trace] SpatialQuery: 0.15ms | bands=10 candidates=5943 results=2602 | visible=1511 | MLIM 12.0 | catalog=2430254
+[17:05:25.476] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:05:25.522] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:25.523] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:25.523] [PARALLAX] [info]   Projected: 1511 | GPU: 1511
+[17:05:25.524] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:25.524] [PARALLAX] [trace] SpatialQuery: 0.14ms | bands=10 candidates=5944 results=2602 | visible=1511 | MLIM 12.0 | catalog=2430254
+[17:05:25.609] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:25.609] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:25.610] [PARALLAX] [info]   Projected: 1511 | GPU: 1511
+[17:05:25.610] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:25.611] [PARALLAX] [trace] SpatialQuery: 0.13ms | bands=10 candidates=5944 results=2602 | visible=1511 | MLIM 12.0 | catalog=2430254
+[17:05:25.612] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:05:25.696] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:25.697] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:25.697] [PARALLAX] [info]   Projected: 1512 | GPU: 1512
+[17:05:25.697] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:25.698] [PARALLAX] [trace] SpatialQuery: 0.17ms | bands=10 candidates=5944 results=2602 | visible=1512 | MLIM 12.0 | catalog=2430254
+[17:05:25.756] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:05:25.786] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:25.787] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:25.787] [PARALLAX] [info]   Projected: 1513 | GPU: 1513
+[17:05:25.788] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:25.789] [PARALLAX] [trace] SpatialQuery: 0.13ms | bands=10 candidates=5944 results=2602 | visible=1513 | MLIM 12.0 | catalog=2430254
+[17:05:25.873] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:25.874] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:25.874] [PARALLAX] [info]   Projected: 1513 | GPU: 1513
+[17:05:25.875] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:25.875] [PARALLAX] [trace] SpatialQuery: 0.14ms | bands=10 candidates=5944 results=2602 | visible=1513 | MLIM 12.0 | catalog=2430254
+[17:05:25.884] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:05:25.965] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:25.966] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:25.966] [PARALLAX] [info]   Projected: 1513 | GPU: 1513
+[17:05:25.966] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:25.967] [PARALLAX] [trace] SpatialQuery: 0.28ms | bands=10 candidates=5944 results=2602 | visible=1513 | MLIM 12.0 | catalog=2430254
+[17:05:26.021] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:05:26.054] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:26.055] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:26.055] [PARALLAX] [info]   Projected: 1513 | GPU: 1513
+[17:05:26.055] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:26.056] [PARALLAX] [trace] SpatialQuery: 0.14ms | bands=10 candidates=5944 results=2602 | visible=1513 | MLIM 12.0 | catalog=2430254
+[17:05:26.139] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:26.140] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:26.140] [PARALLAX] [info]   Projected: 1513 | GPU: 1513
+[17:05:26.141] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:26.142] [PARALLAX] [trace] SpatialQuery: 0.14ms | bands=10 candidates=5944 results=2602 | visible=1513 | MLIM 12.0 | catalog=2430254
+[17:05:26.228] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:26.229] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:26.229] [PARALLAX] [info]   Projected: 1513 | GPU: 1513
+[17:05:26.230] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:26.230] [PARALLAX] [trace] SpatialQuery: 0.13ms | bands=10 candidates=5945 results=2602 | visible=1513 | MLIM 12.0 | catalog=2430254
+[17:05:26.314] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:26.314] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:26.314] [PARALLAX] [info]   Projected: 1513 | GPU: 1513
+[17:05:26.315] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:26.315] [PARALLAX] [trace] SpatialQuery: 0.22ms | bands=10 candidates=5944 results=2602 | visible=1513 | MLIM 12.0 | catalog=2430254
+[17:05:26.401] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:26.402] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:26.402] [PARALLAX] [info]   Projected: 1513 | GPU: 1513
+[17:05:26.402] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:26.403] [PARALLAX] [trace] SpatialQuery: 0.16ms | bands=10 candidates=5944 results=2602 | visible=1513 | MLIM 12.0 | catalog=2430254
+[17:05:26.489] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:26.490] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:26.490] [PARALLAX] [info]   Projected: 1513 | GPU: 1513
+[17:05:26.490] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:26.491] [PARALLAX] [trace] SpatialQuery: 0.21ms | bands=10 candidates=5944 results=2602 | visible=1513 | MLIM 12.0 | catalog=2430254
+[17:05:26.576] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:26.577] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:26.577] [PARALLAX] [info]   Projected: 1513 | GPU: 1513
+[17:05:26.577] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:26.578] [PARALLAX] [trace] SpatialQuery: 0.13ms | bands=10 candidates=5945 results=2602 | visible=1513 | MLIM 12.0 | catalog=2430254
+[17:05:26.662] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:26.663] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:26.663] [PARALLAX] [info]   Projected: 1513 | GPU: 1513
+[17:05:26.664] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:26.664] [PARALLAX] [trace] SpatialQuery: 0.16ms | bands=10 candidates=5946 results=2602 | visible=1513 | MLIM 12.0 | catalog=2430254
+[17:05:26.751] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:26.752] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:26.752] [PARALLAX] [info]   Projected: 1512 | GPU: 1512
+[17:05:26.752] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:26.753] [PARALLAX] [trace] SpatialQuery: 0.16ms | bands=10 candidates=5946 results=2602 | visible=1512 | MLIM 12.0 | catalog=2430254
+[17:05:26.838] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:26.839] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:26.839] [PARALLAX] [info]   Projected: 1512 | GPU: 1512
+[17:05:26.839] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:26.840] [PARALLAX] [trace] SpatialQuery: 0.14ms | bands=10 candidates=5946 results=2602 | visible=1512 | MLIM 12.0 | catalog=2430254
+[17:05:26.926] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:26.926] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:26.927] [PARALLAX] [info]   Projected: 1512 | GPU: 1512
+[17:05:26.927] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:26.928] [PARALLAX] [trace] SpatialQuery: 0.15ms | bands=10 candidates=5945 results=2602 | visible=1512 | MLIM 12.0 | catalog=2430254
+[17:05:27.016] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:27.017] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:27.017] [PARALLAX] [info]   Projected: 1512 | GPU: 1512
+[17:05:27.017] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:27.018] [PARALLAX] [trace] SpatialQuery: 0.26ms | bands=10 candidates=5945 results=2602 | visible=1512 | MLIM 12.0 | catalog=2430254
+[17:05:27.052] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:05:27.105] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:27.105] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:27.106] [PARALLAX] [info]   Projected: 1512 | GPU: 1512
+[17:05:27.106] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:27.106] [PARALLAX] [trace] SpatialQuery: 0.16ms | bands=10 candidates=5945 results=2602 | visible=1512 | MLIM 12.0 | catalog=2430254
+[17:05:27.191] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:27.191] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:27.192] [PARALLAX] [info]   Projected: 1512 | GPU: 1512
+[17:05:27.192] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:27.193] [PARALLAX] [trace] SpatialQuery: 0.17ms | bands=10 candidates=5945 results=2602 | visible=1512 | MLIM 12.0 | catalog=2430254
+[17:05:27.268] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:05:27.281] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:27.281] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:27.281] [PARALLAX] [info]   Projected: 1512 | GPU: 1512
+[17:05:27.282] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:27.283] [PARALLAX] [trace] SpatialQuery: 0.33ms | bands=10 candidates=5945 results=2602 | visible=1512 | MLIM 12.0 | catalog=2430254
+[17:05:27.369] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:27.369] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:27.370] [PARALLAX] [info]   Projected: 1512 | GPU: 1512
+[17:05:27.370] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:27.371] [PARALLAX] [trace] SpatialQuery: 0.15ms | bands=10 candidates=5945 results=2602 | visible=1512 | MLIM 12.0 | catalog=2430254
+[17:05:27.420] [PARALLAX] [info] Magnitude limit: 12.0 (fainter)
+[17:05:27.459] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:27.460] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:27.460] [PARALLAX] [info]   Projected: 1512 | GPU: 1512
+[17:05:27.460] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:27.461] [PARALLAX] [trace] SpatialQuery: 0.23ms | bands=10 candidates=5945 results=2602 | visible=1512 | MLIM 12.0 | catalog=2430254
+[17:05:27.545] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:27.546] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:27.546] [PARALLAX] [info]   Projected: 1512 | GPU: 1512
+[17:05:27.547] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:27.547] [PARALLAX] [trace] SpatialQuery: 0.14ms | bands=10 candidates=5945 results=2602 | visible=1512 | MLIM 12.0 | catalog=2430254
+[17:05:27.633] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:27.634] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2602 | Mag passed: 2602 (MLIM 12.0)
+[17:05:27.634] [PARALLAX] [info]   Projected: 1512 | GPU: 1512
+[17:05:27.635] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:27.635] [PARALLAX] [trace] SpatialQuery: 0.21ms | bands=10 candidates=5945 results=2602 | visible=1512 | MLIM 12.0 | catalog=2430254
+[17:05:27.722] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:27.723] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2601 | Mag passed: 2601 (MLIM 12.0)
+[17:05:27.723] [PARALLAX] [info]   Projected: 1511 | GPU: 1511
+[17:05:27.724] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:27.725] [PARALLAX] [trace] SpatialQuery: 0.14ms | bands=10 candidates=5945 results=2601 | visible=1511 | MLIM 12.0 | catalog=2430254
+[17:05:27.811] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:27.811] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2601 | Mag passed: 2601 (MLIM 12.0)
+[17:05:27.812] [PARALLAX] [info]   Projected: 1512 | GPU: 1512
+[17:05:27.812] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:27.813] [PARALLAX] [trace] SpatialQuery: 0.14ms | bands=10 candidates=5944 results=2601 | visible=1512 | MLIM 12.0 | catalog=2430254
+[17:05:27.899] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:27.899] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2601 | Mag passed: 2601 (MLIM 12.0)
+[17:05:27.900] [PARALLAX] [info]   Projected: 1512 | GPU: 1512
+[17:05:27.900] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:27.901] [PARALLAX] [trace] SpatialQuery: 0.17ms | bands=10 candidates=5944 results=2601 | visible=1512 | MLIM 12.0 | catalog=2430254
+[17:05:27.988] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:27.989] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2601 | Mag passed: 2601 (MLIM 12.0)
+[17:05:27.989] [PARALLAX] [info]   Projected: 1512 | GPU: 1512
+[17:05:27.989] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:27.990] [PARALLAX] [trace] SpatialQuery: 0.16ms | bands=10 candidates=5944 results=2601 | visible=1512 | MLIM 12.0 | catalog=2430254
+[17:05:28.075] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:28.076] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2601 | Mag passed: 2601 (MLIM 12.0)
+[17:05:28.076] [PARALLAX] [info]   Projected: 1512 | GPU: 1512
+[17:05:28.076] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:28.077] [PARALLAX] [trace] SpatialQuery: 0.15ms | bands=10 candidates=5945 results=2601 | visible=1512 | MLIM 12.0 | catalog=2430254
+[17:05:28.164] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:28.165] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 2601 | Mag passed: 2601 (MLIM 12.0)
+[17:05:28.165] [PARALLAX] [info]   Projected: 1512 | GPU: 1512
+[17:05:28.165] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:28.166] [PARALLAX] [trace] SpatialQuery: 0.24ms | bands=10 candidates=5946 results=2601 | visible=1512 | MLIM 12.0 | catalog=2430254
+[17:05:28.212] [PARALLAX] [info] Magnitude limit: 11.5 (brighter)
+[17:05:28.248] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:28.249] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1894 | Mag passed: 1894 (MLIM 11.5)
+[17:05:28.249] [PARALLAX] [info]   Projected: 1118 | GPU: 1118
+[17:05:28.249] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:28.250] [PARALLAX] [trace] SpatialQuery: 0.22ms | bands=10 candidates=5946 results=1894 | visible=1118 | MLIM 11.5 | catalog=2430254
+[17:05:28.326] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:28.327] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1895 | Mag passed: 1895 (MLIM 11.5)
+[17:05:28.327] [PARALLAX] [info]   Projected: 1117 | GPU: 1117
+[17:05:28.327] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:28.328] [PARALLAX] [trace] SpatialQuery: 0.13ms | bands=10 candidates=5946 results=1895 | visible=1117 | MLIM 11.5 | catalog=2430254
+[17:05:28.405] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:28.405] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1895 | Mag passed: 1895 (MLIM 11.5)
+[17:05:28.405] [PARALLAX] [info]   Projected: 1117 | GPU: 1117
+[17:05:28.406] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:28.406] [PARALLAX] [trace] SpatialQuery: 0.21ms | bands=10 candidates=5946 results=1895 | visible=1117 | MLIM 11.5 | catalog=2430254
+[17:05:28.421] [PARALLAX] [info] Magnitude limit: 11.0 (brighter)
+[17:05:28.480] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:28.482] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1191 | Mag passed: 1191 (MLIM 11.0)
+[17:05:28.483] [PARALLAX] [info]   Projected: 691 | GPU: 691
+[17:05:28.483] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:28.484] [PARALLAX] [trace] SpatialQuery: 0.12ms | bands=10 candidates=5947 results=1191 | visible=691 | MLIM 11.0 | catalog=2430254
+[17:05:28.551] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:28.552] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1191 | Mag passed: 1191 (MLIM 11.0)
+[17:05:28.552] [PARALLAX] [info]   Projected: 691 | GPU: 691
+[17:05:28.552] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:28.553] [PARALLAX] [trace] SpatialQuery: 0.10ms | bands=10 candidates=5947 results=1191 | visible=691 | MLIM 11.0 | catalog=2430254
+[17:05:28.573] [PARALLAX] [info] Magnitude limit: 10.5 (brighter)
+[17:05:28.618] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:28.619] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 797 | Mag passed: 797 (MLIM 10.5)
+[17:05:28.619] [PARALLAX] [info]   Projected: 473 | GPU: 473
+[17:05:28.620] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:28.620] [PARALLAX] [trace] SpatialQuery: 0.10ms | bands=10 candidates=5946 results=797 | visible=473 | MLIM 10.5 | catalog=2430254
+[17:05:28.682] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:28.683] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 797 | Mag passed: 797 (MLIM 10.5)
+[17:05:28.683] [PARALLAX] [info]   Projected: 473 | GPU: 473
+[17:05:28.684] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:28.685] [PARALLAX] [trace] SpatialQuery: 0.08ms | bands=10 candidates=5946 results=797 | visible=473 | MLIM 10.5 | catalog=2430254
+[17:05:28.745] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:28.746] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 797 | Mag passed: 797 (MLIM 10.5)
+[17:05:28.746] [PARALLAX] [info]   Projected: 473 | GPU: 473
+[17:05:28.747] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:28.748] [PARALLAX] [trace] SpatialQuery: 0.18ms | bands=10 candidates=5946 results=797 | visible=473 | MLIM 10.5 | catalog=2430254
+[17:05:28.808] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:28.809] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 797 | Mag passed: 797 (MLIM 10.5)
+[17:05:28.809] [PARALLAX] [info]   Projected: 473 | GPU: 473
+[17:05:28.809] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:28.810] [PARALLAX] [trace] SpatialQuery: 0.06ms | bands=10 candidates=5946 results=797 | visible=473 | MLIM 10.5 | catalog=2430254
+[17:05:28.844] [PARALLAX] [info] Magnitude limit: 10.0 (brighter)
+[17:05:28.873] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:28.874] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 492 | Mag passed: 492 (MLIM 10.0)
+[17:05:28.874] [PARALLAX] [info]   Projected: 287 | GPU: 287
+[17:05:28.874] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:28.875] [PARALLAX] [trace] SpatialQuery: 0.05ms | bands=10 candidates=5946 results=492 | visible=287 | MLIM 10.0 | catalog=2430254
+[17:05:28.933] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:28.933] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 492 | Mag passed: 492 (MLIM 10.0)
+[17:05:28.934] [PARALLAX] [info]   Projected: 287 | GPU: 287
+[17:05:28.934] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:28.934] [PARALLAX] [trace] SpatialQuery: 0.06ms | bands=10 candidates=5946 results=492 | visible=287 | MLIM 10.0 | catalog=2430254
+[17:05:28.991] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:28.992] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 492 | Mag passed: 492 (MLIM 10.0)
+[17:05:28.992] [PARALLAX] [info]   Projected: 287 | GPU: 287
+[17:05:28.992] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:28.993] [PARALLAX] [trace] SpatialQuery: 0.05ms | bands=10 candidates=5947 results=492 | visible=287 | MLIM 10.0 | catalog=2430254
+[17:05:29.050] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:29.051] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 492 | Mag passed: 492 (MLIM 10.0)
+[17:05:29.051] [PARALLAX] [info]   Projected: 287 | GPU: 287
+[17:05:29.052] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:29.053] [PARALLAX] [trace] SpatialQuery: 0.09ms | bands=10 candidates=5947 results=492 | visible=287 | MLIM 10.0 | catalog=2430254
+[17:05:29.108] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:29.109] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 492 | Mag passed: 492 (MLIM 10.0)
+[17:05:29.109] [PARALLAX] [info]   Projected: 287 | GPU: 287
+[17:05:29.109] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:29.110] [PARALLAX] [trace] SpatialQuery: 0.06ms | bands=10 candidates=5947 results=492 | visible=287 | MLIM 10.0 | catalog=2430254
+[17:05:29.168] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:29.169] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 492 | Mag passed: 492 (MLIM 10.0)
+[17:05:29.169] [PARALLAX] [info]   Projected: 287 | GPU: 287
+[17:05:29.170] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:29.170] [PARALLAX] [trace] SpatialQuery: 0.06ms | bands=10 candidates=5948 results=492 | visible=287 | MLIM 10.0 | catalog=2430254
+[17:05:29.237] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:29.238] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 492 | Mag passed: 492 (MLIM 10.0)
+[17:05:29.238] [PARALLAX] [info]   Projected: 287 | GPU: 287
+[17:05:29.239] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:29.239] [PARALLAX] [trace] SpatialQuery: 0.05ms | bands=10 candidates=5948 results=492 | visible=287 | MLIM 10.0 | catalog=2430254
+[17:05:29.306] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:29.306] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 492 | Mag passed: 492 (MLIM 10.0)
+[17:05:29.307] [PARALLAX] [info]   Projected: 287 | GPU: 287
+[17:05:29.307] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=5.6
+[17:05:29.308] [PARALLAX] [trace] SpatialQuery: 0.04ms | bands=10 candidates=5948 results=492 | visible=287 | MLIM 10.0 | catalog=2430254
+[17:05:29.377] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:29.377] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 830 | Mag passed: 830 (MLIM 10.0)
+[17:05:29.378] [PARALLAX] [info]   Projected: 493 | GPU: 493
+[17:05:29.378] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=7.4
+[17:05:29.378] [PARALLAX] [trace] SpatialQuery: 0.07ms | bands=12 candidates=9154 results=830 | visible=493 | MLIM 10.0 | catalog=2430254
+[17:05:29.477] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:29.477] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1841 | Mag passed: 1841 (MLIM 10.0)
+[17:05:29.477] [PARALLAX] [info]   Projected: 1024 | GPU: 1024
+[17:05:29.477] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=10.9
+[17:05:29.478] [PARALLAX] [trace] SpatialQuery: 0.18ms | bands=18 candidates=19405 results=1841 | visible=1024 | MLIM 10.0 | catalog=2430254
+[17:05:29.574] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:29.574] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 1841 | Mag passed: 1841 (MLIM 10.0)
+[17:05:29.575] [PARALLAX] [info]   Projected: 1024 | GPU: 1024
+[17:05:29.575] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=10.9
+[17:05:29.575] [PARALLAX] [trace] SpatialQuery: 0.15ms | bands=18 candidates=19405 results=1841 | visible=1024 | MLIM 10.0 | catalog=2430254
+[17:05:29.681] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:29.681] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 5105 | Mag passed: 5105 (MLIM 10.0)
+[17:05:29.682] [PARALLAX] [info]   Projected: 2802 | GPU: 2802
+[17:05:29.682] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=17.5
+[17:05:29.682] [PARALLAX] [trace] SpatialQuery: 0.51ms | bands=28 candidates=46504 results=5105 | visible=2802 | MLIM 10.0 | catalog=2430254
+[17:05:29.857] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:29.858] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 6336 | Mag passed: 6336 (MLIM 10.0)
+[17:05:29.858] [PARALLAX] [info]   Projected: 3374 | GPU: 3374
+[17:05:29.859] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=19.3
+[17:05:29.859] [PARALLAX] [trace] SpatialQuery: 0.55ms | bands=30 candidates=55006 results=6336 | visible=3374 | MLIM 10.0 | catalog=2430254
+[17:05:30.304] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:30.306] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 55317 | Mag passed: 55317 (MLIM 10.0)
+[17:05:30.307] [PARALLAX] [info]   Projected: 32984 | GPU: 32984
+[17:05:30.307] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=60.5
+[17:05:30.308] [PARALLAX] [trace] SpatialQuery: 3.67ms | bands=80 candidates=406120 results=55317 | visible=32984 | MLIM 10.0 | catalog=2430254
+[17:05:32.525] [PARALLAX] [info] === Skychart Pipeline ===
+[17:05:32.526] [PARALLAX] [info]   Catalog: 2430254 | Candidates: 149157 | Mag passed: 149157 (MLIM 10.0)
+[17:05:32.526] [PARALLAX] [info]   Projected: 93653 | GPU: 93653
+[17:05:32.527] [PARALLAX] [info]   Camera: alt=49.4 az=35.7 fov=120.0
+[17:05:32.528] [PARALLAX] [trace] SpatialQuery: 10.10ms | bands=125 candidates=1105519 results=149157 | visible=93653 | MLIM 10.0 | catalog=2430254
+[17:05:33.130] [PARALLAX] [info] Main loop exited
+[17:05:33.132] [PARALLAX] [trace] BitmapFont destroyed
+[17:05:33.133] [PARALLAX] [trace] LineRenderer destroyed
+[17:05:33.134] [PARALLAX] [trace] Starfield renderer destroyed
+[17:05:33.134] [PARALLAX] [trace] Sky background renderer destroyed
+[17:05:33.135] [PARALLAX] [trace] Graphics pipeline destroyed
+[17:05:33.135] [PARALLAX] [trace] Render pass destroyed
+[17:05:33.136] [PARALLAX] [trace] Swapchain destroyed
+[17:05:33.159] [PARALLAX] [trace] Vulkan logical device destroyed
+[17:05:33.160] [PARALLAX] [trace] Vulkan debug messenger destroyed
+[17:05:33.160] [PARALLAX] [trace] Vulkan surface destroyed
+[17:05:33.160] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\nvoglv64.dll
+[17:05:33.161] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\nvoglv64.dll
+[17:05:33.161] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\ProgramData\obs-studio-hook\graphics-hook64.dll
+[17:05:33.163] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\VulkanSDK\1.4.341.1\Bin\VkLayer_khronos_validation.dll
+[17:05:33.163] [PARALLAX] [trace] Vulkan instance destroyed
+[17:05:33.186] [PARALLAX] [info] Window destroyed
+[17:05:33.203] [PARALLAX] [info] Parallax shutdown complete.

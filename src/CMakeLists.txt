@@ -28,6 +28,7 @@ add_executable(parallax
     overlay/horizon.cpp
     ui/font.cpp
     ui/hud.cpp
+    ui/panel_system.cpp
 )
 
 target_include_directories(parallax PRIVATE

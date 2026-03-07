@@ -31,6 +31,12 @@
     <CustomBuild Include="C:\Parallax-dev\Parallax\build\CMakeFiles\3d8c1758119fe9be1bc83335e3a11d21\text.vert.spv.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
+    <CustomBuild Include="C:\Parallax-dev\Parallax\build\CMakeFiles\3d8c1758119fe9be1bc83335e3a11d21\ui_rect.frag.spv.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Parallax-dev\Parallax\build\CMakeFiles\3d8c1758119fe9be1bc83335e3a11d21\ui_rect.vert.spv.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
     <CustomBuild Include="C:\Parallax-dev\Parallax\build\CMakeFiles\f3ce5fe29ba837a1ada6f4c67994e6cd\compile_shaders.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>

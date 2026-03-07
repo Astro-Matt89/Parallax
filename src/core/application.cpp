@@ -5,6 +5,7 @@
 /// NO atmospheric effects on star rendering.
 ///
 /// SPRINT 04 Task 4.7: Full overlay integration.
+/// SPRINT 05 Task 5.0: Tycho-2 catalog + spatial index integration.
 /// Render order:
 ///   1. Sky background
 ///   2. Coordinate grid (behind stars)
@@ -21,6 +22,7 @@
 
 #include <glm/trigonometric.hpp>
 
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <filesystem>
@@ -94,8 +96,9 @@ void Application::init()
         *m_context, m_pipeline->get_render_pass(), shader_dir, m_swapchain->get_extent());
 
     // 7. Starfield renderer (skychart mode — no atmosphere parameter)
+    //    Buffer increased to 300k for Tycho-2 at high MLIM           ← SPRINT 05 Task 5.0
     m_starfield = std::make_unique<rendering::Starfield>(
-        *m_context, m_pipeline->get_render_pass(), shader_dir);
+        *m_context, m_pipeline->get_render_pass(), shader_dir, 300000);
 
     // 7b. Line renderer for overlays (constellations, grids, horizon)  ← SPRINT 04 Task 4.1
     m_line_renderer = std::make_unique<rendering::LineRenderer>(
@@ -108,41 +111,86 @@ void Application::init()
     m_hud = std::make_unique<ui::Hud>(
         *m_context, m_pipeline->get_render_pass(), shader_dir);
 
-    // 10. Load star catalog
-    const std::filesystem::path hipparcos_path{"data/catalogs/hipparcos.csv"};
-    const std::filesystem::path bright_path{"data/catalogs/bright_stars.csv"};
+    // =================================================================
+    // 10. Load star catalog — Tycho-2 preferred, Hipparcos fallback
+    //                                                    ← SPRINT 05 Task 5.0
+    // =================================================================
+    {
+        const std::filesystem::path tycho2_path{"data/catalogs/tycho2.csv"};
+        const std::filesystem::path hipparcos_path{"data/catalogs/hipparcos.csv"};
+        const std::filesystem::path bright_path{"data/catalogs/bright_stars.csv"};
 
-    auto loaded_stars = catalog::CatalogLoader::load_hipparcos_csv(hipparcos_path);
-    if (loaded_stars.has_value())
-    {
-        m_stars = std::move(loaded_stars.value());
-        PLX_CORE_INFO("Hipparcos catalog loaded: {} stars from {}",
-                      m_stars.size(), hipparcos_path.string());
-    }
-    else
-    {
-        PLX_CORE_WARN("Hipparcos catalog not found at {}. Trying bright star fallback...",
-                      hipparcos_path.string());
-        auto fallback = catalog::CatalogLoader::load_bright_star_csv(bright_path);
-        if (fallback.has_value())
+        // Try Tycho-2 first
+        auto loaded_tycho2 = catalog::CatalogLoader::load_tycho2_csv(tycho2_path);
+        if (loaded_tycho2.has_value())
         {
-            m_stars = std::move(fallback.value());
-            PLX_CORE_INFO("Bright star catalog loaded: {} stars from {}",
-                          m_stars.size(), bright_path.string());
+            m_stars = std::move(loaded_tycho2.value());
+            PLX_CORE_INFO("Tycho-2 catalog loaded: {} stars", m_stars.size());
         }
         else
         {
-            PLX_CORE_WARN("No catalog found. Rendering will show no stars.");
+            PLX_CORE_WARN("Tycho-2 catalog not found at {}. Trying Hipparcos fallback...",
+                          tycho2_path.string());
+            auto loaded_hip = catalog::CatalogLoader::load_hipparcos_csv(hipparcos_path);
+            if (loaded_hip.has_value())
+            {
+                m_stars = std::move(loaded_hip.value());
+                PLX_CORE_INFO("Hipparcos catalog loaded: {} stars", m_stars.size());
+            }
+            else
+            {
+                PLX_CORE_WARN("Hipparcos not found. Trying bright star fallback...");
+                auto fallback = catalog::CatalogLoader::load_bright_star_csv(bright_path);
+                if (fallback.has_value())
+                {
+                    m_stars = std::move(fallback.value());
+                    PLX_CORE_INFO("Bright star catalog loaded: {} stars", m_stars.size());
+                }
+                else
+                {
+                    PLX_CORE_WARN("No catalog found. Rendering will show no stars.");
+                }
+            }
+        }
+
+        // Build spatial index on the primary catalog
+        if (!m_stars.empty())
+        {
+            PLX_CORE_INFO("Building spatial index for {} stars...", m_stars.size());
+            m_spatial_index.build(m_stars, 180);
+        }
+
+        // Load Hipparcos separately for constellation HIP ID resolution
+        {
+            const std::filesystem::path hipparcos_const_path{"data/catalogs/hipparcos.csv"};
+            auto hip_stars = catalog::CatalogLoader::load_hipparcos_csv(hipparcos_const_path);
+            if (hip_stars.has_value())
+            {
+                m_hipparcos_stars = std::move(hip_stars.value());
+                PLX_CORE_INFO("Hipparcos catalog loaded for constellation lookup: {} stars",
+                              m_hipparcos_stars.size());
+            }
         }
     }
 
     // 10b. Load constellation overlay                                   ← SPRINT 04 Task 4.2
+    //      Resolve against Hipparcos (has HIP IDs for constellations)   ← SPRINT 05 Task 5.0
     {
         const std::filesystem::path const_lines{"data/catalogs/constellation_lines.csv"};
         const std::filesystem::path const_names{"data/catalogs/constellation_names.csv"};
         if (m_constellations.load(const_lines, const_names))
         {
-            m_constellations.resolve_stars(m_stars);
+            if (!m_hipparcos_stars.empty())
+            {
+                m_constellations.resolve_stars(m_hipparcos_stars);
+                PLX_CORE_INFO("Constellations resolved against Hipparcos ({} stars)",
+                              m_hipparcos_stars.size());
+            }
+            else
+            {
+                m_constellations.resolve_stars(m_stars);
+                PLX_CORE_WARN("Constellations resolved against primary catalog (no Hipparcos)");
+            }
         }
     }
 
@@ -467,10 +515,35 @@ void Application::update_simulation(f64 delta_time_sec)
                         *m_line_renderer, m_hud->get_font(),
                         viewport);
 
-    // Visibility prefilter
-    catalog::PrefilterStats prefilter_stats{};  // ← FIX: added missing semicolon
-    const auto candidates = catalog::VisibilityFilter::filter(
-        m_stars, m_observer, lst, m_camera->get_magnitude_limit(), &prefilter_stats);
+    // =================================================================
+    // Spatial index query — replaces VisibilityFilter       ← SPRINT 05 Task 5.0
+    // =================================================================
+    const auto pointing = m_camera->get_pointing();
+    const f64 fov_rad = m_camera->get_fov_rad();
+    const f32 mag_limit = m_camera->get_magnitude_limit();
+
+    std::vector<u32> candidates;
+    catalog::SpatialQueryStats query_stats{};
+
+    if (m_spatial_index.is_built())
+    {
+        // Convert camera Alt/Az → RA/Dec for spatial query
+        const auto camera_eq = astro::Coordinates::horizontal_to_equatorial(
+            pointing, m_observer, lst);
+
+        // Query radius: FOV diagonal half-angle with margin
+        const f64 query_radius = fov_rad * 0.75;
+
+        candidates = m_spatial_index.query(
+            camera_eq.ra, camera_eq.dec, query_radius, mag_limit, &query_stats);
+    }
+    else
+    {
+        // Fallback to old VisibilityFilter if spatial index not built
+        catalog::PrefilterStats prefilter_stats{};
+        candidates = catalog::VisibilityFilter::filter(
+            m_stars, m_observer, lst, mag_limit, &prefilter_stats);
+    }
 
     // --- Step 3: Starfield update — NO atmosphere parameter ---
     m_starfield->update(m_stars, candidates, m_observer, lst, *m_camera);
@@ -490,7 +563,6 @@ void Application::update_simulation(f64 delta_time_sec)
                      viewport);
 
     // --- Step 7: Update HUD (drawn last in render pass) ---
-    const auto pointing = m_camera->get_pointing();
     const f32 fps = (m_delta_time > 0.0) ? static_cast<f32>(1.0 / m_delta_time) : 0.0f;
 
     m_hud->update(ui::HudData{
@@ -514,16 +586,31 @@ void Application::update_simulation(f64 delta_time_sec)
         .overlay_horizon         = m_horizon.is_visible(),
     });
 
-    // Periodic logging
+    // Periodic logging — query time + visible star count             ← SPRINT 05 Task 5.0
     ++m_frame_counter;
     if (m_frame_counter % 60 == 0)
     {
-        PLX_CORE_TRACE(
-            "Stars: {} total | {} passed | {} visible | MLIM {:.1f}",
-            prefilter_stats.total,
-            prefilter_stats.passed,
-            m_starfield->get_visible_count(),
-            m_camera->get_magnitude_limit());
+        if (m_spatial_index.is_built())
+        {
+            PLX_CORE_TRACE(
+                "SpatialQuery: {:.2f}ms | bands={} candidates={} results={} | "
+                "visible={} | MLIM {:.1f} | catalog={}",
+                query_stats.query_time_ms,
+                query_stats.bands_searched,
+                query_stats.candidates_scanned,
+                query_stats.results,
+                m_starfield->get_visible_count(),
+                mag_limit,
+                m_stars.size());
+        }
+        else
+        {
+            PLX_CORE_TRACE(
+                "Stars: {} visible | MLIM {:.1f} | catalog={}",
+                m_starfield->get_visible_count(),
+                m_camera->get_magnitude_limit(),
+                m_stars.size());
+        }
     }
 }
 
@@ -557,9 +644,9 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
 
     vkCmdBeginRenderPass(cmd, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
 
-    VkViewport viewport{0.0f, 0.0f, static_cast<float>(extent.width),
+    VkViewport vp{0.0f, 0.0f, static_cast<float>(extent.width),
                         static_cast<float>(extent.height), 0.0f, 1.0f};
-    vkCmdSetViewport(cmd, 0, 1, &viewport);
+    vkCmdSetViewport(cmd, 0, 1, &vp);
     VkRect2D scissor{{0, 0}, extent};
     vkCmdSetScissor(cmd, 0, 1, &scissor);
 
@@ -652,25 +739,11 @@ void Application::draw_frame()
 }
 
 // =================================================================
-// recreate_swapchain — FIX: use in-place recreate() instead of
-// destroying and constructing a new Swapchain object.
-//
-// The old code did:
-//   m_swapchain = std::make_unique<vulkan::Swapchain>(...);
-// which destroyed the old VkSwapchainKHR *then* created a new one,
-// leaving oldSwapchain = VK_NULL_HANDLE.  On some drivers/platforms
-// this causes VK_ERROR_SURFACE_LOST_KHR (-1000000001) during resize.
-//
-// Swapchain::recreate() internally calls destroy() then create(),
-// keeping the same object alive and letting the driver retire the
-// old swapchain gracefully.
+// recreate_swapchain
 // =================================================================
 
 void Application::recreate_swapchain()
 {
-    // Block until the window has a valid (non-zero) size.
-    // This handles the minimised-window case where extent would be 0×0,
-    // which Vulkan does not allow for swapchain creation.
     uint32_t w = m_window->get_width();
     uint32_t h = m_window->get_height();
     while (w == 0 || h == 0)
@@ -682,18 +755,14 @@ void Application::recreate_swapchain()
 
     m_context->wait_idle();
 
-    // Recreate the swapchain IN PLACE — this calls vkDeviceWaitIdle,
-    // destroys image views + old swapchain, then creates new ones.
     m_swapchain->recreate(w, h);
 
-    // Recreate pipeline (render pass + framebuffers) against new swapchain
     m_pipeline = std::make_unique<vulkan::Pipeline>(*m_context, *m_swapchain,
         std::filesystem::path{PLX_SHADER_DIR});
 
     const auto extent = m_swapchain->get_extent();
     m_sky_background->set_extent(extent);
 
-    // Recreate per-image render-finished semaphores
     for (auto sem : m_render_finished_semaphores)
     {
         if (sem != VK_NULL_HANDLE)

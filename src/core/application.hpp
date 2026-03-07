@@ -8,6 +8,7 @@
 #include "astro/time_system.hpp"
 #include "catalog/dso_entry.hpp"
 #include "catalog/dso_loader.hpp"
+#include "catalog/spatial_index.hpp"                       // ← SPRINT 05 Task 5.0
 #include "catalog/star_entry.hpp"
 #include "catalog/visibility_filter.hpp"
 #include "core/input.hpp"
@@ -107,6 +108,12 @@ namespace parallax::core
         // Star catalog
         // -----------------------------------------------------------------
         std::vector<catalog::StarEntry> m_stars;
+
+        // -----------------------------------------------------------------
+        // Tycho-2 / Hipparcos dual catalog support          ← SPRINT 05 Task 5.0
+        // -----------------------------------------------------------------
+        catalog::SpatialIndex m_spatial_index;               ///< Declination-band spatial index
+        std::vector<catalog::StarEntry> m_hipparcos_stars;   ///< Hipparcos catalog (constellation lookup)
 
         // -----------------------------------------------------------------
         // DSO catalog                                       ← SPRINT 04 Task 4.5

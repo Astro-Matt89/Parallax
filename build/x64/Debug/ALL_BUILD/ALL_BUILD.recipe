@@ -20,6 +20,9 @@
       <FullPath>C:\Parallax-dev\Parallax\build\bin\Debug\test_coordinates.exe</FullPath>
     </ProjectOutput>
     <ProjectOutput>
+      <FullPath>C:\Parallax-dev\Parallax\build\bin\Debug\test_spatial_index.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
       <FullPath>C:\Parallax-dev\Parallax\build\bin\Debug\test_time_system.exe</FullPath>
     </ProjectOutput>
     <ProjectOutput>

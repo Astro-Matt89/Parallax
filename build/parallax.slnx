@@ -14,6 +14,7 @@
 		<BuildDependency Project="tests/test_atmosphere.vcxproj"/>
 		<BuildDependency Project="tests/test_catalog_loader.vcxproj"/>
 		<BuildDependency Project="tests/test_coordinates.vcxproj"/>
+		<BuildDependency Project="tests/test_spatial_index.vcxproj"/>
 		<BuildDependency Project="tests/test_time_system.vcxproj"/>
 		<Build Solution="Debug|*" Project="false"/>
 		<Build Solution="Release|*" Project="false"/>
@@ -42,6 +43,9 @@
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 	</Project>
 	<Project Path="tests/test_coordinates.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="de6642a6-c134-3df2-a7f2-77675feb652c">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="tests/test_spatial_index.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="22ef2308-77c5-348b-b5d5-cc804bdad1d7">
 		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
 	</Project>
 	<Project Path="tests/test_time_system.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="a0c0faec-e2ca-309d-b09e-c70af00821fd">

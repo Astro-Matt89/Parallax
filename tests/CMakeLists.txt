@@ -82,3 +82,24 @@ target_link_libraries(test_atmosphere PRIVATE
 )
 
 add_test(NAME Atmosphere COMMAND test_atmosphere)
+
+# -----------------------------------------------------------------
+# Test: SpatialIndex                                ← SPRINT 05 Task 5.0
+# -----------------------------------------------------------------
+add_executable(test_spatial_index
+    test_spatial_index.cpp
+    "${CMAKE_SOURCE_DIR}/src/catalog/spatial_index.cpp"
+    "${CMAKE_SOURCE_DIR}/src/core/logger.cpp"
+)
+
+target_include_directories(test_spatial_index PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_spatial_index PRIVATE
+    doctest::doctest
+    glm::glm
+    spdlog::spdlog
+)
+
+add_test(NAME SpatialIndex COMMAND test_spatial_index)

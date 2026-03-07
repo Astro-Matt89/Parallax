@@ -7,6 +7,7 @@
 #include "core/types.hpp"
 
 #include <charconv>
+#include <chrono>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -203,6 +204,105 @@ CatalogLoader::load_hipparcos_csv(const std::filesystem::path& path)
 }
 
 // -----------------------------------------------------------------
+// Load Tycho-2 CSV: TYC,RA_deg,Dec_deg,Vmag,BV
+// -----------------------------------------------------------------
+
+std::optional<std::vector<StarEntry>>
+CatalogLoader::load_tycho2_csv(const std::filesystem::path& path)
+{
+    using Clock = std::chrono::high_resolution_clock;
+    const auto t_start = Clock::now();
+
+    std::ifstream file(path);
+    if (!file.is_open())
+    {
+        PLX_CORE_ERROR("CatalogLoader: Failed to open Tycho-2 file: {}", path.string());
+        return std::nullopt;
+    }
+
+    std::vector<StarEntry> stars;
+    stars.reserve(2600000);  // Tycho-2 has ~2.5M entries
+
+    std::string line;
+
+    // Skip header line
+    if (!std::getline(file, line))
+    {
+        PLX_CORE_ERROR("CatalogLoader: Tycho-2 file is empty: {}", path.string());
+        return std::nullopt;
+    }
+
+    u32 line_number = 1;
+    u32 skipped = 0;
+
+    while (std::getline(file, line))
+    {
+        ++line_number;
+
+        if (line.empty())
+        {
+            continue;
+        }
+
+        // Parse CSV columns: TYC,RA_deg,Dec_deg,Vmag,BV
+        std::istringstream stream(line);
+        std::string tyc_str;
+        std::string ra_str;
+        std::string dec_str;
+        std::string mag_str;
+        std::string bv_str;
+
+        if (!std::getline(stream, tyc_str, ',') ||
+            !std::getline(stream, ra_str, ',') ||
+            !std::getline(stream, dec_str, ',') ||
+            !std::getline(stream, mag_str, ',') ||
+            !std::getline(stream, bv_str))
+        {
+            ++skipped;
+            continue;
+        }
+
+        const auto ra_deg  = parse_f64(trim(ra_str));
+        const auto dec_deg = parse_f64(trim(dec_str));
+        const auto mag_v   = parse_f64(trim(mag_str));
+        const auto bv      = parse_f64(trim(bv_str));
+
+        if (!ra_deg || !dec_deg || !mag_v || !bv)
+        {
+            ++skipped;
+            continue;
+        }
+
+        stars.push_back(StarEntry{
+            .ra         = *ra_deg * astro_constants::kDegToRad,
+            .dec        = *dec_deg * astro_constants::kDegToRad,
+            .mag_v      = static_cast<f32>(*mag_v),
+            .color_bv   = static_cast<f32>(*bv),
+            .catalog_id = hash_tyc_id(trim(tyc_str)),
+        });
+    }
+
+    const auto t_end = Clock::now();
+    const f64 elapsed_ms = std::chrono::duration<f64, std::milli>(t_end - t_start).count();
+
+    if (stars.empty())
+    {
+        PLX_CORE_ERROR("CatalogLoader: No valid stars found in Tycho-2: {}", path.string());
+        return std::nullopt;
+    }
+
+    if (skipped > 0)
+    {
+        PLX_CORE_WARN("CatalogLoader: Tycho-2 skipped {} malformed lines", skipped);
+    }
+
+    PLX_CORE_INFO("CatalogLoader: Loaded {} Tycho-2 stars from {} in {:.1f}ms",
+                  stars.size(), path.string(), elapsed_ms);
+
+    return stars;
+}
+
+// -----------------------------------------------------------------
 // Utility: trim whitespace
 // -----------------------------------------------------------------
 
@@ -262,6 +362,22 @@ std::optional<u32> CatalogLoader::parse_u32(std::string_view sv)
     }
 
     return value;
+}
+
+// -----------------------------------------------------------------
+// Utility: hash TYC identifier string → u32
+// -----------------------------------------------------------------
+
+u32 CatalogLoader::hash_tyc_id(std::string_view tyc_str)
+{
+    // FNV-1a 32-bit hash
+    u32 hash = 2166136261u;
+    for (char c : tyc_str)
+    {
+        hash ^= static_cast<u32>(static_cast<u8>(c));
+        hash *= 16777619u;
+    }
+    return hash;
 }
 
 } // namespace parallax::catalog

@@ -15,7 +15,7 @@ namespace parallax::catalog
 {
     /// @brief Static utility class for loading star catalog files.
     ///
-    /// Phase 1 supports CSV loading for Hipparcos-style and bright-star catalogs.
+    /// Phase 1 supports CSV loading for Hipparcos-style, bright-star, and Tycho-2 catalogs.
     /// Binary .plxcat format will be added in a later task.
     class CatalogLoader
     {
@@ -49,6 +49,20 @@ namespace parallax::catalog
         [[nodiscard]] static std::optional<std::vector<StarEntry>>
             load_hipparcos_csv(const std::filesystem::path& path);
 
+        /// @brief Load stars from a Tycho-2 CSV file.
+        ///
+        /// Expected CSV columns (header row required):
+        ///   TYC, RA_deg, Dec_deg, Vmag, BV
+        ///
+        /// RA and Dec are in degrees and will be converted to radians.
+        /// Vmag is Johnson V (already converted from VT by prepare_tycho2.py).
+        /// catalog_id is set to a hash of the TYC identifier (string).
+        ///
+        /// @param path Path to the CSV file.
+        /// @return Vector of StarEntry on success, std::nullopt on failure.
+        [[nodiscard]] static std::optional<std::vector<StarEntry>>
+            load_tycho2_csv(const std::filesystem::path& path);
+
     private:
         /// @brief Trim leading and trailing whitespace from a string_view.
         [[nodiscard]] static std::string_view trim(std::string_view sv);
@@ -60,6 +74,9 @@ namespace parallax::catalog
         /// @brief Parse a single u32 value from a trimmed string_view.
         /// @return The parsed value, or std::nullopt on failure.
         [[nodiscard]] static std::optional<u32> parse_u32(std::string_view sv);
+
+        /// @brief Simple hash for TYC identifier strings → u32 catalog_id.
+        [[nodiscard]] static u32 hash_tyc_id(std::string_view tyc_str);
     };
 
 } // namespace parallax::catalog

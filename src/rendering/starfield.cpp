@@ -112,6 +112,8 @@ void Starfield::update(std::span<const catalog::StarEntry> stars,
 
     std::vector<StarVertex> vertices;
     vertices.reserve(std::min(static_cast<u32>(candidate_indices.size()), m_buffer_capacity));
+    m_visible_indices.clear();
+    m_visible_screen_positions.clear();
 
     f32 min_mag = std::numeric_limits<f32>::max();
 
@@ -138,6 +140,8 @@ void Starfield::update(std::span<const catalog::StarEntry> stars,
 
         // 5. Pack vertex — raw catalog data, no atmospheric modification
         vertices.push_back(StarVertex{
+            m_visible_indices.push_back(idx);
+            m_visible_screen_positions.push_back(Vec2f{screen_pos->x, screen_pos->y});
             .screen_x = screen_pos->x,
             .screen_y = screen_pos->y,
             .mag_v    = star.mag_v,
@@ -195,7 +199,8 @@ void Starfield::draw(VkCommandBuffer cmd) const
                        0, sizeof(StarfieldPushConstants), &m_push_constants);
     vkCmdDraw(cmd, 1, m_visible_count, 0, 0);
 }
-
+std::span<const u32> Starfield::get_visible_indices() const { return m_visible_indices; }
+std::span<const Vec2f> Starfield::get_screen_positions() const { return m_visible_screen_positions; }
 u32 Starfield::get_visible_count() const { return m_visible_count; }
 VkPipeline Starfield::get_pipeline() const { return m_pipeline; }
 VkPipelineLayout Starfield::get_pipeline_layout() const { return m_pipeline_layout; }

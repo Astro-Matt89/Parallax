@@ -394,7 +394,7 @@ void Application::process_input()
 
             if (m_selection.has_selection())
             {
-                const auto& sel = m_selection.get_selected();
+                const auto& sel = m_selection.get_selection();
                 if (sel.type == ui::SelectedObjectType::Star)
                 {
                     PLX_CORE_INFO("Selected star: HIP {} mag {:.2f} ({:.4f}, {:.4f})",
@@ -544,13 +544,13 @@ void Application::process_input()
     // F — Toggle tracking on selected object
     if (m_input->is_key_pressed(SDL_SCANCODE_F))
     {
-        if (m_selection.has_selection())
-        {
-            m_selection.toggle_tracking();
-            PLX_CORE_INFO("Tracking {}",
-                          m_selection.is_tracking() ? "enabled" : "disabled");
-        }
-    }
+       if (m_selection.has_selection())
+       {
+           m_selection.set_tracking(!m_selection.is_tracking());
+           PLX_CORE_INFO("Tracking {}",
+                         m_selection.is_tracking() ? "enabled" : "disabled");
+       }
+   }
 
     // Camera reset
     if (m_input->is_key_pressed(SDL_SCANCODE_R))

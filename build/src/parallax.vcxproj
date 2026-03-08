@@ -463,6 +463,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Parallax-dev\Parallax\src\ui\font.cpp" />
     <ClCompile Include="C:\Parallax-dev\Parallax\src\ui\hud.cpp" />
     <ClCompile Include="C:\Parallax-dev\Parallax\src\ui\panel_system.cpp" />
+    <ClCompile Include="C:\Parallax-dev\Parallax\src\ui\widgets.cpp" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

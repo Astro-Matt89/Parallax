@@ -29,6 +29,7 @@ add_executable(parallax
     ui/font.cpp
     ui/hud.cpp
     ui/panel_system.cpp
+    ui/widgets.cpp
 )
 
 target_include_directories(parallax PRIVATE

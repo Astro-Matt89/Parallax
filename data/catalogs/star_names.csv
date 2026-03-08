@@ -1,0 +1,197 @@
+HIP,Name,Bayer,Constellation,SpectralType
+32349,Sirius,Alpha CMa,CMa,A1V
+30438,Canopus,Alpha Car,Car,F0II
+69673,Arcturus,Alpha Boo,Boo,K1.5III
+71683,Rigil Kentaurus,Alpha Cen,Cen,G2V
+91262,Vega,Alpha Lyr,Lyr,A0V
+24436,Capella,Alpha Aur,Aur,G8III
+24608,Rigel,Beta Ori,Ori,B8Ia
+37279,Procyon,Alpha CMi,CMi,F5IV-V
+7588,Achernar,Alpha Eri,Eri,B3Vpe
+27989,Betelgeuse,Alpha Ori,Ori,M2Iab
+68702,Hadar,Beta Cen,Cen,B1III
+97649,Altair,Alpha Aql,Aql,A7V
+21421,Aldebaran,Alpha Tau,Tau,K5III
+60718,Acrux,Alpha Cru,Cru,B0.5IV
+65474,Spica,Alpha Vir,Vir,B1III-IV
+80763,Antares,Alpha Sco,Sco,M1.5Iab
+15863,Pollux,Beta Gem,Gem,K0III
+37826,Pollux,Beta Gem,Gem,K0III
+9884,Fomalhaut,Alpha PsA,PsA,A3V
+113368,Fomalhaut,Alpha PsA,PsA,A3V
+62434,Mimosa,Beta Cru,Cru,B0.5III
+30324,Adhara,Epsilon CMa,CMa,B2II
+26311,Bellatrix,Gamma Ori,Ori,B2III
+113963,Scheat,Beta Peg,Peg,M2.5II-III
+746,Alpheratz,Alpha And,And,B9p
+25336,Elnath,Beta Tau,Tau,B7III
+25930,Mintaka,Delta Ori,Ori,O9.5II
+26727,Alnilam,Epsilon Ori,Ori,B0Ia
+25428,Saiph,Kappa Ori,Ori,B0.5Ia
+26221,Alnitak,Zeta Ori,Ori,O9.7Ib
+677,Algenib,Gamma Peg,Peg,B2IV
+15338,Mirfak,Alpha Per,Per,F5Ib
+5447,Mirach,Beta And,And,M0IIIa
+3419,Almach,Gamma And,And,K3II
+11767,Polaris,Alpha UMi,UMi,F7Ib-II
+54061,Alioth,Epsilon UMa,UMa,A1III-IVp
+62956,Mizar,Zeta UMa,UMa,A2Vp
+65378,Mizar,Zeta UMa,UMa,A2Vp
+67301,Alkaid,Eta UMa,UMa,B3V
+53910,Merak,Beta UMa,UMa,A1V
+59774,Phad,Gamma UMa,UMa,A0V
+58001,Dubhe,Alpha UMa,UMa,K0III
+49669,Megrez,Delta UMa,UMa,A3V
+36850,Castor,Alpha Gem,Gem,A2Vm
+34444,Alhena,Gamma Gem,Gem,A1IV
+57632,Denebola,Beta Leo,Leo,A3V
+49583,Algieba,Gamma Leo,Leo,K1III
+32362,Wezen,Delta CMa,CMa,F8Ia
+33579,Aludra,Eta CMa,CMa,B5Ia
+44816,Alphard,Alpha Hya,Hya,K3II-III
+72622,Kochab,Beta UMi,UMi,K4III
+86032,Rasalhague,Alpha Oph,Oph,A5III
+84012,Sabik,Eta Oph,Oph,A2.5V
+85927,Shaula,Lambda Sco,Sco,B2IV
+87073,Sargas,Theta Sco,Sco,F1III
+78820,Kaus Australis,Epsilon Sgr,Sgr,B9.5III
+90185,Nunki,Sigma Sgr,Sgr,B2.5V
+102098,Deneb,Alpha Cyg,Cyg,A2Ia
+107315,Enif,Epsilon Peg,Peg,K2Ib
+112122,Markab,Alpha Peg,Peg,B9III
+100751,Alderamin,Alpha Cep,Cep,A7IV-V
+17702,Algol,Beta Per,Per,B8V
+14576,Menkar,Alpha Cet,Cet,M1.5III
+8903,Diphda,Beta Cet,Cet,K0III
+100453,Sadr,Gamma Cyg,Cyg,F8Ib
+95947,Peacock,Alpha Pav,Pav,B2IV
+82273,Eltanin,Gamma Dra,Dra,K5III
+87833,Etamin,Gamma Dra,Dra,K5III
+3179,Ankaa,Alpha Phe,Phe,K0III
+109268,Alnair,Alpha Gru,Gru,B7IV
+2081,Schedar,Alpha Cas,Cas,K0IIIa
+3821,Tsih,Gamma Cas,Cas,B0.5IVe
+8886,Ruchbah,Delta Cas,Cas,A5III-IV
+6686,Caph,Beta Cas,Cas,F2III
+4427,Segin,Epsilon Cas,Cas,B3III
+99473,Albireo,Beta Cyg,Cyg,K3II
+92855,Sheliak,Beta Lyr,Lyr,B7Ve
+93194,Sulafat,Gamma Lyr,Lyr,B9III
+102488,Gienah,Epsilon Cyg,Cyg,K0III
+76267,Unukalhai,Alpha Ser,Ser,K2III
+67927,Thuban,Alpha Dra,Dra,A0III
+85696,Dschubba,Delta Sco,Sco,B0.3IV
+84143,Graffias,Beta Sco,Sco,B1V
+78401,Acrab,Beta Sco,Sco,B1V
+53740,Cor Caroli,Alpha CVn,CVn,A0spe
+45556,Regulus,Alpha Leo,Leo,B8IVn
+49668,Zosma,Delta Leo,Leo,A4V
+47908,Chertan,Theta Leo,Leo,A2IV
+61084,Deneb Algedi,Delta Cap,Cap,A7III
+105199,Sadalmelik,Alpha Aqr,Aqr,G2Ib
+106278,Sadalsuud,Beta Aqr,Aqr,G0Ib
+10826,Hamal,Alpha Ari,Ari,K1III
+12706,Sheratan,Beta Ari,Ari,A5V
+77070,Zubeneschamali,Beta Lib,Lib,B8V
+72105,Zubenelgenubi,Alpha Lib,Lib,A3IV
+95241,Ascella,Zeta Sgr,Sgr,A2III
+92041,Kaus Media,Delta Sgr,Sgr,K3III
+89931,Kaus Borealis,Lambda Sgr,Sgr,K0IV
+86228,Wei,Epsilon Sco,Sco,K2.5III
+80112,Yed Prior,Delta Oph,Oph,M0.5III
+79593,Cebalrai,Beta Oph,Oph,K2III
+61359,Gienah,Gamma Crv,Crv,B8IIIp
+59316,Kraz,Beta Crv,Crv,G5II
+60965,Algorab,Delta Crv,Crv,A0V
+59803,Minkar,Epsilon Crv,Crv,K2III
+58952,Alchiba,Alpha Crv,Crv,F1V
+36188,Mirzam,Beta CMa,CMa,B1II-III
+38170,Naos,Zeta Pup,Pup,O5Iaf
+39429,Tureis,Rho Pup,Pup,F6IIp
+45238,Suhail,Lambda Vel,Vel,K4Ib
+42913,Regor,Gamma Vel,Vel,WC8
+50099,Alsephina,Delta Vel,Vel,A1V
+39953,Avior,Epsilon Car,Car,K3III
+45348,Aspidiske,Iota Car,Car,A8Ib
+93506,Nunki,Sigma Sgr,Sgr,B2.5V
+28360,Menkib,Xi Per,Per,O7.5III
+5394,Tsih,Gamma Cas,Cas,B0.5IVe
+14135,Mira,Omicron Cet,Cet,M7IIIe
+88635,Ras Algethi,Alpha Her,Her,M5Ib-II
+84345,Kornephoros,Beta Her,Her,G7IIIa
+57399,Muphrid,Eta Boo,Boo,G0IV
+58188,Nekkar,Beta Boo,Boo,G8IIIa
+71075,Seginus,Gamma Boo,Boo,A7III
+73555,Izar,Epsilon Boo,Boo,K0II-III
+112029,Skat,Delta Aqr,Aqr,A3V
+110395,Sadachbia,Gamma Aqr,Aqr,A0V
+24427,Hassaleh,Iota Aur,Aur,K3II
+28380,Menkalinan,Beta Aur,Aur,A1IV
+23015,Mahasim,Theta Aur,Aur,A0p
+35904,Furud,Zeta CMa,CMa,B2.5V
+44248,Miaplacidus,Beta Car,Car,A1III
+30867,Phaet,Alpha Col,Col,B7IV
+28199,Wazn,Beta Col,Col,K1III
+71860,Gacrux,Gamma Cru,Cru,M3.5III
+59747,Imai,Delta Cru,Cru,B2IV
+45941,Markeb,Kappa Vel,Vel,B2IV
+33977,Azmidi,Xi Pup,Pup,G6Ia
+31685,Muliphein,Gamma CMa,CMa,B8IIe
+25985,Tabit,Pi3 Ori,Ori,F6V
+26549,Hatsya,Iota Ori,Ori,O9III
+22109,Ain,Epsilon Tau,Tau,K0III
+20889,Tianguan,Zeta Tau,Tau,B4IIIpe
+21881,Prima Hyadum,Gamma Tau,Tau,G9.5III
+20455,Chamukuy,Theta2 Tau,Tau,A7III
+20205,Secunda Hyadum,Delta Tau,Tau,K0III
+17499,Atlas,27 Tau,Tau,B8III
+17531,Electra,17 Tau,Tau,B6IIIe
+17573,Maia,20 Tau,Tau,B7III
+17608,Merope,23 Tau,Tau,B6IVe
+17489,Taygeta,19 Tau,Tau,B6IV
+17579,Celaeno,16 Tau,Tau,B7IV
+17847,Alcyone,Eta Tau,Tau,B7IIIe
+36046,Wezen,Delta CMa,CMa,F8Ia
+50583,Merak,Beta UMa,UMa,A1V
+63608,Phecda,Gamma UMa,UMa,A0Ve
+90496,Kaus Australis,Epsilon Sgr,Sgr,B9.5III
+10602,Mesarthim,Gamma Ari,Ari,A1p
+110960,Biham,Theta Peg,Peg,A2V
+113881,Algenib,Gamma Peg,Peg,B2IV
+1067,Algenib,Gamma Peg,Peg,B2IV
+109074,Sadalbari,Mu Peg,Peg,G8III
+95853,Arkab Prior,Beta1 Sgr,Sgr,B9V
+95294,Arkab Posterior,Beta2 Sgr,Sgr,F2III
+86670,Ainalrami,Nu2 Sgr,Sgr,K1IIIb
+83000,Grumium,Xi Dra,Dra,K2III
+87585,Rastaban,Beta Dra,Dra,G2Ib-IIa
+94376,Altais,Delta Dra,Dra,G9III
+75458,Edasich,Iota Dra,Dra,K2III
+56343,Alula Borealis,Nu UMa,UMa,K3III
+55219,Alula Australis,Xi UMa,UMa,G0V
+48319,Tania Borealis,Lambda UMa,UMa,A2IV
+47508,Tania Australis,Mu UMa,UMa,M0III
+46733,Talitha,Iota UMa,UMa,A7V
+44127,Muscida,Omicron UMa,UMa,G4II-III
+102422,Alsafi,Sigma Dra,Dra,K0V
+75097,Alphecca,Alpha CrB,CrB,A0IV
+78159,Nusakan,Beta CrB,CrB,F0p
+92946,Tarazed,Gamma Aql,Aql,K3II
+93805,Alshain,Beta Aql,Aql,G8IV
+104139,Sualocin,Alpha Del,Del,B9IV
+104858,Rotanev,Beta Del,Del,F5III
+90191,Nunki,Sigma Sgr,Sgr,B2.5V
+68933,Menkent,Theta Cen,Cen,K0III
+61932,Muhlifain,Gamma Cen,Cen,A1III
+66657,Ke Kwan,Iota Cen,Cen,A2V
+56561,Ginan,Epsilon Cru,Cru,K3III
+104060,Nashira,Gamma Cap,Cap,F0p
+100345,Dabih,Beta Cap,Cap,F8V
+107556,Algedi,Alpha Cap,Cap,G8.5III
+36377,Tejat,Mu Gem,Gem,M3III
+35550,Tejat Posterior,Mu Gem,Gem,M3III
+31681,Propus,Eta Gem,Gem,M3III
+30343,Mebsuta,Epsilon Gem,Gem,G8Ib
+29655,Wasat,Delta Gem,Gem,F0IV
+62434,Mimosa,Beta Cru,Cru,B0.5III
+52727,Alkes,Alpha Crt,Crt,K1III

@@ -88,6 +88,12 @@
     <ClCompile Include="C:\Parallax-dev\Parallax\src\ui\side_panel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Parallax-dev\Parallax\src\ui\selection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Parallax-dev\Parallax\src\ui\info_panel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Parallax-dev\Parallax\src\CMakeLists.txt" />

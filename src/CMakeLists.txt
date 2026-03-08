@@ -32,6 +32,8 @@ add_executable(parallax
     ui/widgets.cpp
     ui/toolbar.cpp
     ui/side_panel.cpp
+    ui/selection.cpp
+    ui/info_panel.cpp
 )
 
 target_include_directories(parallax PRIVATE

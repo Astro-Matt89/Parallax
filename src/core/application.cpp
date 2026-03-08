@@ -26,6 +26,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <filesystem>
+#include <format>
 #include <limits>
 
 namespace
@@ -110,6 +111,95 @@ void Application::init()
     // 9. HUD overlay
     m_hud = std::make_unique<ui::Hud>(
         *m_context, m_pipeline->get_render_pass(), shader_dir);
+
+    // 9b. PanelSystem — batched panel backgrounds           ← SPRINT 05 Task 5.1
+    m_panel_system.init(*m_context, m_pipeline->get_render_pass(), shader_dir);
+
+    // 9c. Toolbar                                           ← SPRINT 05 Task 5.3
+    {
+        ui::ToolbarCallbacks cb;
+        cb.toggle_constellations = [this]() { m_constellations.toggle_visible(); };
+        cb.toggle_stars          = [this]() { /* TODO: add Starfield visibility toggle */ };
+        cb.toggle_dso            = [this]() { m_dso_renderer.toggle_visible(); };
+        cb.cycle_grid            = [this]() { m_coord_grid.cycle_type(); };
+        cb.toggle_horizon        = [this]() { m_horizon.toggle_visible(); };
+        cb.time_reverse          = [this]()
+        {
+            if (m_time_scale >= 0.0) { m_time_scale = -1.0; }
+            else { m_time_scale *= 2.0; }
+        };
+        cb.time_pause_toggle = [this]()
+        {
+            m_time_scale = (m_time_scale != 0.0) ? 0.0 : 1.0;
+        };
+        cb.time_forward = [this]()
+        {
+            if (m_time_scale <= 0.0) { m_time_scale = 1.0; }
+            else { m_time_scale *= 2.0; }
+        };
+        cb.time_reset_now = [this]()
+        {
+            m_julian_date = astro::TimeSystem::now_as_jd();
+            m_time_scale = 1.0;
+        };
+        cb.set_fov = [this](f64 fov_deg) { m_camera->set_fov(fov_deg); };
+        m_toolbar.init(cb);
+    }
+
+    // 9d. SidePanel                                         ← SPRINT 05 Task 5.4
+    {
+        ui::SidePanelCallbacks cb;
+        cb.set_location = [this](f64 lat_deg, f64 lon_deg, f64 elev_m, f32 bortle)
+        {
+            m_observer.latitude_rad  = glm::radians(lat_deg);
+            m_observer.longitude_rad = glm::radians(lon_deg);
+            m_elevation_m            = elev_m;
+            m_sky_params.bortle_scale = bortle;
+            PLX_CORE_INFO("Observer location set: {:.2f}N {:.2f}E {:.0f}m Bortle {}",
+                          lat_deg, lon_deg, elev_m, static_cast<int>(bortle));
+        };
+        cb.set_bortle = [this](f32 bortle)
+        {
+            m_sky_params.bortle_scale = bortle;
+            PLX_CORE_INFO("Bortle scale: {}", static_cast<int>(bortle));
+        };
+        cb.set_magnitude_limit = [this](f32 mag)
+        {
+            m_camera->set_magnitude_limit(mag);
+            PLX_CORE_INFO("Magnitude limit: {:.1f}", mag);
+        };
+        cb.set_time_scale = [this](f64 scale)
+        {
+            m_time_scale = scale;
+            PLX_CORE_INFO("Time scale: x{}", scale);
+        };
+        m_side_panel.init(cb);
+    }
+
+    // 9e. InfoPanel                                         ← SPRINT 05 Task 5.5
+    {
+        ui::InfoPanelCallbacks cb;
+        cb.track = [this]()
+        {
+            m_selection.set_tracking(!m_selection.is_tracking());
+            PLX_CORE_INFO("Tracking {}", m_selection.is_tracking() ? "enabled" : "disabled");
+        };
+        cb.goto_object = [this]() { /* TODO: future telescope slew command */ };
+        m_info_panel.init(cb);
+    }
+
+    // 9f. Selection — load star names                      ← SPRINT 05 Task 5.5
+    {
+        const std::filesystem::path star_names_path{"data/catalogs/star_names.csv"};
+        if (m_selection.load_star_names(star_names_path))
+        {
+            PLX_CORE_INFO("Star names loaded: {} entries", m_selection.get_name_count());
+        }
+        else
+        {
+            PLX_CORE_WARN("Star names not found at {}", star_names_path.string());
+        }
+    }
 
     // =================================================================
     // 10. Load star catalog — Tycho-2 preferred, Hipparcos fallback
@@ -279,6 +369,7 @@ void Application::shutdown()
         m_command_pool = VK_NULL_HANDLE;
     }
 
+    m_panel_system.destroy();   // ← SPRINT 05 Task 5.1 (destroy before HUD)
     m_hud.reset();
     m_line_renderer.reset();    // ← SPRINT 04 Task 4.1 (destroy before starfield)
     m_starfield.reset();
@@ -344,7 +435,10 @@ void Application::process_input()
     // =================================================================
     // Step 1: Determine if mouse is over any UI panel
     // =================================================================
-    const bool mouse_over_ui = m_panel_system.is_mouse_over_ui(mouse_pos);
+    const bool mouse_over_ui = m_panel_system.is_mouse_over_ui(mouse_pos)
+                            || m_toolbar.is_mouse_over(mouse_pos)
+                            || m_side_panel.is_mouse_over(mouse_pos)
+                            || m_info_panel.is_mouse_over(mouse_pos);
 
     // =================================================================
     // Step 2: Route mouse input based on priority
@@ -650,6 +744,81 @@ void Application::update_simulation(f64 delta_time_sec)
     m_horizon.update(*m_camera, *m_line_renderer, m_hud->get_font(),
                      viewport);
 
+    // --- Step 6b: Selection — refresh screen position + Alt/Az each frame ---
+    m_selection.update(m_stars, m_dsos, m_observer, lst, *m_camera);
+
+    // --- Step 6c: Selection indicator (submit lines to renderer) ---
+    if (m_selection.has_selection())
+    {
+        m_selection.render_indicator(*m_line_renderer, viewport);
+    }
+
+    // --- Step 6d: Toolbar update                          ← SPRINT 05 Task 5.3
+    {
+        const ui::ToolbarState toolbar_state{
+            .constellations_visible = m_constellations.is_visible(),
+            .stars_visible          = true,
+            .dso_visible            = m_dso_renderer.is_visible(),
+            .grid_visible           = m_coord_grid.get_type() != overlay::GridType::None,
+            .horizon_visible        = m_horizon.is_visible(),
+            .time_scale             = m_time_scale,
+            .time_paused            = (m_time_scale == 0.0),
+            .fov_deg                = m_camera->get_fov_deg(),
+            .magnitude_limit        = m_camera->get_magnitude_limit(),
+        };
+        m_toolbar.update(
+            m_input->get_mouse_position(),
+            m_input->was_click(),
+            m_input->is_left_button_down(),
+            static_cast<f32>(delta_time_sec),
+            viewport.width, viewport.height,
+            toolbar_state);
+    }
+
+    // --- Step 6e: SidePanel update                        ← SPRINT 05 Task 5.4
+    {
+        const auto dt_utc = astro::TimeSystem::from_julian_date(m_julian_date);
+        const auto utc_str = std::format("{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}",
+            dt_utc.year, dt_utc.month, dt_utc.day,
+            dt_utc.hour, dt_utc.minute, static_cast<i32>(dt_utc.second));
+
+        const f64 lst_hours = lst * astro_constants::kRadToHour;
+        const i32 lst_h = static_cast<i32>(lst_hours);
+        const f64 lst_m_frac = (lst_hours - static_cast<f64>(lst_h)) * 60.0;
+        const i32 lst_m = static_cast<i32>(lst_m_frac);
+        const i32 lst_s = static_cast<i32>((lst_m_frac - static_cast<f64>(lst_m)) * 60.0);
+        const auto lst_str = std::format("{:02d}h {:02d}m {:02d}s", lst_h, lst_m, lst_s);
+
+        const ui::SidePanelState side_state{
+            .latitude_deg    = m_observer.latitude_rad  * astro_constants::kRadToDeg,
+            .longitude_deg   = m_observer.longitude_rad * astro_constants::kRadToDeg,
+            .elevation_m     = m_elevation_m,
+            .selected_preset = -1,
+            .utc_string      = utc_str,
+            .lst_string      = lst_str,
+            .julian_date     = m_julian_date,
+            .time_scale      = m_time_scale,
+            .time_paused     = (m_time_scale == 0.0),
+            .bortle_scale    = m_sky_params.bortle_scale,
+            .magnitude_limit = m_camera->get_magnitude_limit(),
+        };
+        m_side_panel.update(
+            m_input->get_mouse_position(),
+            m_input->was_click(),
+            m_input->is_left_button_down(),
+            static_cast<f32>(delta_time_sec),
+            viewport.width, viewport.height,
+            side_state);
+    }
+
+    // --- Step 6f: InfoPanel update                        ← SPRINT 05 Task 5.5
+    m_info_panel.update(
+        m_selection,
+        m_input->get_mouse_position(),
+        m_input->was_click(),
+        static_cast<f32>(delta_time_sec),
+        viewport.width, viewport.height);
+
     // --- Step 7: Update HUD (drawn last in render pass) ---
     const f32 fps = (m_delta_time > 0.0) ? static_cast<f32>(1.0 / m_delta_time) : 0.0f;
 
@@ -707,9 +876,10 @@ void Application::update_simulation(f64 delta_time_sec)
 //
 // 1. Sky background (fullscreen triangle)
 // 2. Starfield (instanced points, additive)
-// 3. Line renderer (all overlay geometry: grid, constellations,
-//                    DSO icons, horizon — in submit order)
-// 4. HUD (bitmap font quads, alpha blended — always on top)
+// 3. Sky overlay lines: grid → constellations → DSOs → horizon → selection indicator
+// 4. Panel backgrounds (transparent filled quads)
+// 5. UI border lines: toolbar separators, side panel / info panel borders
+// 6. All text: HUD + toolbar + side panel + info panel (batched, single draw call)
 // =================================================================
 
 void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_index)
@@ -744,10 +914,23 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
     // 2. Starfield (additive blending)
     m_starfield->draw(cmd);
 
-    // 3. All overlay lines: grid → constellations → DSOs → horizon
+    // 3. Sky overlay lines: grid → constellations → DSOs → horizon + selection indicator
     m_line_renderer->render(cmd);
 
-    // 4. HUD (always on top)
+    // 4. Panel backgrounds (transparent filled quads — behind UI content)
+    m_panel_system.render_backgrounds(cmd, extent);
+
+    // 5. UI panel content: toolbar, side panel, info panel
+    //    Each render() call submits text to the shared font queue and border
+    //    lines to the line renderer; a second line_renderer→render() then
+    //    flushes the UI border lines before the text draw call.
+    m_line_renderer->begin_frame();
+    m_toolbar.render(m_hud->get_font(), *m_line_renderer, m_panel_system, cmd, extent);
+    m_side_panel.render(m_hud->get_font(), *m_line_renderer, extent);
+    m_info_panel.render(m_hud->get_font(), *m_line_renderer, extent);
+    m_line_renderer->render(cmd);   // flush UI border lines
+
+    // 6. All text: HUD panels + toolbar + side panel + info panel (single GPU draw call)
     m_hud->render(cmd, extent);
 
     vkCmdEndRenderPass(cmd);

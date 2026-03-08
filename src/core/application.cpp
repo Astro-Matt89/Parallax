@@ -369,6 +369,7 @@ void Application::shutdown()
         m_command_pool = VK_NULL_HANDLE;
     }
 
+    m_panel_system.destroy();   // ← SPRINT 05 Task 5.1 (destroy before HUD)
     m_hud.reset();
     m_line_renderer.reset();    // ← SPRINT 04 Task 4.1 (destroy before starfield)
     m_starfield.reset();

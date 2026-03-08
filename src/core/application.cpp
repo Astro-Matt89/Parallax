@@ -388,8 +388,9 @@ void Application::process_input()
                 click_ndc,
                 m_stars, visible_indices, screen_positions,
                 m_dsos,
-                *m_camera, m_observer,
+                m_observer,
                 astro::TimeSystem::lmst(m_julian_date, m_observer.longitude_rad),
+                *m_camera,
                 viewport);
 
             if (m_selection.has_selection())

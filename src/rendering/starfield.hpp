@@ -79,6 +79,7 @@ namespace parallax::rendering
         [[nodiscard]] u32 get_visible_count() const;
         [[nodiscard]] VkPipeline get_pipeline() const;
         [[nodiscard]] VkPipelineLayout get_pipeline_layout() const;
+
         /// @brief Indices into the star catalog for each visible star this frame.
         [[nodiscard]] std::span<const u32> get_visible_indices() const;
 
@@ -117,7 +118,8 @@ namespace parallax::rendering
 
         /// Fixed reference magnitude for normalization (Sirius-class).
         static constexpr f32 kReferenceMag = -1.5f;
-                /// @brief Catalog indices of visible stars this frame (for selection picking).
+
+        /// @brief Catalog indices of visible stars this frame (for selection picking).
         std::vector<u32> m_visible_indices;
 
         /// @brief Screen NDC of each visible star (parallel to m_visible_indices).

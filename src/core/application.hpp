@@ -162,6 +162,8 @@ namespace parallax::core
         // -----------------------------------------------------------------
         rendering::SkyParams m_sky_params;
 
+        f64 m_elevation_m = 0.0;  ///< Observer elevation above sea level (metres)
+
         /// @brief Wall-clock time tracking for delta_time computation.
         std::chrono::steady_clock::time_point m_last_frame_time;
 

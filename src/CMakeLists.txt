@@ -30,6 +30,7 @@ add_executable(parallax
     ui/hud.cpp
     ui/panel_system.cpp
     ui/widgets.cpp
+    ui/toolbar.cpp
 )
 
 target_include_directories(parallax PRIVATE

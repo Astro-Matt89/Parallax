@@ -23,6 +23,11 @@
 #include "rendering/sky_background.hpp"
 #include "rendering/starfield.hpp"
 #include "ui/hud.hpp"
+#include "ui/info_panel.hpp"                              // ← SPRINT 05 Task 5.5
+#include "ui/panel_system.hpp"                            // ← SPRINT 05 Task 5.1
+#include "ui/selection.hpp"                               // ← SPRINT 05 Task 5.5
+#include "ui/side_panel.hpp"                              // ← SPRINT 05 Task 5.4
+#include "ui/toolbar.hpp"                                 // ← SPRINT 05 Task 5.3
 #include "vulkan/context.hpp"
 #include "vulkan/pipeline.hpp"
 #include "vulkan/swapchain.hpp"
@@ -105,6 +110,15 @@ namespace parallax::core
         rendering::DsoRenderer m_dso_renderer;               // Task 4.5
 
         // -----------------------------------------------------------------
+        // UI subsystems                                     ← SPRINT 05
+        // -----------------------------------------------------------------
+        ui::PanelSystem m_panel_system;                      // Task 5.1  Batched panel backgrounds
+        ui::Toolbar m_toolbar;                               // Task 5.3  Bottom toolbar
+        ui::SidePanel m_side_panel;                          // Task 5.4  Left side panel
+        ui::Selection m_selection;                            // Task 5.5  Object selection system
+        ui::InfoPanel m_info_panel;                           // Task 5.5  Right info panel
+
+        // -----------------------------------------------------------------
         // Star catalog
         // -----------------------------------------------------------------
         std::vector<catalog::StarEntry> m_stars;
@@ -114,6 +128,16 @@ namespace parallax::core
         // -----------------------------------------------------------------
         catalog::SpatialIndex m_spatial_index;               ///< Declination-band spatial index
         std::vector<catalog::StarEntry> m_hipparcos_stars;   ///< Hipparcos catalog (constellation lookup)
+
+        // -----------------------------------------------------------------
+        // Visible star tracking (per-frame)                 ← SPRINT 05 Task 5.6
+        //
+        // Populated during update_simulation() by the spatial index query.
+        // Consumed by Selection::try_select() for click-picking and by
+        // the starfield renderer for the GPU upload.
+        // -----------------------------------------------------------------
+        std::vector<u32> m_visible_star_indices;             ///< Indices into m_stars for visible stars
+        std::vector<Vec2f> m_star_screen_positions;          ///< Screen NDC per visible star (parallel)
 
         // -----------------------------------------------------------------
         // DSO catalog                                       ← SPRINT 04 Task 4.5

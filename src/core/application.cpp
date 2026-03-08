@@ -321,33 +321,114 @@ void Application::main_loop()
 }
 
 // =================================================================
-// Input processing — all key bindings                   ← SPRINT 04 Task 4.7
+// Input processing — mouse priority + key bindings      ← SPRINT 05 Task 5.6
+//
+// Mouse interaction priority:
+//   1. Mouse over UI panel → UI handles it
+//   2. Click on sky (not drag) → object selection
+//   3. Drag on sky → camera pan
+//   4. Scroll on sky → zoom
+//
+// Cursor styles:
+//   Arrow     → default / not over anything interactive
+//   Hand      → over a clickable UI element
+//   Crosshair → over the sky (ready to select)
+//   SizeAll   → actively dragging the sky (panning)
 // =================================================================
 
 void Application::process_input()
 {
-    // Mouse drag → Camera pan
-    if (m_input->is_mouse_dragging())
-    {
-        const auto drag = m_input->get_mouse_drag_delta();
-        const f64 fov = m_camera->get_fov_rad();
-        const f64 sensitivity = fov / static_cast<f64>(m_window->get_width());
+    const Vec2f mouse_pos = m_input->get_mouse_position();
+    const VkExtent2D viewport = m_swapchain->get_extent();
 
-        const f64 delta_az  = -static_cast<f64>(drag.x) * sensitivity;
-        const f64 delta_alt = -static_cast<f64>(drag.y) * sensitivity;
-        m_camera->pan(delta_az, delta_alt);
+    // =================================================================
+    // Step 1: Determine if mouse is over any UI panel
+    // =================================================================
+    const bool mouse_over_ui = m_panel_system.is_mouse_over_ui(mouse_pos);
+
+    // =================================================================
+    // Step 2: Route mouse input based on priority
+    // =================================================================
+    if (mouse_over_ui)
+    {
+        // --- Priority 1: UI panels consume mouse input ---
+        m_panel_system.process_input(*m_input, mouse_pos);
+        m_input->set_cursor(CursorStyle::Hand);
     }
-
-    // Scroll → Camera zoom
-    const f32 scroll = m_input->get_scroll_delta();
-    if (scroll != 0.0f)
+    else
     {
-        const f64 zoom_factor = 1.0 - static_cast<f64>(scroll) * 0.1;
-        m_camera->zoom(zoom_factor);
+        // --- Sky interaction ---
+
+        // Priority 3: Drag on sky → camera pan
+        if (m_input->is_mouse_dragging())
+        {
+            const auto drag = m_input->get_mouse_drag_delta();
+            const f64 fov = m_camera->get_fov_rad();
+            const f64 sensitivity = fov / static_cast<f64>(m_window->get_width());
+
+            const f64 delta_az  = -static_cast<f64>(drag.x) * sensitivity;
+            const f64 delta_alt = -static_cast<f64>(drag.y) * sensitivity;
+            m_camera->pan(delta_az, delta_alt);
+
+            m_input->set_cursor(CursorStyle::SizeAll);
+        }
+        // Priority 2: Click on sky (not drag) → object selection
+        else if (m_input->was_click())
+        {
+            const Vec2f click_pos = m_input->get_click_position();
+
+            const f32 ndc_x = (2.0f * click_pos.x / static_cast<f32>(viewport.width)) - 1.0f;
+            const f32 ndc_y = (2.0f * click_pos.y / static_cast<f32>(viewport.height)) - 1.0f;
+            const Vec2f click_ndc = {ndc_x, ndc_y};
+
+            const auto& visible_indices = m_starfield->get_visible_indices();
+            const auto& screen_positions = m_starfield->get_screen_positions();
+
+            m_selection.try_select(
+                click_ndc,
+                m_stars, visible_indices, screen_positions,
+                m_dsos,
+                *m_camera, m_observer,
+                astro::TimeSystem::lmst(m_julian_date, m_observer.longitude_rad),
+                viewport);
+
+            if (m_selection.has_selection())
+            {
+                const auto& sel = m_selection.get_selected();
+                if (sel.type == ui::SelectedObjectType::Star)
+                {
+                    PLX_CORE_INFO("Selected star: HIP {} mag {:.2f} ({:.4f}, {:.4f})",
+                                  sel.hip_id, sel.mag_v, sel.ra_rad, sel.dec_rad);
+                }
+                else if (sel.type == ui::SelectedObjectType::Dso)
+                {
+                    PLX_CORE_INFO("Selected DSO: {}", sel.designation);
+                }
+            }
+            else
+            {
+                PLX_CORE_TRACE("Click on sky: no object found near cursor");
+            }
+
+            m_input->set_cursor(CursorStyle::Crosshair);
+        }
+        else
+        {
+            // Hovering over sky, not dragging or clicking
+            m_input->set_cursor(CursorStyle::Crosshair);
+        }
+
+        // Priority 4: Scroll on sky → camera zoom
+        const f32 scroll = m_input->get_scroll_delta();
+        if (scroll != 0.0f)
+        {
+            const f64 zoom_factor = 1.0 - static_cast<f64>(scroll) * 0.1;
+            m_camera->zoom(zoom_factor);
+        }
     }
 
     // =================================================================
-    // Magnitude limit: [ and ] keys (or PageUp / PageDown)
+    // Keyboard bindings (always active regardless of mouse state)
     // =================================================================
 
     if (m_input->is_key_pressed(SDL_SCANCODE_RIGHTBRACKET) ||
@@ -364,7 +445,6 @@ void Application::process_input()
         PLX_CORE_INFO("Magnitude limit: {:.1f} (brighter)", m_camera->get_magnitude_limit());
     }
 
-    // Time scale controls
     if (m_input->is_key_pressed(SDL_SCANCODE_1)) { m_time_scale = 1.0;     PLX_CORE_INFO("Time scale: x1"); }
     if (m_input->is_key_pressed(SDL_SCANCODE_2)) { m_time_scale = 10.0;    PLX_CORE_INFO("Time scale: x10"); }
     if (m_input->is_key_pressed(SDL_SCANCODE_3)) { m_time_scale = 100.0;   PLX_CORE_INFO("Time scale: x100"); }
@@ -394,10 +474,7 @@ void Application::process_input()
                       dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second);
     }
 
-    // =================================================================
     // UI controls
-    // =================================================================
-
     if (m_input->is_key_pressed(SDL_SCANCODE_H))
     {
         m_hud->toggle_visible();
@@ -424,11 +501,7 @@ void Application::process_input()
         PLX_CORE_INFO("Bortle scale: {}", static_cast<int>(bortle));
     }
 
-    // =================================================================
-    // Overlay toggles                                   ← SPRINT 04 Task 4.7
-    // =================================================================
-
-    // C — Constellation lines + labels
+    // Overlay toggles
     if (m_input->is_key_pressed(SDL_SCANCODE_C))
     {
         m_constellations.toggle_visible();
@@ -436,40 +509,54 @@ void Application::process_input()
                       m_constellations.is_visible() ? "shown" : "hidden");
     }
 
-    // G — Cycle coordinate grid (None → Eq → AltAz → Both → None)
     if (m_input->is_key_pressed(SDL_SCANCODE_G))
     {
         m_coord_grid.cycle_type();
         PLX_CORE_INFO("Coordinate grid: {}", m_coord_grid.get_type_name());
     }
 
-    // D — Toggle deep sky objects (Messier)
     if (m_input->is_key_pressed(SDL_SCANCODE_D))
     {
         m_dso_renderer.toggle_visible();
         PLX_CORE_INFO("DSOs {}", m_dso_renderer.is_visible() ? "shown" : "hidden");
     }
 
-    // O — Toggle horizon overlay + cardinal markers
     if (m_input->is_key_pressed(SDL_SCANCODE_O))
     {
         m_horizon.toggle_visible();
         PLX_CORE_INFO("Horizon {}", m_horizon.is_visible() ? "shown" : "hidden");
     }
 
-    // =================================================================
-    // Camera reset + quit
-    // =================================================================
+    // Selection: Escape clears first, then closes window
+    if (m_input->is_key_pressed(SDL_SCANCODE_ESCAPE))
+    {
+        if (m_selection.has_selection())
+        {
+            m_selection.clear();
+            PLX_CORE_INFO("Selection cleared");
+        }
+        else
+        {
+            m_window->request_close();
+        }
+    }
 
+    // F — Toggle tracking on selected object
+    if (m_input->is_key_pressed(SDL_SCANCODE_F))
+    {
+        if (m_selection.has_selection())
+        {
+            m_selection.toggle_tracking();
+            PLX_CORE_INFO("Tracking {}",
+                          m_selection.is_tracking() ? "enabled" : "disabled");
+        }
+    }
+
+    // Camera reset
     if (m_input->is_key_pressed(SDL_SCANCODE_R))
     {
         m_camera->reset();
         PLX_CORE_INFO("Camera reset (MLIM {:.1f})", m_camera->get_magnitude_limit());
-    }
-
-    if (m_input->is_key_pressed(SDL_SCANCODE_ESCAPE))
-    {
-        m_window->request_close();
     }
 }
 

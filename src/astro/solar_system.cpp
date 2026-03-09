@@ -9,6 +9,7 @@
 #include "astro/time_system.hpp"
 #include "core/types.hpp"
 
+#include <algorithm>
 #include <cmath>
 
 namespace parallax::astro
@@ -128,17 +129,6 @@ EquatorialCoord SolarSystem::ecliptic_to_equatorial(
 
 // =================================================================
 // compute_sun — Meeus Ch. 25 low-precision solar coordinates
-//
-// Full pipeline:
-//   1. Geometric mean longitude L0, mean anomaly M, eccentricity e
-//   2. Equation of center C
-//   3. True longitude λ = L0 + C
-//   4. True anomaly ν = M + C
-//   5. Distance R (AU)
-//   6. Apparent longitude (nutation + aberration correction)
-//   7. Corrected obliquity
-//   8. Ecliptic → equatorial conversion
-//   9. Angular diameter and magnitude
 // =================================================================
 
 CelestialBodyState SolarSystem::compute_sun(f64 jd)

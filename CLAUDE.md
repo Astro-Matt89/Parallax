@@ -264,28 +264,51 @@ parallax/
 
 No circular dependencies. Each module testable in isolation.
 
-### 5.4 Skychart vs Imaging (Architectural Separation)
+### 5.4 Project Modes (Architectural Separation)
 
-Parallax has two distinct rendering modes with separate pipelines:
+Parallax is NOT a planetarium. It is a ground-based observation simulator.
+The planetarium (skychart) is a navigation tool — the actual product is the
+instrument simulation, the science, and the procedural universe.
 
-**Skychart Mode** (Phase 1-2):
-Clean planetarium atlas. Used for target selection and coordinate readout.
-- Stars rendered as schematic points (magnitude → size/brightness, linear mapping)
+**Skychart Mode** (Phase 1 — COMPLETE):
+Navigation atlas for selecting targets and reading coordinates.
+- Stars as schematic points (magnitude → size/brightness, linear mapping)
 - No atmospheric effects on stars (no extinction, no refraction, no reddening)
 - Visibility controlled solely by user-adjustable magnitude limit
-- Horizon culling (stars below alt 0° hidden — physical obstruction, not atmosphere)
-- Sky background gradient provides visual context only
-- Think: Stellarium, Cartes du Ciel
+- Toggle atmosphere ON/OFF: when OFF, no horizon brightening, no twilight,
+  no moon glow — pure black sky with all objects visible. Useful for planning
+  during full moon or daytime.
+- Horizon culling toggleable (linked to atmosphere toggle)
+- Think: Stellarium, Cartes du Ciel — but ONLY as a navigation aid
 
-**Imaging Mode** (Phase 2-3):
-Instrument simulation. Shows what the telescope/sensor actually captures.
+**Imaging Mode** (Phase 2 — NEXT):
+What the telescope/sensor actually captures. This is the core of Parallax.
 - Full atmospheric model: refraction, extinction, seeing, scintillation
-- Optical simulation: PSF, diffraction, aberrations
-- Sensor simulation: noise, dark current, exposure stacking
+- Optical simulation: telescope PSF, diffraction, aberrations, field curvature
+- Sensor simulation: CCD/CMOS, noise, dark current, gain, bit depth
+- Astrophotography pipeline: exposure, stacking, calibration, stretching
+- Bloom, PSF convolution, diffraction spikes — all HERE, not in skychart
 - Think: what appears on the CCD after a real exposure
 
-These two modes share the Catalog and Astro modules but have separate rendering pipelines.
-The Atmosphere class exists in the codebase but is only used by the Imaging pipeline.
+**Science / Discovery Mode** (Phase 3):
+Analysis and discovery mechanics. The gameplay emerges from physics.
+- Spectroscopy, photometry, astrometry
+- Light curves, transit detection, parallax measurement
+- Object discovery, confirmation observations, follow-up scheduling
+- Signal-to-noise ratio as detection threshold
+- Research progression, publication system
+
+**Procedural Universe** (Phase 2-3, parallel development):
+What makes Parallax infinite. Trillions of objects beyond real catalogs.
+- Seed-based deterministic generation
+- Large scale structure → galaxies → stellar populations → planetary systems
+- Transient events (supernovae, novae, GRBs)
+- Seamless integration with real catalog data
+- Level-of-detail based on instrument zoom/exposure
+
+These modes share Catalog, Astro, and Core modules but have separate rendering
+and simulation pipelines. The skychart selects targets; the instrument observes them;
+the science system analyzes the results; the procedural engine makes the universe infinite.
 
 ### 5.5 Data Flow — Skychart Mode (Single Frame)
 
@@ -370,42 +393,53 @@ Star Entry (compact, 32 bytes):
 
 ## 7. Development Phases
 
-### Phase 1: Planetarium Core (CURRENT)
+### Phase 1: Planetarium Core ✅ COMPLETE (Sprints 01-05)
 - Vulkan initialization + rendering pipeline
 - SDL2 window + input handling
-- Star catalog loading (Hipparcos/Tycho-2 first, then Gaia)
-- Coordinate transforms (J2000 ↔ horizontal)
-- Magnitude-based star rendering
-- Basic atmospheric model (refraction, extinction)
+- Star catalogs: Hipparcos + Tycho-2 (2.5M stars) with spatial indexing
+- Coordinate transforms (J2000 ↔ horizontal ↔ screen)
+- Magnitude-based star rendering (skychart mode)
 - Sky background gradient
-- Time simulation (sidereal clock)
-- Basic telescope model (FOV, magnification)
+- Time simulation (sidereal clock, acceleration)
+- Constellations (Stellarium verified data), coordinate grids
+- Messier DSO catalog (110 objects)
+- Horizon + cardinal markers
+- Stellarium-style interactive UI (toolbar, panels, selection, info)
 
-### Phase 2: Deep Universe
-- Procedural galaxy generation
-- Deep sky object rendering
-- Full atmospheric simulation (seeing, scintillation)
-- CCD/CMOS sensor simulation
-- Astrophotography pipeline
-- Solar system integration
+### Phase 2: Instrument Foundation (Sprints 06-10)
+- Solar system (Sole, Luna, pianeti — effemeridi VSOP87/Meeus)
+- Skychart atmosphere toggle (on/off)
+- Telescope model (aperture, focal length, FOV, resolution limit)
+- Atmospheric model applied to imaging (refraction, extinction, seeing)
+- CCD/CMOS sensor simulation (noise, dark current, gain, exposure)
+- Astrophotography pipeline (stacking, calibration, stretching)
+- Bloom, PSF, diffraction spikes (imaging mode only)
+- NGC/IC catalog (~13,000 objects)
+- Gaia DR3 streaming foundation
 
-### Phase 3: Discovery & Gameplay
-- Discovery mechanics (detection, confirmation)
-- Career progression
-- Research funding system
+### Phase 3: Deep Universe & Discovery (Sprints 11+)
+- Procedural universe foundation (seed-based generation)
+- Large scale structure, galaxy generation
+- Stellar population synthesis, planetary systems
+- Transient events (supernovae, novae, variable stars)
+- Discovery mechanics (detection, confirmation, follow-up)
+- Spectroscopy, photometry, astrometry tools
+- Light curve analysis, transit detection
+- Parallax measurement over time (the game title)
+- Research progression, career system
 - Multi-observatory management
-- Transient event system
+- Advanced/sci-fi instruments
 
 ---
 
 ## 8. Current Sprint
 
-**Sprint:** 05 — Tycho-2 Integration & Interactive UI
-**Goal:** Integrate 2.5M star catalog with spatial indexing, then Stellarium-style interactive UI
+**Sprint:** 06 — Solar System & Atmosphere Toggle (PLANNED)
+**Goal:** Sun, Moon, major planets via VSOP87/Meeus ephemeris; skychart atmosphere on/off toggle
 
-See: `docs/sprints/sprint_05.md`
+See: `docs/sprints/sprint_06.md`
 
-**Previous:** Sprint 01 ✅ Vulkan pipeline | Sprint 02 ✅ Planetarium core | Sprint 03 ✅ Sky, HUD | Sprint 04 ✅ Overlays, constellations, Messier
+**Previous:** Sprint 01-05 ✅ — Phase 1 Planetarium Core complete
 
 ---
 

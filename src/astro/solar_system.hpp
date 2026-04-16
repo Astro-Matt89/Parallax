@@ -64,6 +64,44 @@ namespace parallax::astro
         f64 distance_km;                ///< Geocentric distance in km
     };
 
+    /// @brief Keplerian orbital elements with polynomial coefficients (Meeus Table 31.A).
+    ///
+    /// Each element is expressed as a polynomial in T (Julian centuries from J2000.0):
+    ///   value = c[0] + c[1]*T + c[2]*T² + c[3]*T³
+    ///
+    /// Referred to the mean ecliptic and equinox of J2000.0.
+    struct OrbitalElements
+    {
+        f64 L[4];       ///< Mean longitude (degrees)
+        f64 a[2];       ///< Semi-major axis (AU): constant + rate per century
+        f64 e[4];       ///< Eccentricity
+        f64 i[4];       ///< Inclination (degrees)
+        f64 omega[4];   ///< Longitude of ascending node Ω (degrees)
+        f64 pi[4];      ///< Longitude of perihelion ϖ (degrees)
+    };
+
+    /// @brief Planet identifier constants.
+    ///
+    /// Values match traditional numbering (Earth=3 skipped).
+    namespace planet_id
+    {
+        constexpr u32 kMercury = 1;
+        constexpr u32 kVenus   = 2;
+        constexpr u32 kMars    = 4;
+        constexpr u32 kJupiter = 5;
+        constexpr u32 kSaturn  = 6;
+        constexpr u32 kUranus  = 7;
+        constexpr u32 kNeptune = 8;
+    } // namespace planet_id
+
+    /// @brief Heliocentric ecliptic Cartesian position.
+    struct HeliocentricPos
+    {
+        f64 x;  ///< AU, toward vernal equinox
+        f64 y;  ///< AU, 90° east in ecliptic plane
+        f64 z;  ///< AU, toward ecliptic north pole
+    };
+
     /// @brief Solar System ephemeris calculator.
     ///
     /// Provides static methods to compute positions of the Sun, Moon, and
@@ -103,11 +141,17 @@ namespace parallax::astro
         /// @return Extended Moon state with phase, elongation, distance in km.
         [[nodiscard]] static MoonState compute_moon_full(f64 jd);
 
-        /// @brief Compute planet position for a given Julian Date (stub — Task 6.3).
+        /// @brief Compute planet position for a given Julian Date.
+        ///
+        /// Uses Meeus Ch. 31 Keplerian orbital elements with Kepler's equation.
+        /// Accuracy ~0.1–0.5° depending on planet and epoch.
+        ///
+        /// @param jd Julian Date.
         /// @param planet_id 1=Mercury, 2=Venus, 4=Mars, 5=Jupiter, 6=Saturn, 7=Uranus, 8=Neptune.
+        /// @return Planet state with RA/Dec, distance, magnitude, phase angle.
         [[nodiscard]] static CelestialBodyState compute_planet(f64 jd, u32 planet_id);
 
-        /// @brief All Solar System bodies computed at once (stubs for Moon/planets).
+        /// @brief All Solar System bodies computed at once (shared Earth position).
         struct AllBodies
         {
             CelestialBodyState sun;
@@ -115,7 +159,7 @@ namespace parallax::astro
             std::array<CelestialBodyState, 7> planets;  ///< Mercury..Neptune (no Earth)
         };
 
-        /// @brief Compute all bodies at once.
+        /// @brief Compute all bodies at once (more efficient — shares Earth's heliocentric position).
         [[nodiscard]] static AllBodies compute_all(f64 jd);
 
         // -----------------------------------------------------------------
@@ -136,6 +180,20 @@ namespace parallax::astro
         /// @param jd Julian Date.
         /// @return Mean obliquity in radians.
         [[nodiscard]] static f64 mean_obliquity(f64 jd);
+
+        /// @brief Compute heliocentric ecliptic position of a planet from orbital elements.
+        ///
+        /// @param elements Orbital elements for the planet.
+        /// @param T Julian centuries from J2000.0.
+        /// @return Heliocentric ecliptic Cartesian coordinates (AU).
+        [[nodiscard]] static HeliocentricPos compute_heliocentric(
+            const OrbitalElements& elements, f64 T);
+
+        /// @brief Compute heliocentric ecliptic position of Earth.
+        ///
+        /// @param T Julian centuries from J2000.0.
+        /// @return Earth's heliocentric ecliptic Cartesian coordinates (AU).
+        [[nodiscard]] static HeliocentricPos compute_earth_heliocentric(f64 T);
 
     private:
         /// @brief Compute Sun geometric mean longitude, mean anomaly, eccentricity.
@@ -159,5 +217,50 @@ namespace parallax::astro
         /// @return Named MoonPhase.
         [[nodiscard]] static MoonPhase classify_moon_phase(
             f64 elongation_deg, f64 illumination);
-    };  
+
+        /// @brief Solve Kepler's equation M = E - e*sin(E) iteratively.
+        ///
+        /// @param M_rad Mean anomaly (radians).
+        /// @param e Eccentricity.
+        /// @return Eccentric anomaly E (radians).
+        [[nodiscard]] static f64 solve_kepler(f64 M_rad, f64 e);
+
+        /// @brief Compute planet state from heliocentric positions.
+        ///
+        /// Given a planet's and Earth's heliocentric positions, computes
+        /// geocentric ecliptic → equatorial coordinates, distance, phase angle,
+        /// and apparent magnitude.
+        ///
+        /// @param planet Heliocentric position of the planet.
+        /// @param earth Heliocentric position of Earth.
+        /// @param r_helio Heliocentric distance of the planet (AU).
+        /// @param planet_id Planet identifier for magnitude computation.
+        /// @param eps_rad Obliquity of the ecliptic (radians).
+        /// @return Complete planet state.
+        [[nodiscard]] static CelestialBodyState compute_planet_state(
+            const HeliocentricPos& planet,
+            const HeliocentricPos& earth,
+            f64 r_helio,
+            u32 planet_id,
+            f64 eps_rad);
+
+        /// @brief Compute apparent magnitude for a planet.
+        ///
+        /// Uses simplified formulas from Meeus Ch. 41 / sprint doc.
+        ///
+        /// @param planet_id Planet identifier.
+        /// @param r Heliocentric distance (AU).
+        /// @param delta Geocentric distance (AU).
+        /// @param phase_angle_deg Phase angle (degrees).
+        /// @return Apparent visual magnitude.
+        [[nodiscard]] static f32 compute_planet_magnitude(
+            u32 planet_id, f64 r, f64 delta, f64 phase_angle_deg);
+
+        /// @brief Get the angular diameter of a planet at 1 AU, in arcseconds.
+        [[nodiscard]] static f64 planet_angular_diameter_at_1au(u32 planet_id);
+
+        /// @brief Get orbital elements for a given planet ID.
+        /// @return Pointer to elements, or nullptr for invalid ID.
+        [[nodiscard]] static const OrbitalElements* get_planet_elements(u32 planet_id);
+    }; 
 } // namespace parallax::astro

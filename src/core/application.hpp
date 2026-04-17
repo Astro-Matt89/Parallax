@@ -19,6 +19,7 @@
 #include "overlay/horizon.hpp"                            // ← SPRINT 04 Task 4.4
 #include "rendering/camera.hpp"
 #include "rendering/dso_renderer.hpp"                     // ← SPRINT 04 Task 4.5
+#include "rendering/solar_system_renderer.hpp"            // ← SPRINT 06 Task 6.5
 #include "rendering/line_renderer.hpp"                    // ← SPRINT 04 Task 4.1
 #include "rendering/sky_background.hpp"
 #include "rendering/starfield.hpp"
@@ -108,6 +109,7 @@ namespace parallax::core
         overlay::CoordGrid m_coord_grid;                     // Task 4.3
         overlay::Horizon m_horizon;                          // Task 4.4
         rendering::DsoRenderer m_dso_renderer;               // Task 4.5
+        rendering::SolarSystemRenderer m_solar_system_renderer; // ← SPRINT 06 Task 6.5
 
         // -----------------------------------------------------------------
         // UI subsystems                                     ← SPRINT 05

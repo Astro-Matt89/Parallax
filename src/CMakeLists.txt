@@ -22,6 +22,8 @@ add_executable(parallax
     catalog/visibility_filter.cpp
     rendering/camera.cpp
     rendering/sky_background.cpp
+    rendering/solar_system_renderer.cpp
+    rendering/solar_system_renderer_helpers.cpp
     rendering/starfield.cpp
     rendering/line_renderer.cpp
     rendering/dso_renderer.cpp

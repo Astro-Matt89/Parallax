@@ -382,6 +382,8 @@ void Selection::update(std::span<const catalog::StarEntry> stars,
             }
         }
         // Body not in current list (shouldn't happen, but defensive — keep stale position)
+        PLX_CORE_WARN("Selection::update: Solar System body_id {} not found in current screen objects",
+                      m_selection.body_id);
         return;
     }
 

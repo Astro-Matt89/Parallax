@@ -197,12 +197,14 @@ void InfoPanel::update(const Selection& selection,
         m_constellation_text.clear();
 
         // Distance: Moon in km, others in AU
-        // body_id 0 = Sun, 1 = Moon — see SolarSystemRenderer
+        // Use named constants from SolarSystemRenderer (available via selection.hpp include chain).
+        // body_id 0 = Sun, 1 = Moon — see SolarSystemRenderer::kBodyIdSun / kBodyIdMoon
         {
+            static constexpr double kAuToKm = 149597870.7;  // km per AU (IAU 2012)
             char dist_buf[64];
-            if (sel.body_id == 1u)  // Moon
+            if (sel.body_id == rendering::SolarSystemRenderer::kBodyIdMoon)
             {
-                const double km = sel.distance_au * 149597870.7;
+                const double km = sel.distance_au * kAuToKm;
                 std::snprintf(dist_buf, sizeof(dist_buf), "Dist: %.0f km", km);
             }
             else
@@ -227,7 +229,7 @@ void InfoPanel::update(const Selection& selection,
         }
 
         // Phase + illumination: only for non-Sun (body_id 0 = Sun)
-        if (sel.body_id != 0u)
+        if (sel.body_id != rendering::SolarSystemRenderer::kBodyIdSun)
         {
             char phase_buf[32];
             std::snprintf(phase_buf, sizeof(phase_buf), "Phase: %.1f deg", sel.phase_angle_deg);

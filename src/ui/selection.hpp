@@ -86,7 +86,7 @@ struct SelectedObject
     f32 size_arcmin = 0.0f;
 
     // SolarSystem fields (valid when type == SolarSystem)
-    u32 body_id = 0;                         ///< 0=Sun, 1=Moon, 10+planet_id
+    u32 body_id = 0;                         ///< 0=Sun, 1=Moon, 10+planet_id (see SolarSystemRenderer)
     std::string body_name;                   ///< "Sun", "Moon", "Jupiter", ...
     f64 distance_au = 0.0;                   ///< Distance from Earth (AU)
     f32 angular_diameter_arcsec = 0.0f;

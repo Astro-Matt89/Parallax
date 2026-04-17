@@ -143,6 +143,9 @@ void InfoPanel::update(const Selection& selection,
         m_spectral_text = sel.spectral_type.empty() ? "" : "Sp   " + sel.spectral_type;
         m_constellation_text = sel.constellation.empty() ? "" : "Con  " + sel.constellation;
         m_size_text.clear();
+        m_dist_text.clear();
+        m_phase_text.clear();
+        m_illum_text.clear();
     }
     else if (sel.type == SelectedObjectType::Dso)
     {
@@ -166,6 +169,79 @@ void InfoPanel::update(const Selection& selection,
         char size_buf[32];
         std::snprintf(size_buf, sizeof(size_buf), "Size %.1f'", sel.size_arcmin);
         m_size_text = size_buf;
+
+        m_dist_text.clear();
+        m_phase_text.clear();
+        m_illum_text.clear();
+    }
+    else if (sel.type == SelectedObjectType::SolarSystem)
+    {
+        m_title = sel.body_name;
+        m_subtitle.clear();
+        m_type_text = "Solar System";
+
+        m_ra_text = "RA   " + format_ra(sel.ra_rad);
+        m_dec_text = "Dec  " + format_dec(sel.dec_rad);
+        m_alt_text = "Alt  " + format_alt(sel.alt_rad);
+        m_az_text = "Az   " + format_az(sel.az_rad);
+
+        // Magnitude with explicit sign for bright objects
+        {
+            char mag_buf[32];
+            std::snprintf(mag_buf, sizeof(mag_buf), "Mag: %+.2f", sel.mag_v);
+            m_mag_text = mag_buf;
+        }
+
+        m_bv_text.clear();
+        m_spectral_text.clear();
+        m_constellation_text.clear();
+
+        // Distance: Moon in km, others in AU
+        // body_id 0 = Sun, 1 = Moon — see SolarSystemRenderer
+        {
+            char dist_buf[64];
+            if (sel.body_id == 1u)  // Moon
+            {
+                const double km = sel.distance_au * 149597870.7;
+                std::snprintf(dist_buf, sizeof(dist_buf), "Dist: %.0f km", km);
+            }
+            else
+            {
+                std::snprintf(dist_buf, sizeof(dist_buf), "Dist: %.3f AU", sel.distance_au);
+            }
+            m_dist_text = dist_buf;
+        }
+
+        // Angular diameter: arcsec if < 120", else arcmin
+        {
+            char size_buf[32];
+            if (sel.angular_diameter_arcsec < 120.0f)
+            {
+                std::snprintf(size_buf, sizeof(size_buf), "Size: %.1f\"", sel.angular_diameter_arcsec);
+            }
+            else
+            {
+                std::snprintf(size_buf, sizeof(size_buf), "Size: %.1f'", sel.angular_diameter_arcsec / 60.0f);
+            }
+            m_size_text = size_buf;
+        }
+
+        // Phase + illumination: only for non-Sun (body_id 0 = Sun)
+        if (sel.body_id != 0u)
+        {
+            char phase_buf[32];
+            std::snprintf(phase_buf, sizeof(phase_buf), "Phase: %.1f deg", sel.phase_angle_deg);
+            m_phase_text = phase_buf;
+
+            char illum_buf[32];
+            std::snprintf(illum_buf, sizeof(illum_buf), "Illum: %.1f%%", sel.illumination * 100.0f);
+            m_illum_text = illum_buf;
+        }
+        else
+        {
+            m_phase_text.clear();
+            m_illum_text.clear();
+        }
     }
 
     // Tracking status
@@ -320,6 +396,24 @@ void InfoPanel::render(BitmapFont& font, rendering::LineRenderer& lines,
     if (!m_size_text.empty())
     {
         font.draw_text(m_size_text, cx, cy, 1.0f, widget_colors::kTextBright);
+        cy += kRowHeight;
+    }
+
+    if (!m_dist_text.empty())
+    {
+        font.draw_text(m_dist_text, cx, cy, 1.0f, widget_colors::kTextBright);
+        cy += kRowHeight;
+    }
+
+    if (!m_phase_text.empty())
+    {
+        font.draw_text(m_phase_text, cx, cy, 1.0f, widget_colors::kTextBright);
+        cy += kRowHeight;
+    }
+
+    if (!m_illum_text.empty())
+    {
+        font.draw_text(m_illum_text, cx, cy, 1.0f, widget_colors::kTextBright);
         cy += kRowHeight;
     }
 

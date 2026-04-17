@@ -17,6 +17,7 @@
 #include "core/types.hpp"
 #include "rendering/camera.hpp"
 #include "rendering/line_renderer.hpp"
+#include "rendering/solar_system_renderer.hpp"
 #include "ui/font.hpp"
 
 #include <filesystem>
@@ -38,7 +39,8 @@ enum class SelectedObjectType : u8
 {
     None,
     Star,
-    Dso
+    Dso,
+    SolarSystem
 };
 
 // =================================================================
@@ -82,6 +84,14 @@ struct SelectedObject
     std::string dso_common_name;    ///< e.g. "Orion Nebula"
     catalog::DsoType dso_type = catalog::DsoType::Other;
     f32 size_arcmin = 0.0f;
+
+    // SolarSystem fields (valid when type == SolarSystem)
+    u32 body_id = 0;                         ///< 0=Sun, 1=Moon, 10+planet_id
+    std::string body_name;                   ///< "Sun", "Moon", "Jupiter", ...
+    f64 distance_au = 0.0;                   ///< Distance from Earth (AU)
+    f32 angular_diameter_arcsec = 0.0f;
+    f32 phase_angle_deg = 0.0f;
+    f32 illumination = 0.0f;                 ///< 0..1
 
     // Computed each frame (valid for both Star and Dso)
     f64 alt_rad = 0.0;
@@ -144,11 +154,38 @@ public:
                     const rendering::Camera& camera,
                     VkExtent2D viewport);
 
+    /// @brief Attempt to select nearest Star, DSO, or Solar System body.
+    ///
+    /// Priority within kPickRadiusNdc: closest pixel distance wins regardless of type.
+    /// If two objects are equidistant, Solar System > Star > DSO (Solar System bodies
+    /// are rare and almost always the intended target when clicked).
+    void try_select(Vec2f click_ndc,
+                    std::span<const catalog::StarEntry> stars,
+                    std::span<const u32> visible_star_indices,
+                    std::span<const Vec2f> star_screen_positions,
+                    std::span<const catalog::DsoEntry> dsos,
+                    std::span<const rendering::SolarSystemScreenObject> ss_objects,
+                    const astro::ObserverLocation& observer,
+                    f64 lst_rad,
+                    const rendering::Camera& camera,
+                    VkExtent2D viewport);
+
     /// @brief Update the selected object's screen position and Alt/Az for this frame.
     ///
     /// Must be called each frame after simulation update, before rendering.
     void update(std::span<const catalog::StarEntry> stars,
                 std::span<const catalog::DsoEntry> dsos,
+                const astro::ObserverLocation& observer,
+                f64 lst_rad,
+                const rendering::Camera& camera);
+
+    /// @brief Update the selected object's screen position and Alt/Az for this frame.
+    ///
+    /// Overload that also refreshes Solar System body positions from the latest
+    /// rendered screen objects. Must be called after SolarSystemRenderer::update().
+    void update(std::span<const catalog::StarEntry> stars,
+                std::span<const catalog::DsoEntry> dsos,
+                std::span<const rendering::SolarSystemScreenObject> ss_objects,
                 const astro::ObserverLocation& observer,
                 f64 lst_rad,
                 const rendering::Camera& camera);

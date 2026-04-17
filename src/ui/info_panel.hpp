@@ -147,7 +147,10 @@ private:
     std::string m_bv_text;
     std::string m_spectral_text;
     std::string m_constellation_text;
-    std::string m_size_text;        ///< DSO angular size
+    std::string m_size_text;        ///< DSO angular size / Solar System angular diameter
+    std::string m_dist_text;        ///< Solar System body distance (AU or km for Moon)
+    std::string m_phase_text;       ///< Solar System phase angle
+    std::string m_illum_text;       ///< Solar System illumination fraction
     std::string m_tracking_text;    ///< "TRACKING" or empty
 
     /// @brief Currently selected type (for conditional display logic).

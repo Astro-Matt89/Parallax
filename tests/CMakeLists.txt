@@ -146,3 +146,25 @@ glm::glm
 )
 
 add_test(NAME SkyState COMMAND test_sky_state)
+
+# -----------------------------------------------------------------
+# Test: SolarSystemRenderer helpers             ← SPRINT 06 Task 6.5
+# -----------------------------------------------------------------
+add_executable(test_solar_system_renderer
+test_solar_system_renderer.cpp
+"${CMAKE_SOURCE_DIR}/src/rendering/solar_system_renderer_helpers.cpp"
+)
+
+target_include_directories(test_solar_system_renderer PRIVATE
+"${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_solar_system_renderer PRIVATE
+doctest::doctest
+glm::glm
+Vulkan::Vulkan
+SDL2::SDL2
+spdlog::spdlog
+)
+
+add_test(NAME SolarSystemRenderer COMMAND test_solar_system_renderer)

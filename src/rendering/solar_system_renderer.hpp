@@ -150,6 +150,11 @@ namespace parallax::rendering
                                     f32 illumination, bool waxing,
                                     LineRenderer& lines);
 
+        // -----------------------------------------------------------------
+        // Pure static helpers — public for testability (no Vulkan required)
+        // -----------------------------------------------------------------
+
+    public:
         /// @brief Get the display color for a planet.
         [[nodiscard]] static Vec4f planet_color(u32 planet_id);
 
@@ -162,7 +167,7 @@ namespace parallax::rendering
         /// as the starfield, but with a minimum size for visibility.
         [[nodiscard]] static f32 magnitude_to_radius_ndc(f32 magnitude);
 
-        /// @brief Convert NDC to pixel coordinates.
+    private:
         [[nodiscard]] static Vec2f ndc_to_pixel(Vec2f ndc, VkExtent2D viewport);
 
         /// @brief Try to project a body to screen, respecting horizon culling.

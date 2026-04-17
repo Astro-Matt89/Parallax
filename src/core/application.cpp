@@ -616,6 +616,12 @@ void Application::process_input()
         PLX_CORE_INFO("DSOs {}", m_dso_renderer.is_visible() ? "shown" : "hidden");
     }
 
+    if (m_input->is_key_pressed(SDL_SCANCODE_P))
+    {
+        m_solar_system_renderer.toggle_visible();
+        PLX_CORE_INFO("Solar System {}", m_solar_system_renderer.is_visible() ? "shown" : "hidden");
+    }
+
     if (m_input->is_key_pressed(SDL_SCANCODE_O))
     {
         m_horizon.toggle_visible();
@@ -729,6 +735,18 @@ void Application::update_simulation(f64 delta_time_sec)
 
     // --- Step 3: Starfield update — NO atmosphere parameter ---
     m_starfield->update(m_stars, candidates, m_observer, lst, *m_camera);
+
+    // --- Step 3b: Solar System bodies (Sun, Moon, planets) ← SPRINT 06 Task 6.5 ---
+    {
+        const auto ss_bodies = astro::SolarSystem::compute_all(m_julian_date);
+        const auto moon_state = astro::SolarSystem::compute_moon_full(m_julian_date);
+        m_solar_system_renderer.update(
+            ss_bodies, moon_state,
+            *m_camera, m_observer, lst,
+            *m_line_renderer, m_hud->get_font(),
+            viewport,
+            false);  // atmosphere off — skychart mode bypasses horizon cull
+    }
 
     // --- Step 4: Constellation lines + labels (over stars) ---
     m_constellations.update(*m_camera, m_observer, lst,

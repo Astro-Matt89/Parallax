@@ -285,8 +285,9 @@ TEST_CASE("Integration: 2024-06-21 06:00 UTC at 0°N/0°E (summer solstice dawn)
     // At the equator on summer solstice at 06:00 UTC the sun is near the
     // eastern horizon — expect civil twilight or day (sun alt ≈ -2° to +5°).
     // Precomputed expected value: sun alt ≈ −1.9° (civil twilight, dawn).
-    // Allow generous ±2° tolerance to account for algorithm precision.
-    CHECK(sc.sun_altitude_deg == doctest::Approx(-1.9f).epsilon(2.0f));
+    // Allow generous ±2° absolute tolerance to account for algorithm precision.
+    CHECK(sc.sun_altitude_deg >= -3.9f);
+    CHECK(sc.sun_altitude_deg <=  0.1f);
 
     // State should be CivilTwilight or Day (near horizon transition)
     const bool near_horizon =

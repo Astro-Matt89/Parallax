@@ -12,6 +12,8 @@
 #include "astro/coordinates.hpp"
 #include "core/logger.hpp"
 
+#include <glm/gtc/constants.hpp>
+
 #include <cmath>
 
 namespace parallax::rendering
@@ -123,7 +125,7 @@ void SolarSystemRenderer::render_sun(const astro::CelestialBodyState& sun,
     const f32 ray_out = kSunRadiusNdc * kRayOuter;
     for (u32 d = 0; d < 4; ++d)
     {
-        const f32 angle = static_cast<f32>(d) * 1.5707963f;  // 0, π/2, π, 3π/2
+        const f32 angle = static_cast<f32>(d) * glm::half_pi<f32>();
         const f32 cos_a = std::cos(angle);
         const f32 sin_a = std::sin(angle);
         lines.add_line(Vec2f{pos.x + cos_a * ray_in,  pos.y + sin_a * ray_in},
@@ -327,7 +329,7 @@ void SolarSystemRenderer::draw_filled_circle(Vec2f center_ndc,
 {
     // Approximate a filled disc with 3 concentric line-circles
     // at 100%, 66%, and 33% of the radius. At 6-8 px this looks solid.
-    const f32 step = 6.2831853f / static_cast<f32>(segments);
+    const f32 step = glm::two_pi<f32>() / static_cast<f32>(segments);
 
     for (u32 ring = 0; ring < 3; ++ring)
     {
@@ -392,7 +394,7 @@ void SolarSystemRenderer::draw_moon_phase(Vec2f center_ndc,
         // Determine shadowed x range depending on waxing/waning:
         //   Waxing (bright RIGHT): shadow on LEFT, from disc-edge to terminator
         //   Waning (bright LEFT):  shadow on RIGHT, from terminator to disc-edge
-        float x_start, x_end;
+        f32 x_start, x_end;
         if (waxing)
         {
             x_start = center_ndc.x - disc_hw;

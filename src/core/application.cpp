@@ -745,7 +745,11 @@ void Application::update_simulation(f64 delta_time_sec)
             *m_camera, m_observer, lst,
             *m_line_renderer, m_hud->get_font(),
             viewport,
-            false);  // atmosphere off — skychart mode bypasses horizon cull
+            // atmosphere_on = false: skychart mode bypasses horizon culling so
+            // Solar System bodies remain visible for planning (same as atmosphere-off
+            // described in CLAUDE.md §5.4). A future skychart atmosphere toggle
+            // can replace this with the actual flag when implemented.
+            false);
     }
 
     // --- Step 4: Constellation lines + labels (over stars) ---

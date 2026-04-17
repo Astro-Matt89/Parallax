@@ -14,6 +14,7 @@ add_executable(parallax
     astro/time_system.cpp
     astro/coordinates.cpp
     astro/atmosphere.cpp
+    astro/sky_state.cpp
     astro/solar_system.cpp
     catalog/catalog_loader.cpp
     catalog/dso_loader.cpp

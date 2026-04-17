@@ -123,3 +123,26 @@ target_link_libraries(test_spatial_index PRIVATE
     )
 
     add_test(NAME SolarSystem COMMAND test_solar_system)
+
+# -----------------------------------------------------------------
+# Test: SkyState                                    ← SPRINT 06 Task 6.4
+# -----------------------------------------------------------------
+add_executable(test_sky_state
+test_sky_state.cpp
+"${CMAKE_SOURCE_DIR}/src/astro/sky_state.cpp"
+"${CMAKE_SOURCE_DIR}/src/astro/solar_system.cpp"
+"${CMAKE_SOURCE_DIR}/src/astro/coordinates.cpp"
+"${CMAKE_SOURCE_DIR}/src/astro/atmosphere.cpp"
+"${CMAKE_SOURCE_DIR}/src/astro/time_system.cpp"
+)
+
+target_include_directories(test_sky_state PRIVATE
+"${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_sky_state PRIVATE
+doctest::doctest
+glm::glm
+)
+
+add_test(NAME SkyState COMMAND test_sky_state)

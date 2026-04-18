@@ -90,7 +90,11 @@ bool StarCatalogProvider::load(const std::filesystem::path& tycho2_path,
         if (hipparcos_is_primary)
         {
             // Hipparcos is already in m_stars — build the HIP map directly from it
-            // to avoid a redundant disk read and a duplicate in-memory copy.
+            // to avoid a redundant disk read.  We copy m_stars rather than aliasing it
+            // because SpatialIndex holds a std::span over m_stars; if m_stars were ever
+            // moved (e.g. during a reload), an alias in m_hipparcos_stars would dangle.
+            // This trade-off is acceptable: both vectors share the same data values and
+            // the Hipparcos catalog is typically ≤ 120 k entries (~4 MB).
             m_hipparcos_stars = m_stars;
             PLX_CORE_INFO("StarCatalogProvider: HIP map built from primary Hipparcos catalog ({} stars)",
                           m_hipparcos_stars.size());
@@ -227,9 +231,11 @@ CelestialObject StarCatalogProvider::make_object(const catalog::StarEntry& star)
     // Fields not present in StarEntry (distance_pc, proper_motion_*, parallax_mas, hd_id)
     // are zero-initialised by StarData's default member initialisers.
     StarData sd{};
-    // catalog_id for Hipparcos == HIP number; store it in hip_id.
-    // For Tycho-2 entries this will hold the TYC hash — callers that need a true
-    // HIP number should use resolve_hip() instead.
+    // StarData::hip_id is used to carry the catalog's native identifier:
+    //   - Hipparcos entries: catalog_id == HIP number, so hip_id holds a true HIP number.
+    //   - Tycho-2 entries: catalog_id is a u32 hash of the TYC string, NOT a HIP number.
+    // Callers that require a verified HIP number (e.g. constellation-line resolution)
+    // must use resolve_hip() instead of reading this field directly.
     sd.hip_id = star.catalog_id;
     obj.data  = sd;
 

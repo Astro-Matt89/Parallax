@@ -482,6 +482,7 @@ void Application::process_input()
                 click_ndc,
                 m_stars, visible_indices, screen_positions,
                 m_dsos,
+                m_solar_system_renderer.get_screen_objects(),
                 m_observer,
                 astro::TimeSystem::lmst(m_julian_date, m_observer.longitude_rad),
                 *m_camera,
@@ -498,6 +499,11 @@ void Application::process_input()
                 else if (sel.type == ui::SelectedObjectType::Dso)
                 {
                     PLX_CORE_INFO("Selected DSO: {}", sel.designation);
+                }
+                else if (sel.type == ui::SelectedObjectType::SolarSystem)
+                {
+                    PLX_CORE_INFO("Selected Solar System body: {} (body_id {})",
+                                  sel.body_name, sel.body_id);
                 }
             }
             else
@@ -767,7 +773,11 @@ void Application::update_simulation(f64 delta_time_sec)
                      viewport);
 
     // --- Step 6b: Selection — refresh screen position + Alt/Az each frame ---
-    m_selection.update(m_stars, m_dsos, m_observer, lst, *m_camera);
+    // Note: m_solar_system_renderer.update() runs above (Step 3b), so SS screen
+    // objects reflect the current frame when passed here.
+    m_selection.update(m_stars, m_dsos,
+                       m_solar_system_renderer.get_screen_objects(),
+                       m_observer, lst, *m_camera);
 
     // --- Step 6c: Selection indicator (submit lines to renderer) ---
     if (m_selection.has_selection())

@@ -7,6 +7,7 @@
 
 #include "astro/coordinates.hpp"
 #include "core/logger.hpp"
+#include "rendering/solar_system_renderer.hpp"
 
 #include <cmath>
 #include <cstdio>
@@ -109,12 +110,68 @@ void Selection::try_select(Vec2f click_ndc,
                            const rendering::Camera& camera,
                            VkExtent2D viewport)
 {
+    // Delegate to the Solar System-aware overload with an empty SS span.
+    try_select(click_ndc,
+               stars, visible_star_indices, star_screen_positions,
+               dsos,
+               std::span<const rendering::SolarSystemScreenObject>{},
+               observer, lst_rad, camera, viewport);
+}
+
+void Selection::try_select(Vec2f click_ndc,
+                           std::span<const catalog::StarEntry> stars,
+                           std::span<const u32> visible_star_indices,
+                           std::span<const Vec2f> star_screen_positions,
+                           std::span<const catalog::DsoEntry> dsos,
+                           std::span<const rendering::SolarSystemScreenObject> ss_objects,
+                           const astro::ObserverLocation& observer,
+                           f64 lst_rad,
+                           const rendering::Camera& camera,
+                           VkExtent2D viewport)
+{
     (void)viewport;  // Not needed — picking is in NDC space
 
     f32 best_dist_sq = kPickRadiusNdc * kPickRadiusNdc;
     bool found = false;
 
     SelectedObject candidate;
+
+    // -----------------------------------------------------------------
+    // Search Solar System bodies first (priority: SS > Star > DSO)
+    // -----------------------------------------------------------------
+    for (const auto& ss : ss_objects)
+    {
+        const f32 dx = ss.screen_ndc.x - click_ndc.x;
+        const f32 dy = ss.screen_ndc.y - click_ndc.y;
+        const f32 dist_sq = dx * dx + dy * dy;
+        if (dist_sq < best_dist_sq)
+        {
+            best_dist_sq = dist_sq;
+            found = true;
+            candidate.type = SelectedObjectType::SolarSystem;
+            candidate.body_id = ss.body_id;
+            candidate.body_name = std::string(ss.name);
+            candidate.ra_rad = ss.equatorial.ra;
+            candidate.dec_rad = ss.equatorial.dec;
+            candidate.mag_v = ss.magnitude;
+            candidate.distance_au = ss.distance_au;
+            candidate.angular_diameter_arcsec = ss.angular_diameter_arcsec;
+            candidate.phase_angle_deg = ss.phase_angle_deg;
+            candidate.illumination = ss.illumination;
+            candidate.alt_rad = ss.alt_rad;
+            candidate.az_rad = ss.az_rad;
+            candidate.above_horizon = ss.alt_rad >= 0.0;
+            candidate.screen_ndc = ss.screen_ndc;
+            // Clear star/DSO-specific fields so stale data doesn't leak.
+            candidate.hip_id = 0;
+            candidate.common_name.clear();
+            candidate.bayer.clear();
+            candidate.constellation.clear();
+            candidate.spectral_type.clear();
+            candidate.designation.clear();
+            candidate.dso_common_name.clear();
+        }
+    }
 
     // -----------------------------------------------------------------
     // Search visible stars
@@ -221,12 +278,17 @@ void Selection::try_select(Vec2f click_ndc,
 
     if (found)
     {
-        // Compute Alt/Az
-        const auto hz = astro::Coordinates::equatorial_to_horizontal(
-            {candidate.ra_rad, candidate.dec_rad}, observer, lst_rad);
-        candidate.alt_rad = hz.alt;
-        candidate.az_rad = hz.az;
-        candidate.above_horizon = hz.alt >= 0.0;
+        // For Solar System bodies, Alt/Az was already set from the screen object
+        // (which is updated each frame by SolarSystemRenderer). For stars and DSOs,
+        // compute Alt/Az from RA/Dec now.
+        if (candidate.type != SelectedObjectType::SolarSystem)
+        {
+            const auto hz = astro::Coordinates::equatorial_to_horizontal(
+                {candidate.ra_rad, candidate.dec_rad}, observer, lst_rad);
+            candidate.alt_rad = hz.alt;
+            candidate.az_rad = hz.az;
+            candidate.above_horizon = hz.alt >= 0.0;
+        }
 
         m_selection = candidate;
 
@@ -243,10 +305,15 @@ void Selection::try_select(Vec2f click_ndc,
                               candidate.hip_id, candidate.mag_v);
             }
         }
-        else
+        else if (candidate.type == SelectedObjectType::Dso)
         {
             PLX_CORE_INFO("Selected DSO: {} ({}) mag {:.1f}",
                           candidate.designation, candidate.dso_common_name, candidate.mag_v);
+        }
+        else
+        {
+            PLX_CORE_INFO("Selected Solar System body: {} (body_id {}) mag {:.2f}",
+                          candidate.body_name, candidate.body_id, candidate.mag_v);
         }
     }
     else
@@ -265,6 +332,19 @@ void Selection::update(std::span<const catalog::StarEntry> stars,
                        f64 lst_rad,
                        const rendering::Camera& camera)
 {
+    // Delegate to the Solar System-aware overload with an empty SS span.
+    update(stars, dsos,
+           std::span<const rendering::SolarSystemScreenObject>{},
+           observer, lst_rad, camera);
+}
+
+void Selection::update(std::span<const catalog::StarEntry> stars,
+                       std::span<const catalog::DsoEntry> dsos,
+                       std::span<const rendering::SolarSystemScreenObject> ss_objects,
+                       const astro::ObserverLocation& observer,
+                       f64 lst_rad,
+                       const rendering::Camera& camera)
+{
     // Stars/DSOs spans are available for future use (e.g. re-reading updated data)
     // but RA/Dec are already stored in m_selection from try_select().
     (void)stars;
@@ -272,6 +352,38 @@ void Selection::update(std::span<const catalog::StarEntry> stars,
 
     if (m_selection.type == SelectedObjectType::None)
     {
+        return;
+    }
+
+    // -----------------------------------------------------------------
+    // Solar System: refresh from latest screen objects
+    // Tracking a Solar System body (e.g. Moon) works the same as stars:
+    // the RA/Dec stored here is updated each frame, so the camera tracks
+    // the body as it moves across the sky.
+    // -----------------------------------------------------------------
+    if (m_selection.type == SelectedObjectType::SolarSystem)
+    {
+        for (const auto& ss : ss_objects)
+        {
+            if (ss.body_id == m_selection.body_id)
+            {
+                m_selection.ra_rad = ss.equatorial.ra;
+                m_selection.dec_rad = ss.equatorial.dec;
+                m_selection.alt_rad = ss.alt_rad;
+                m_selection.az_rad = ss.az_rad;
+                m_selection.above_horizon = ss.alt_rad >= 0.0;
+                m_selection.screen_ndc = ss.screen_ndc;
+                m_selection.mag_v = ss.magnitude;
+                m_selection.distance_au = ss.distance_au;
+                m_selection.angular_diameter_arcsec = ss.angular_diameter_arcsec;
+                m_selection.phase_angle_deg = ss.phase_angle_deg;
+                m_selection.illumination = ss.illumination;
+                return;
+            }
+        }
+        // Body not in current list (shouldn't happen, but defensive — keep stale position)
+        PLX_CORE_WARN("Selection::update: Solar System body_id {} not found in current screen objects",
+                      m_selection.body_id);
         return;
     }
 

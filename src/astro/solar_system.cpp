@@ -512,7 +512,7 @@ MoonState SolarSystem::compute_moon_full(f64 jd)
 // Returns nullptr for any planet_id that is not one of the seven.
 // =================================================================
 
-const OrbitalElements* SolarSystem::get_planet_elements(u32 planet_id)
+const OrbitalElements* SolarSystem::get_planet_elements(u32 id)
 {
     // Meeus "Astronomical Algorithms" 2nd ed., Table 31.A.
     // Referred to the mean ecliptic and equinox of J2000.0.
@@ -585,17 +585,15 @@ const OrbitalElements* SolarSystem::get_planet_elements(u32 planet_id)
     };
 
     // Map planet_id to table index.
-    // Note: the parameter name 'planet_id' shadows the planet_id namespace here,
-    // so we use raw integer literals for case labels.
-    switch (planet_id)
+    switch (id)
     {
-        case 1: return &kPlanetTable[0];  // Mercury
-        case 2: return &kPlanetTable[1];  // Venus
-        case 4: return &kPlanetTable[2];  // Mars
-        case 5: return &kPlanetTable[3];  // Jupiter
-        case 6: return &kPlanetTable[4];  // Saturn
-        case 7: return &kPlanetTable[5];  // Uranus
-        case 8: return &kPlanetTable[6];  // Neptune
+        case planet_id::kMercury: return &kPlanetTable[0];
+        case planet_id::kVenus:   return &kPlanetTable[1];
+        case planet_id::kMars:    return &kPlanetTable[2];
+        case planet_id::kJupiter: return &kPlanetTable[3];
+        case planet_id::kSaturn:  return &kPlanetTable[4];
+        case planet_id::kUranus:  return &kPlanetTable[5];
+        case planet_id::kNeptune: return &kPlanetTable[6];
         default: return nullptr;          // Earth (3) or any invalid id
     }
 }
@@ -733,20 +731,18 @@ HeliocentricPos SolarSystem::compute_earth_heliocentric(f64 T)
 // Apparent diameter at actual distance Δ AU = diameter_at_1au / Δ.
 // =================================================================
 
-f64 SolarSystem::planet_angular_diameter_at_1au(u32 planet_id)
+f64 SolarSystem::planet_angular_diameter_at_1au(u32 id)
 {
-    // Note: parameter 'planet_id' shadows the planet_id namespace;
-    // use raw literals for the case labels.
-    switch (planet_id)
+    switch (id)
     {
-        case 1: return 6.74;    // Mercury
-        case 2: return 16.92;   // Venus
-        case 4: return 9.36;    // Mars
-        case 5: return 196.74;  // Jupiter
-        case 6: return 165.6;   // Saturn (disk only, no rings)
-        case 7: return 70.0;    // Uranus
-        case 8: return 67.9;    // Neptune
-        default: return 0.0;
+        case planet_id::kMercury: return 6.74;
+        case planet_id::kVenus:   return 16.92;
+        case planet_id::kMars:    return 9.36;
+        case planet_id::kJupiter: return 196.74;
+        case planet_id::kSaturn:  return 165.6;   // disk only, no rings
+        case planet_id::kUranus:  return 70.0;
+        case planet_id::kNeptune: return 67.9;
+        default:                  return 0.0;
     }
 }
 
@@ -766,45 +762,44 @@ f64 SolarSystem::planet_angular_diameter_at_1au(u32 planet_id)
 // =================================================================
 
 f32 SolarSystem::compute_planet_magnitude(
-    u32 planet_id, f64 r, f64 delta, f64 phase_angle_deg)
+    u32 id, f64 r, f64 delta, f64 phase_angle_deg)
 {
     const f64 i        = phase_angle_deg;
     const f64 log10_rD = std::log10(r * delta);
     f64 V = 0.0;
 
-    // Note: parameter 'planet_id' shadows the planet_id namespace.
-    switch (planet_id)
+    switch (id)
     {
-        case 1:  // Mercury
+        case planet_id::kMercury:
             V = -0.42 + 5.0 * log10_rD
                 + 0.0380 * i
                 - 0.000273 * i * i
                 + 2.0e-6  * i * i * i;
             break;
 
-        case 2:  // Venus
+        case planet_id::kVenus:
             V = -4.40 + 5.0 * log10_rD
                 + 0.0009 * i
                 + 2.39e-7 * i * i * i;
             break;
 
-        case 4:  // Mars
+        case planet_id::kMars:
             V = -1.52 + 5.0 * log10_rD + 0.016 * i;
             break;
 
-        case 5:  // Jupiter
+        case planet_id::kJupiter:
             V = -9.40 + 5.0 * log10_rD + 0.005 * i;
             break;
 
-        case 6:  // Saturn — ring-tilt correction omitted (Task 6.3 scope)
+        case planet_id::kSaturn:  // ring-tilt correction omitted (Task 6.3 scope)
             V = -8.88 + 5.0 * log10_rD;
             break;
 
-        case 7:  // Uranus
+        case planet_id::kUranus:
             V = -7.19 + 5.0 * log10_rD + 0.002 * i;
             break;
 
-        case 8:  // Neptune
+        case planet_id::kNeptune:
             V = -6.87 + 5.0 * log10_rD;
             break;
 
@@ -837,7 +832,7 @@ CelestialBodyState SolarSystem::compute_planet_state(
     const HeliocentricPos& planet,
     const HeliocentricPos& earth,
     f64 r_helio,
-    u32 planet_id,
+    u32 id,
     f64 eps_rad)
 {
     // --- Step 1: geocentric ecliptic Cartesian ---
@@ -872,10 +867,10 @@ CelestialBodyState SolarSystem::compute_planet_state(
     const f64 illumination = (1.0 + std::cos(phase_rad)) / 2.0;
 
     // --- Step 6: apparent magnitude ---
-    const f32 magnitude = compute_planet_magnitude(planet_id, r_helio, delta, phase_deg);
+    const f32 magnitude = compute_planet_magnitude(id, r_helio, delta, phase_deg);
 
     // --- Step 7: angular diameter (arcsec) ---
-    const f32 angular_diam = static_cast<f32>(planet_angular_diameter_at_1au(planet_id) / delta);
+    const f32 angular_diam = static_cast<f32>(planet_angular_diameter_at_1au(id) / delta);
 
     return CelestialBodyState{
         .equatorial              = eq,

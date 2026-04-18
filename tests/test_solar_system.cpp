@@ -527,9 +527,9 @@ TEST_CASE("Mars opposition 2020-10-13 — RA, Dec, magnitude")
     const auto mars = SolarSystem::compute_planet(kJD_MarsOpp2020, planet_id::kMars);
 
     // Reference: at opposition ~Oct 13, Sun RA ≈ 13.4h (201°),
-    // so Mars is opposite at ≈ 1.4h (21°), confirmed by JPL Horizons.
+    // so Mars is opposite at ≈ 1.4h = 21°, confirmed by Meeus algorithm output.
     // JPL Horizons geocentric apparent (J2000) near opposition:
-    //   RA ≈ 1h 24m (21°), Dec ≈ +5.7°
+    //   RA ≈ 1h 24m = 21.0°, Dec ≈ +5.7°
     constexpr f64 kExpectedRaDeg  = 21.0;
     constexpr f64 kExpectedDecDeg = 5.7;
 
@@ -589,7 +589,7 @@ TEST_CASE("Jupiter at J2000.0 — RA and Dec position")
     CHECK(jupiter.distance_au < 6.5);
 
     MESSAGE("Jupiter J2000.0: RA=", ra_to_hours(jupiter.equatorial.ra),
-            "h (", dec_to_deg(jupiter.equatorial.ra), "°), Dec=",
+            "h (", jupiter.equatorial.ra * astro_constants::kRadToDeg, "°), Dec=",
             dec_to_deg(jupiter.equatorial.dec),
             "°, sep=", sep, "°, dist=", jupiter.distance_au, " AU");
 }

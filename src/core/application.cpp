@@ -318,12 +318,11 @@ void Application::init()
                       -glm::degrees(m_observer.longitude_rad));
     }
 
-    // 13. Sky parameters (visual context only — NOT applied to stars)
+    // 13. Sky parameters — ephemeris fields (sun/moon) are set each frame in update_simulation.
     m_sky_params = rendering::SkyParams{
         .bortle_scale = 4.0f,
-        .sun_altitude_deg = -30.0f,
-        .moon_altitude_deg = -90.0f,
-        .moon_phase = 0.0f,
+        // sun_altitude_deg, sun_azimuth_deg, moon_altitude_deg, moon_azimuth_deg,
+        // moon_illumination, atmosphere_enabled — all use struct defaults; overwritten each frame.
     };
 
     // 14. Atmosphere model: KEPT for future imaging mode, not used in skychart
@@ -634,6 +633,12 @@ void Application::process_input()
         PLX_CORE_INFO("Horizon {}", m_horizon.is_visible() ? "shown" : "hidden");
     }
 
+    if (m_input->is_key_pressed(SDL_SCANCODE_A))
+    {
+        m_atmosphere_on = !m_atmosphere_on;
+        PLX_CORE_INFO("Atmosphere {}", m_atmosphere_on ? "ON (twilight gradient)" : "OFF (pure black)");
+    }
+
     // Selection: Escape clears first, then closes window
     if (m_input->is_key_pressed(SDL_SCANCODE_ESCAPE))
     {
@@ -694,6 +699,26 @@ void Application::update_simulation(f64 delta_time_sec)
     // Compute Local Sidereal Time
     const f64 lst = astro::TimeSystem::lmst(m_julian_date, m_observer.longitude_rad);
 
+    // --- Solar System ephemeris (computed once, shared by sky background + renderer) ---
+    // ← SPRINT 06 Task 6.6: must be before sky background update
+    const auto ss_bodies  = astro::SolarSystem::compute_all(m_julian_date);
+    const auto moon_state = astro::SolarSystem::compute_moon_full(m_julian_date);
+
+    // --- Update sky parameters with live Sun/Moon Alt/Az ← SPRINT 06 Task 6.6 ---
+    {
+        const auto sun_hz  = astro::Coordinates::equatorial_to_horizontal(
+            ss_bodies.sun.equatorial, m_observer, lst);
+        const auto moon_hz = astro::Coordinates::equatorial_to_horizontal(
+            ss_bodies.moon.equatorial, m_observer, lst);
+
+        m_sky_params.sun_altitude_deg  = static_cast<f32>(sun_hz.alt  * astro_constants::kRadToDeg);
+        m_sky_params.sun_azimuth_deg   = static_cast<f32>(sun_hz.az   * astro_constants::kRadToDeg);
+        m_sky_params.moon_altitude_deg = static_cast<f32>(moon_hz.alt * astro_constants::kRadToDeg);
+        m_sky_params.moon_azimuth_deg  = static_cast<f32>(moon_hz.az  * astro_constants::kRadToDeg);
+        m_sky_params.moon_illumination = moon_state.body.illumination;
+        m_sky_params.atmosphere_enabled = m_atmosphere_on;
+    }
+
     // Update sky background (visual context only)
     m_sky_background->update_params(m_sky_params, *m_camera);
 
@@ -743,20 +768,15 @@ void Application::update_simulation(f64 delta_time_sec)
     m_starfield->update(m_stars, candidates, m_observer, lst, *m_camera);
 
     // --- Step 3b: Solar System bodies (Sun, Moon, planets) ← SPRINT 06 Task 6.5 ---
-    {
-        const auto ss_bodies = astro::SolarSystem::compute_all(m_julian_date);
-        const auto moon_state = astro::SolarSystem::compute_moon_full(m_julian_date);
-        m_solar_system_renderer.update(
-            ss_bodies, moon_state,
-            *m_camera, m_observer, lst,
-            *m_line_renderer, m_hud->get_font(),
-            viewport,
-            // atmosphere_on = false: skychart mode bypasses horizon culling so
-            // Solar System bodies remain visible for planning (same as atmosphere-off
-            // described in CLAUDE.md §5.4). A future skychart atmosphere toggle
-            // can replace this with the actual flag when implemented.
-            false);
-    }
+    m_solar_system_renderer.update(
+        ss_bodies, moon_state,
+        *m_camera, m_observer, lst,
+        *m_line_renderer, m_hud->get_font(),
+        viewport,
+        // atmosphere_on = false: skychart mode bypasses horizon culling so
+        // Solar System bodies remain visible for planning (CLAUDE.md §5.4).
+        // The sky background's atmosphere_enabled is a separate visual toggle.
+        false);
 
     // --- Step 4: Constellation lines + labels (over stars) ---
     m_constellations.update(*m_camera, m_observer, lst,

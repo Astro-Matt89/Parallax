@@ -164,6 +164,10 @@ namespace parallax::core
         // -----------------------------------------------------------------
         rendering::SkyParams m_sky_params;
 
+        /// @brief Atmosphere toggle: true = Bortle gradient + twilight glow;
+        ///        false = pure black sky (all objects still rendered). Key: 'A'.
+        bool m_atmosphere_on = true;
+
         f64 m_elevation_m = 0.0;  ///< Observer elevation above sea level (metres)
 
         /// @brief Wall-clock time tracking for delta_time computation.

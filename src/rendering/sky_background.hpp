@@ -16,25 +16,40 @@ namespace parallax::rendering
     /// @brief Sky parameters controlling the appearance of the night sky.
     struct SkyParams
     {
-        f32 bortle_scale = 4.0f;        ///< Bortle dark-sky scale (1–9)
-        f32 sun_altitude_deg = -18.0f;  ///< Sun altitude in degrees (< -18° = night)
-        f32 moon_altitude_deg = -90.0f; ///< Moon altitude in degrees (below horizon)
-        f32 moon_phase = 0.0f;          ///< Moon phase (0 = new, 1 = full)
+        f32  bortle_scale       = 4.0f;   ///< Bortle dark-sky scale (1–9)
+        f32  sun_altitude_deg   = -90.0f; ///< Sun altitude in degrees (< -18° = night, default safe)
+        f32  sun_azimuth_deg    = 0.0f;   ///< Sun azimuth in degrees (0=N, 90=E)
+        f32  moon_altitude_deg  = -90.0f; ///< Moon altitude in degrees (default: below horizon)
+        f32  moon_azimuth_deg   = 0.0f;   ///< Moon azimuth in degrees
+        f32  moon_illumination  = 0.0f;   ///< Moon illumination fraction (0..1)
+        bool atmosphere_enabled = true;   ///< When false, sky renders as pure black
     };
 
     /// @brief Uniform buffer data sent to the sky background shaders each frame.
     ///
     /// Matches the `SkyUBO` layout in sky_background.frag (std140).
+    ///
+    /// std140 layout (48 bytes, 3 × vec4 rows):
+    ///   Row 0 (bytes  0–15): camera_alt_rad, camera_az_rad, fov_rad, aspect_ratio
+    ///   Row 1 (bytes 16–31): bortle_scale, sun_altitude_deg, sun_azimuth_deg, moon_altitude_deg
+    ///   Row 2 (bytes 32–47): moon_azimuth_deg, moon_illumination, atmosphere_enabled (uint), _pad0
     struct SkyUniformData
     {
-        f32 camera_alt_rad;     ///< Camera altitude in radians
-        f32 camera_az_rad;      ///< Camera azimuth in radians
-        f32 fov_rad;            ///< Field of view in radians
-        f32 aspect_ratio;       ///< Viewport width / height
-        f32 bortle_scale;       ///< Bortle scale 1–9
-        f32 sun_altitude_deg;   ///< Sun altitude in degrees
-        f32 padding0 = 0.0f;
-        f32 padding1 = 0.0f;
+        // Row 0
+        f32 camera_alt_rad;      ///< Camera altitude in radians
+        f32 camera_az_rad;       ///< Camera azimuth in radians
+        f32 fov_rad;             ///< Vertical field of view in radians
+        f32 aspect_ratio;        ///< Viewport width / height
+        // Row 1
+        f32 bortle_scale;        ///< Bortle scale 1–9
+        f32 sun_altitude_deg;    ///< Sun altitude in degrees
+        f32 sun_azimuth_deg;     ///< Sun azimuth in degrees
+        f32 moon_altitude_deg;   ///< Moon altitude in degrees
+        // Row 2
+        f32 moon_azimuth_deg;    ///< Moon azimuth in degrees
+        f32 moon_illumination;   ///< Moon illumination fraction (0..1)
+        u32 atmosphere_enabled;  ///< 0=disabled (pure black), 1=enabled; uint for std140 safety
+        f32 _pad0 = 0.0f;        ///< Padding to complete vec4 row 2
     };
 
     /// @brief Renders a procedural sky gradient as a fullscreen pass.

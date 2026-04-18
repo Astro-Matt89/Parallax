@@ -168,3 +168,22 @@ spdlog::spdlog
 )
 
 add_test(NAME SolarSystemRenderer COMMAND test_solar_system_renderer)
+
+# -----------------------------------------------------------------
+# Test: SkyBackgroundUbo layout               ← SPRINT 06 Task 6.6
+# -----------------------------------------------------------------
+add_executable(test_sky_background_ubo
+test_sky_background_ubo.cpp
+)
+
+target_include_directories(test_sky_background_ubo PRIVATE
+"${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_sky_background_ubo PRIVATE
+doctest::doctest
+glm::glm
+Vulkan::Vulkan
+)
+
+add_test(NAME SkyBackgroundUbo COMMAND test_sky_background_ubo)

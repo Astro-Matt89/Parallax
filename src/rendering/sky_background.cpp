@@ -111,15 +111,19 @@ void SkyBackground::update_params(const SkyParams& params, const Camera& camera)
     const auto pointing = camera.get_pointing();
 
     m_uniform_data = SkyUniformData{
-        .camera_alt_rad   = static_cast<f32>(pointing.alt),
-        .camera_az_rad    = static_cast<f32>(pointing.az),
-        .fov_rad          = static_cast<f32>(camera.get_fov_rad()),
-        .aspect_ratio     = static_cast<f32>(m_extent.width)
-                          / static_cast<f32>(std::max(m_extent.height, 1u)),
-        .bortle_scale     = params.bortle_scale,
-        .sun_altitude_deg = params.sun_altitude_deg,
-        .padding0         = 0.0f,
-        .padding1         = 0.0f,
+        .camera_alt_rad    = static_cast<f32>(pointing.alt),
+        .camera_az_rad     = static_cast<f32>(pointing.az),
+        .fov_rad           = static_cast<f32>(camera.get_fov_rad()),
+        .aspect_ratio      = static_cast<f32>(m_extent.width)
+                           / static_cast<f32>(std::max(m_extent.height, 1u)),
+        .bortle_scale      = params.bortle_scale,
+        .sun_altitude_deg  = params.sun_altitude_deg,
+        .sun_azimuth_deg   = params.sun_azimuth_deg,
+        .moon_altitude_deg = params.moon_altitude_deg,
+        .moon_azimuth_deg  = params.moon_azimuth_deg,
+        .moon_illumination = params.moon_illumination,
+        .atmosphere_enabled = params.atmosphere_enabled ? 1u : 0u,
+        ._pad0             = 0.0f,
     };
 
     upload_uniforms();

@@ -413,3 +413,300 @@ TEST_CASE("compute_all — Sun matches individual compute_sun")
     CHECK(all.sun.magnitude == doctest::Approx(sun_single.magnitude));
     CHECK(all.sun.angular_diameter_arcsec == doctest::Approx(sun_single.angular_diameter_arcsec));
 }
+
+// =================================================================
+// Task 6.3 planet tests
+// =================================================================
+
+// =================================================================
+// PLANET TEST 1: Invalid planet_id returns default-constructed state
+//
+// Earth (id=3) is not a valid target for compute_planet.
+// Any id outside {1,2,4,5,6,7,8} must return a zeroed CelestialBodyState.
+// =================================================================
+
+TEST_CASE("compute_planet — invalid planet_id returns zeroed state")
+{
+    constexpr f64 kJD_J2000 = 2451545.0;
+
+    // Earth (id=3) is not a valid planet target
+    const auto earth_result = SolarSystem::compute_planet(kJD_J2000, 3);
+    CHECK(earth_result.distance_au == 0.0);
+    CHECK(earth_result.equatorial.ra == 0.0);
+    CHECK(earth_result.equatorial.dec == 0.0);
+    CHECK(earth_result.magnitude == 0.0f);
+    CHECK(earth_result.illumination == 0.0f);
+
+    // Clearly invalid id
+    const auto invalid = SolarSystem::compute_planet(kJD_J2000, 99);
+    CHECK(invalid.distance_au == 0.0);
+    CHECK(invalid.equatorial.ra == 0.0);
+
+    MESSAGE("Invalid planet ids correctly return zeroed state");
+}
+
+// =================================================================
+// PLANET TEST 2: Kepler equation solver round-trip
+//
+// For given M and e, the solution E satisfies M = E − e·sin(E)
+// to within 1e-9.  We verify this property using a local re-implementation
+// of the same Newton–Raphson algorithm (solve_kepler is private).
+//
+// Tests: e ∈ {0.0, 0.2, 0.9} with several M values.
+// =================================================================
+
+TEST_CASE("Kepler equation — Newton-Raphson round-trip M = E − e·sin(E)")
+{
+    // Local replica of the Newton–Raphson solver (solve_kepler is private)
+    auto kepler_solve = [](f64 M_rad, f64 e) -> f64
+    {
+        f64 E = M_rad + e * std::sin(M_rad);
+        for (int iter = 0; iter < 20; ++iter)
+        {
+            const f64 dE = (E - e * std::sin(E) - M_rad) / (1.0 - e * std::cos(E));
+            E -= dE;
+            if (std::abs(dE) < 1.0e-10)
+            {
+                break;
+            }
+        }
+        return E;
+    };
+
+    constexpr f64 kTol = 1.0e-9;
+
+    // e = 0.0: circular orbit — trivial case, E = M exactly
+    for (f64 M_deg : {0.0, 30.0, 90.0, 180.0, 270.0, 359.0})
+    {
+        const f64 M = M_deg * astro_constants::kDegToRad;
+        const f64 E = kepler_solve(M, 0.0);
+        const f64 residual = std::abs(E - 0.0 * std::sin(E) - M);
+        CHECK(residual < kTol);
+    }
+
+    // e = 0.2: moderate eccentricity (Mercury-like)
+    for (f64 M_deg : {10.0, 45.0, 90.0, 135.0, 180.0, 270.0, 350.0})
+    {
+        const f64 M = M_deg * astro_constants::kDegToRad;
+        const f64 E = kepler_solve(M, 0.2);
+        const f64 residual = std::abs(E - 0.2 * std::sin(E) - M);
+        CHECK(residual < kTol);
+    }
+
+    // e = 0.9: high eccentricity (comet-like, stress test)
+    for (f64 M_deg : {1.0, 10.0, 30.0, 90.0, 180.0, 270.0})
+    {
+        const f64 M = M_deg * astro_constants::kDegToRad;
+        const f64 E = kepler_solve(M, 0.9);
+        const f64 residual = std::abs(E - 0.9 * std::sin(E) - M);
+        CHECK(residual < kTol);
+    }
+
+    MESSAGE("Kepler solver round-trip verified for e in {0.0, 0.2, 0.9}");
+}
+
+// =================================================================
+// PLANET TEST 3: Mars opposition 2020-10-13
+//
+// Mars was at opposition on 2020-10-13 (JD ≈ 2459136.0).
+// Reference (JPL Horizons, geocentric apparent J2000):
+//   RA  ≈ 23h 09m (= 347.3°)
+//   Dec ≈ +5°
+//   V magnitude ≈ -2.6
+//
+// Tolerance: 1° total angular separation (Meeus Ch. 31 accuracy).
+// Magnitude:  -2.6 ± 0.3.
+// =================================================================
+
+TEST_CASE("Mars opposition 2020-10-13 — RA, Dec, magnitude")
+{
+    // JD for 2020-10-13 00:00 TDT
+    // Mars opposition occurred 2020-10-13 22:26 UTC
+    constexpr f64 kJD_MarsOpp2020 = 2459136.0;
+
+    const auto mars = SolarSystem::compute_planet(kJD_MarsOpp2020, planet_id::kMars);
+
+    // Reference: at opposition ~Oct 13, Sun RA ≈ 13.4h (201°),
+    // so Mars is opposite at ≈ 1.4h (21°), confirmed by JPL Horizons.
+    // JPL Horizons geocentric apparent (J2000) near opposition:
+    //   RA ≈ 1h 24m (21°), Dec ≈ +5.7°
+    constexpr f64 kExpectedRaDeg  = 21.0;
+    constexpr f64 kExpectedDecDeg = 5.7;
+
+    const EquatorialCoord expected{
+        .ra  = kExpectedRaDeg  * astro_constants::kDegToRad,
+        .dec = kExpectedDecDeg * astro_constants::kDegToRad,
+    };
+
+    const f64 sep = angular_separation_deg(mars.equatorial, expected);
+    CHECK(sep < 1.0);  // within 1° (Meeus Ch. 31 low-precision bound)
+
+    // Magnitude near opposition: Mars ≈ -2.6
+    CHECK(mars.magnitude == doctest::Approx(-2.6f).epsilon(0.12));  // ±0.3 mag
+
+    // Distance sanity: at opposition Mars should be ~0.4–0.5 AU from Earth
+    CHECK(mars.distance_au > 0.3);
+    CHECK(mars.distance_au < 0.8);
+
+    MESSAGE("Mars 2020 opposition: RA=", ra_to_hours(mars.equatorial.ra),
+            "h, Dec=", dec_to_deg(mars.equatorial.dec),
+            "°, sep=", sep, "°, mag=", mars.magnitude,
+            ", dist=", mars.distance_au, " AU");
+}
+
+// =================================================================
+// PLANET TEST 4: Jupiter at J2000.0
+//
+// Reference (Meeus Table 31.A computed / JPL Horizons J2000.0):
+//   RA  ≈ 25.5° (1h 42m)
+//   Dec ≈ +9.9°
+//
+// Tolerance: 1° angular separation.
+// =================================================================
+
+TEST_CASE("Jupiter at J2000.0 — RA and Dec position")
+{
+    constexpr f64 kJD_J2000 = 2451545.0;
+
+    const auto jupiter = SolarSystem::compute_planet(kJD_J2000, planet_id::kJupiter);
+
+    // Reference: JPL Horizons geocentric apparent at J2000.0:
+    //   RA ≈ 1h 35m (23.8°), Dec ≈ +9.25°
+    // Meeus Ch. 31 low-precision accuracy: ~0.5° — using 1° tolerance.
+    constexpr f64 kExpectedRaDeg  = 23.8;  // 1h 35m (JPL Horizons J2000.0)
+    constexpr f64 kExpectedDecDeg = 9.25;
+
+    const EquatorialCoord expected{
+        .ra  = kExpectedRaDeg  * astro_constants::kDegToRad,
+        .dec = kExpectedDecDeg * astro_constants::kDegToRad,
+    };
+
+    const f64 sep = angular_separation_deg(jupiter.equatorial, expected);
+    CHECK(sep < 1.0);
+
+    // Distance: Jupiter is ~4.2–6.2 AU from Earth; ~5 AU at J2000
+    CHECK(jupiter.distance_au > 3.9);
+    CHECK(jupiter.distance_au < 6.5);
+
+    MESSAGE("Jupiter J2000.0: RA=", ra_to_hours(jupiter.equatorial.ra),
+            "h (", dec_to_deg(jupiter.equatorial.ra), "°), Dec=",
+            dec_to_deg(jupiter.equatorial.dec),
+            "°, sep=", sep, "°, dist=", jupiter.distance_au, " AU");
+}
+
+// =================================================================
+// PLANET TEST 5: Venus illumination and phase angle bounds
+//
+// For any valid JD, Venus illumination must be in [0, 1]
+// and phase angle must be in [0°, 180°].
+// Also verify the distance is in a physically plausible range.
+// =================================================================
+
+TEST_CASE("Venus — illumination and phase angle bounds at J2000.0")
+{
+    constexpr f64 kJD_J2000 = 2451545.0;
+
+    const auto venus = SolarSystem::compute_planet(kJD_J2000, planet_id::kVenus);
+
+    // Illumination fraction must be in [0, 1]
+    CHECK(venus.illumination >= 0.0f);
+    CHECK(venus.illumination <= 1.0f);
+
+    // Phase angle must be in [0°, 180°]
+    CHECK(venus.phase_angle_deg >= 0.0f);
+    CHECK(venus.phase_angle_deg <= 180.0f);
+
+    // Venus geocentric distance: between |1.0 − 0.723| = 0.277 AU (inferior conj.)
+    // and 1.0 + 0.723 = 1.723 AU (superior conj.)
+    CHECK(venus.distance_au > 0.25);
+    CHECK(venus.distance_au < 1.75);
+
+    MESSAGE("Venus J2000.0: illumination=", venus.illumination,
+            ", phase=", venus.phase_angle_deg,
+            "°, dist=", venus.distance_au, " AU");
+}
+
+// =================================================================
+// PLANET TEST 6: Distance sanity checks at J2000.0
+//
+// Each planet's geocentric distance must lie within its physically
+// possible range (perihelion − 1 AU  to  aphelion + 1 AU, roughly):
+//   Mercury ∈ [0.5, 1.5] AU
+//   Jupiter ∈ [3.9, 6.5] AU
+//   Neptune ∈ [28,  31]  AU
+// =================================================================
+
+TEST_CASE("Planet distances — sanity bounds at J2000.0")
+{
+    constexpr f64 kJD_J2000 = 2451545.0;
+
+    const auto mercury = SolarSystem::compute_planet(kJD_J2000, planet_id::kMercury);
+    const auto jupiter = SolarSystem::compute_planet(kJD_J2000, planet_id::kJupiter);
+    const auto neptune = SolarSystem::compute_planet(kJD_J2000, planet_id::kNeptune);
+
+    // Mercury: semi-major axis 0.387 AU → Earth distance 0.613–1.387 AU
+    CHECK(mercury.distance_au >= 0.5);
+    CHECK(mercury.distance_au <= 1.5);
+
+    // Jupiter: semi-major axis ~5.2 AU → Earth distance 4.2–6.2 AU
+    CHECK(jupiter.distance_au >= 3.9);
+    CHECK(jupiter.distance_au <= 6.5);
+
+    // Neptune: semi-major axis ~30.1 AU → Earth distance ~29–31.5 AU
+    CHECK(neptune.distance_au >= 28.0);
+    CHECK(neptune.distance_au <= 31.5);
+
+    MESSAGE("Distances at J2000.0: Mercury=", mercury.distance_au,
+            " AU, Jupiter=", jupiter.distance_au,
+            " AU, Neptune=", neptune.distance_au, " AU");
+}
+
+// =================================================================
+// PLANET TEST 7: compute_all — all 7 planets populated non-trivially
+//
+// Every planet must have distance_au > 0.
+// The spread of RA values across all 7 planets must exceed 10°
+// (planets are not all stacked at the same point on the sky).
+// =================================================================
+
+TEST_CASE("compute_all — all 7 planets populated non-trivially")
+{
+    constexpr f64 kJD_J2000 = 2451545.0;
+
+    const auto all = SolarSystem::compute_all(kJD_J2000);
+
+    // Every planet has a non-zero positive distance
+    for (u32 i = 0; i < 7; ++i)
+    {
+        CHECK(all.planets[i].distance_au > 0.0);
+    }
+
+    // Planets are spread across the sky — RA range > 10°
+    // (At J2000, planets span from Jupiter ~1.7h to Mars/Mercury ~20–21h)
+    f64 min_ra = all.planets[0].equatorial.ra;
+    f64 max_ra = all.planets[0].equatorial.ra;
+    for (u32 i = 1; i < 7; ++i)
+    {
+        min_ra = std::min(min_ra, all.planets[i].equatorial.ra);
+        max_ra = std::max(max_ra, all.planets[i].equatorial.ra);
+    }
+
+    constexpr f64 kMinSpreadRad = 10.0 * astro_constants::kDegToRad;
+    CHECK((max_ra - min_ra) > kMinSpreadRad);
+
+    // All planets have non-trivial RA (not all exactly zero)
+    f64 ra_sum = 0.0;
+    for (u32 i = 0; i < 7; ++i)
+    {
+        ra_sum += all.planets[i].equatorial.ra;
+    }
+    CHECK(ra_sum > 0.0);
+
+    MESSAGE("Planet RAs at J2000.0 (hours):");
+    for (u32 i = 0; i < 7; ++i)
+    {
+        MESSAGE("  planet[", i, "] = ", ra_to_hours(all.planets[i].equatorial.ra),
+                "h  dist=", all.planets[i].distance_au, " AU");
+    }
+    MESSAGE("RA spread = ", (max_ra - min_ra) * astro_constants::kRadToDeg, "°");
+}

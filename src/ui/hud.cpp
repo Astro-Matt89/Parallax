@@ -14,6 +14,29 @@ namespace parallax::ui
 {
 
 // =================================================================
+// Sky-state helper                                ← SPRINT 06 Task 6.7
+// =================================================================
+
+namespace
+{
+
+/// @brief Map Sun altitude + atmosphere flag to a human-readable sky state label.
+/// @param sun_alt_deg  Sun altitude in degrees.
+/// @param atmosphere_on  True when the atmosphere is enabled.
+/// @return Short label string (pointer to a string literal).
+const char* sky_state_label(f32 sun_alt_deg, bool atmosphere_on)
+{
+    if (!atmosphere_on)          return "ATMO OFF";
+    if (sun_alt_deg >= 0.0f)     return "DAY";
+    if (sun_alt_deg >= -6.0f)    return "CIVIL TWI";
+    if (sun_alt_deg >= -12.0f)   return "NAUTICAL TWI";
+    if (sun_alt_deg >= -18.0f)   return "ASTRO TWI";
+    return "NIGHT";
+}
+
+} // anonymous namespace
+
+// =================================================================
 // Formatting helpers (unchanged from Sprint 03)
 // =================================================================
 
@@ -139,6 +162,7 @@ void Hud::render(VkCommandBuffer cmd, VkExtent2D viewport_extent)
     draw_observer_panel(vw, vh);
     draw_performance_panel(vw, vh);
     draw_overlay_status(vw, vh);         // ← SPRINT 04 Task 4.7
+    draw_sky_state(vw, vh);              // ← SPRINT 06 Task 6.7
 
     m_font.render(cmd, viewport_extent);
 }
@@ -354,7 +378,6 @@ void Hud::draw_performance_panel(f32 vw, f32 vh)
 // Format: CONST ON  GRID EQ  DSO ON  HORIZ ON
 // Active overlays shown in bright green, inactive in dim.
 // =================================================================
-
 void Hud::draw_overlay_status(f32 vw, f32 vh)
 {
     // Position: bottom of screen, centered horizontally
@@ -415,6 +438,48 @@ void Hud::draw_overlay_status(f32 vw, f32 vh)
         const Vec3f color = m_data.overlay_horizon ? kColorValue : kColorDim;
         m_font.draw_text(val, x, y, kScale, color);
     }
+}
+
+// =================================================================
+// Bottom-right extension: sky state                      ← SPRINT 06 Task 6.7
+//
+// Format: SKY  NIGHT | CIVIL TWI | NAUTICAL TWI | ASTRO TWI | DAY | ATMO OFF
+// Drawn below the FPS panel in the bottom-right column.
+// =================================================================
+
+void Hud::draw_sky_state(f32 vw, f32 vh)
+{
+    constexpr f32 kPanelChars = 22.0f;
+    // Sky state line: 1 line above performance panel (FPS + TIME = 2 lines)
+    // so this sits at offset 3 from the bottom margin.
+    constexpr f32 kSkyStateLine = 3.0f;
+    const f32 x_label = vw - kMargin - kPanelChars * kGlyphW;
+    const f32 x_value = x_label + kGlyphW * 5;
+    const f32 y = vh - kMargin - kLineSpacing * kSkyStateLine;
+
+    const char* state = sky_state_label(m_data.sun_altitude_deg, m_data.atmosphere_on);
+
+    // Color coding: dim red = ATMO OFF, bright white = DAY, warm orange = twilight, dim = NIGHT
+    Vec3f state_color;
+    if (!m_data.atmosphere_on)
+    {
+        state_color = {0.8f, 0.2f, 0.2f};      // dim red — ATMO OFF
+    }
+    else if (m_data.sun_altitude_deg >= 0.0f)
+    {
+        state_color = {1.0f, 1.0f, 1.0f};      // bright white — DAY
+    }
+    else if (m_data.sun_altitude_deg >= -18.0f)
+    {
+        state_color = {1.0f, 0.6f, 0.2f};      // warm orange — twilight states
+    }
+    else
+    {
+        state_color = kColorDim;                // dim green — NIGHT
+    }
+
+    m_font.draw_text("SKY  ", x_label, y, kScale, kColorLabel);
+    m_font.draw_text(state, x_value, y, kScale, state_color);
 }
 
 } // namespace parallax::ui

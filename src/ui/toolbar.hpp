@@ -47,6 +47,7 @@ namespace parallax::ui
         bool dso_visible            = false;
         bool grid_visible           = false;
         bool horizon_visible        = false;
+        bool atmosphere_on          = true;  ///< Atmosphere toggle state ← SPRINT 06 Task 6.7
 
         // Time
         f64 time_scale = 1.0;
@@ -67,12 +68,13 @@ namespace parallax::ui
     /// actions as their keyboard equivalents.
     struct ToolbarCallbacks
     {
-        // Overlay toggles (equivalent to keyboard C, S, D, G, O)
+        // Overlay toggles (equivalent to keyboard C, S, D, G, O, A)
         std::function<void()> toggle_constellations;
         std::function<void()> toggle_stars;
         std::function<void()> toggle_dso;
         std::function<void()> cycle_grid;
         std::function<void()> toggle_horizon;
+        std::function<void()> toggle_atmosphere;  ///< Atmosphere toggle ← SPRINT 06 Task 6.7
 
         // Time controls (equivalent to keyboard -, Space, +, =)
         std::function<void()> time_reverse;
@@ -199,6 +201,7 @@ namespace parallax::ui
         std::unique_ptr<ToggleButton> m_btn_dso;
         std::unique_ptr<ToggleButton> m_btn_grid;
         std::unique_ptr<ToggleButton> m_btn_horiz;
+        std::unique_ptr<ToggleButton> m_btn_atmo;  ///< Atmosphere toggle ← SPRINT 06 Task 6.7
 
         // -----------------------------------------------------------------
         // Widgets — Time group

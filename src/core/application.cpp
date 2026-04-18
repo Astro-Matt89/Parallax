@@ -1,19 +1,18 @@
 /// @file application.cpp
 /// @brief Application implementation — skychart mode.
 ///
-/// Frame loop: input → time → sky → prefilter → starfield → overlays → HUD → render → present.
-/// NO atmospheric effects on star rendering.
-///
+/// SPRINT 06 Task 6.7: Canonical frame-loop order documented in update_simulation().
 /// SPRINT 04 Task 4.7: Full overlay integration.
 /// SPRINT 05 Task 5.0: Tycho-2 catalog + spatial index integration.
 /// Render order:
 ///   1. Sky background
 ///   2. Coordinate grid (behind stars)
 ///   3. Starfield (additive)
-///   4. Constellation lines + labels (over stars)
-///   5. DSO icons + labels (over stars)
-///   6. Horizon line + cardinal markers (over everything except HUD)
-///   7. HUD (always on top)
+///   4. Solar System bodies (Sun, Moon, planets)
+///   5. Constellation lines + labels (over stars)
+///   6. DSO icons + labels (over stars)
+///   7. Horizon line + cardinal markers (over everything except HUD)
+///   8. HUD (always on top)
 
 #include "core/application.hpp"
 
@@ -123,6 +122,7 @@ void Application::init()
         cb.toggle_dso            = [this]() { m_dso_renderer.toggle_visible(); };
         cb.cycle_grid            = [this]() { m_coord_grid.cycle_type(); };
         cb.toggle_horizon        = [this]() { m_horizon.toggle_visible(); };
+        cb.toggle_atmosphere     = [this]() { toggle_atmosphere(); };  // ← SPRINT 06 Task 6.7
         cb.time_reverse          = [this]()
         {
             if (m_time_scale >= 0.0) { m_time_scale = -1.0; }
@@ -411,6 +411,21 @@ void Application::main_loop()
 }
 
 // =================================================================
+// Atmosphere toggle API                           ← SPRINT 06 Task 6.7
+// =================================================================
+
+void Application::toggle_atmosphere()
+{
+    m_atmosphere_on = !m_atmosphere_on;
+    PLX_CORE_INFO("Atmosphere: {}", m_atmosphere_on ? "ON (twilight gradient)" : "OFF (pure black)");
+}
+
+void Application::set_atmosphere(bool on)
+{
+    m_atmosphere_on = on;
+}
+
+// =================================================================
 // Input processing — mouse priority + key bindings      ← SPRINT 05 Task 5.6
 //
 // Mouse interaction priority:
@@ -635,8 +650,7 @@ void Application::process_input()
 
     if (m_input->is_key_pressed(SDL_SCANCODE_A))
     {
-        m_atmosphere_on = !m_atmosphere_on;
-        PLX_CORE_INFO("Atmosphere {}", m_atmosphere_on ? "ON (twilight gradient)" : "OFF (pure black)");
+        toggle_atmosphere();
     }
 
     // Selection: Escape clears first, then closes window
@@ -675,14 +689,22 @@ void Application::process_input()
 // =================================================================
 // Simulation update — skychart mode (no atmosphere on stars)
 //
-// Render order per sprint_04.md Task 4.7:
-//   1. Sky background   (updated first, drawn by record_command_buffer)
-//   2. Coordinate grid  (behind stars — submitted to line renderer)
-//   3. Starfield        (additive)
-//   4. Constellations   (over stars — lines + labels)
-//   5. DSO icons+labels (over stars)
-//   6. Horizon+cardinals(over everything except HUD)
-//   7. HUD              (always on top)
+// CANONICAL FRAME LOOP ORDER (Task 6.7):             ← SPRINT 06 Task 6.7
+//
+//  1.  Advance simulation clock → JD, LST.
+//  2.  Compute Sun/Moon/planet positions:
+//        const auto ss_bodies   = astro::SolarSystem::compute_all(jd);
+//        const auto moon_state  = astro::SolarSystem::compute_moon_full(jd);
+//  3.  Compute Sun Alt/Az, Moon Alt/Az → m_sky_params, m_sun_altitude_deg.
+//  4.  Update sky background UBO with sun/moon/atmosphere_on (Task 6.6).
+//  5.  Update starfield (existing).
+//  6.  Update solar system renderer (atmosphere_on branch — Task 6.5).
+//  7.  Update constellations + DSOs + grid (existing).
+//  8.  Update selection (runs AFTER solar_system_renderer.update so its
+//      get_screen_objects() reflects this frame).
+//  9.  Render pass: sky background → starfield → solar system → DSOs →
+//      constellations → grid → horizon → selection indicator → HUD → toolbar.
+// 10.  Submit / present.
 //
 // All overlay geometry is submitted to the single m_line_renderer.
 // Labels are submitted to the BitmapFont inside m_hud.
@@ -717,6 +739,9 @@ void Application::update_simulation(f64 delta_time_sec)
         m_sky_params.moon_azimuth_deg  = static_cast<f32>(moon_hz.az  * astro_constants::kRadToDeg);
         m_sky_params.moon_illumination = moon_state.body.illumination;
         m_sky_params.atmosphere_enabled = m_atmosphere_on;
+
+        // Cache sun altitude for HUD sky-state readout ← SPRINT 06 Task 6.7
+        m_sun_altitude_deg = m_sky_params.sun_altitude_deg;
     }
 
     // Update sky background (visual context only)
@@ -768,15 +793,15 @@ void Application::update_simulation(f64 delta_time_sec)
     m_starfield->update(m_stars, candidates, m_observer, lst, *m_camera);
 
     // --- Step 3b: Solar System bodies (Sun, Moon, planets) ← SPRINT 06 Task 6.5 ---
+    // atmosphere_on controls horizon culling for Solar System bodies:
+    //   true  → horizon cull active (bodies below alt=0 are hidden)
+    //   false → all bodies always visible (Option A per Task 6.7 spec)
     m_solar_system_renderer.update(
         ss_bodies, moon_state,
         *m_camera, m_observer, lst,
         *m_line_renderer, m_hud->get_font(),
         viewport,
-        // atmosphere_on = false: skychart mode bypasses horizon culling so
-        // Solar System bodies remain visible for planning (CLAUDE.md §5.4).
-        // The sky background's atmosphere_enabled is a separate visual toggle.
-        false);
+        m_atmosphere_on);  // ← SPRINT 06 Task 6.7: pass live toggle
 
     // --- Step 4: Constellation lines + labels (over stars) ---
     m_constellations.update(*m_camera, m_observer, lst,
@@ -813,6 +838,7 @@ void Application::update_simulation(f64 delta_time_sec)
             .dso_visible            = m_dso_renderer.is_visible(),
             .grid_visible           = m_coord_grid.get_type() != overlay::GridType::None,
             .horizon_visible        = m_horizon.is_visible(),
+            .atmosphere_on          = m_atmosphere_on,          // ← SPRINT 06 Task 6.7
             .time_scale             = m_time_scale,
             .time_paused            = (m_time_scale == 0.0),
             .fov_deg                = m_camera->get_fov_deg(),
@@ -893,6 +919,8 @@ void Application::update_simulation(f64 delta_time_sec)
         .overlay_grid_name       = m_coord_grid.get_type_name(),
         .overlay_dso             = m_dso_renderer.is_visible(),
         .overlay_horizon         = m_horizon.is_visible(),
+        .sun_altitude_deg        = m_sun_altitude_deg,           // ← SPRINT 06 Task 6.7
+        .atmosphere_on           = m_atmosphere_on,              // ← SPRINT 06 Task 6.7
     });
 
     // Periodic logging — query time + visible star count             ← SPRINT 05 Task 5.0

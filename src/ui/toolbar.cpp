@@ -25,7 +25,7 @@ void Toolbar::init(const ToolbarCallbacks& callbacks)
 
     m_initialized = true;
     PLX_CORE_INFO("Toolbar initialized (3 groups, {} buttons, 1 slider)",
-                  5 + 4);  // 5 overlay toggles + 4 time buttons
+                  6 + 4);  // overlay group: CONST, STAR, DSO, GRID, HORIZ, ATMO = 6; time = 4
 }
 
 // =================================================================
@@ -35,7 +35,7 @@ void Toolbar::init(const ToolbarCallbacks& callbacks)
 void Toolbar::create_overlay_group(const ToolbarCallbacks& callbacks)
 {
     // Retro text "icons" — short labels matching keyboard shortcuts
-    // C=constellations, S=stars, D=DSO, G=grid, O=horizon
+    // C=constellations, S=stars, D=DSO, G=grid, O=horizon, A=atmosphere
     const Vec2f dummy_pos = {0.0f, 0.0f};
     const Vec2f btn_size = {kButtonW, kButtonH};
 
@@ -58,6 +58,11 @@ void Toolbar::create_overlay_group(const ToolbarCallbacks& callbacks)
     m_btn_horiz = std::make_unique<ToggleButton>(
         "HORIZ", dummy_pos, Vec2f{56.0f, kButtonH},
         callbacks.toggle_horizon ? callbacks.toggle_horizon : []() {});
+
+    // ATMO — atmosphere toggle (A key equivalent)       ← SPRINT 06 Task 6.7
+    m_btn_atmo = std::make_unique<ToggleButton>(
+        "ATMO", dummy_pos, btn_size,
+        callbacks.toggle_atmosphere ? callbacks.toggle_atmosphere : []() {});
 }
 
 // =================================================================
@@ -130,9 +135,9 @@ void Toolbar::layout_widgets(u32 viewport_width, u32 viewport_height)
     // Toolbar sits at the bottom, centered horizontally
     // Compute total width of all groups
 
-    // Group 1: overlay toggles (5 buttons)
-    const f32 overlay_w = kButtonW * 4.0f + 56.0f  // HORIZ is wider
-                          + kButtonSpacing * 4.0f;
+    // Group 1: overlay toggles (6 buttons: CONST, STAR, DSO, GRID, HORIZ, ATMO)
+    const f32 overlay_w = kButtonW * 5.0f + 56.0f  // HORIZ is wider
+                          + kButtonSpacing * 5.0f;
 
     // Group 2: time controls (4 buttons + speed text)
     const f32 time_btn_w = 36.0f;
@@ -168,7 +173,11 @@ void Toolbar::layout_widgets(u32 viewport_width, u32 viewport_height)
     x += kButtonW + kButtonSpacing;
 
     m_btn_horiz->set_position({x, widget_y});
-    x += 56.0f + kGroupSpacing;
+    x += 56.0f + kButtonSpacing;
+
+    // ATMO button (atmosphere toggle)                   ← SPRINT 06 Task 6.7
+    m_btn_atmo->set_position({x, widget_y});
+    x += kButtonW + kGroupSpacing;
 
     // --- Group 2: Time controls ---
     m_btn_time_rev->set_position({x, widget_y});
@@ -256,6 +265,7 @@ void Toolbar::update(Vec2f mouse_pos, bool mouse_clicked, bool mouse_down, f32 d
     m_btn_dso->set_active(state.dso_visible);
     m_btn_grid->set_active(state.grid_visible);
     m_btn_horiz->set_active(state.horizon_visible);
+    m_btn_atmo->set_active(state.atmosphere_on);        // ← SPRINT 06 Task 6.7
 
     // Sync FOV slider (only if not currently dragging)
     if (!m_slider_fov->is_dragging())
@@ -306,6 +316,7 @@ void Toolbar::update(Vec2f mouse_pos, bool mouse_clicked, bool mouse_down, f32 d
     m_btn_dso->update(mouse_pos, mouse_clicked, dt);
     m_btn_grid->update(mouse_pos, mouse_clicked, dt);
     m_btn_horiz->update(mouse_pos, mouse_clicked, dt);
+    m_btn_atmo->update(mouse_pos, mouse_clicked, dt);   // ← SPRINT 06 Task 6.7
 
     m_btn_time_rev->update(mouse_pos, mouse_clicked, dt);
     m_btn_time_pause->update(mouse_pos, mouse_clicked, dt);
@@ -336,10 +347,11 @@ void Toolbar::render(BitmapFont& font, rendering::LineRenderer& lines,
     m_btn_dso->render(font, lines, vp);
     m_btn_grid->render(font, lines, vp);
     m_btn_horiz->render(font, lines, vp);
+    m_btn_atmo->render(font, lines, vp);    // ← SPRINT 06 Task 6.7
 
     // --- Group separator line 1 ---
     {
-        const f32 sep_x = m_btn_horiz->get_position().x + m_btn_horiz->get_size().x
+        const f32 sep_x = m_btn_atmo->get_position().x + m_btn_atmo->get_size().x
                           + kGroupSpacing * 0.5f;
         const f32 sep_top = m_toolbar_y + 6.0f;
         const f32 sep_bot = m_toolbar_y + kToolbarHeight - 6.0f;

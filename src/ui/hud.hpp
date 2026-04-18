@@ -60,6 +60,10 @@ namespace parallax::ui
         const char* overlay_grid_name = "None"; ///< Grid type name string
         bool overlay_dso = true;            ///< DSO icons visible
         bool overlay_horizon = true;        ///< Horizon + cardinals visible
+
+        // Sky state                                        ← SPRINT 06 Task 6.7
+        f32 sun_altitude_deg = -90.0f;      ///< Sun altitude in degrees (from sky background)
+        bool atmosphere_on = true;          ///< Atmosphere toggle state
     };
 
     /// @brief Retro green terminal HUD overlay.
@@ -125,6 +129,9 @@ namespace parallax::ui
 
         /// @brief Draw the overlay status bar (bottom-center).            ← SPRINT 04 Task 4.7
         void draw_overlay_status(f32 vw, f32 vh);
+
+        /// @brief Draw the sky-state line in the observer panel.          ← SPRINT 06 Task 6.7
+        void draw_sky_state(f32 vw, f32 vh);
 
         BitmapFont m_font;
         HudData m_data{};

@@ -3,6 +3,7 @@
 ///
 /// Sun position: Meeus "Astronomical Algorithms" Ch. 25 (low precision, ~0.01°).
 /// Moon position: Meeus "Astronomical Algorithms" Ch. 47 (abridged, ~0.1°).
+/// Planet positions: Meeus "Astronomical Algorithms" Ch. 31 (Keplerian elements, ~0.1–0.5°).
 /// All coefficients are the published Meeus values — not AI-generated.
 
 #include "astro/solar_system.hpp"
@@ -34,6 +35,30 @@ static constexpr f64 kMoonRadiusKm = 1737.4;
 
 /// AU in km (IAU 2012).
 static constexpr f64 kAuKm = 149597870.7;
+
+// =================================================================
+// Meeus Table 31.A — Earth's orbital elements (J2000.0 equinox)
+//
+// Referred to the mean ecliptic and equinox of J2000.0.
+// Each element is a polynomial in T (Julian centuries from J2000.0):
+//   value = c[0] + c[1]·T + c[2]·T² + c[3]·T³
+//
+// Meeus "Astronomical Algorithms" 2nd ed., Table 31.A, row for Earth.
+// Do NOT include Earth in the planet table — kEarthElements is separate.
+// =================================================================
+
+/// @brief Earth's Keplerian orbital elements (Meeus Table 31.A).
+///
+/// Used exclusively by compute_earth_heliocentric().
+/// Earth is not a valid planet_id target; these elements are kept separate.
+static constexpr OrbitalElements kEarthElements = {
+    .L     = {100.466449,   35999.3728519,  -0.00000568,   -0.000000026},
+    .a     = {1.000001018,  0.0},
+    .e     = {0.01670862,  -0.000042037,    -0.0000001236,   0.00000000004},
+    .i     = {0.0,          0.0130546,      -0.00000931,    -0.000000034},
+    .omega = {174.873174,  -0.2410908,       0.00004067,    -0.000001327},
+    .pi    = {102.937348,   1.7195366,       0.00045688,    -0.000000018},
+};
 
 // =================================================================
 // normalize_degrees — keep angle in [0, 360)
@@ -477,25 +502,431 @@ MoonState SolarSystem::compute_moon_full(f64 jd)
 }
 
 // =================================================================
-// compute_planet — stub for Task 6.3
+// get_planet_elements — Meeus Table 31.A, 7 planets (Earth excluded)
+//
+// Returns a pointer into a static constexpr table of OrbitalElements
+// indexed by planet_id (1=Mercury, 2=Venus, 4=Mars, 5=Jupiter,
+// 6=Saturn, 7=Uranus, 8=Neptune).  Earth (id=3) is not in this
+// table — use kEarthElements instead.
+//
+// Returns nullptr for any planet_id that is not one of the seven.
 // =================================================================
 
-CelestialBodyState SolarSystem::compute_planet(
-    [[maybe_unused]] f64 jd, [[maybe_unused]] u32 planet_id)
+const OrbitalElements* SolarSystem::get_planet_elements(u32 id)
 {
-    return CelestialBodyState{
-        .equatorial            = EquatorialCoord{.ra = 0.0, .dec = 0.0},
-        .horizontal            = HorizontalCoord{.alt = 0.0, .az = 0.0},
-        .distance_au           = 1.0,
-        .magnitude             = 0.0f,
-        .angular_diameter_arcsec = 0.0f,
-        .phase_angle_deg       = 0.0f,
-        .illumination          = 0.0f,
+    // Meeus "Astronomical Algorithms" 2nd ed., Table 31.A.
+    // Referred to the mean ecliptic and equinox of J2000.0.
+    // Layout: [0]=Mercury [1]=Venus [2]=Mars [3]=Jupiter [4]=Saturn [5]=Uranus [6]=Neptune
+    static constexpr OrbitalElements kPlanetTable[7] =
+    {
+        // ── Mercury (planet_id = 1) ───────────────────────────────────────────
+        {
+            .L     = {252.250906,   149474.0722491,   0.00030350,    0.000000018},
+            .a     = {0.387098310,  0.0},
+            .e     = {0.20563175,   0.000020406,     -0.0000000284, -0.00000000017},
+            .i     = {7.004986,     0.0018215,        -0.00001809,    0.000000053},
+            .omega = {48.330893,    1.1861883,          0.00017542,    0.000000215},
+            .pi    = {77.456119,    1.5564775,          0.00029589,    0.000000056},
+        },
+        // ── Venus (planet_id = 2) ─────────────────────────────────────────────
+        {
+            .L     = {181.979801,   58519.2130302,    0.00031014,    0.000000015},
+            .a     = {0.723329820,  0.0},
+            .e     = {0.00677188,  -0.000047766,      0.0000000975,  0.00000000044},
+            .i     = {3.394662,     0.0010037,        -0.00000088,   -0.000000007},
+            .omega = {76.679920,    0.9011190,          0.00040665,   -0.000000080},
+            .pi    = {131.563703,   1.4022288,         -0.00107618,   -0.000005765},
+        },
+        // ── Mars (planet_id = 4) ──────────────────────────────────────────────
+        {
+            .L     = {355.433275,   19141.6964746,    0.00031097,    0.000000015},
+            .a     = {1.523679342,  0.0},
+            .e     = {0.09340062,   0.000090483,     -0.0000000806, -0.00000000035},
+            .i     = {1.849726,    -0.0006010,         0.00001276,   -0.000000007},
+            .omega = {49.558093,    0.7720959,          0.00001557,    0.000002267},
+            .pi    = {336.060234,   1.8410449,          0.00013477,    0.000000536},
+        },
+        // ── Jupiter (planet_id = 5) ───────────────────────────────────────────
+        {
+            .L     = {34.351519,    3036.3027748,     0.00022330,    0.000000037},
+            .a     = {5.202603191,  0.0000001913},
+            .e     = {0.04849485,   0.000163244,     -0.0000004719, -0.00000000197},
+            .i     = {1.303270,    -0.0054966,         0.00000465,   -0.000000004},
+            .omega = {100.464441,   1.0209550,          0.00040117,    0.000000569},
+            .pi    = {14.331309,    1.6126668,          0.00103127,   -0.000004569},
+        },
+        // ── Saturn (planet_id = 6) ────────────────────────────────────────────
+        {
+            .L     = {50.077444,    1223.5110686,     0.00051908,   -0.000000030},
+            .a     = {9.554909596, -0.0000021389},
+            .e     = {0.05550862,  -0.000346818,     -0.0000006456,  0.00000000338},
+            .i     = {2.488878,    -0.0037363,        -0.00001516,    0.000000089},
+            .omega = {113.665524,   0.8770979,         -0.00012067,   -0.000002380},
+            .pi    = {93.057237,    1.9637613,          0.00083753,    0.000004928},
+        },
+        // ── Uranus (planet_id = 7) ────────────────────────────────────────────
+        {
+            .L     = {314.055005,   429.8640561,      0.00030434,    0.000000026},
+            .a     = {19.218446062, -0.0000000372},
+            .e     = {0.04629590,  -0.000027337,      0.0000000790,  0.00000000025},
+            .i     = {0.773196,     0.0007744,          0.00003749,   -0.000000092},
+            .omega = {74.005957,    0.5211278,          0.00133947,    0.000018484},
+            .pi    = {173.005291,   1.4863790,          0.00021406,    0.000000434},
+        },
+        // ── Neptune (planet_id = 8) ───────────────────────────────────────────
+        {
+            .L     = {304.348665,   219.8833092,      0.00030882,    0.000000018},
+            .a     = {30.110386869, -0.0000001663},
+            .e     = {0.00898809,   0.000006408,     -0.0000000008, -0.00000000005},
+            .i     = {1.769953,    -0.0093082,        -0.00000708,    0.000000027},
+            .omega = {131.784057,   1.1022057,          0.00026006,   -0.000000636},
+            .pi    = {48.120276,    1.4262957,          0.00038434,    0.000000020},
+        },
+    };
+
+    // Map planet_id to table index.
+    switch (id)
+    {
+        case planet_id::kMercury: return &kPlanetTable[0];
+        case planet_id::kVenus:   return &kPlanetTable[1];
+        case planet_id::kMars:    return &kPlanetTable[2];
+        case planet_id::kJupiter: return &kPlanetTable[3];
+        case planet_id::kSaturn:  return &kPlanetTable[4];
+        case planet_id::kUranus:  return &kPlanetTable[5];
+        case planet_id::kNeptune: return &kPlanetTable[6];
+        default: return nullptr;          // Earth (3) or any invalid id
+    }
+}
+
+// =================================================================
+// solve_kepler — Newton–Raphson solution of Kepler's equation
+//
+// Kepler's equation:  M = E − e·sin(E)
+//
+// Given mean anomaly M and eccentricity e, find eccentric anomaly E.
+//
+// Algorithm (Meeus Ch. 30):
+//   Initial guess: E₀ = M + e·sin(M)
+//   Iterate: Eₙ₊₁ = Eₙ − (Eₙ − e·sin(Eₙ) − M) / (1 − e·cos(Eₙ))
+//   Terminate when |ΔE| < 1e-10 or after 20 iterations.
+//
+// Convergence is guaranteed for all e < 1 (elliptical orbits).
+// For e = 0 (circular), ΔE = 0 on the first iteration.
+// =================================================================
+
+f64 SolarSystem::solve_kepler(f64 M_rad, f64 e)
+{
+    static constexpr int kMaxIterations = 20;
+    static constexpr f64 kTolerance     = 1.0e-10;
+
+    // Initial guess — good first approximation for small e
+    f64 E = M_rad + e * std::sin(M_rad);
+
+    for (int iter = 0; iter < kMaxIterations; ++iter)
+    {
+        const f64 dE = (E - e * std::sin(E) - M_rad) / (1.0 - e * std::cos(E));
+        E -= dE;
+        if (std::abs(dE) < kTolerance)
+        {
+            break;
+        }
+    }
+
+    return E;
+}
+
+// =================================================================
+// compute_heliocentric — heliocentric ecliptic Cartesian from elements
+//
+// Algorithm (Meeus Ch. 31):
+//   1. Evaluate each orbital element as a polynomial in T.
+//   2. Normalize angular elements to [0°, 360°).
+//   3. Derive M (mean anomaly) = L − ϖ.
+//   4. Derive ω (argument of perihelion) = ϖ − Ω.
+//   5. Solve Kepler's equation for eccentric anomaly E.
+//   6. Compute true anomaly ν and heliocentric distance r.
+//   7. Rotate into ecliptic Cartesian (Meeus Eq. 31.4):
+//      x = r·(cos(Ω)·cos(ω+ν) − sin(Ω)·sin(ω+ν)·cos(i))
+//      y = r·(sin(Ω)·cos(ω+ν) + cos(Ω)·sin(ω+ν)·cos(i))
+//      z = r·(sin(ω+ν)·sin(i))
+// =================================================================
+
+HeliocentricPos SolarSystem::compute_heliocentric(const OrbitalElements& el, f64 T)
+{
+    // --- Step 1: evaluate polynomials in T ---
+    const f64 L_deg = normalize_degrees(
+        el.L[0] + el.L[1] * T + el.L[2] * T * T + el.L[3] * T * T * T);
+
+    const f64 a = el.a[0] + el.a[1] * T;
+
+    const f64 e = el.e[0] + el.e[1] * T + el.e[2] * T * T + el.e[3] * T * T * T;
+
+    const f64 i_deg = el.i[0] + el.i[1] * T + el.i[2] * T * T + el.i[3] * T * T * T;
+
+    const f64 omega_deg = normalize_degrees(
+        el.omega[0] + el.omega[1] * T + el.omega[2] * T * T + el.omega[3] * T * T * T);
+
+    const f64 pi_deg = normalize_degrees(
+        el.pi[0] + el.pi[1] * T + el.pi[2] * T * T + el.pi[3] * T * T * T);
+
+    // --- Step 2: derived angular quantities ---
+    const f64 M_deg = normalize_degrees(L_deg - pi_deg);          // mean anomaly
+    const f64 w_deg = normalize_degrees(pi_deg - omega_deg);      // argument of perihelion
+
+    const f64 M_rad     = M_deg     * astro_constants::kDegToRad;
+    const f64 i_rad     = i_deg     * astro_constants::kDegToRad;
+    const f64 omega_rad = omega_deg * astro_constants::kDegToRad;
+    const f64 w_rad     = w_deg     * astro_constants::kDegToRad;
+
+    // --- Step 3: eccentric anomaly via Newton–Raphson ---
+    const f64 E = solve_kepler(M_rad, e);
+
+    // --- Step 4: true anomaly ---
+    // ν = 2·atan2(√(1+e)·sin(E/2), √(1−e)·cos(E/2))
+    const f64 nu = 2.0 * std::atan2(
+        std::sqrt(1.0 + e) * std::sin(E / 2.0),
+        std::sqrt(1.0 - e) * std::cos(E / 2.0)
+    );
+
+    // --- Step 5: heliocentric distance ---
+    const f64 r = a * (1.0 - e * std::cos(E));
+
+    // --- Step 6: ecliptic Cartesian (Meeus Eq. 31.4) ---
+    // u = argument of latitude = ω + ν
+    const f64 u = w_rad + nu;
+
+    const f64 cos_omega = std::cos(omega_rad);
+    const f64 sin_omega = std::sin(omega_rad);
+    const f64 cos_u     = std::cos(u);
+    const f64 sin_u     = std::sin(u);
+    const f64 cos_i     = std::cos(i_rad);
+    const f64 sin_i     = std::sin(i_rad);
+
+    return HeliocentricPos{
+        .x = r * (cos_omega * cos_u - sin_omega * sin_u * cos_i),
+        .y = r * (sin_omega * cos_u + cos_omega * sin_u * cos_i),
+        .z = r * (sin_u * sin_i),
     };
 }
 
 // =================================================================
-// compute_all — compute Sun + Moon (real) + stubs for planets
+// compute_earth_heliocentric — Earth's heliocentric ecliptic position
+//
+// Uses kEarthElements (Meeus Table 31.A, Earth row) and the same
+// Keplerian algorithm as compute_heliocentric.  Earth's inclination
+// is approximately 0° so z ≈ 0, but non-zero T terms are included.
+// =================================================================
+
+HeliocentricPos SolarSystem::compute_earth_heliocentric(f64 T)
+{
+    return compute_heliocentric(kEarthElements, T);
+}
+
+// =================================================================
+// planet_angular_diameter_at_1au — equatorial angular diameter (arcsec)
+//
+// Published values for each planet's equatorial disk at 1 AU distance.
+// Source: Meeus "Astronomical Algorithms" 2nd ed. / IAU standard data.
+//
+// Apparent diameter at actual distance Δ AU = diameter_at_1au / Δ.
+// =================================================================
+
+f64 SolarSystem::planet_angular_diameter_at_1au(u32 id)
+{
+    switch (id)
+    {
+        case planet_id::kMercury: return 6.74;
+        case planet_id::kVenus:   return 16.92;
+        case planet_id::kMars:    return 9.36;
+        case planet_id::kJupiter: return 196.74;
+        case planet_id::kSaturn:  return 165.6;   // disk only, no rings
+        case planet_id::kUranus:  return 70.0;
+        case planet_id::kNeptune: return 67.9;
+        default:                  return 0.0;
+    }
+}
+
+// =================================================================
+// compute_planet_magnitude — apparent visual magnitude
+//
+// Simplified phase-dependent formulas from Meeus Ch. 41.
+//
+//   V = H + 5·log10(r·Δ) + phase_correction(i)
+//
+// where i = phase angle in degrees, r = heliocentric dist (AU),
+// Δ = geocentric dist (AU).
+//
+// Saturn: ring-tilt term omitted (out of scope for Task 6.3).
+// Venus:  valid for i < 163.7°; the formula is used without clamping
+//         since conjunction geometry rarely produces larger angles.
+// =================================================================
+
+f32 SolarSystem::compute_planet_magnitude(
+    u32 id, f64 r, f64 delta, f64 phase_angle_deg)
+{
+    const f64 i        = phase_angle_deg;
+    const f64 log10_rD = std::log10(r * delta);
+    f64 V = 0.0;
+
+    switch (id)
+    {
+        case planet_id::kMercury:
+            V = -0.42 + 5.0 * log10_rD
+                + 0.0380 * i
+                - 0.000273 * i * i
+                + 2.0e-6  * i * i * i;
+            break;
+
+        case planet_id::kVenus:
+            V = -4.40 + 5.0 * log10_rD
+                + 0.0009 * i
+                + 2.39e-7 * i * i * i;
+            break;
+
+        case planet_id::kMars:
+            V = -1.52 + 5.0 * log10_rD + 0.016 * i;
+            break;
+
+        case planet_id::kJupiter:
+            V = -9.40 + 5.0 * log10_rD + 0.005 * i;
+            break;
+
+        case planet_id::kSaturn:  // ring-tilt correction omitted (Task 6.3 scope)
+            V = -8.88 + 5.0 * log10_rD;
+            break;
+
+        case planet_id::kUranus:
+            V = -7.19 + 5.0 * log10_rD + 0.002 * i;
+            break;
+
+        case planet_id::kNeptune:
+            V = -6.87 + 5.0 * log10_rD;
+            break;
+
+        default:
+            V = 0.0;
+            break;
+    }
+
+    return static_cast<f32>(V);
+}
+
+// =================================================================
+// compute_planet_state — geocentric state from heliocentric positions
+//
+// Given the heliocentric ecliptic positions of a planet and Earth,
+// computes all fields of CelestialBodyState except horizontal (Alt/Az),
+// which is observer-dependent and set to zero by convention.
+//
+// Steps:
+//   1. Geocentric ecliptic Cartesian = planet − earth.
+//   2. Geocentric distance Δ.
+//   3. Ecliptic λ/β → equatorial RA/Dec.
+//   4. Phase angle via the cosine rule on the Sun–Planet–Earth triangle.
+//   5. Illumination fraction k = (1 + cos(phase)) / 2.
+//   6. Apparent magnitude from compute_planet_magnitude().
+//   7. Angular diameter = diameter_at_1au / Δ.
+// =================================================================
+
+CelestialBodyState SolarSystem::compute_planet_state(
+    const HeliocentricPos& planet,
+    const HeliocentricPos& earth,
+    f64 r_helio,
+    u32 id,
+    f64 eps_rad)
+{
+    // --- Step 1: geocentric ecliptic Cartesian ---
+    const f64 X = planet.x - earth.x;
+    const f64 Y = planet.y - earth.y;
+    const f64 Z = planet.z - earth.z;
+
+    // --- Step 2: geocentric distance Δ (AU) ---
+    const f64 delta = std::sqrt(X * X + Y * Y + Z * Z);
+
+    // --- Step 3: ecliptic longitude λ and latitude β ---
+    const f64 lambda = std::atan2(Y, X);
+    const f64 beta   = std::asin(std::clamp(Z / delta, -1.0, 1.0));
+
+    // Ecliptic → equatorial
+    const EquatorialCoord eq = ecliptic_to_equatorial(lambda, beta, eps_rad);
+
+    // --- Step 4: phase angle ---
+    // Earth's heliocentric distance R
+    const f64 R = std::sqrt(earth.x * earth.x + earth.y * earth.y + earth.z * earth.z);
+
+    // Cosine rule on the Sun–Planet–Earth triangle:
+    //   cos(phase) = (r² + Δ² − R²) / (2·r·Δ)
+    const f64 cos_phase = std::clamp(
+        (r_helio * r_helio + delta * delta - R * R) / (2.0 * r_helio * delta),
+        -1.0, 1.0
+    );
+    const f64 phase_rad = std::acos(cos_phase);
+    const f64 phase_deg = phase_rad * astro_constants::kRadToDeg;
+
+    // --- Step 5: illumination fraction ---
+    const f64 illumination = (1.0 + std::cos(phase_rad)) / 2.0;
+
+    // --- Step 6: apparent magnitude ---
+    const f32 magnitude = compute_planet_magnitude(id, r_helio, delta, phase_deg);
+
+    // --- Step 7: angular diameter (arcsec) ---
+    const f32 angular_diam = static_cast<f32>(planet_angular_diameter_at_1au(id) / delta);
+
+    return CelestialBodyState{
+        .equatorial              = eq,
+        .horizontal              = HorizontalCoord{.alt = 0.0, .az = 0.0},  // caller computes
+        .distance_au             = delta,
+        .magnitude               = magnitude,
+        .angular_diameter_arcsec = angular_diam,
+        .phase_angle_deg         = static_cast<f32>(phase_deg),
+        .illumination            = static_cast<f32>(illumination),
+    };
+}
+
+// =================================================================
+// compute_planet — Meeus Ch. 31 Keplerian planet ephemeris
+//
+// Replaces the stub from Task 6.3.  Full pipeline:
+//   1. Look up Meeus Table 31.A orbital elements for planet_id.
+//   2. Evaluate elements as polynomials in T (Julian centuries).
+//   3. Solve Kepler's equation for eccentric anomaly E.
+//   4. Compute heliocentric ecliptic Cartesian for planet and Earth.
+//   5. Convert to geocentric equatorial (RA/Dec).
+//   6. Derive phase angle, illumination, magnitude, angular diameter.
+//
+// Horizontal coordinates (Alt/Az) are left zero — the caller (SkyState
+// or the renderer) computes them using the observer location and LST.
+//
+// Returns a default-constructed (zeroed) state for invalid planet_id
+// values (e.g. Earth=3 is not a valid target).
+// =================================================================
+
+CelestialBodyState SolarSystem::compute_planet(f64 jd, u32 planet_id)
+{
+    const OrbitalElements* elements = get_planet_elements(planet_id);
+    if (!elements)
+    {
+        return CelestialBodyState{};  // invalid id — caller should not use this
+    }
+
+    const f64 T = TimeSystem::julian_centuries(jd);
+
+    const HeliocentricPos planet_pos = compute_heliocentric(*elements, T);
+    const HeliocentricPos earth_pos  = compute_earth_heliocentric(T);
+
+    const f64 r_helio = std::sqrt(
+        planet_pos.x * planet_pos.x +
+        planet_pos.y * planet_pos.y +
+        planet_pos.z * planet_pos.z
+    );
+
+    const f64 eps_rad = mean_obliquity(jd);
+
+    return compute_planet_state(planet_pos, earth_pos, r_helio, planet_id, eps_rad);
+}
+
+// =================================================================
+// compute_all — compute Sun + Moon + all 7 planets
 // =================================================================
 
 SolarSystem::AllBodies SolarSystem::compute_all(f64 jd)

@@ -66,6 +66,19 @@ namespace parallax::core
         /// @brief Enter the main loop. Returns when the window is closed.
         void run();
 
+        // -----------------------------------------------------------------
+        // Atmosphere toggle API                          ← SPRINT 06 Task 6.7
+        // -----------------------------------------------------------------
+
+        /// @brief Returns true when the atmosphere is enabled (twilight gradient + horizon culling).
+        [[nodiscard]] bool is_atmosphere_on() const { return m_atmosphere_on; }
+
+        /// @brief Toggle atmosphere on/off and log the change.
+        void toggle_atmosphere();
+
+        /// @brief Explicitly set atmosphere state.
+        void set_atmosphere(bool on);
+
     private:
         void init();
         void main_loop();
@@ -167,6 +180,10 @@ namespace parallax::core
         /// @brief Atmosphere toggle: true = Bortle gradient + twilight glow;
         ///        false = pure black sky (all objects still rendered). Key: 'A'.
         bool m_atmosphere_on = true;
+
+        /// @brief Cached Sun altitude in degrees — computed each frame in update_simulation().
+        ///        Shared between sky background, solar system renderer, and HUD.
+        f32 m_sun_altitude_deg = -90.0f;  ///< ← SPRINT 06 Task 6.7
 
         f64 m_elevation_m = 0.0;  ///< Observer elevation above sea level (metres)
 

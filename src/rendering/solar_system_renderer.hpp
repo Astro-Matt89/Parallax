@@ -104,6 +104,13 @@ namespace parallax::rendering
         /// Use body_id to distinguish: 0=Sun, 1=Moon, 10+planet_id for planets.
         [[nodiscard]] std::span<const SolarSystemScreenObject> get_screen_objects() const;
 
+        /// @brief Body ID constants for selection system.
+        ///
+        /// Public so the InfoPanel and selection layer can compare against them.
+        /// Planet body IDs: 10 + planet_id (e.g. 11=Mercury, 12=Venus, 14=Mars, ...)
+        static constexpr u32 kBodyIdSun  = 0;
+        static constexpr u32 kBodyIdMoon = 1;
+
     private:
         /// @brief Render the Sun icon: yellow-orange filled circle + label.
         void render_sun(const astro::CelestialBodyState& sun,
@@ -232,11 +239,6 @@ namespace parallax::rendering
 
         /// @brief Maximum icon radius (prevents overly large icons).
         static constexpr f32 kMaxIconRadiusNdc = 0.012f;
-
-        /// @brief Body ID constants for selection system.
-        static constexpr u32 kBodyIdSun  = 0;
-        static constexpr u32 kBodyIdMoon = 1;
-        /// Planet body IDs: 10 + planet_id (e.g. 11=Mercury, 12=Venus, 14=Mars, ...)
     };
 
 } // namespace parallax::rendering

@@ -113,12 +113,14 @@ private:
     /// @brief Convert a @c StarEntry to a @c CelestialObject.
     [[nodiscard]] static CelestialObject make_object(const catalog::StarEntry& star) noexcept;
 
-    std::vector<catalog::StarEntry>               m_stars;           ///< Primary catalog
-    catalog::SpatialIndex                         m_spatial_index;   ///< Index over m_stars
-    std::unordered_map<std::uint32_t, std::size_t> m_catalog_id_map; ///< catalog_id → m_stars idx
+    std::vector<catalog::StarEntry>                m_stars;           ///< Primary catalog
+    catalog::SpatialIndex                          m_spatial_index;   ///< Index over m_stars
+    /// catalog_id (u32 from StarEntry, stored as u64 to avoid narrowing) → index in m_stars.
+    std::unordered_map<std::uint64_t, std::size_t> m_catalog_id_map;
 
-    std::vector<catalog::StarEntry>               m_hipparcos_stars; ///< Hipparcos (constellation)
-    std::unordered_map<std::uint32_t, std::size_t> m_hip_map;        ///< HIP → m_hipparcos idx
+    std::vector<catalog::StarEntry>                m_hipparcos_stars; ///< Hipparcos (constellation)
+    /// HIP number (catalog_id from Hipparcos, stored as u64) → index in m_hipparcos_stars.
+    std::unordered_map<std::uint64_t, std::size_t> m_hip_map;
 };
 
 } // namespace parallax::universe

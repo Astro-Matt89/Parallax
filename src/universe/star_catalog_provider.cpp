@@ -27,6 +27,7 @@ bool StarCatalogProvider::load(const std::filesystem::path& tycho2_path,
     // 1. Primary catalog — Tycho-2 preferred, Hipparcos fallback
     // -------------------------------------------------------------------------
     bool primary_loaded = false;
+    bool hipparcos_is_primary = false;
 
     auto tycho2 = catalog::CatalogLoader::load_tycho2_csv(tycho2_path);
     if (tycho2.has_value())
@@ -49,6 +50,7 @@ bool StarCatalogProvider::load(const std::filesystem::path& tycho2_path,
                 PLX_CORE_INFO("StarCatalogProvider: Hipparcos loaded as primary ({} stars)",
                               m_stars.size());
                 primary_loaded = true;
+                hipparcos_is_primary = true;
             }
         }
     }
@@ -60,12 +62,14 @@ bool StarCatalogProvider::load(const std::filesystem::path& tycho2_path,
     }
 
     // -------------------------------------------------------------------------
-    // 2. Build catalog_id → index map for O(1) query_object() lookups
+    // 2. Build catalog_id → index map for O(1) query_object() lookups.
+    //    StarEntry::catalog_id is u32, widened to u64 to match the map key type
+    //    and to avoid narrowing when comparing against decode_source_id() results.
     // -------------------------------------------------------------------------
     m_catalog_id_map.reserve(m_stars.size());
     for (std::size_t i = 0; i < m_stars.size(); ++i)
     {
-        m_catalog_id_map.emplace(m_stars[i].catalog_id, i);
+        m_catalog_id_map.emplace(static_cast<std::uint64_t>(m_stars[i].catalog_id), i);
     }
 
     // -------------------------------------------------------------------------
@@ -75,33 +79,44 @@ bool StarCatalogProvider::load(const std::filesystem::path& tycho2_path,
     m_spatial_index.build(m_stars, 180);
 
     // -------------------------------------------------------------------------
-    // 4. Hipparcos — loaded separately for constellation-line resolution
+    // 4. Hipparcos — loaded for constellation-line resolution (resolve_hip).
     //
-    //    This is always attempted when a path is provided, even if Hipparcos
-    //    was already used as the primary catalog above, so that m_hip_map is
-    //    populated and resolve_hip() works regardless of which catalog is primary.
+    //    If Hipparcos was already used as the primary catalog (step 1), reuse
+    //    m_stars rather than loading the file a second time.  Otherwise load
+    //    from disk so the HIP map is always populated when a path is given.
     // -------------------------------------------------------------------------
     if (hipparcos_path.has_value())
     {
-        auto hip = catalog::CatalogLoader::load_hipparcos_csv(*hipparcos_path);
-        if (hip.has_value())
+        if (hipparcos_is_primary)
         {
-            m_hipparcos_stars = std::move(hip.value());
-            PLX_CORE_INFO("StarCatalogProvider: Hipparcos loaded for constellation lookup ({} stars)",
+            // Hipparcos is already in m_stars — build the HIP map directly from it
+            // to avoid a redundant disk read and a duplicate in-memory copy.
+            m_hipparcos_stars = m_stars;
+            PLX_CORE_INFO("StarCatalogProvider: HIP map built from primary Hipparcos catalog ({} stars)",
                           m_hipparcos_stars.size());
-
-            m_hip_map.reserve(m_hipparcos_stars.size());
-            for (std::size_t i = 0; i < m_hipparcos_stars.size(); ++i)
-            {
-                // For Hipparcos entries catalog_id IS the HIP number.
-                m_hip_map.emplace(m_hipparcos_stars[i].catalog_id, i);
-            }
         }
         else
         {
-            PLX_CORE_WARN("StarCatalogProvider: Hipparcos not found at '{}' — "
-                          "constellation lookup will be unavailable",
-                          hipparcos_path->string());
+            auto hip = catalog::CatalogLoader::load_hipparcos_csv(*hipparcos_path);
+            if (hip.has_value())
+            {
+                m_hipparcos_stars = std::move(hip.value());
+                PLX_CORE_INFO("StarCatalogProvider: Hipparcos loaded for constellation lookup ({} stars)",
+                              m_hipparcos_stars.size());
+            }
+            else
+            {
+                PLX_CORE_WARN("StarCatalogProvider: Hipparcos not found at '{}' — "
+                              "constellation lookup will be unavailable",
+                              hipparcos_path->string());
+            }
+        }
+
+        m_hip_map.reserve(m_hipparcos_stars.size());
+        for (std::size_t i = 0; i < m_hipparcos_stars.size(); ++i)
+        {
+            // For Hipparcos entries catalog_id IS the HIP number.
+            m_hip_map.emplace(static_cast<std::uint64_t>(m_hipparcos_stars[i].catalog_id), i);
         }
     }
 
@@ -152,9 +167,9 @@ std::optional<CelestialObject> StarCatalogProvider::query_object(u64 id) const
 
     // The lower 56 bits hold the catalog_id used when encoding this object's id.
     // For Hipparcos entries that is the HIP number; for Tycho-2 it is a u32 hash
-    // of the TYC identifier string.  The lookup is symmetric: we use the same
-    // catalog_id that make_object() wrote into encode_id().
-    const auto source_id = static_cast<std::uint32_t>(decode_source_id(id));
+    // of the TYC identifier string.  StarEntry::catalog_id is u32, so the decoded
+    // value always fits — the map key is u64 to avoid narrowing on the insert side.
+    const std::uint64_t source_id = decode_source_id(id);
     const auto it = m_catalog_id_map.find(source_id);
     if (it == m_catalog_id_map.end())
     {
@@ -179,7 +194,7 @@ std::size_t StarCatalogProvider::get_count() const
 
 std::optional<CelestialObject> StarCatalogProvider::resolve_hip(std::uint32_t hip) const
 {
-    const auto it = m_hip_map.find(hip);
+    const auto it = m_hip_map.find(static_cast<std::uint64_t>(hip));
     if (it == m_hip_map.end())
     {
         return std::nullopt;

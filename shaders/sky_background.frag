@@ -56,6 +56,12 @@ const float RAD2DEG = 180.0 / PI;
 const float DEG2RAD = PI / 180.0;
 const float HALF_PI = PI * 0.5;
 
+// Moon glow parameters
+const float MOON_GLOW_MIN_ALT_DEG = -5.0;  // Moon glow visible even slightly below horizon
+const float MOON_GLOW_RADIUS_DEG  = 30.0;  // Angular radius of diffuse glow bloom
+const vec3  MOON_GLOW_COLOR = vec3(0.10, 0.10, 0.09);  // Warm white (slightly warm tint)
+const float MOON_GLOW_INTENSITY = 0.5;     // Scale factor for moon glow brightness
+
 // -----------------------------------------------------------------
 // Compute the altitude angle (radians) for this fragment.
 // Top of screen = higher altitude, bottom = lower altitude.
@@ -227,6 +233,8 @@ void main()
     if (twilight_weight > 0.001)
     {
         // Azimuth distance from fragment to sun's azimuth: 0° (toward sun) .. 180°
+        // Add 540.0 = 360.0 + 180.0 before mod to ensure a positive argument, then
+        // subtract 180.0 so the result is symmetric 0..180 rather than directional.
         float daz = abs(mod(frag_az_deg - sun_azimuth_deg + 540.0, 360.0) - 180.0);
         float az_falloff  = smoothstep(90.0, 0.0, daz);
         float alt_falloff = smoothstep(35.0, 0.0, max(frag_alt_deg, 0.0));
@@ -243,17 +251,19 @@ void main()
 
     // ---- Moon glow: diffuse warm-white bloom near Moon position ----
     // Only at night / early twilight, not in full daylight.
-    if (moon_altitude_deg > -5.0 && moon_illumination > 0.05 && t_day < 0.5)
+    // The threshold MOON_GLOW_MIN_ALT_DEG = -5° lets refracted moonlight
+    // contribute even when the Moon is just below the geometric horizon.
+    if (moon_altitude_deg > MOON_GLOW_MIN_ALT_DEG && moon_illumination > 0.05 && t_day < 0.5)
     {
         float ang = angular_distance_deg(
             frag_alt_deg, frag_az_deg,
             moon_altitude_deg, moon_azimuth_deg
         );
-        float moon_glow = smoothstep(30.0, 0.0, ang)
+        float moon_glow = smoothstep(MOON_GLOW_RADIUS_DEG, 0.0, ang)
                         * moon_illumination
                         * (1.0 - t_day);
 
-        base += vec3(0.10, 0.10, 0.09) * moon_glow * 0.5;
+        base += MOON_GLOW_COLOR * moon_glow * MOON_GLOW_INTENSITY;
     }
 
     // ---- Dithering: break 8-bit banding artifacts ----

@@ -34,8 +34,9 @@ if(WIN32)
     message(STATUS "Platform: Windows")
     add_compile_definitions(PLX_PLATFORM_WINDOWS)
     if(MSVC)
-        # Treat warnings as errors, highest warning level
-        add_compile_options(/W4 /WX /permissive-)
+        # Treat warnings as errors, highest warning level.
+        # /utf-8 required by {fmt} (via spdlog) and for UTF-8 chars in our sources.
+        add_compile_options(/W4 /WX /permissive- /utf-8)
     endif()
 elseif(UNIX AND NOT APPLE)
     message(STATUS "Platform: Linux")

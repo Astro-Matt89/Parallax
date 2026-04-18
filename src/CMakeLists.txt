@@ -4,6 +4,9 @@
 
 add_executable(parallax
     main.cpp
+    universe/object_id.hpp
+    universe/celestial_object.hpp
+    universe/data_provider.hpp
     core/logger.cpp
     core/window.cpp
     core/application.cpp

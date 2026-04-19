@@ -11,6 +11,8 @@ add_executable(parallax
     universe/star_catalog_provider.cpp
     universe/dso_provider.hpp
     universe/dso_provider.cpp
+    universe/solar_system_provider.hpp
+    universe/solar_system_provider.cpp
     core/logger.cpp
     core/window.cpp
     core/application.cpp

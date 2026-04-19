@@ -13,6 +13,7 @@
 
 #include "universe/data_provider.hpp"
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <list>
@@ -167,10 +168,16 @@ private:
     /// per query.  Stored as float for cache-efficiency (adequate for rendering).
     mutable std::vector<std::array<float, 3>> m_pixel_uvecs;
 
-    /// Logging / stats (mutable because updated in const query_fov).
-    mutable bool          m_first_query_logged{false};
-    mutable std::uint64_t m_query_count{0};
-    mutable std::uint64_t m_cache_hits{0};
+    /// Precomputed half-pixel-diagonal (radians) for the inclusive disc query margin.
+    /// Constant for a given m_nside; computed alongside m_pixel_uvecs.
+    mutable double m_half_diag_rad{0.0};
+
+    /// Logging / stats.
+    /// These are atomic so that set_master_seed (which holds m_cache_mutex and resets
+    /// them) and query_fov (which increments them without the lock) cannot race.
+    mutable std::atomic<bool>          m_first_query_logged{false};
+    mutable std::atomic<std::uint64_t> m_query_count{0};
+    mutable std::atomic<std::uint64_t> m_cache_hits{0};
 
     // -------------------------------------------------------------------------
     // Private helpers (implemented in procedural_provider.cpp)

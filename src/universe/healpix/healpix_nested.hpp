@@ -154,11 +154,15 @@ namespace detail
     {
         // -----------------------------------------------------------------------
         // Polar caps (Górski 2005, eq. 4)
+        // Note: this is a simplified approximation of the polar-cap formula adequate
+        // for the rejection-sampling use case in ProceduralProvider (position verified
+        // via ang2pix_nest; unconditional fallback after 20 retries).
         // -----------------------------------------------------------------------
+        constexpr double kSqrt3 = 1.7320508075688772; ///< sqrt(3), hoisted for clarity
         const double tp_polar        = 1.0 - za;
         // polar_coord_scale: scales phi to a ring-edge crossing index in the polar cap.
-        // Equivalent to nside * sqrt(3*(1-|z|)), where 1-|z| = tp_polar.
-        const double polar_coord_scale = static_cast<double>(nside) * std::sqrt(3.0 * tp_polar);
+        // Equivalent to nside * sqrt(3*(1-|z|)) = nside * sqrt(3) * sqrt(tp_polar).
+        const double polar_coord_scale = static_cast<double>(nside) * kSqrt3 * std::sqrt(tp_polar);
 
         // Precompute phi / (π/2) once to avoid redundant division
         const double phi_over_halfpi   = phi_rad / (kTwoPi / 4.0);

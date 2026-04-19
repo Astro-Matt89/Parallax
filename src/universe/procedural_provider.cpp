@@ -21,7 +21,6 @@
 #include <chrono>
 #include <cmath>
 #include <numbers>
-#include <numeric>
 
 namespace parallax::universe
 {
@@ -205,11 +204,16 @@ void ProceduralProvider::query_fov(double     ra,
 
     // -------------------------------------------------------------------------
     // Precompute pixel centre unit vectors on first use (one-time cost).
+    // Also precomputes m_half_diag_rad (constant for a given nside).
     // Avoids O(nside²) pix2ang_nest calls on every subsequent query.
     // -------------------------------------------------------------------------
     if (m_pixel_uvecs.empty())
     {
-        const std::int64_t npix = 12LL * m_nside * m_nside;
+        const std::int64_t npix         = 12LL * m_nside * m_nside;
+        const double       pixel_area   = 4.0 * kPi / static_cast<double>(npix);
+        // Half-diagonal: sqrt(pixel_area/2) = sqrt(pixel_area) / sqrt(2)
+        m_half_diag_rad = std::sqrt(pixel_area) / std::numbers::sqrt2;
+
         m_pixel_uvecs.resize(static_cast<std::size_t>(npix));
         for (std::int64_t i = 0; i < npix; ++i)
         {
@@ -237,9 +241,8 @@ void ProceduralProvider::query_fov(double     ra,
     const float  qz       = static_cast<float>(std::sin(dec));
 
     // Effective disc threshold includes half-pixel diagonal for inclusive semantics.
-    const double pixel_area_sr  = 4.0 * kPi / (12.0 * static_cast<double>(m_nside * m_nside));
-    const double half_diag_rad  = 0.5 * std::sqrt(2.0 * pixel_area_sr);
-    const float  cos_disc_eff   = static_cast<float>(std::cos(radius_rad + half_diag_rad));
+    // m_half_diag_rad is precomputed once per nside and reused here.
+    const float cos_disc_eff = static_cast<float>(std::cos(radius_rad + m_half_diag_rad));
 
     // Exact threshold for per-star distance check (no extra margin needed).
     const float cos_radius = static_cast<float>(std::cos(radius_rad));
@@ -454,13 +457,15 @@ ProceduralProvider::CellData ProceduralProvider::generate_cell(std::int64_t pixe
     cell.stars.reserve(static_cast<std::size_t>(star_count));
 
     // ------------------------------------------------------------------
-    // Half-diagonal of the cell for rejection-sampling cap
-    // For a pixel of area A sr, the bounding circle has radius ≈ sqrt(A/2)
-    // because the half-diagonal of a square is side/sqrt(2) = sqrt(A)/sqrt(2).
-    // std::numbers::inv_sqrt2 = 1/sqrt(2) ≈ 0.70710678.
+    // Half-diagonal of the cell for rejection-sampling cap.
+    // Reuse m_half_diag_rad which is precomputed in query_fov/pixel precomputation
+    // and is constant for a given nside.  Fall back to inline computation if
+    // the pixel uvecs have not been precomputed yet (first call from generate_cell
+    // before query_fov has run).
     // ------------------------------------------------------------------
-    const double pixel_area_sr  = cell_area_sr;
-    const double half_diag_rad  = std::sqrt(pixel_area_sr) / std::numbers::sqrt2;
+    const double half_diag_rad = (m_half_diag_rad > 0.0)
+        ? m_half_diag_rad
+        : std::sqrt(cell_area_sr) / std::numbers::sqrt2;
 
     // ------------------------------------------------------------------
     // Step 6–8: Generate each star
@@ -545,7 +550,7 @@ ProceduralProvider::CellData ProceduralProvider::generate_cell(std::int64_t pixe
         const float u_c1 = rng.next_float();
         const float u_c2 = rng.next_float();
         float bv = 0.4f + (u_c1 + u_c2 - 1.0f) * 1.1f;
-        bv += (mag - kMinProceduralMag) * 0.04f; // fainter → slightly redder
+        bv += (mag - kMinProceduralMag) * 0.04f; // empirical reddening: 0.04 B-V units per mag
         bv  = std::max(-0.3f, std::min(2.0f, bv));
 
         // ----------------------------------------------------------------
@@ -588,26 +593,33 @@ ProceduralProvider::CellData ProceduralProvider::generate_cell(std::int64_t pixe
     // Sort stars by magnitude ascending so query_fov can binary-search the
     // mag_limit boundary and skip the faint tail without iterating it.
     // (Faint stars dominate by count — ~94% have mag > 14 for kMaxGenerationMag = 16.)
-    // We must sort both stars and star_uvecs together to keep them in sync.
+    // We sort a vector of pairs (mag_v, index) to keep stars and star_uvecs in sync
+    // without extra index-array allocation.
     {
         const std::size_t n = cell.stars.size();
-        // Build an index array for stable co-sort
-        std::vector<std::size_t> idx(n);
-        std::iota(idx.begin(), idx.end(), std::size_t{0});
-        std::sort(idx.begin(), idx.end(),
-            [&](std::size_t a, std::size_t b) noexcept
+
+        // Pack (mag_v, original_index) into a flat array for sorting
+        std::vector<std::pair<float, std::size_t>> order(n);
+        for (std::size_t i = 0; i < n; ++i)
+        {
+            order[i] = { cell.stars[i].mag_v, i };
+        }
+        std::sort(order.begin(), order.end(),
+            [](const std::pair<float, std::size_t>& a,
+               const std::pair<float, std::size_t>& b) noexcept
             {
-                return cell.stars[a].mag_v < cell.stars[b].mag_v;
+                return a.first < b.first;
             });
 
         std::vector<CelestialObject>         sorted_stars(n);
         std::vector<std::array<float, 3>>    sorted_uvecs(n);
         for (std::size_t i = 0; i < n; ++i)
         {
-            sorted_stars[i] = std::move(cell.stars[idx[i]]);
-            sorted_uvecs[i] = cell.star_uvecs[idx[i]];
+            const std::size_t src = order[i].second;
+            sorted_stars[i] = std::move(cell.stars[src]);
+            sorted_uvecs[i] = cell.star_uvecs[src];
         }
-        cell.stars     = std::move(sorted_stars);
+        cell.stars      = std::move(sorted_stars);
         cell.star_uvecs = std::move(sorted_uvecs);
     }
 

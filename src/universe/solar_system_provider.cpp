@@ -158,14 +158,17 @@ CelestialObject SolarSystemProvider::make_object(
     obj.ra       = state.equatorial.ra;   // radians, J2000 geocentric
     obj.dec      = state.equatorial.dec;  // radians, J2000 geocentric
     obj.mag_v    = state.magnitude;
-    obj.color_bv = 0.0f; // TODO: ephemeris does not supply B-V colour index
+    obj.color_bv = 0.0f; // B-V not provided by the ephemeris; future work could add
+                         // catalogue values (e.g. Sun ≈ 0.65, Moon ≈ 0.85).
 
     SolarSystemData sd{};
     sd.distance_au              = static_cast<float>(state.distance_au);
     sd.phase_angle              = state.phase_angle_deg;   // degrees, matches field name
     sd.apparent_diameter_arcsec = state.angular_diameter_arcsec;
-    // Note: state.illumination (fraction 0..1) has no dedicated field in SolarSystemData
-    // (Task 7.1 schema — do not add fields here).  TODO: add illumination to SolarSystemData.
+    // Note: state.illumination (fraction 0..1) is not mapped here because
+    // SolarSystemData has no dedicated field for it (Task 7.1 schema).
+    // Adding one is a schema change that belongs to a future amendment of Task 7.1,
+    // not to this wrapper task.
     obj.data = sd;
 
     return obj;

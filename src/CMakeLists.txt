@@ -9,6 +9,8 @@ add_executable(parallax
     universe/data_provider.hpp
     universe/star_catalog_provider.hpp
     universe/star_catalog_provider.cpp
+    universe/dso_provider.hpp
+    universe/dso_provider.cpp
     core/logger.cpp
     core/window.cpp
     core/application.cpp

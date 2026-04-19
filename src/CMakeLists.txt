@@ -7,6 +7,8 @@ add_executable(parallax
     universe/object_id.hpp
     universe/celestial_object.hpp
     universe/data_provider.hpp
+    universe/star_catalog_provider.hpp
+    universe/star_catalog_provider.cpp
     core/logger.cpp
     core/window.cpp
     core/application.cpp

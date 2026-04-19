@@ -162,6 +162,7 @@ void ProceduralProvider::set_master_seed(std::uint64_t seed)
     m_cell_cache.clear();
     m_lru_order.clear();
     // pixel_uvecs are independent of the seed (they depend only on nside) — keep them.
+    // Reset stats so that hit-rate logging reflects the new seed's session only.
     m_first_query_logged = false;
     m_query_count        = 0;
     m_cache_hits         = 0;
@@ -437,6 +438,7 @@ ProceduralProvider::CellData ProceduralProvider::generate_cell(std::int64_t pixe
     // Step 5: Star count (Poisson approximation)
     // ------------------------------------------------------------------
     // Cell area = 4π / (12 * nside²) steradians → convert to deg²
+    // Conversion factor: (180/π)² ≈ 3282.8 deg²/sr  (kRadToDeg² is correct here)
     const double cell_area_sr     = 4.0 * kPi / (12.0 * static_cast<double>(m_nside * m_nside));
     const double cell_area_deg_sq = cell_area_sr * kRadToDeg * kRadToDeg;
 
@@ -444,7 +446,8 @@ ProceduralProvider::CellData ProceduralProvider::generate_cell(std::int64_t pixe
     const double expected_count = density * cell_area_deg_sq;
 
     // Simple Poisson approximation: round(expected + uniform(-0.5, 0.5))
-    const double u_count   = rng.next_double() - 0.5; // in [-0.5, 0.5)
+    // next_double() returns [0, 1), so subtracting 0.5 gives [-0.5, 0.5).
+    const double u_count   = rng.next_double() - 0.5;
     const auto star_count  = static_cast<std::int64_t>(
         std::max(0.0, std::round(expected_count + u_count)));
 
@@ -452,9 +455,12 @@ ProceduralProvider::CellData ProceduralProvider::generate_cell(std::int64_t pixe
 
     // ------------------------------------------------------------------
     // Half-diagonal of the cell for rejection-sampling cap
+    // For a pixel of area A sr, the bounding circle has radius ≈ sqrt(A/2)
+    // because the half-diagonal of a square is side/sqrt(2) = sqrt(A)/sqrt(2).
+    // std::numbers::inv_sqrt2 = 1/sqrt(2) ≈ 0.70710678.
     // ------------------------------------------------------------------
     const double pixel_area_sr  = cell_area_sr;
-    const double half_diag_rad  = 0.7071067811865476 * std::sqrt(pixel_area_sr);
+    const double half_diag_rad  = std::sqrt(pixel_area_sr) / std::numbers::sqrt2;
 
     // ------------------------------------------------------------------
     // Step 6–8: Generate each star

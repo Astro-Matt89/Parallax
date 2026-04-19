@@ -155,11 +155,16 @@ namespace detail
         // -----------------------------------------------------------------------
         // Polar caps (Górski 2005, eq. 4)
         // -----------------------------------------------------------------------
-        const double tp_polar  = 1.0 - za;
-        const double tmp       = static_cast<double>(nside) * std::sqrt(3.0 * tp_polar);
+        const double tp_polar        = 1.0 - za;
+        // polar_coord_scale: scales phi to a ring-edge crossing index in the polar cap.
+        // Equivalent to nside * sqrt(3*(1-|z|)), where 1-|z| = tp_polar.
+        const double polar_coord_scale = static_cast<double>(nside) * std::sqrt(3.0 * tp_polar);
 
-        const std::int64_t jp = static_cast<std::int64_t>(phi_rad / (kTwoPi / 4.0) * tmp);
-        const std::int64_t jm = static_cast<std::int64_t>(phi_rad / (kTwoPi / 4.0) * tmp) + nside;
+        // Precompute phi / (π/2) once to avoid redundant division
+        const double phi_over_halfpi   = phi_rad / (kTwoPi / 4.0);
+
+        const std::int64_t jp = static_cast<std::int64_t>(phi_over_halfpi * polar_coord_scale);
+        const std::int64_t jm = static_cast<std::int64_t>(phi_over_halfpi * polar_coord_scale) + nside;
 
         // Clamp to valid range
         const std::int64_t jp_c = std::max(std::int64_t{0}, jp);

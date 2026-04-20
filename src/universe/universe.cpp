@@ -584,7 +584,6 @@ void Universe::init_messier_names()
     messier_names_ =
     {
         { 1,  "Crab Nebula"          },
-        { 3,  "Globular Cluster M3"  },
         { 8,  "Lagoon Nebula"        },
         { 11, "Wild Duck Cluster"    },
         { 13, "Great Hercules Cluster"},
@@ -608,7 +607,6 @@ void Universe::init_messier_names()
         { 66, "Leo Triplet (NGC 3627)"},
         { 74, "Phantom Galaxy"       },
         { 77, "Cetus A"              },
-        { 78, "Messier 78 Nebula"    },
         { 81, "Bode's Galaxy"        },
         { 82, "Cigar Galaxy"         },
         { 83, "Southern Pinwheel"    },
@@ -618,8 +616,6 @@ void Universe::init_messier_names()
         { 92, "Hercules Cluster"     },
         {101, "Pinwheel Galaxy"      },
         {104, "Sombrero Galaxy"      },
-        {106, "Messier 106"          },
-        {110, "Edward Young Star"    },
     };
 }
 

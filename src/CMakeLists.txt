@@ -13,6 +13,11 @@ add_executable(parallax
     universe/dso_provider.cpp
     universe/solar_system_provider.hpp
     universe/solar_system_provider.cpp
+    universe/procedural_provider.hpp
+    universe/procedural_provider.cpp
+    universe/healpix/healpix_nested.hpp
+    universe/rng/splitmix64.hpp
+    universe/rng/xoshiro256ss.hpp
     core/logger.cpp
     core/window.cpp
     core/application.cpp

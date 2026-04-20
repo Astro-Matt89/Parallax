@@ -312,8 +312,10 @@ void ProceduralProvider::query_fov(double     ra,
 
     if (log_stats)
     {
-        const double hit_rate = (m_query_count > 0)
-            ? static_cast<double>(m_cache_hits) / static_cast<double>(m_query_count) * 100.0
+        const std::uint64_t queries = m_query_count.load(std::memory_order_relaxed);
+        const std::uint64_t hits    = m_cache_hits.load(std::memory_order_relaxed);
+        const double hit_rate = (queries > 0)
+            ? static_cast<double>(hits) / static_cast<double>(queries) * 100.0
             : 0.0;
 
         std::size_t cached_count = 0;
@@ -323,7 +325,7 @@ void ProceduralProvider::query_fov(double     ra,
         }
 
         PLX_CORE_TRACE("ProceduralProvider: queries={} cache_cells={} hit_rate={:.1f}%",
-                       m_query_count, cached_count, hit_rate);
+                       queries, cached_count, hit_rate);
     }
 }
 

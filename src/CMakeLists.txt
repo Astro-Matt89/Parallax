@@ -15,6 +15,8 @@ add_executable(parallax
     universe/solar_system_provider.cpp
     universe/procedural_provider.hpp
     universe/procedural_provider.cpp
+    universe/universe.hpp
+    universe/universe.cpp
     universe/healpix/healpix_nested.hpp
     universe/rng/splitmix64.hpp
     universe/rng/xoshiro256ss.hpp

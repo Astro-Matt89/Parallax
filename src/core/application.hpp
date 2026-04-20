@@ -6,11 +6,6 @@
 #include "astro/atmosphere.hpp"
 #include "astro/coordinates.hpp"
 #include "astro/time_system.hpp"
-#include "catalog/dso_entry.hpp"
-#include "catalog/dso_loader.hpp"
-#include "catalog/spatial_index.hpp"                       // ← SPRINT 05 Task 5.0
-#include "catalog/star_entry.hpp"
-#include "catalog/visibility_filter.hpp"
 #include "core/input.hpp"
 #include "core/types.hpp"
 #include "core/window.hpp"
@@ -29,6 +24,8 @@
 #include "ui/selection.hpp"                               // ← SPRINT 05 Task 5.5
 #include "ui/side_panel.hpp"                              // ← SPRINT 05 Task 5.4
 #include "ui/toolbar.hpp"                                 // ← SPRINT 05 Task 5.3
+#include "universe/celestial_object.hpp"                  // ← SPRINT 07 Task 7.7
+#include "universe/universe.hpp"                          // ← SPRINT 07 Task 7.7
 #include "vulkan/context.hpp"
 #include "vulkan/pipeline.hpp"
 #include "vulkan/swapchain.hpp"
@@ -116,6 +113,16 @@ namespace parallax::core
         std::unique_ptr<ui::Hud> m_hud;                     ///< Retro HUD overlay  ← SPRINT 03 Task 3.6
 
         // -----------------------------------------------------------------
+        // Universe facade                                   ← SPRINT 07 Task 7.7
+        // -----------------------------------------------------------------
+
+        /// @brief Universe facade over all data providers (stars, DSOs, SS, procedural).
+        std::unique_ptr<universe::Universe> m_universe;
+
+        /// @brief Reusable per-frame visible objects buffer (cleared by query_fov each frame).
+        std::vector<universe::CelestialObject> m_frame_objects;
+
+        // -----------------------------------------------------------------
         // Overlays                                          ← SPRINT 04
         // -----------------------------------------------------------------
         overlay::Constellations m_constellations;            // Task 4.2
@@ -132,32 +139,6 @@ namespace parallax::core
         ui::SidePanel m_side_panel;                          // Task 5.4  Left side panel
         ui::Selection m_selection;                            // Task 5.5  Object selection system
         ui::InfoPanel m_info_panel;                           // Task 5.5  Right info panel
-
-        // -----------------------------------------------------------------
-        // Star catalog
-        // -----------------------------------------------------------------
-        std::vector<catalog::StarEntry> m_stars;
-
-        // -----------------------------------------------------------------
-        // Tycho-2 / Hipparcos dual catalog support          ← SPRINT 05 Task 5.0
-        // -----------------------------------------------------------------
-        catalog::SpatialIndex m_spatial_index;               ///< Declination-band spatial index
-        std::vector<catalog::StarEntry> m_hipparcos_stars;   ///< Hipparcos catalog (constellation lookup)
-
-        // -----------------------------------------------------------------
-        // Visible star tracking (per-frame)                 ← SPRINT 05 Task 5.6
-        //
-        // Populated during update_simulation() by the spatial index query.
-        // Consumed by Selection::try_select() for click-picking and by
-        // the starfield renderer for the GPU upload.
-        // -----------------------------------------------------------------
-        std::vector<u32> m_visible_star_indices;             ///< Indices into m_stars for visible stars
-        std::vector<Vec2f> m_star_screen_positions;          ///< Screen NDC per visible star (parallel)
-
-        // -----------------------------------------------------------------
-        // DSO catalog                                       ← SPRINT 04 Task 4.5
-        // -----------------------------------------------------------------
-        std::vector<catalog::DsoEntry> m_dsos;
 
         // -----------------------------------------------------------------
         // Simulation state
@@ -186,6 +167,9 @@ namespace parallax::core
         f32 m_sun_altitude_deg = -90.0f;  ///< ← SPRINT 06 Task 6.7
 
         f64 m_elevation_m = 0.0;  ///< Observer elevation above sea level (metres)
+
+        /// @brief Logged once after the first frame with procedural data.
+        bool m_procedural_first_tick_logged = false; ///< ← SPRINT 07 Task 7.7
 
         /// @brief Wall-clock time tracking for delta_time computation.
         std::chrono::steady_clock::time_point m_last_frame_time;

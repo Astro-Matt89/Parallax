@@ -19,6 +19,7 @@
 #include "rendering/line_renderer.hpp"
 #include "rendering/solar_system_renderer.hpp"
 #include "ui/font.hpp"
+#include "universe/celestial_object.hpp"
 
 #include <filesystem>
 #include <optional>
@@ -67,7 +68,7 @@ struct SelectedObject
     SelectedObjectType type = SelectedObjectType::None;
 
     // Star fields (valid when type == Star)
-    u32 star_index = 0;             ///< Index into m_stars vector
+    u32 star_index = 0;             ///< Index into m_stars vector (legacy path only)
     u32 hip_id = 0;                 ///< Hipparcos catalog ID
     f64 ra_rad = 0.0;              ///< J2000 RA (radians)
     f64 dec_rad = 0.0;             ///< J2000 Dec (radians)
@@ -79,7 +80,7 @@ struct SelectedObject
     std::string spectral_type;      ///< Spectral class
 
     // DSO fields (valid when type == Dso)
-    u32 dso_index = 0;              ///< Index into m_dsos vector
+    u32 dso_index = 0;              ///< Index into m_dsos vector (legacy path only)
     std::string designation;        ///< e.g. "M42"
     std::string dso_common_name;    ///< e.g. "Orion Nebula"
     catalog::DsoType dso_type = catalog::DsoType::Other;
@@ -100,6 +101,9 @@ struct SelectedObject
 
     /// @brief True if the object is above the horizon.
     bool above_horizon = false;
+
+    /// @brief Full CelestialObject copy (Universe path — populated by try_select_from_objects).
+    universe::CelestialObject celestial_obj;
 };
 
 // =================================================================
@@ -108,12 +112,21 @@ struct SelectedObject
 
 /// @brief Object selection system: click-pick, tracking, name lookup.
 ///
-/// Lifecycle:
-///   1. load_star_names()   — parse data/catalogs/star_names.csv
-///   2. try_select()        — called on left-click, finds nearest object within radius
-///   3. update()            — called each frame to refresh screen position + Alt/Az
-///   4. render_indicator()  — draws yellow crosshair/circle around selected object
-///   5. clear()             — deselect
+/// Two usage paths:
+///
+/// **Universe path (new):**
+///   1. load_star_names()              — parse data/catalogs/star_names.csv
+///   2. try_select_from_objects()      — called on left-click, iterates m_frame_objects
+///   3. update_from_objects()          — called each frame to refresh position + Alt/Az
+///   4. render_indicator()             — draws yellow crosshair/circle around selected object
+///   5. clear()                        — deselect
+///
+/// **Legacy path (deprecated):**
+///   1. load_star_names()
+///   2. try_select()
+///   3. update()
+///   4. render_indicator()
+///   5. clear()
 class Selection
 {
 public:
@@ -129,6 +142,51 @@ public:
     /// @param path Path to data/catalogs/star_names.csv.
     /// @return True if at least some names were loaded.
     [[nodiscard]] bool load_star_names(const std::filesystem::path& path);
+
+    // ---------------------------------------------------------------
+    // Universe path (new API)
+    // ---------------------------------------------------------------
+
+    /// @brief Attempt to select the nearest object to the click position from m_frame_objects.
+    ///
+    /// Iterates @p objects in reverse (so foreground objects — planets, DSOs — win over
+    /// background stars at the same screen position). Projects each object's RA/Dec to screen
+    /// and selects the nearest within kPickRadiusNdc.  If nothing is found, clears the
+    /// current selection.
+    ///
+    /// @param click_ndc  Click position in NDC [-1, 1].
+    /// @param objects    Per-frame visible objects (populated by Universe::query_fov).
+    /// @param observer   Observer location.
+    /// @param lst_rad    Local sidereal time (radians).
+    /// @param camera     Current camera state.
+    /// @param viewport   Current viewport dimensions.
+    void try_select_from_objects(Vec2f click_ndc,
+                                 std::span<const universe::CelestialObject> objects,
+                                 const astro::ObserverLocation& observer,
+                                 f64 lst_rad,
+                                 const rendering::Camera& camera,
+                                 VkExtent2D viewport);
+
+    /// @brief Refresh the selected object's screen position and Alt/Az for this frame.
+    ///
+    /// Uses @p ss_objects to refresh Solar System body positions from the latest
+    /// renderer output (preserving phased-moon data etc.).  For all other types,
+    /// re-projects the stored RA/Dec.
+    ///
+    /// @param objects   Per-frame visible objects buffer (from Universe::query_fov).
+    /// @param ss_objects  Latest Solar System screen objects (from SolarSystemRenderer).
+    /// @param observer  Observer location.
+    /// @param lst_rad   Local sidereal time (radians).
+    /// @param camera    Current camera state.
+    void update_from_objects(std::span<const universe::CelestialObject> objects,
+                             std::span<const rendering::SolarSystemScreenObject> ss_objects,
+                             const astro::ObserverLocation& observer,
+                             f64 lst_rad,
+                             const rendering::Camera& camera);
+
+    // ---------------------------------------------------------------
+    // Legacy path (deprecated)
+    // ---------------------------------------------------------------
 
     /// @brief Attempt to select the nearest star or DSO to the click position.
     ///
@@ -190,6 +248,10 @@ public:
                 f64 lst_rad,
                 const rendering::Camera& camera);
 
+    // ---------------------------------------------------------------
+    // Common
+    // ---------------------------------------------------------------
+
     /// @brief Render the selection indicator: yellow crosshair + circle.
     void render_indicator(rendering::LineRenderer& lines,
                           VkExtent2D viewport) const;
@@ -225,7 +287,7 @@ private:
     /// @brief HIP ID → star name data.
     std::unordered_map<u32, StarNameEntry> m_star_names;
 
-    /// @brief Pick radius in NDC units (���15px at 1080p).
+    /// @brief Pick radius in NDC units (~15px at 1080p).
     static constexpr f32 kPickRadiusNdc = 0.028f;
 
     /// @brief Selection indicator color: bright yellow.

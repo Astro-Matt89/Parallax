@@ -18,7 +18,6 @@
 #include <cstring>
 #include <fstream>
 #include <limits>
-
 namespace
 {
 
@@ -90,7 +89,55 @@ Starfield::~Starfield()
 }
 
 // -----------------------------------------------------------------
-// update() — Skychart transform pipeline (NO atmosphere)
+// begin_frame() / add_celestial_object() / end_frame()  — Universe path
+// -----------------------------------------------------------------
+
+void Starfield::begin_frame(f32 mag_limit)
+{
+    m_pending_vertices.clear();
+    m_pending_vertices.reserve(std::min(m_buffer_capacity, 100000u));
+    m_push_constants.mag_limit = mag_limit;
+}
+
+void Starfield::add_celestial_object(Vec2f screen_pos,
+                                     const universe::CelestialObject& obj)
+{
+    if (m_pending_vertices.size() >= m_buffer_capacity)
+    {
+        return;
+    }
+
+    m_pending_vertices.push_back(StarVertex{
+        .screen_x = screen_pos.x,
+        .screen_y = screen_pos.y,
+        .mag_v    = obj.mag_v,
+        .color_bv = obj.color_bv,
+    });
+}
+
+void Starfield::end_frame()
+{
+    m_visible_count = static_cast<u32>(m_pending_vertices.size());
+
+    if (m_visible_count == 0)
+    {
+        m_push_constants.brightest_mag = kReferenceMag;
+        return;
+    }
+
+    // Compute brightest magnitude for push constant normalisation.
+    f32 min_mag = std::numeric_limits<f32>::max();
+    for (const auto& v : m_pending_vertices)
+    {
+        if (v.mag_v < min_mag) min_mag = v.mag_v;
+    }
+    m_push_constants.brightest_mag = min_mag;
+
+    upload_star_data(m_pending_vertices);
+}
+
+// -----------------------------------------------------------------
+// update() — Skychart transform pipeline (NO atmosphere) — LEGACY
 //
 // Uses Coordinates::project_radec_to_screen() — the SAME shared
 // function as constellation overlays.

@@ -22,11 +22,13 @@
 #include "rendering/camera.hpp"
 #include "rendering/line_renderer.hpp"
 #include "ui/font.hpp"
+#include "universe/celestial_object.hpp"
 
 #include <vulkan/vulkan.h>
 
 #include <array>
 #include <optional>
+#include <span>
 #include <string_view>
 #include <vector>
 
@@ -50,10 +52,15 @@ namespace parallax::rendering
 
     /// @brief Renders Sun, Moon, and planets as schematic icons in the skychart.
     ///
-    /// Usage each frame:
-    ///   1. Call update() with current ephemeris, camera, observer, LST.
-    ///   2. Icons + labels are submitted to the shared LineRenderer and BitmapFont.
-    ///   3. Call get_screen_objects() for selection picking.
+    /// Two usage paths:
+    ///
+    /// **Universe path (new):**
+    ///   1. begin_frame(lines, font, viewport, atmosphere_on)  — reset per-frame state
+    ///   2. add_celestial_object(screen_pos, alt_rad, az_rad, obj)  — one call per body
+    ///
+    /// **Legacy path (deprecated):**
+    ///   1. update(bodies, moon_state, camera, observer, lst_rad, lines, font, viewport, atmosphere_on)
+    ///   2. get_screen_objects() for selection picking
     class SolarSystemRenderer
     {
     public:
@@ -65,7 +72,48 @@ namespace parallax::rendering
         SolarSystemRenderer(SolarSystemRenderer&&) = default;
         SolarSystemRenderer& operator=(SolarSystemRenderer&&) = default;
 
+        // ---------------------------------------------------------------
+        // Universe path (new API)
+        // ---------------------------------------------------------------
+
+        /// @brief Set up rendering context for this frame.
+        ///
+        /// Resets the screen objects list and stores references to the shared
+        /// line renderer, font, and viewport.  Call once per frame before any
+        /// add_celestial_object().
+        ///
+        /// @param atmosphere_on  Whether horizon culling is active.  When false
+        ///                       the caller still passes pre-filtered objects that
+        ///                       have already passed horizon culling (or not).
+        void begin_frame(LineRenderer& lines,
+                         ui::BitmapFont& font,
+                         VkExtent2D viewport,
+                         bool atmosphere_on);
+
+        /// @brief Draw a single Solar System body icon + label at the given screen position.
+        ///
+        /// Dispatches by decoded body index from @p obj.id:
+        ///   0 → Sun, 1 → Moon (uses SolarSystemData.illumination / .waxing),
+        ///   2-8 → planets (styled by planet_id).
+        ///
+        /// Also appends to the internal screen-objects list (for selection picking).
+        ///
+        /// @param screen_pos  Pre-projected NDC position (from Application).
+        /// @param alt_rad     Altitude of the body (radians) — stored in screen object.
+        /// @param az_rad      Azimuth of the body (radians) — stored in screen object.
+        /// @param obj         CelestialObject with ObjectType::SolarSystemBody.
+        void add_celestial_object(Vec2f screen_pos,
+                                  f64 alt_rad,
+                                  f64 az_rad,
+                                  const universe::CelestialObject& obj);
+
+        // ---------------------------------------------------------------
+        // Legacy path (deprecated)
+        // ---------------------------------------------------------------
+
         /// @brief Project all Solar System bodies to screen and draw icons + labels.
+        ///
+        /// @deprecated Use begin_frame() + add_celestial_object() instead.
         ///
         /// @param bodies       All computed Solar System body states.
         /// @param moon_state   Extended Moon state (for phase rendering).
@@ -76,6 +124,7 @@ namespace parallax::rendering
         /// @param font         Shared bitmap font for labels.
         /// @param viewport     Current viewport dimensions.
         /// @param atmosphere_on True if atmosphere/horizon culling is active.
+        [[deprecated("Use begin_frame() + add_celestial_object()")]]
         void update(const astro::SolarSystem::AllBodies& bodies,
                     const astro::MoonState& moon_state,
                     const Camera& camera,
@@ -85,6 +134,10 @@ namespace parallax::rendering
                     ui::BitmapFont& font,
                     VkExtent2D viewport,
                     bool atmosphere_on);
+
+        // ---------------------------------------------------------------
+        // Common
+        // ---------------------------------------------------------------
 
         /// @brief Set visibility of all Solar System objects.
         void set_visible(bool visible);
@@ -112,6 +165,27 @@ namespace parallax::rendering
         static constexpr u32 kBodyIdMoon = 1;
 
     private:
+        /// @brief Render the Sun icon at the given screen position.
+        void draw_sun_at(Vec2f screen_pos,
+                         const astro::EquatorialCoord& equatorial,
+                         f64 alt_rad, f64 az_rad,
+                         const universe::SolarSystemData& sd) const;
+
+        /// @brief Render the Moon icon at the given screen position.
+        void draw_moon_at(Vec2f screen_pos,
+                          const astro::EquatorialCoord& equatorial,
+                          f64 alt_rad, f64 az_rad,
+                          f32 magnitude,
+                          const universe::SolarSystemData& sd) const;
+
+        /// @brief Render a planet icon at the given screen position.
+        void draw_planet_at(Vec2f screen_pos,
+                            const astro::EquatorialCoord& equatorial,
+                            f64 alt_rad, f64 az_rad,
+                            f32 magnitude,
+                            u32 planet_id,
+                            const universe::SolarSystemData& sd) const;
+
         /// @brief Render the Sun icon: yellow-orange filled circle + label.
         void render_sun(const astro::CelestialBodyState& sun,
                         const Camera& camera,
@@ -199,6 +273,12 @@ namespace parallax::rendering
 
         /// @brief Screen objects for selection picking (rebuilt each frame).
         std::vector<SolarSystemScreenObject> m_screen_objects;
+
+        /// @brief Transient per-frame rendering context (set by begin_frame).
+        LineRenderer*   m_frame_lines       = nullptr;
+        ui::BitmapFont* m_frame_font        = nullptr;
+        VkExtent2D      m_frame_viewport    = {};
+        bool            m_frame_atm_on      = true;
 
         // -----------------------------------------------------------------
         // Visual constants (skychart mode — schematic, not realistic)

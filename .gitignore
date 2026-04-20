@@ -49,3 +49,4 @@ build-release/
 _codeql_detected_source_root
 build_test/
 build/
+vcpkg_installed/

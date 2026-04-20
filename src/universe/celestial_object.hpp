@@ -6,6 +6,7 @@
 /// Uses std::variant instead of a raw C union (as suggested by the sprint doc) to
 /// remain idiomatic C++20 and type-safe, while preserving "one of" semantics.
 
+#include "catalog/dso_entry.hpp"
 #include "universe/object_id.hpp"
 
 #include <cstdint>
@@ -36,15 +37,18 @@ struct SolarSystemData
     float distance_au              {0.0f};
     float phase_angle              {0.0f}; ///< degrees
     float apparent_diameter_arcsec {0.0f};
+    float illumination             {1.0f}; ///< Fraction illuminated (0..1) — Task 7.7
+    bool  waxing                   {true}; ///< Moon waxing (true) or waning (false) — Task 7.7
 };
 
 /// @brief Extra data for deep-sky objects (nebulae, clusters, etc.).
 struct DsoData
 {
-    float         size_arcmin        {0.0f};
-    float         surface_brightness {0.0f};
-    std::uint32_t ngc_id             {0};
-    std::uint32_t ic_id              {0};
+    float              size_arcmin        {0.0f};
+    float              surface_brightness {0.0f};
+    std::uint32_t      ngc_id             {0};
+    std::uint32_t      ic_id              {0};
+    catalog::DsoType   dso_type           {catalog::DsoType::Other}; ///< Morphological sub-type — Task 7.7
 };
 
 /// @brief Extra data for external galaxies.

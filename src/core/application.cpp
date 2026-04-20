@@ -1,9 +1,9 @@
 /// @file application.cpp
 /// @brief Application implementation — skychart mode.
 ///
+/// SPRINT 07 Task 7.7: Rewired through Universe facade.
 /// SPRINT 06 Task 6.7: Canonical frame-loop order documented in update_simulation().
 /// SPRINT 04 Task 4.7: Full overlay integration.
-/// SPRINT 05 Task 5.0: Tycho-2 catalog + spatial index integration.
 /// Render order:
 ///   1. Sky background
 ///   2. Coordinate grid (behind stars)
@@ -15,9 +15,6 @@
 ///   8. HUD (always on top)
 
 #include "core/application.hpp"
-
-#include "catalog/catalog_loader.hpp"
-#include "catalog/dso_loader.hpp"
 
 #include <glm/trigonometric.hpp>
 
@@ -202,101 +199,31 @@ void Application::init()
     }
 
     // =================================================================
-    // 10. Load star catalog — Tycho-2 preferred, Hipparcos fallback
-    //                                                    ← SPRINT 05 Task 5.0
+    // 10. Universe facade — replaces all direct catalog loading.
+    //     ← SPRINT 07 Task 7.7
     // =================================================================
     {
-        const std::filesystem::path tycho2_path{"data/catalogs/tycho2.csv"};
-        const std::filesystem::path hipparcos_path{"data/catalogs/hipparcos.csv"};
-        const std::filesystem::path bright_path{"data/catalogs/bright_stars.csv"};
+        m_universe = std::make_unique<universe::Universe>();
 
-        // Try Tycho-2 first
-        auto loaded_tycho2 = catalog::CatalogLoader::load_tycho2_csv(tycho2_path);
-        if (loaded_tycho2.has_value())
-        {
-            m_stars = std::move(loaded_tycho2.value());
-            PLX_CORE_INFO("Tycho-2 catalog loaded: {} stars", m_stars.size());
-        }
-        else
-        {
-            PLX_CORE_WARN("Tycho-2 catalog not found at {}. Trying Hipparcos fallback...",
-                          tycho2_path.string());
-            auto loaded_hip = catalog::CatalogLoader::load_hipparcos_csv(hipparcos_path);
-            if (loaded_hip.has_value())
-            {
-                m_stars = std::move(loaded_hip.value());
-                PLX_CORE_INFO("Hipparcos catalog loaded: {} stars", m_stars.size());
-            }
-            else
-            {
-                PLX_CORE_WARN("Hipparcos not found. Trying bright star fallback...");
-                auto fallback = catalog::CatalogLoader::load_bright_star_csv(bright_path);
-                if (fallback.has_value())
-                {
-                    m_stars = std::move(fallback.value());
-                    PLX_CORE_INFO("Bright star catalog loaded: {} stars", m_stars.size());
-                }
-                else
-                {
-                    PLX_CORE_WARN("No catalog found. Rendering will show no stars.");
-                }
-            }
-        }
+        const std::filesystem::path data_dir{"data"};
+        m_universe->load_catalogs(data_dir);
 
-        // Build spatial index on the primary catalog
-        if (!m_stars.empty())
-        {
-            PLX_CORE_INFO("Building spatial index for {} stars...", m_stars.size());
-            m_spatial_index.build(m_stars, 180);
-        }
+        // TODO: wire master seed to config when config system supports it.
+        // Using a fixed seed until then so procedural content is reproducible.
+        static constexpr std::uint64_t kMasterSeed = 0xA5735E5DULL;
+        m_universe->init_procedural(kMasterSeed);
 
-        // Load Hipparcos separately for constellation HIP ID resolution
-        {
-            const std::filesystem::path hipparcos_const_path{"data/catalogs/hipparcos.csv"};
-            auto hip_stars = catalog::CatalogLoader::load_hipparcos_csv(hipparcos_const_path);
-            if (hip_stars.has_value())
-            {
-                m_hipparcos_stars = std::move(hip_stars.value());
-                PLX_CORE_INFO("Hipparcos catalog loaded for constellation lookup: {} stars",
-                              m_hipparcos_stars.size());
-            }
-        }
+        PLX_CORE_INFO("Universe initialized: {} real objects",
+                      m_universe->get_real_object_count());
     }
 
-    // 10b. Load constellation overlay                                   ← SPRINT 04 Task 4.2
-    //      Resolve against Hipparcos (has HIP IDs for constellations)   ← SPRINT 05 Task 5.0
+    // 10b. Load constellation overlay — resolve via Universe                ← SPRINT 04 Task 4.2
     {
         const std::filesystem::path const_lines{"data/catalogs/constellation_lines.csv"};
         const std::filesystem::path const_names{"data/catalogs/constellation_names.csv"};
         if (m_constellations.load(const_lines, const_names))
         {
-            if (!m_hipparcos_stars.empty())
-            {
-                m_constellations.resolve_stars(m_hipparcos_stars);
-                PLX_CORE_INFO("Constellations resolved against Hipparcos ({} stars)",
-                              m_hipparcos_stars.size());
-            }
-            else
-            {
-                m_constellations.resolve_stars(m_stars);
-                PLX_CORE_WARN("Constellations resolved against primary catalog (no Hipparcos)");
-            }
-        }
-    }
-
-    // 10c. Load Messier DSO catalog                                     ← SPRINT 04 Task 4.5
-    {
-        const std::filesystem::path messier_path{"data/catalogs/messier.csv"};
-        auto loaded_dsos = catalog::DsoLoader::load_messier_csv(messier_path);
-        if (loaded_dsos.has_value())
-        {
-            m_dsos = std::move(loaded_dsos.value());
-            PLX_CORE_INFO("Messier catalog loaded: {} objects from {}",
-                          m_dsos.size(), messier_path.string());
-        }
-        else
-        {
-            PLX_CORE_WARN("Messier catalog not found at {}", messier_path.string());
+            m_constellations.resolve_via_universe(m_universe.get());
         }
     }
 
@@ -489,14 +416,9 @@ void Application::process_input()
             const f32 ndc_y = (2.0f * click_pos.y / static_cast<f32>(viewport.height)) - 1.0f;
             const Vec2f click_ndc = {ndc_x, ndc_y};
 
-            const auto& visible_indices = m_starfield->get_visible_indices();
-            const auto& screen_positions = m_starfield->get_screen_positions();
-
-            m_selection.try_select(
+            m_selection.try_select_from_objects(
                 click_ndc,
-                m_stars, visible_indices, screen_positions,
-                m_dsos,
-                m_solar_system_renderer.get_screen_objects(),
+                m_frame_objects,
                 m_observer,
                 astro::TimeSystem::lmst(m_julian_date, m_observer.longitude_rad),
                 *m_camera,
@@ -687,30 +609,21 @@ void Application::process_input()
 }
 
 // =================================================================
-// Simulation update — skychart mode (no atmosphere on stars)
+// Simulation update — Universe path (Task 7.7)
 //
-// CANONICAL FRAME LOOP ORDER (Task 6.7):             ← SPRINT 06 Task 6.7
+// CANONICAL FRAME LOOP ORDER:
 //
 //  1.  Advance simulation clock → JD, LST.
-//  2.  Compute Sun/Moon/planet positions:
-//        const auto ss_bodies   = astro::SolarSystem::compute_all(jd);
-//        const auto moon_state  = astro::SolarSystem::compute_moon_full(jd);
-//  3.  Compute Sun Alt/Az, Moon Alt/Az → m_sky_params, m_sun_altitude_deg.
-//  4.  Update sky background UBO with sun/moon/atmosphere_on (Task 6.6).
-//  5.  Update starfield (existing).
-//  6.  Update solar system renderer (atmosphere_on branch — Task 6.5).
-//  7.  Update constellations + DSOs + grid (existing).
-//  8.  Update selection (runs AFTER solar_system_renderer.update so its
-//      get_screen_objects() reflects this frame).
-//  9.  Render pass: sky background → starfield → solar system → DSOs →
-//      constellations → grid → horizon → selection indicator → HUD → toolbar.
+//  2.  Universe update (ephemeris + time-dependent state).
+//  3.  Compute Sun/Moon Alt/Az for sky background UBO.
+//  4.  Update sky background.
+//  5.  query_fov → m_frame_objects.
+//  6.  Per-object: equatorial_to_horizontal, horizon cull, project to screen,
+//      dispatch to renderer by ObjectType.
+//  7.  Constellations, grid, horizon.
+//  8.  Selection refresh.
+//  9.  Panels, HUD.
 // 10.  Submit / present.
-//
-// All overlay geometry is submitted to the single m_line_renderer.
-// Labels are submitted to the BitmapFont inside m_hud.
-// The actual GPU draw order is:
-//   sky_bg → starfield → line_renderer (all overlays) → HUD
-// The submit order below controls Z-layering within the line batch.
 // =================================================================
 
 void Application::update_simulation(f64 delta_time_sec)
@@ -721,13 +634,21 @@ void Application::update_simulation(f64 delta_time_sec)
     // Compute Local Sidereal Time
     const f64 lst = astro::TimeSystem::lmst(m_julian_date, m_observer.longitude_rad);
 
-    // --- Solar System ephemeris (computed once, shared by sky background + renderer) ---
-    // ← SPRINT 06 Task 6.6: must be before sky background update
-    const auto ss_bodies  = astro::SolarSystem::compute_all(m_julian_date);
-    const auto moon_state = astro::SolarSystem::compute_moon_full(m_julian_date);
+    // --- Universe update --- (must be before query_fov)
+    m_universe->update(m_julian_date);
 
-    // --- Update sky parameters with live Sun/Moon Alt/Az ← SPRINT 06 Task 6.6 ---
+    // --- Procedural first-tick log ---
+    if (!m_procedural_first_tick_logged)
     {
+        PLX_CORE_INFO("Procedural provider active — master seed 0xA5735E5D, nside=64 cells");
+        m_procedural_first_tick_logged = true;
+    }
+
+    // --- Update sky parameters with live Sun/Moon Alt/Az (same as before) ---
+    {
+        const auto ss_bodies  = astro::SolarSystem::compute_all(m_julian_date);
+        const auto moon_state = astro::SolarSystem::compute_moon_full(m_julian_date);
+
         const auto sun_hz  = astro::Coordinates::equatorial_to_horizontal(
             ss_bodies.sun.equatorial, m_observer, lst);
         const auto moon_hz = astro::Coordinates::equatorial_to_horizontal(
@@ -740,97 +661,104 @@ void Application::update_simulation(f64 delta_time_sec)
         m_sky_params.moon_illumination = moon_state.body.illumination;
         m_sky_params.atmosphere_enabled = m_atmosphere_on;
 
-        // Cache sun altitude for HUD sky-state readout ← SPRINT 06 Task 6.7
         m_sun_altitude_deg = m_sky_params.sun_altitude_deg;
     }
 
     // Update sky background (visual context only)
     m_sky_background->update_params(m_sky_params, *m_camera);
 
-    // Clear line renderer for this frame                               ← SPRINT 04 Task 4.1
+    // Clear line renderer for this frame
     m_line_renderer->begin_frame();
 
     const VkExtent2D viewport = m_swapchain->get_extent();
 
-    // --- Step 2: Coordinate grid (behind stars visually, but all lines
-    //     are drawn in one batch after starfield in the render pass).
-    //     Submitted first so grid lines are "underneath" overlay lines. ---
+    // Coordinate grid (submit first — it goes behind overlays in the line batch)
     m_coord_grid.update(*m_camera, m_observer, lst,
-                        *m_line_renderer, m_hud->get_font(),
-                        viewport);
+                        *m_line_renderer, m_hud->get_font(), viewport);
 
-    // =================================================================
-    // Spatial index query — replaces VisibilityFilter       ← SPRINT 05 Task 5.0
-    // =================================================================
-    const auto pointing = m_camera->get_pointing();
-    const f64 fov_rad = m_camera->get_fov_rad();
-    const f32 mag_limit = m_camera->get_magnitude_limit();
+    // ---  query_fov → m_frame_objects  ---
+    const auto pointing  = m_camera->get_pointing();
+    const f64  fov_rad   = m_camera->get_fov_rad();
+    const f32  mag_limit = m_camera->get_magnitude_limit();
 
-    std::vector<u32> candidates;
-    catalog::SpatialQueryStats query_stats{};
+    // Convert camera pointing (Alt/Az) → RA/Dec for the FOV query
+    const auto camera_eq = astro::Coordinates::horizontal_to_equatorial(
+        pointing, m_observer, lst);
 
-    if (m_spatial_index.is_built())
+    // Query radius = FOV half-angle (gnomonic), padded by 25 %
+    const f64 query_radius_deg = glm::degrees(fov_rad * 0.75);
+
+    m_universe->query_fov(camera_eq.ra, camera_eq.dec,
+                          query_radius_deg, mag_limit,
+                          universe::QueryFlags::All,
+                          m_frame_objects);
+
+    // --- Begin renderer frames ---
+    m_starfield->begin_frame(mag_limit);
+    m_solar_system_renderer.begin_frame(*m_line_renderer, m_hud->get_font(), viewport, m_atmosphere_on);
+    m_dso_renderer.begin_frame(*m_line_renderer, m_hud->get_font(), viewport);
+
+    // --- Dispatch per-frame objects ---
+    for (const auto& obj : m_frame_objects)
     {
-        // Convert camera Alt/Az → RA/Dec for spatial query
-        const auto camera_eq = astro::Coordinates::horizontal_to_equatorial(
-            pointing, m_observer, lst);
+        const auto hz = astro::Coordinates::equatorial_to_horizontal(
+            {obj.ra, obj.dec}, m_observer, lst);
 
-        // Query radius: FOV diagonal half-angle with margin
-        const f64 query_radius = fov_rad * 0.75;
+        if (m_atmosphere_on && hz.alt < 0.0)
+        {
+            continue;  // Below horizon when atmosphere culling is on
+        }
 
-        candidates = m_spatial_index.query(
-            camera_eq.ra, camera_eq.dec, query_radius, mag_limit, &query_stats);
+        const auto screen_opt = astro::Coordinates::horizontal_to_screen(hz, pointing, fov_rad);
+        if (!screen_opt.has_value())
+        {
+            continue;  // Outside FOV
+        }
+
+        const Vec2f screen = screen_opt.value();
+
+        switch (obj.type)
+        {
+            case universe::ObjectType::Star:
+            case universe::ObjectType::ProceduralStar:
+                m_starfield->add_celestial_object(screen, obj);
+                break;
+
+            case universe::ObjectType::SolarSystemBody:
+                m_solar_system_renderer.add_celestial_object(screen, hz.alt, hz.az, obj);
+                break;
+
+            case universe::ObjectType::DeepSkyObject:
+                m_dso_renderer.add_celestial_object(screen, obj);
+                break;
+
+            default:
+                break; // Galaxy / ProceduralDso — not yet rendered
+        }
     }
-    else
-    {
-        // Fallback to old VisibilityFilter if spatial index not built
-        catalog::PrefilterStats prefilter_stats{};
-        candidates = catalog::VisibilityFilter::filter(
-            m_stars, m_observer, lst, mag_limit, &prefilter_stats);
-    }
 
-    // --- Step 3: Starfield update — NO atmosphere parameter ---
-    m_starfield->update(m_stars, candidates, m_observer, lst, *m_camera);
+    // Finalise starfield GPU upload
+    m_starfield->end_frame();
 
-    // --- Step 3b: Solar System bodies (Sun, Moon, planets) ← SPRINT 06 Task 6.5 ---
-    // atmosphere_on controls horizon culling for Solar System bodies:
-    //   true  → horizon cull active (bodies below alt=0 are hidden)
-    //   false → all bodies always visible (Option A per Task 6.7 spec)
-    m_solar_system_renderer.update(
-        ss_bodies, moon_state,
-        *m_camera, m_observer, lst,
-        *m_line_renderer, m_hud->get_font(),
-        viewport,
-        m_atmosphere_on);  // ← SPRINT 06 Task 6.7: pass live toggle
-
-    // --- Step 4: Constellation lines + labels (over stars) ---
+    // --- Constellation lines + labels (over stars) ---
     m_constellations.update(*m_camera, m_observer, lst,
-                            *m_line_renderer, m_hud->get_font(),
-                            viewport);
+                            *m_line_renderer, m_hud->get_font(), viewport);
 
-    // --- Step 5: DSO icons + labels (over stars) ---
-    m_dso_renderer.update(*m_camera, m_observer, lst,
-                          m_dsos, *m_line_renderer, m_hud->get_font(),
-                          viewport);
+    // --- Horizon line + cardinal markers ---
+    m_horizon.update(*m_camera, *m_line_renderer, m_hud->get_font(), viewport);
 
-    // --- Step 6: Horizon line + cardinal markers (over everything except HUD) ---
-    m_horizon.update(*m_camera, *m_line_renderer, m_hud->get_font(),
-                     viewport);
+    // --- Selection — refresh screen position + Alt/Az each frame ---
+    m_selection.update_from_objects(m_frame_objects,
+                                    m_solar_system_renderer.get_screen_objects(),
+                                    m_observer, lst, *m_camera);
 
-    // --- Step 6b: Selection — refresh screen position + Alt/Az each frame ---
-    // Note: m_solar_system_renderer.update() runs above (Step 3b), so SS screen
-    // objects reflect the current frame when passed here.
-    m_selection.update(m_stars, m_dsos,
-                       m_solar_system_renderer.get_screen_objects(),
-                       m_observer, lst, *m_camera);
-
-    // --- Step 6c: Selection indicator (submit lines to renderer) ---
+    // --- Selection indicator ---
     if (m_selection.has_selection())
     {
         m_selection.render_indicator(*m_line_renderer, viewport);
     }
 
-    // --- Step 6d: Toolbar update                          ← SPRINT 05 Task 5.3
+    // --- Toolbar update ---
     {
         const ui::ToolbarState toolbar_state{
             .constellations_visible = m_constellations.is_visible(),
@@ -838,7 +766,7 @@ void Application::update_simulation(f64 delta_time_sec)
             .dso_visible            = m_dso_renderer.is_visible(),
             .grid_visible           = m_coord_grid.get_type() != overlay::GridType::None,
             .horizon_visible        = m_horizon.is_visible(),
-            .atmosphere_on          = m_atmosphere_on,          // ← SPRINT 06 Task 6.7
+            .atmosphere_on          = m_atmosphere_on,
             .time_scale             = m_time_scale,
             .time_paused            = (m_time_scale == 0.0),
             .fov_deg                = m_camera->get_fov_deg(),
@@ -853,7 +781,7 @@ void Application::update_simulation(f64 delta_time_sec)
             toolbar_state);
     }
 
-    // --- Step 6e: SidePanel update                        ← SPRINT 05 Task 5.4
+    // --- SidePanel update ---
     {
         const auto dt_utc = astro::TimeSystem::from_julian_date(m_julian_date);
         const auto utc_str = std::format("{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}",
@@ -889,7 +817,7 @@ void Application::update_simulation(f64 delta_time_sec)
             side_state);
     }
 
-    // --- Step 6f: InfoPanel update                        ← SPRINT 05 Task 5.5
+    // --- InfoPanel update ---
     m_info_panel.update(
         m_selection,
         m_input->get_mouse_position(),
@@ -897,7 +825,7 @@ void Application::update_simulation(f64 delta_time_sec)
         static_cast<f32>(delta_time_sec),
         viewport.width, viewport.height);
 
-    // --- Step 7: Update HUD (drawn last in render pass) ---
+    // --- HUD update ---
     const f32 fps = (m_delta_time > 0.0) ? static_cast<f32>(1.0 / m_delta_time) : 0.0f;
 
     m_hud->update(ui::HudData{
@@ -905,49 +833,33 @@ void Application::update_simulation(f64 delta_time_sec)
         .local_sidereal_time_rad = lst,
         .utc_hours               = 0.0,
         .altitude_deg            = pointing.alt * astro_constants::kRadToDeg,
-        .azimuth_deg             = pointing.az * astro_constants::kRadToDeg,
+        .azimuth_deg             = pointing.az  * astro_constants::kRadToDeg,
         .fov_deg                 = m_camera->get_fov_deg(),
         .magnitude_limit         = m_camera->get_magnitude_limit(),
-        .latitude_deg            = m_observer.latitude_rad * astro_constants::kRadToDeg,
+        .latitude_deg            = m_observer.latitude_rad  * astro_constants::kRadToDeg,
         .longitude_deg           = m_observer.longitude_rad * astro_constants::kRadToDeg,
         .bortle_scale            = m_sky_params.bortle_scale,
         .fps                     = fps,
         .visible_stars           = m_starfield->get_visible_count(),
-        .total_stars             = static_cast<u32>(m_stars.size()),
+        .total_stars             = static_cast<u32>(m_frame_objects.size()),
         .time_scale              = m_time_scale,
         .overlay_const           = m_constellations.is_visible(),
         .overlay_grid_name       = m_coord_grid.get_type_name(),
         .overlay_dso             = m_dso_renderer.is_visible(),
         .overlay_horizon         = m_horizon.is_visible(),
-        .sun_altitude_deg        = m_sun_altitude_deg,           // ← SPRINT 06 Task 6.7
-        .atmosphere_on           = m_atmosphere_on,              // ← SPRINT 06 Task 6.7
+        .sun_altitude_deg        = m_sun_altitude_deg,
+        .atmosphere_on           = m_atmosphere_on,
     });
 
-    // Periodic logging — query time + visible star count             ← SPRINT 05 Task 5.0
+    // Periodic logging
     ++m_frame_counter;
     if (m_frame_counter % 60 == 0)
     {
-        if (m_spatial_index.is_built())
-        {
-            PLX_CORE_TRACE(
-                "SpatialQuery: {:.2f}ms | bands={} candidates={} results={} | "
-                "visible={} | MLIM {:.1f} | catalog={}",
-                query_stats.query_time_ms,
-                query_stats.bands_searched,
-                query_stats.candidates_scanned,
-                query_stats.results,
-                m_starfield->get_visible_count(),
-                mag_limit,
-                m_stars.size());
-        }
-        else
-        {
-            PLX_CORE_TRACE(
-                "Stars: {} visible | MLIM {:.1f} | catalog={}",
-                m_starfield->get_visible_count(),
-                m_camera->get_magnitude_limit(),
-                m_stars.size());
-        }
+        PLX_CORE_TRACE(
+            "Universe: {} frame objects | visible stars={} | MLIM {:.1f}",
+            m_frame_objects.size(),
+            m_starfield->get_visible_count(),
+            mag_limit);
     }
 }
 

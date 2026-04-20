@@ -24,6 +24,9 @@
 #include <utility>
 #include <vector>
 
+// Forward declare to avoid pulling universe headers into the overlay layer.
+namespace parallax::universe { class Universe; }
+
 namespace parallax::overlay
 {
     /// @brief One constellation: abbreviation, full name, and HIP-pair line segments.
@@ -36,7 +39,12 @@ namespace parallax::overlay
 
     /// @brief The 88 IAU constellation stick figures rendered as sky overlays.
     ///
-    /// Lifecycle:
+    /// Lifecycle (Universe path — new):
+    ///   1. load()                 — parse CSV files
+    ///   2. resolve_via_universe() — store Universe pointer for HIP resolution
+    ///   3. update()               — each frame, transform + submit geometry
+    ///
+    /// Lifecycle (legacy path — deprecated):
     ///   1. load()          — parse CSV files
     ///   2. resolve_stars() — build HIP → catalog index map, store catalog ref
     ///   3. update()        — each frame, transform + submit geometry
@@ -58,13 +66,27 @@ namespace parallax::overlay
         [[nodiscard]] bool load(const std::filesystem::path& lines_path,
                                 const std::filesystem::path& names_path);
 
+        /// @brief Register the Universe facade for HIP ID resolution.
+        ///
+        /// After this call, update() resolves HIP IDs via Universe::resolve_hip()
+        /// instead of the legacy catalog span.  The Universe pointer must remain
+        /// valid for the lifetime of this object.
+        ///
+        /// Clears the legacy HIP-to-index map and catalog span.
+        ///
+        /// @param universe  Pointer to the Universe facade (may be nullptr to revert).
+        void resolve_via_universe(const universe::Universe* universe);
+
         /// @brief Build the HIP ID → catalog vector index lookup table.
+        ///
+        /// @deprecated Use resolve_via_universe() instead.
         ///
         /// Must be called after the star catalog is loaded and before the first
         /// update(). Only stars present in the catalog can be resolved; missing
         /// HIP IDs are logged and the corresponding segments skipped at render time.
         ///
         /// @param catalog The loaded star catalog (lifetime must outlive this object).
+        [[deprecated("Use resolve_via_universe()")]]
         void resolve_stars(std::span<const catalog::StarEntry> catalog);
 
         /// @brief Transform constellation stars and submit lines + labels for this frame.
@@ -85,16 +107,24 @@ namespace parallax::overlay
     private:
         [[nodiscard]] bool load_lines(const std::filesystem::path& path);
         void load_names(const std::filesystem::path& path);
-        [[nodiscard]] std::optional<u32> resolve_hip(u32 hip_id) const;
+
+        /// @brief Legacy HIP resolution — returns catalog index.
+        [[nodiscard]] std::optional<u32> resolve_hip_legacy(u32 hip_id) const;
+
+        /// @brief Universe-path HIP resolution — returns RA/Dec pair.
+        [[nodiscard]] std::optional<std::pair<double, double>> resolve_hip_universe(u32 hip_id) const;
 
         std::vector<ConstellationData> m_constellations;
         bool m_visible = true;
 
-        /// @brief HIP catalog_id → index into the star catalog vector.
+        /// @brief HIP catalog_id → index into the star catalog vector (legacy path).
         std::unordered_map<u32, u32> m_hip_to_index;
 
-        /// @brief Non-owning view of the star catalog (set by resolve_stars).
+        /// @brief Non-owning view of the star catalog (legacy path — set by resolve_stars).
         std::span<const catalog::StarEntry> m_catalog;
+
+        /// @brief Non-owning pointer to the Universe facade (Universe path — set by resolve_via_universe).
+        const universe::Universe* m_universe = nullptr;
 
         /// @brief Dim blue-gray overlay color (RGBA).
         static constexpr Vec4f kLineColor{0.3f, 0.4f, 0.6f, 0.5f};

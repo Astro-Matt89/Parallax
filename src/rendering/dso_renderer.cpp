@@ -9,12 +9,63 @@
 #include "core/logger.hpp"
 
 #include <cmath>
+#include <format>
 
 namespace parallax::rendering
 {
 
 // =================================================================
-// Public API
+// Universe path — new API
+// =================================================================
+
+void DsoRenderer::begin_frame(LineRenderer& lines, ui::BitmapFont& font, VkExtent2D viewport)
+{
+    m_frame_lines    = &lines;
+    m_frame_font     = &font;
+    m_frame_viewport = viewport;
+    m_rendered_count = 0;
+}
+
+void DsoRenderer::add_celestial_object(Vec2f screen_pos,
+                                       const universe::CelestialObject& obj)
+{
+    if (!m_visible || !m_frame_lines || !m_frame_font)
+    {
+        return;
+    }
+
+    // Extract DsoData defensively via std::get_if.
+    const auto* dso_data = std::get_if<universe::DsoData>(&obj.data);
+    if (!dso_data)
+    {
+        return; // Object does not carry DsoData — skip rendering
+    }
+
+    // Build label: "M<num>" from source_id (Messier number).
+    const std::string label = std::format("M{}", universe::decode_source_id(obj.id));
+
+    draw_dso_at(screen_pos, dso_data->dso_type, label);
+
+    ++m_rendered_count;
+}
+
+void DsoRenderer::draw_dso_at(Vec2f screen_pos,
+                               catalog::DsoType dso_type,
+                               std::string_view label) const
+{
+    draw_icon(dso_type, screen_pos, kIconColor, kIconRadiusNdc, *m_frame_lines);
+
+    const Vec2f px = ndc_to_pixel(screen_pos, m_frame_viewport);
+    const f32 offset_x = kIconRadiusNdc * static_cast<f32>(m_frame_viewport.width) * 0.5f + 4.0f;
+
+    m_frame_font->draw_text(std::string{label},
+                            px.x + offset_x,
+                            px.y - 8.0f,
+                            kLabelScale, kLabelColor);
+}
+
+// =================================================================
+// Legacy path — deprecated
 // =================================================================
 
 void DsoRenderer::update(const Camera& camera,

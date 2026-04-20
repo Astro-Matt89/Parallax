@@ -8,6 +8,8 @@
 
 #include "overlay/constellations.hpp"
 
+#include "universe/universe.hpp"
+
 #include "core/logger.hpp"
 
 #include <cmath>
@@ -144,6 +146,35 @@ void Constellations::load_names(const std::filesystem::path& path)
 }
 
 // =================================================================
+// HIP resolution — Universe path
+// =================================================================
+
+void Constellations::resolve_via_universe(const universe::Universe* universe)
+{
+    m_universe = universe;
+
+    if (m_universe)
+    {
+        // Clear legacy data — we no longer need the catalog span or HIP map.
+        m_hip_to_index.clear();
+        m_catalog = {};
+
+        u32 resolved = 0;
+        u32 missing  = 0;
+        for (const auto& c : m_constellations)
+        {
+            for (const auto& [h1, h2] : c.segments)
+            {
+                if (m_universe->resolve_hip(h1)) { ++resolved; } else { ++missing; }
+                if (m_universe->resolve_hip(h2)) { ++resolved; } else { ++missing; }
+            }
+        }
+        PLX_CORE_INFO("Constellations resolved via Universe: {} resolved, {} missing",
+                      resolved, missing);
+    }
+}
+
+// =================================================================
 // HIP resolution
 // =================================================================
 
@@ -198,7 +229,7 @@ void Constellations::resolve_stars(std::span<const catalog::StarEntry> catalog)
     verify(25336, "Bellatrix",  81.28, 6.35);
 }
 
-std::optional<u32> Constellations::resolve_hip(u32 hip_id) const
+std::optional<u32> Constellations::resolve_hip_legacy(u32 hip_id) const
 {
     auto it = m_hip_to_index.find(hip_id);
     if (it != m_hip_to_index.end())
@@ -206,6 +237,20 @@ std::optional<u32> Constellations::resolve_hip(u32 hip_id) const
         return it->second;
     }
     return std::nullopt;
+}
+
+std::optional<std::pair<double, double>> Constellations::resolve_hip_universe(u32 hip_id) const
+{
+    if (!m_universe)
+    {
+        return std::nullopt;
+    }
+    auto obj = m_universe->resolve_hip(hip_id);
+    if (!obj.has_value())
+    {
+        return std::nullopt;
+    }
+    return std::make_pair(obj->ra, obj->dec);
 }
 
 // =================================================================
@@ -225,7 +270,10 @@ void Constellations::update(const rendering::Camera& camera,
                             ui::BitmapFont& font,
                             VkExtent2D viewport)
 {
-    if (!m_visible || m_constellations.empty() || m_catalog.empty())
+    const bool use_universe = (m_universe != nullptr);
+    const bool use_legacy   = !use_universe && !m_catalog.empty();
+
+    if (!m_visible || m_constellations.empty() || (!use_universe && !use_legacy))
     {
         return;
     }
@@ -246,23 +294,40 @@ void Constellations::update(const rendering::Camera& camera,
 
         for (const auto& [hip1, hip2] : constellation.segments)
         {
-            const auto idx1 = resolve_hip(hip1);
-            const auto idx2 = resolve_hip(hip2);
-            if (!idx1.has_value() || !idx2.has_value())
+            double ra1 = 0.0, dec1 = 0.0;
+            double ra2 = 0.0, dec2 = 0.0;
+
+            if (use_universe)
             {
-                continue;
+                const auto p1 = resolve_hip_universe(hip1);
+                const auto p2 = resolve_hip_universe(hip2);
+                if (!p1.has_value() || !p2.has_value())
+                {
+                    continue;
+                }
+                ra1 = p1->first;  dec1 = p1->second;
+                ra2 = p2->first;  dec2 = p2->second;
+            }
+            else
+            {
+                const auto idx1 = resolve_hip_legacy(hip1);
+                const auto idx2 = resolve_hip_legacy(hip2);
+                if (!idx1.has_value() || !idx2.has_value())
+                {
+                    continue;
+                }
+                ra1 = m_catalog[idx1.value()].ra;
+                dec1 = m_catalog[idx1.value()].dec;
+                ra2 = m_catalog[idx2.value()].ra;
+                dec2 = m_catalog[idx2.value()].dec;
             }
 
-            const auto& star1 = m_catalog[idx1.value()];
-            const auto& star2 = m_catalog[idx2.value()];
-
             // RA/Dec → screen NDC via THE SAME shared function as starfield
-            // star.ra and star.dec are already in RADIANS (from catalog loader)
             const auto s1 = astro::Coordinates::project_radec_to_screen(
-                star1.ra, star1.dec, observer, lst_rad, pointing, fov_rad);
+                ra1, dec1, observer, lst_rad, pointing, fov_rad);
 
             const auto s2 = astro::Coordinates::project_radec_to_screen(
-                star2.ra, star2.dec, observer, lst_rad, pointing, fov_rad);
+                ra2, dec2, observer, lst_rad, pointing, fov_rad);
 
             if (!s1.has_value() || !s2.has_value())
             {
@@ -286,11 +351,6 @@ void Constellations::update(const rendering::Camera& camera,
             const f32 cy_ndc = sum_sy / static_cast<f32>(screen_count);
 
             // NDC [-1,1] → pixel coordinates
-            // X: -1 = left edge, +1 = right edge
-            // Y: In Vulkan NDC, -1 = top, +1 = bottom (Y already flipped
-            //    by horizontal_to_screen which negates proj_y for Vulkan)
-            // So: pixel_x = (ndc_x + 1) / 2 * width
-            //     pixel_y = (ndc_y + 1) / 2 * height
             const f32 px = (cx_ndc + 1.0f) * 0.5f * vw;
             const f32 py = (cy_ndc + 1.0f) * 0.5f * vh;
 

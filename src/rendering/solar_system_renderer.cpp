@@ -36,6 +36,171 @@ static constexpr std::array<u32, 7> kPlanetIdMap = {
 };
 
 // =================================================================
+// Universe path — begin_frame / add_celestial_object
+// =================================================================
+
+void SolarSystemRenderer::begin_frame(LineRenderer& lines,
+                                       ui::BitmapFont& font,
+                                       VkExtent2D viewport,
+                                       bool atmosphere_on)
+{
+    m_frame_lines    = &lines;
+    m_frame_font     = &font;
+    m_frame_viewport = viewport;
+    m_frame_atm_on   = atmosphere_on;
+    m_rendered_count = 0;
+    m_screen_objects.clear();
+}
+
+void SolarSystemRenderer::add_celestial_object(Vec2f screen_pos,
+                                                f64 alt_rad,
+                                                f64 az_rad,
+                                                const universe::CelestialObject& obj)
+{
+    if (!m_visible || !m_frame_lines || !m_frame_font)
+    {
+        return;
+    }
+
+    const auto* sd = std::get_if<universe::SolarSystemData>(&obj.data);
+    if (!sd)
+    {
+        return; // Not a solar system body — skip
+    }
+
+    const astro::EquatorialCoord equatorial{obj.ra, obj.dec};
+    const u64 body_index = universe::decode_source_id(obj.id);
+
+    if (body_index == 0)
+    {
+        draw_sun_at(screen_pos, equatorial, alt_rad, az_rad, *sd);
+    }
+    else if (body_index == 1)
+    {
+        draw_moon_at(screen_pos, equatorial, alt_rad, az_rad, obj.mag_v, *sd);
+    }
+    else if (body_index >= 2 && body_index <= 8)
+    {
+        // Planet: body_index 2-8 maps to kPlanetIdMap[0..6]
+        const u32 planet_id = kPlanetIdMap[body_index - 2];
+        draw_planet_at(screen_pos, equatorial, alt_rad, az_rad, obj.mag_v, planet_id, *sd);
+    }
+}
+
+void SolarSystemRenderer::draw_sun_at(Vec2f screen_pos,
+                                       const astro::EquatorialCoord& equatorial,
+                                       f64 alt_rad, f64 az_rad,
+                                       const universe::SolarSystemData& sd) const
+{
+    draw_filled_circle(screen_pos, kSunRadiusNdc, kSunColor, *m_frame_lines);
+
+    constexpr f32 kRayInner = 1.1f;
+    constexpr f32 kRayOuter = 1.6f;
+    const f32 ray_in  = kSunRadiusNdc * kRayInner;
+    const f32 ray_out = kSunRadiusNdc * kRayOuter;
+    for (u32 d = 0; d < 4; ++d)
+    {
+        const f32 angle = static_cast<f32>(d) * glm::half_pi<f32>();
+        const f32 cos_a = std::cos(angle);
+        const f32 sin_a = std::sin(angle);
+        m_frame_lines->add_line(Vec2f{screen_pos.x + cos_a * ray_in,  screen_pos.y + sin_a * ray_in},
+                                Vec2f{screen_pos.x + cos_a * ray_out, screen_pos.y + sin_a * ray_out},
+                                kSunColor);
+    }
+
+    const Vec2f px = ndc_to_pixel(screen_pos, m_frame_viewport);
+    const f32 offset_x = kLabelOffsetNdc.x * static_cast<f32>(m_frame_viewport.width)  * 0.5f;
+    const f32 offset_y = kLabelOffsetNdc.y * static_cast<f32>(m_frame_viewport.height) * 0.5f;
+    m_frame_font->draw_text("Sun", px.x + offset_x, px.y - offset_y, kLabelScale, kSunLabelColor);
+
+    m_screen_objects.push_back(SolarSystemScreenObject{
+        .screen_ndc              = screen_pos,
+        .equatorial              = equatorial,
+        .alt_rad                 = alt_rad,
+        .az_rad                  = az_rad,
+        .distance_au             = static_cast<f64>(sd.distance_au),
+        .magnitude               = 0.0f,    // Sun magnitude handled separately
+        .angular_diameter_arcsec = sd.apparent_diameter_arcsec,
+        .phase_angle_deg         = sd.phase_angle,
+        .illumination            = sd.illumination,
+        .body_id                 = kBodyIdSun,
+        .name                    = "Sun",
+    });
+    ++m_rendered_count;
+}
+
+void SolarSystemRenderer::draw_moon_at(Vec2f screen_pos,
+                                        const astro::EquatorialCoord& equatorial,
+                                        f64 alt_rad, f64 az_rad,
+                                        f32 magnitude,
+                                        const universe::SolarSystemData& sd) const
+{
+    draw_filled_circle(screen_pos, kMoonRadiusNdc, kMoonColor, *m_frame_lines);
+    draw_moon_phase(screen_pos, kMoonRadiusNdc, sd.illumination, sd.waxing, *m_frame_lines);
+
+    const Vec2f px = ndc_to_pixel(screen_pos, m_frame_viewport);
+    const f32 offset_x = kLabelOffsetNdc.x * static_cast<f32>(m_frame_viewport.width)  * 0.5f;
+    const f32 offset_y = kLabelOffsetNdc.y * static_cast<f32>(m_frame_viewport.height) * 0.5f;
+    m_frame_font->draw_text("Moon", px.x + offset_x, px.y - offset_y, kLabelScale, kMoonLabelColor);
+
+    m_screen_objects.push_back(SolarSystemScreenObject{
+        .screen_ndc              = screen_pos,
+        .equatorial              = equatorial,
+        .alt_rad                 = alt_rad,
+        .az_rad                  = az_rad,
+        .distance_au             = static_cast<f64>(sd.distance_au),
+        .magnitude               = magnitude,
+        .angular_diameter_arcsec = sd.apparent_diameter_arcsec,
+        .phase_angle_deg         = sd.phase_angle,
+        .illumination            = sd.illumination,
+        .body_id                 = kBodyIdMoon,
+        .name                    = "Moon",
+    });
+    ++m_rendered_count;
+}
+
+void SolarSystemRenderer::draw_planet_at(Vec2f screen_pos,
+                                          const astro::EquatorialCoord& equatorial,
+                                          f64 alt_rad, f64 az_rad,
+                                          f32 magnitude,
+                                          u32 planet_id,
+                                          const universe::SolarSystemData& sd) const
+{
+    const Vec4f col    = planet_color(planet_id);
+    const f32 radius   = magnitude_to_radius_ndc(magnitude);
+
+    draw_filled_circle(screen_pos, radius, col, *m_frame_lines);
+
+    if (planet_id == astro::planet_id::kSaturn)
+    {
+        m_frame_lines->add_line(Vec2f{screen_pos.x - radius * 1.8f, screen_pos.y},
+                                Vec2f{screen_pos.x + radius * 1.8f, screen_pos.y},
+                                col);
+    }
+
+    const Vec2f px = ndc_to_pixel(screen_pos, m_frame_viewport);
+    const f32 offset_x = kLabelOffsetNdc.x * static_cast<f32>(m_frame_viewport.width)  * 0.5f;
+    const f32 offset_y = kLabelOffsetNdc.y * static_cast<f32>(m_frame_viewport.height) * 0.5f;
+    m_frame_font->draw_text(std::string(planet_name(planet_id)),
+                            px.x + offset_x, px.y - offset_y, kLabelScale, kPlanetLabelColor);
+
+    m_screen_objects.push_back(SolarSystemScreenObject{
+        .screen_ndc              = screen_pos,
+        .equatorial              = equatorial,
+        .alt_rad                 = alt_rad,
+        .az_rad                  = az_rad,
+        .distance_au             = static_cast<f64>(sd.distance_au),
+        .magnitude               = magnitude,
+        .angular_diameter_arcsec = sd.apparent_diameter_arcsec,
+        .phase_angle_deg         = sd.phase_angle,
+        .illumination            = sd.illumination,
+        .body_id                 = 10u + planet_id,
+        .name                    = planet_name(planet_id),
+    });
+    ++m_rendered_count;
+}
+
+// =================================================================
 // Public API
 // =================================================================
 

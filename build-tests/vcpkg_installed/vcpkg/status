@@ -1,0 +1,75 @@
+Package: vcpkg-cmake-config
+Version: 2024-05-23
+Architecture: x64-linux
+Multi-Arch: same
+Abi: 63a3ca443fab9494f7145771496b8add2c2ce38249c0faef827f6a4202bf4457
+Status: install ok installed
+
+Package: vcpkg-cmake
+Version: 2024-04-23
+Architecture: x64-linux
+Multi-Arch: same
+Abi: 8f2153eb6dcca270e064868ddd3737879fc1f23daa19d7e655e2344ecc321fd9
+Status: install ok installed
+
+Package: doctest
+Version: 2.5.1
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-linux
+Multi-Arch: same
+Abi: dc62ba0a27541e8617c76f947e57a4f36c4dc935e3817b9e07ce8bb4e190686f
+Description: The fastest feature-rich C++11/14/17/20 single-header testing framework
+Status: install ok installed
+
+Package: glm
+Version: 1.0.3
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-linux
+Multi-Arch: same
+Abi: 75d62c02afdbe19fc5dd50275f72e4aa5fc36ce825d7c8e1ed8d697f069c3317
+Description: OpenGL Mathematics (GLM)
+Status: install ok installed
+
+Package: zstd
+Version: 1.5.7
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-linux
+Multi-Arch: same
+Abi: 3c1988464e1862bc49489c93d502c19d33d6f61db30b0a016f8aa80ae26d0466
+Description: Zstandard - Fast real-time compression algorithm
+Status: install ok installed
+
+Package: vcpkg-cmake-get-vars
+Version: 2025-05-29
+Depends: vcpkg-cmake
+Architecture: x64-linux
+Multi-Arch: same
+Abi: d4fd7643601bc6290d649d892a70d74eb263cbc232c2eeedf8e9ee4fb319ef89
+Status: install ok installed
+
+Package: vcpkg-tool-meson
+Version: 1.9.0
+Port-Version: 4
+Depends: vcpkg-cmake-get-vars
+Architecture: x64-linux
+Multi-Arch: same
+Abi: 3f5dd8c1f186b5fac9b0c0d8112bf040aa3ebf08d38999de568d479d53303b9b
+Description: Meson build system
+Status: install ok installed
+
+Package: vcpkg-get-python-packages
+Version: 2025-04-05
+Architecture: x64-linux
+Multi-Arch: same
+Abi: 4b2005777f2ea26942c7e8445ca368677107d24a04cf1f729144a6cbb0f470e4
+Status: install ok installed
+
+Package: lz4
+Version: 1.10.0
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-linux
+Multi-Arch: same
+Abi: 436404549c7142e47c3508d8e6da93cfb457247dfa9cd65f541cf21240d2bf2a
+Description: Lossless compression algorithm, providing compression speed at 400 MB/s per core.
+Status: install ok installed
+

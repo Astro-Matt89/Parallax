@@ -6,11 +6,13 @@
 #include "ui/selection.hpp"
 
 #include "astro/coordinates.hpp"
+#include "astro/solar_system.hpp"
 #include "core/logger.hpp"
 #include "rendering/solar_system_renderer.hpp"
 
 #include <cmath>
 #include <cstdio>
+#include <format>
 #include <fstream>
 #include <limits>
 #include <sstream>
@@ -97,7 +99,242 @@ bool Selection::load_star_names(const std::filesystem::path& path)
 }
 
 // =================================================================
-// Selection attempt
+// Universe path — try_select_from_objects
+// =================================================================
+
+void Selection::try_select_from_objects(Vec2f click_ndc,
+                                        std::span<const universe::CelestialObject> objects,
+                                        const astro::ObserverLocation& observer,
+                                        f64 lst_rad,
+                                        const rendering::Camera& camera,
+                                        VkExtent2D viewport)
+{
+    (void)viewport; // Picking is in NDC space
+
+    const auto pointing = camera.get_pointing();
+    const f64 fov_rad   = camera.get_fov_rad();
+
+    f32 best_dist_sq = kPickRadiusNdc * kPickRadiusNdc;
+    bool found = false;
+    SelectedObject candidate;
+
+    // Iterate in reverse so foreground objects (planets, DSOs) win over
+    // background stars at the same screen position.
+    for (auto it = objects.rbegin(); it != objects.rend(); ++it)
+    {
+        const auto& obj = *it;
+
+        const auto hz = astro::Coordinates::equatorial_to_horizontal(
+            {obj.ra, obj.dec}, observer, lst_rad);
+
+        const auto screen_opt = astro::Coordinates::horizontal_to_screen(
+            hz, pointing, fov_rad);
+
+        if (!screen_opt.has_value())
+        {
+            continue;
+        }
+
+        const Vec2f screen = screen_opt.value();
+        const f32 dx = screen.x - click_ndc.x;
+        const f32 dy = screen.y - click_ndc.y;
+        const f32 dist_sq = dx * dx + dy * dy;
+
+        if (dist_sq >= best_dist_sq)
+        {
+            continue;
+        }
+
+        best_dist_sq = dist_sq;
+        found = true;
+
+        candidate = {};
+        candidate.ra_rad  = obj.ra;
+        candidate.dec_rad = obj.dec;
+        candidate.mag_v   = obj.mag_v;
+        candidate.color_bv = obj.color_bv;
+        candidate.alt_rad = hz.alt;
+        candidate.az_rad  = hz.az;
+        candidate.above_horizon = hz.alt >= 0.0;
+        candidate.screen_ndc = screen;
+        candidate.celestial_obj = obj;
+
+        switch (obj.type)
+        {
+            case universe::ObjectType::Star:
+            case universe::ObjectType::ProceduralStar:
+            {
+                candidate.type = SelectedObjectType::Star;
+
+                // Recover HIP ID from StarData if present.
+                if (const auto* sd = std::get_if<universe::StarData>(&obj.data))
+                {
+                    candidate.hip_id = sd->hip_id;
+                    const auto* name_entry = find_star_name(sd->hip_id);
+                    if (name_entry)
+                    {
+                        candidate.common_name  = name_entry->common_name;
+                        candidate.bayer        = name_entry->bayer;
+                        candidate.constellation = name_entry->constellation;
+                        candidate.spectral_type = name_entry->spectral_type;
+                    }
+                }
+                break;
+            }
+
+            case universe::ObjectType::DeepSkyObject:
+            {
+                candidate.type = SelectedObjectType::Dso;
+                candidate.designation = std::format("M{}", universe::decode_source_id(obj.id));
+                if (const auto* dd = std::get_if<universe::DsoData>(&obj.data))
+                {
+                    candidate.dso_type   = dd->dso_type;
+                    candidate.size_arcmin = dd->size_arcmin;
+                }
+                break;
+            }
+
+            case universe::ObjectType::SolarSystemBody:
+            {
+                candidate.type = SelectedObjectType::SolarSystem;
+                const u64 body_index = universe::decode_source_id(obj.id);
+
+                if (body_index == 0)
+                {
+                    candidate.body_id   = rendering::SolarSystemRenderer::kBodyIdSun;
+                    candidate.body_name = "Sun";
+                }
+                else if (body_index == 1)
+                {
+                    candidate.body_id   = rendering::SolarSystemRenderer::kBodyIdMoon;
+                    candidate.body_name = "Moon";
+                }
+                else
+                {
+                    // Planet: body_index 2-8
+                    static constexpr std::array<u32, 7> kPlanetIds = {
+                        astro::planet_id::kMercury, astro::planet_id::kVenus,
+                        astro::planet_id::kMars,    astro::planet_id::kJupiter,
+                        astro::planet_id::kSaturn,  astro::planet_id::kUranus,
+                        astro::planet_id::kNeptune,
+                    };
+                    if (body_index >= 2 && body_index <= 8)
+                    {
+                        const u32 pid = kPlanetIds[body_index - 2];
+                        candidate.body_id   = 10u + pid;
+                        candidate.body_name = std::string(rendering::SolarSystemRenderer::planet_name(pid));
+                    }
+                    else
+                    {
+                        candidate.body_id = static_cast<u32>(body_index);
+                    }
+                }
+                if (const auto* sd = std::get_if<universe::SolarSystemData>(&obj.data))
+                {
+                    candidate.distance_au             = static_cast<f64>(sd->distance_au);
+                    candidate.angular_diameter_arcsec = sd->apparent_diameter_arcsec;
+                    candidate.phase_angle_deg         = sd->phase_angle;
+                    candidate.illumination            = sd->illumination;
+                }
+                break;
+            }
+
+            default:
+                break;
+        }
+    }
+
+    if (found)
+    {
+        m_selection = candidate;
+
+        if (candidate.type == SelectedObjectType::Star)
+        {
+            if (!candidate.common_name.empty())
+            {
+                PLX_CORE_INFO("Selected star: {} (HIP {}) mag {:.2f}",
+                              candidate.common_name, candidate.hip_id, candidate.mag_v);
+            }
+            else
+            {
+                PLX_CORE_INFO("Selected star: HIP {} mag {:.2f}",
+                              candidate.hip_id, candidate.mag_v);
+            }
+        }
+        else if (candidate.type == SelectedObjectType::Dso)
+        {
+            PLX_CORE_INFO("Selected DSO: {} mag {:.1f}",
+                          candidate.designation, candidate.mag_v);
+        }
+        else if (candidate.type == SelectedObjectType::SolarSystem)
+        {
+            PLX_CORE_INFO("Selected Solar System body: {} (body_id {}) mag {:.2f}",
+                          candidate.body_name, candidate.body_id, candidate.mag_v);
+        }
+    }
+    else
+    {
+        clear();
+    }
+}
+
+void Selection::update_from_objects(std::span<const universe::CelestialObject> objects,
+                                    std::span<const rendering::SolarSystemScreenObject> ss_objects,
+                                    const astro::ObserverLocation& observer,
+                                    f64 lst_rad,
+                                    const rendering::Camera& camera)
+{
+    (void)objects; // RA/Dec stored in m_selection from try_select_from_objects
+
+    if (m_selection.type == SelectedObjectType::None)
+    {
+        return;
+    }
+
+    if (m_selection.type == SelectedObjectType::SolarSystem)
+    {
+        // Refresh from latest SS screen objects (they carry phase/illumination data)
+        for (const auto& ss : ss_objects)
+        {
+            if (ss.body_id == m_selection.body_id)
+            {
+                m_selection.alt_rad = ss.alt_rad;
+                m_selection.az_rad  = ss.az_rad;
+                m_selection.above_horizon = ss.alt_rad >= 0.0;
+                m_selection.screen_ndc    = ss.screen_ndc;
+                m_selection.distance_au             = ss.distance_au;
+                m_selection.angular_diameter_arcsec = ss.angular_diameter_arcsec;
+                m_selection.phase_angle_deg         = ss.phase_angle_deg;
+                m_selection.illumination            = ss.illumination;
+                m_selection.ra_rad  = ss.equatorial.ra;
+                m_selection.dec_rad = ss.equatorial.dec;
+                return;
+            }
+        }
+        // Body not in current FOV — keep last position
+        return;
+    }
+
+    // Stars and DSOs: re-project stored RA/Dec.
+    const auto pointing = camera.get_pointing();
+    const f64 fov_rad   = camera.get_fov_rad();
+
+    const auto hz = astro::Coordinates::equatorial_to_horizontal(
+        {m_selection.ra_rad, m_selection.dec_rad}, observer, lst_rad);
+
+    m_selection.alt_rad       = hz.alt;
+    m_selection.az_rad        = hz.az;
+    m_selection.above_horizon = hz.alt >= 0.0;
+
+    const auto screen_opt = astro::Coordinates::horizontal_to_screen(hz, pointing, fov_rad);
+    if (screen_opt.has_value())
+    {
+        m_selection.screen_ndc = screen_opt.value();
+    }
+}
+
+// =================================================================
+// Selection attempt (legacy)
 // =================================================================
 
 void Selection::try_select(Vec2f click_ndc,

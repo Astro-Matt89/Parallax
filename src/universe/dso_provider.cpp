@@ -193,6 +193,7 @@ CelestialObject DsoCatalogProvider::make_object(const catalog::DsoEntry& dso,
 
     DsoData dd{};
     dd.size_arcmin = dso.size_arcmin;
+    dd.dso_type    = dso.type;
     // surface_brightness, ngc_id, ic_id are not available in DsoEntry — remain zero.
     obj.data = dd;
 

@@ -104,9 +104,13 @@ private:
     static constexpr std::size_t kBodyCount = 9;
 
     /// @brief Convert a cached body state and its index to a CelestialObject.
+    ///
+    /// @param moon_elongation_deg  Lunar elongation in degrees — used to determine waxing
+    ///                              phase for the Moon.  Pass 0.0 for non-Moon bodies.
     [[nodiscard]] static CelestialObject make_object(
         const astro::CelestialBodyState& state,
-        std::size_t body_index) noexcept;
+        std::size_t body_index,
+        double moon_elongation_deg) noexcept;
 
     /// @brief Retrieve a cached body state by index (0..kBodyCount-1).
     ///
@@ -114,6 +118,7 @@ private:
     [[nodiscard]] const astro::CelestialBodyState& body_at(std::size_t index) const noexcept;
 
     astro::SolarSystem::AllBodies m_bodies{};       ///< Last computed ephemeris snapshot
+    astro::MoonState              m_moon_state{};   ///< Extended moon state (phase, elongation)
     double                        m_last_jd{0.0};   ///< JD of the last update() call
     bool                          m_has_data{false}; ///< True once update() has been called
 };

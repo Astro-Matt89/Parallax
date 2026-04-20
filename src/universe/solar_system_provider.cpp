@@ -44,9 +44,10 @@ namespace
 
 void SolarSystemProvider::update(double jd)
 {
-    m_bodies   = astro::SolarSystem::compute_all(jd);
-    m_last_jd  = jd;
-    m_has_data = true;
+    m_bodies     = astro::SolarSystem::compute_all(jd);
+    m_moon_state = astro::SolarSystem::compute_moon_full(jd);
+    m_last_jd    = jd;
+    m_has_data   = true;
 
     PLX_CORE_TRACE("SolarSystemProvider: updated ephemeris for JD {:.4f}", jd);
 }
@@ -82,7 +83,7 @@ void SolarSystemProvider::query_fov(double     ra,
                                               state.equatorial.dec);
         if (sep <= radius_rad)
         {
-            results.push_back(make_object(state, i));
+            results.push_back(make_object(state, i, m_moon_state.elongation_deg));
         }
     }
 }
@@ -110,7 +111,7 @@ std::optional<CelestialObject> SolarSystemProvider::query_object(u64 id) const
     }
 
     const std::size_t index = static_cast<std::size_t>(source_id);
-    return make_object(body_at(index), index);
+    return make_object(body_at(index), index, m_moon_state.elongation_deg);
 }
 
 // =============================================================================
@@ -149,7 +150,8 @@ const astro::CelestialBodyState& SolarSystemProvider::body_at(std::size_t index)
 
 CelestialObject SolarSystemProvider::make_object(
     const astro::CelestialBodyState& state,
-    std::size_t body_index) noexcept
+    std::size_t body_index,
+    double moon_elongation_deg) noexcept
 {
     CelestialObject obj;
 
@@ -163,12 +165,12 @@ CelestialObject SolarSystemProvider::make_object(
 
     SolarSystemData sd{};
     sd.distance_au              = static_cast<float>(state.distance_au);
-    sd.phase_angle              = state.phase_angle_deg;   // degrees, matches field name
+    sd.phase_angle              = state.phase_angle_deg;
     sd.apparent_diameter_arcsec = state.angular_diameter_arcsec;
-    // Note: state.illumination (fraction 0..1) is not mapped here because
-    // SolarSystemData has no dedicated field for it (Task 7.1 schema).
-    // Adding one is a schema change that belongs to a future amendment of Task 7.1,
-    // not to this wrapper task.
+    sd.illumination             = state.illumination;
+    // Waxing: meaningful only for the Moon (body_index == 1).
+    // Waxing when elongation < 180° (Moon moving toward opposition).
+    sd.waxing = (body_index == 1) ? (moon_elongation_deg < 180.0) : true;
     obj.data = sd;
 
     return obj;

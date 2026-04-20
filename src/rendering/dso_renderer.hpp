@@ -21,6 +21,7 @@
 #include "rendering/camera.hpp"
 #include "rendering/line_renderer.hpp"
 #include "ui/font.hpp"
+#include "universe/celestial_object.hpp"
 
 #include <vulkan/vulkan.h>
 
@@ -31,9 +32,14 @@ namespace parallax::rendering
 {
     /// @brief Renders deep sky object schematic icons and labels.
     ///
-    /// Usage each frame:
-    ///   1. Call update() with current camera, observer, LST, and the DSO catalog.
-    ///   2. Icons + labels are submitted to the shared LineRenderer and BitmapFont.
+    /// Two usage paths:
+    ///
+    /// **Universe path (new):**
+    ///   1. begin_frame(lines, font, viewport)
+    ///   2. add_celestial_object(screen_pos, obj)  — one call per visible DSO
+    ///
+    /// **Legacy path (deprecated):**
+    ///   1. update(camera, observer, lst_rad, catalog, lines, font, viewport)
     class DsoRenderer
     {
     public:
@@ -45,7 +51,35 @@ namespace parallax::rendering
         DsoRenderer(DsoRenderer&&) = default;
         DsoRenderer& operator=(DsoRenderer&&) = default;
 
+        // ---------------------------------------------------------------
+        // Universe path (new API)
+        // ---------------------------------------------------------------
+
+        /// @brief Set up rendering context for this frame.
+        ///
+        /// Stores references to the shared line renderer, font, and viewport
+        /// for use by subsequent add_celestial_object() calls.  Call once per
+        /// frame before any add_celestial_object().
+        void begin_frame(LineRenderer& lines, ui::BitmapFont& font, VkExtent2D viewport);
+
+        /// @brief Draw a single DSO icon + label at the given pre-projected screen position.
+        ///
+        /// Reads type information from @c std::get_if<DsoData>(&obj.data).
+        /// If the object has no DsoData, rendering is skipped (defensive).
+        ///
+        /// @param screen_pos  Pre-projected NDC position (from Application).
+        /// @param obj         CelestialObject with ObjectType::DeepSkyObject.
+        void add_celestial_object(Vec2f screen_pos,
+                                  const universe::CelestialObject& obj);
+
+        // ---------------------------------------------------------------
+        // Legacy path (deprecated)
+        // ---------------------------------------------------------------
+
         /// @brief Project DSOs to screen and draw icons + labels.
+        ///
+        /// @deprecated Use begin_frame() + add_celestial_object() instead.
+        [[deprecated("Use begin_frame() + add_celestial_object()")]]
         void update(const Camera& camera,
                     const astro::ObserverLocation& observer,
                     f64 lst_rad,
@@ -53,6 +87,10 @@ namespace parallax::rendering
                     LineRenderer& lines,
                     ui::BitmapFont& font,
                     VkExtent2D viewport);
+
+        // ---------------------------------------------------------------
+        // Common
+        // ---------------------------------------------------------------
 
         void set_visible(bool visible);
         void toggle_visible();
@@ -62,6 +100,11 @@ namespace parallax::rendering
         [[nodiscard]] u32 get_rendered_count() const;
 
     private:
+        /// @brief Dispatch to draw_icon() and emit the label at the given screen position.
+        void draw_dso_at(Vec2f screen_pos,
+                         catalog::DsoType dso_type,
+                         std::string_view label) const;
+
         /// @brief Draw the type-appropriate icon at the given NDC position.
         static void draw_icon(catalog::DsoType type,
                               Vec2f center_ndc,
@@ -98,6 +141,11 @@ namespace parallax::rendering
 
         bool m_visible = true;
         u32 m_rendered_count = 0;
+
+        /// @brief Transient per-frame rendering context (set by begin_frame).
+        LineRenderer*  m_frame_lines    = nullptr;
+        ui::BitmapFont* m_frame_font    = nullptr;
+        VkExtent2D     m_frame_viewport = {};
 
         /// @brief Icon color: magenta-pink (RGBA).
         static constexpr Vec4f kIconColor{0.8f, 0.4f, 0.6f, 0.7f};

@@ -110,10 +110,14 @@ void InfoPanel::update(const Selection& selection,
 
     if (sel.type == SelectedObjectType::Star)
     {
-        // Title: common name or HIP ID
+        // Title: common name, procedural designation, or HIP ID fallback
         if (!sel.common_name.empty())
         {
             m_title = sel.common_name;
+        }
+        else if (sel.is_procedural)
+        {
+            m_title = sel.designation;   // e.g. "PRC-00A1F3B902"
         }
         else
         {
@@ -122,10 +126,10 @@ void InfoPanel::update(const Selection& selection,
             m_title = buf;
         }
 
-        // Subtitle: Bayer designation
-        m_subtitle = sel.bayer;
+        // Subtitle: Bayer for real stars; "Procedural" for procedural stars
+        m_subtitle = sel.is_procedural ? std::string{"Procedural"} : sel.bayer;
 
-        m_type_text = "Star";
+        m_type_text = sel.is_procedural ? "Star (procedural)" : "Star";
 
         m_ra_text = "RA   " + format_ra(sel.ra_rad);
         m_dec_text = "Dec  " + format_dec(sel.dec_rad);
@@ -140,8 +144,16 @@ void InfoPanel::update(const Selection& selection,
         std::snprintf(bv_buf, sizeof(bv_buf), "B-V  %+.3f", sel.color_bv);
         m_bv_text = bv_buf;
 
-        m_spectral_text = sel.spectral_type.empty() ? "" : "Sp   " + sel.spectral_type;
-        m_constellation_text = sel.constellation.empty() ? "" : "Con  " + sel.constellation;
+        if (sel.is_procedural)
+        {
+            m_spectral_text.clear();
+            m_constellation_text.clear();
+        }
+        else
+        {
+            m_spectral_text      = sel.spectral_type.empty() ? "" : "Sp   " + sel.spectral_type;
+            m_constellation_text = sel.constellation.empty() ? "" : "Con  " + sel.constellation;
+        }
         m_size_text.clear();
         m_dist_text.clear();
         m_phase_text.clear();

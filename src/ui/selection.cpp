@@ -165,19 +165,30 @@ void Selection::try_select_from_objects(Vec2f click_ndc,
             case universe::ObjectType::ProceduralStar:
             {
                 candidate.type = SelectedObjectType::Star;
+                candidate.is_procedural = (obj.type == universe::ObjectType::ProceduralStar);
 
-                // Recover HIP ID from StarData if present.
-                if (const auto* sd = std::get_if<universe::StarData>(&obj.data))
+                if (!candidate.is_procedural)
                 {
-                    candidate.hip_id = sd->hip_id;
-                    const auto* name_entry = find_star_name(sd->hip_id);
-                    if (name_entry)
+                    // Real catalog star: recover HIP ID and name data.
+                    if (const auto* sd = std::get_if<universe::StarData>(&obj.data))
                     {
-                        candidate.common_name  = name_entry->common_name;
-                        candidate.bayer        = name_entry->bayer;
-                        candidate.constellation = name_entry->constellation;
-                        candidate.spectral_type = name_entry->spectral_type;
+                        candidate.hip_id = sd->hip_id;
+                        const auto* name_entry = find_star_name(sd->hip_id);
+                        if (name_entry)
+                        {
+                            candidate.common_name  = name_entry->common_name;
+                            candidate.bayer        = name_entry->bayer;
+                            candidate.constellation = name_entry->constellation;
+                            candidate.spectral_type = name_entry->spectral_type;
+                        }
                     }
+                }
+                else
+                {
+                    // Procedural star: no HIP, no name, no Bayer, no spectral type.
+                    // Build a stable, unique designation from the low 40 bits of source_id.
+                    const u64 source_id = universe::decode_source_id(obj.id);
+                    candidate.designation = std::format("PRC-{:010X}", source_id & 0xFFFFFFFFFFULL);
                 }
                 break;
             }
@@ -250,7 +261,12 @@ void Selection::try_select_from_objects(Vec2f click_ndc,
 
         if (candidate.type == SelectedObjectType::Star)
         {
-            if (!candidate.common_name.empty())
+            if (candidate.is_procedural)
+            {
+                PLX_CORE_INFO("Selected procedural star: {} mag {:.2f}",
+                              candidate.designation, candidate.mag_v);
+            }
+            else if (!candidate.common_name.empty())
             {
                 PLX_CORE_INFO("Selected star: {} (HIP {}) mag {:.2f}",
                               candidate.common_name, candidate.hip_id, candidate.mag_v);

@@ -77,16 +77,16 @@ void SidePanel::create_location_group(const SidePanelCallbacks& callbacks)
 
         auto btn = std::make_unique<ToggleButton>(
             preset.name, dummy, Vec2f{kPresetBtnW, kPresetBtnH},
-            [this, idx, &callbacks, &preset = m_presets[i]]()
+            [this, idx, cb = callbacks.set_location]()
             {
                 m_selected_preset = idx;
-                if (callbacks.set_location)
+                if (cb)
                 {
-                    callbacks.set_location(
-                        preset.latitude_deg,
-                        preset.longitude_deg,
-                        preset.elevation_m,
-                        preset.default_bortle);
+                    const auto& p = m_presets[static_cast<std::size_t>(idx)];
+                    cb(p.latitude_deg,
+                       p.longitude_deg,
+                       p.elevation_m,
+                       p.default_bortle);
                 }
             });
 
@@ -112,12 +112,12 @@ void SidePanel::create_bortle_group(const SidePanelCallbacks& callbacks)
     {
         auto btn = std::make_unique<ToggleButton>(
             std::to_string(b), dummy, size,
-            [this, b, &callbacks]()
+            [this, b, cb = callbacks.set_bortle]()
             {
                 m_selected_bortle = b - 1;
-                if (callbacks.set_bortle)
+                if (cb)
                 {
-                    callbacks.set_bortle(static_cast<f32>(b));
+                    cb(static_cast<f32>(b));
                 }
             });
 
@@ -166,11 +166,11 @@ void SidePanel::create_time_speed_group(const SidePanelCallbacks& callbacks)
     {
         auto btn = std::make_unique<Button>(
             label, dummy, size,
-            [scale, &callbacks]()
+            [scale, cb = callbacks.set_time_scale]()
             {
-                if (callbacks.set_time_scale)
+                if (cb)
                 {
-                    callbacks.set_time_scale(scale);
+                    cb(scale);
                 }
             });
 

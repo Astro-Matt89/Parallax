@@ -434,8 +434,16 @@ void Application::process_input()
                 const auto& sel = m_selection.get_selection();
                 if (sel.type == ui::SelectedObjectType::Star)
                 {
-                    PLX_CORE_INFO("Selected star: HIP {} mag {:.2f} ({:.4f}, {:.4f})",
-                                  sel.hip_id, sel.mag_v, sel.ra_rad, sel.dec_rad);
+                    if (sel.is_procedural)
+                    {
+                        PLX_CORE_INFO("Selected procedural star: {} mag {:.2f} ({:.4f}, {:.4f})",
+                                      sel.designation, sel.mag_v, sel.ra_rad, sel.dec_rad);
+                    }
+                    else
+                    {
+                        PLX_CORE_INFO("Selected star: HIP {} mag {:.2f} ({:.4f}, {:.4f})",
+                                      sel.hip_id, sel.mag_v, sel.ra_rad, sel.dec_rad);
+                    }
                 }
                 else if (sel.type == ui::SelectedObjectType::Dso)
                 {

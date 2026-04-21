@@ -206,7 +206,12 @@ void Application::init()
         m_universe = std::make_unique<universe::Universe>();
 
         const std::filesystem::path data_dir{"data"};
-        m_universe->load_catalogs(data_dir);
+        if (!m_universe->load_catalogs(data_dir))
+        {
+            PLX_CORE_CRITICAL("Universe: failed to load catalogs from '{}'", data_dir.string());
+            std::abort();
+        }
+
 
         // TODO: wire master seed to config when config system supports it.
         // Using a fixed seed until then so procedural content is reproducible.

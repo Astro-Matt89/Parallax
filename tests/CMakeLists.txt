@@ -205,3 +205,22 @@ target_link_libraries(test_knowledge_core_types PRIVATE
 )
 
 add_test(NAME KnowledgeCoreTypes COMMAND test_knowledge_core_types)
+
+# -----------------------------------------------------------------
+# Test: PropertyRegistry                          <- SPRINT 08 Task 8.2
+# -----------------------------------------------------------------
+add_executable(test_property_registry
+    test_property_registry.cpp
+    "${CMAKE_SOURCE_DIR}/src/knowledge/property_registry.cpp"
+)
+
+target_include_directories(test_property_registry PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_property_registry PRIVATE
+    doctest::doctest
+    glm::glm
+)
+
+add_test(NAME PropertyRegistry COMMAND test_property_registry)

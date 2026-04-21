@@ -205,7 +205,7 @@ void Application::init()
     {
         m_universe = std::make_unique<universe::Universe>();
 
-        const std::filesystem::path data_dir{"data"};
+        const std::filesystem::path data_dir{"data/catalogs"};
         if (!m_universe->load_catalogs(data_dir))
         {
             PLX_CORE_CRITICAL("Universe: failed to load catalogs from '{}'", data_dir.string());

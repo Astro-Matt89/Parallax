@@ -169,14 +169,14 @@ namespace parallax::rendering
         void draw_sun_at(Vec2f screen_pos,
                          const astro::EquatorialCoord& equatorial,
                          f64 alt_rad, f64 az_rad,
-                         const universe::SolarSystemData& sd) const;
+                         const universe::SolarSystemData& sd);
 
         /// @brief Render the Moon icon at the given screen position.
         void draw_moon_at(Vec2f screen_pos,
                           const astro::EquatorialCoord& equatorial,
                           f64 alt_rad, f64 az_rad,
                           f32 magnitude,
-                          const universe::SolarSystemData& sd) const;
+                          const universe::SolarSystemData& sd);
 
         /// @brief Render a planet icon at the given screen position.
         void draw_planet_at(Vec2f screen_pos,
@@ -184,7 +184,7 @@ namespace parallax::rendering
                             f64 alt_rad, f64 az_rad,
                             f32 magnitude,
                             u32 planet_id,
-                            const universe::SolarSystemData& sd) const;
+                            const universe::SolarSystemData& sd);
 
         /// @brief Render the Sun icon: yellow-orange filled circle + label.
         void render_sun(const astro::CelestialBodyState& sun,

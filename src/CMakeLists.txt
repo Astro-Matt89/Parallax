@@ -4,6 +4,10 @@
 
 add_executable(parallax
     main.cpp
+    knowledge/knowledge_level.hpp
+    knowledge/measurement_technique.hpp
+    knowledge/property_descriptor.hpp
+    knowledge/measurement_record.hpp
     universe/object_id.hpp
     universe/celestial_object.hpp
     universe/data_provider.hpp

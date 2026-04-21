@@ -6,7 +6,7 @@ Package: vcpkg-make:x64-linux@2026-01-01
 - Compiler: GNU 13.3.0
 - CMake Version: 4.2.3
 -    vcpkg-tool version: 2026-04-08-e0612b42ce44e55a0e630f2ee9d3c533a63d8bc1
-    vcpkg-scripts version: b80e006657 2026-04-13 (7 days ago)
+    vcpkg-scripts version: b80e006657 2026-04-13 (8 days ago)
 
 **To Reproduce**
 

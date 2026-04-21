@@ -1,5 +1,5 @@
 Detecting compiler hash for triplet x64-linux...
-Compiler found: /usr/bin/g++
+Compiler found: /usr/bin/c++
 The following packages are already installed:
     doctest:x64-linux@2.5.1
     glm:x64-linux@1.0.3
@@ -25,7 +25,7 @@ The following packages will be built and installed:
   * vcpkg-make:x64-linux@2026-01-01
     vulkan-memory-allocator:x64-linux@3.3.0
 Additional packages (*) will be modified to complete this operation.
-Restored 0 package(s) from /home/runner/.cache/vcpkg/archives in 26 us. Use --debug to see more details.
+Restored 0 package(s) from /home/runner/.cache/vcpkg/archives in 24 us. Use --debug to see more details.
 Installing 1/13 vcpkg-make:x64-linux@2026-01-01...
 vcpkg-make:x64-linux@2026-01-01 package ABI: 9bb96f091cd25990dc48df54d37ec013355737b6990b681a2a3dbae5368d8e9c
 Building vcpkg-make:x64-linux@2026-01-01...
@@ -56,7 +56,7 @@ Call Stack (most recent call first):
 
 error: building vcpkg-make:x64-linux failed with: BUILD_FAILED
 See https://learn.microsoft.com/vcpkg/troubleshoot/build-failures?WT.mc_id=vcpkg_inproduct_cli for more information.
-Elapsed time to handle vcpkg-make:x64-linux: 29.2 ms
+Elapsed time to handle vcpkg-make:x64-linux: 27 ms
 Please ensure you're using the latest port files with `git pull` and `vcpkg update`.
 Then check for known issues at:
   https://github.com/microsoft/vcpkg/issues?q=is%3Aissue+is%3Aopen+in%3Atitle+vcpkg-make
@@ -71,7 +71,7 @@ Package: vcpkg-make:x64-linux@2026-01-01
 - Compiler: GNU 13.3.0
 - CMake Version: 4.2.3
 -    vcpkg-tool version: 2026-04-08-e0612b42ce44e55a0e630f2ee9d3c533a63d8bc1
-    vcpkg-scripts version: b80e006657 2026-04-13 (7 days ago)
+    vcpkg-scripts version: b80e006657 2026-04-13 (8 days ago)
 
 **To Reproduce**
 

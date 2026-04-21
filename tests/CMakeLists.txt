@@ -187,3 +187,21 @@ Vulkan::Vulkan
 )
 
 add_test(NAME SkyBackgroundUbo COMMAND test_sky_background_ubo)
+
+# -----------------------------------------------------------------
+# Test: KnowledgeCoreTypes                         <- SPRINT 08 Task 8.1
+# -----------------------------------------------------------------
+add_executable(test_knowledge_core_types
+    test_knowledge_core_types.cpp
+)
+
+target_include_directories(test_knowledge_core_types PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_knowledge_core_types PRIVATE
+    doctest::doctest
+    glm::glm
+)
+
+add_test(NAME KnowledgeCoreTypes COMMAND test_knowledge_core_types)

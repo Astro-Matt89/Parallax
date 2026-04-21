@@ -70,6 +70,7 @@ struct SelectedObject
     // Star fields (valid when type == Star)
     u32 star_index = 0;             ///< Index into m_stars vector (legacy path only)
     u32 hip_id = 0;                 ///< Hipparcos catalog ID
+    bool is_procedural = false;     ///< True when the selected Star originated from ProceduralProvider.
     f64 ra_rad = 0.0;              ///< J2000 RA (radians)
     f64 dec_rad = 0.0;             ///< J2000 Dec (radians)
     f32 mag_v = 0.0f;              ///< Visual magnitude

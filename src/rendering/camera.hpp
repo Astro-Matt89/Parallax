@@ -79,7 +79,7 @@ namespace parallax::rendering
 
         // Magnitude limit range
         static constexpr f32 kMinMagLimit = 0.0f;   ///< Only the very brightest
-        static constexpr f32 kMaxMagLimit = 12.0f;   ///< Full catalog depth
+        static constexpr f32 kMaxMagLimit = 20.0f;   ///< Full catalog depth
     };
 
 } // namespace parallax::rendering

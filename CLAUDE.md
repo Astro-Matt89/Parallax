@@ -264,85 +264,134 @@ parallax/
 
 No circular dependencies. Each module testable in isolation.
 
-### 5.4 Project Modes (Architectural Separation)
+### 5.4 Parallax Vision & Project Modes
 
-Parallax is NOT a planetarium. It is a ground-based observation simulator.
-The planetarium (skychart) is a navigation tool — the actual product is the
-instrument simulation, the science, and the procedural universe.
+**Parallax is Space Engine without a spacecraft.**
 
-**Skychart Mode** (Phase 1 — COMPLETE):
-Navigation atlas for selecting targets and reading coordinates.
-- Stars as schematic points (magnitude → size/brightness, linear mapping)
-- No atmospheric effects on stars (no extinction, no refraction, no reddening)
-- Visibility controlled solely by user-adjustable magnitude limit
-- Toggle atmosphere ON/OFF: when OFF, no horizon brightening, no twilight,
-  no moon glow — pure black sky with all objects visible. Useful for planning
-  during full moon or daytime.
-- Horizon culling toggleable (linked to atmosphere toggle)
-- Think: Stellarium, Cartes du Ciel — but ONLY as a navigation aid
+The player is a ground-based astronomer with real and futuristic instruments.
+The gameplay is discovery-driven: point instruments, collect data, analyze it,
+unlock progressively deeper knowledge of celestial objects. Gameplay emerges
+from physics and real observation techniques.
 
-**Imaging Mode** (Phase 2 — NEXT):
-What the telescope/sensor actually captures. This is the core of Parallax.
+The universe is **hybrid**: real astronomical catalogs + procedural generation
+of everything else. Sub-universes make every catalog object itself a world:
+M31 contains billions of stars, Sirius contains planets, the Sun contains asteroids.
+
+**Skychart Mode** (Phase 1 — COMPLETE, will be refactored in Sprint 08):
+Planetarium/encyclopedia of what is KNOWN to the player.
+- Historical catalog objects (Hipparcos, Tycho-2, Messier) always visible
+  with L1-L3 properties (position, mag, color, basic classification)
+- Procedural objects visible ONLY after player discovers them
+- Deep properties (L4+) of historical objects must be measured by the player
+- Toggle atmosphere on/off for observation planning
+- Think: your personal research database, not Stellarium
+
+**Imaging Mode** (Phase 2 — Sprint 09+):
+What the telescope/sensor actually captures. The core of Parallax.
 - Full atmospheric model: refraction, extinction, seeing, scintillation
 - Optical simulation: telescope PSF, diffraction, aberrations, field curvature
 - Sensor simulation: CCD/CMOS, noise, dark current, gain, bit depth
 - Astrophotography pipeline: exposure, stacking, calibration, stretching
-- Bloom, PSF convolution, diffraction spikes — all HERE, not in skychart
-- Think: what appears on the CCD after a real exposure
+- Real integration time, realistic SNR progression
+- All-sky cameras for sky quality monitoring and wow timelapses
 
-**Science / Discovery Mode** (Phase 3):
-Analysis and discovery mechanics. The gameplay emerges from physics.
-- Spectroscopy, photometry, astrometry
-- Light curves, transit detection, parallax measurement
-- Object discovery, confirmation observations, follow-up scheduling
-- Signal-to-noise ratio as detection threshold
-- Research progression, publication system
+**Science / Discovery Mode** (Phase 3 — Sprint 10+):
+Analysis and discovery mechanics. Raw data → knowledge.
+- Stratified knowledge: each object has 6+ levels of discoverable properties
+- Manual analysis tools for critical discoveries (periodograms, spectral fitting)
+- Automatic analysis for routine measurements
+- Confirmation required: 2+ independent detections to confirm a discovery
+- Survey mode: scan sky areas for new candidates
+- Pointed mode: targeted observation of known/suspected objects
 
-**Procedural Universe** (Phase 2-3, parallel development):
-What makes Parallax infinite. Trillions of objects beyond real catalogs.
+**Procedural Universe** (Sprint 07, extended Sprint 11+):
+What makes Parallax infinite.
 - Seed-based deterministic generation
-- Large scale structure → galaxies → stellar populations → planetary systems
-- Transient events (supernovae, novae, GRBs)
-- Seamless integration with real catalog data
-- Level-of-detail based on instrument zoom/exposure
+- Every object fully exists in the engine with all properties
+- Observation reveals properties, not generates them
+- Sub-universe hierarchy: M31 → stars → planets → surfaces
+- Transient events (supernovae, novae, GRBs) procedural in time and space
 
-These modes share Catalog, Astro, and Core modules but have separate rendering
-and simulation pipelines. The skychart selects targets; the instrument observes them;
-the science system analyzes the results; the procedural engine makes the universe infinite.
+### 5.5 The Two Data Layers
 
-### 5.5 Data Flow — Skychart Mode (Single Frame)
+Parallax separates two conceptually distinct data layers:
+
+**Universe** (ground truth — Sprint 07):
+Contains every object that exists, with all its properties, deterministic from seed.
+Does not care what the player knows. Does not change based on gameplay.
+
+**Knowledge Database** (player state — Sprint 08):
+What the player has discovered. Initialized at game start with the "historical
+knowledge" — i.e., L1-L3 properties of all real catalog objects, because the
+scientific community has already catalogued them. The player adds:
+- L4+ properties of historical objects (deep characterization)
+- Existence and all properties of procedural objects
+- Detection confirmation status (candidate vs confirmed)
+- Observation history per object
+
+**Rule for rendering**: the skychart displays `KnowledgeDatabase`, not `Universe`.
+The Universe is only consulted through the Observation subsystem (which takes
+time, requires instruments, produces data records).
+
+### 5.6 Sub-Universe Hierarchy
+
+Every CelestialObject can be a "container" with its own sub-universe.
+Entering a container (resolving its interior) requires angular resolution
+better than the container's `containment_angular_radius_arcsec`.
+
+```
+Milky Way (implicit top-level)
+  ├── Hipparcos stars (catalog — L1-L3 historical)
+  │   └── Sirius (is_container=true, radius=7.5")
+  │       ├── Sirius B (catalog — historical, L2+ needs resolving)
+  │       └── Planets (procedural — need L5 to resolve, then L6 for surface)
+  ├── Tycho-2 stars (catalog)
+  │   └── HIP XYZ
+  │       └── Planetary system (procedural, unless specifically catalogued)
+  ├── M31 (DSO — L1-L3 historical)
+  │   ├── Individual stars (procedural, billions)
+  │   ├── Nebulae (procedural)
+  │   ├── Globular clusters (procedural, modeled on real distribution)
+  │   └── Historical SN (e.g., S Andromedae 1885 — catalog)
+  └── Procedural stars/galaxies (beyond catalogs, discoverable)
+```
+
+### 5.7 Data Flow — Skychart Mode (Single Frame)
 
 ```
 1. Timer tick → delta time
 2. Input poll (SDL2 events)
 3. Update simulation time (JD += dt × time_scale / 86400)
 4. Compute LST
-5. Catalog query: all stars with Vmag ≤ magnitude_limit
-6. For each star:
-   a. RA/Dec → Alt/Az (current epoch, observer location, LST)
-   b. Skip if Alt < 0° (below horizon)
-   c. Alt/Az → screen coords (stereographic projection vs camera pointing)
-   d. Magnitude → size + brightness (linear mapping, schematic)
-   e. B-V → color (real stellar color)
-   f. Add to GPU star buffer
-7. Upload star buffer
-8. Render: sky background → starfield (additive) → HUD (alpha)
-9. Present
+5. Update observation sessions (Sprint 08+): tick active sessions
+6. Harvest completed sessions → analysis → Knowledge DB updates
+7. Universe::query_fov for render bounds
+8. Filter through Knowledge: historical always, procedural only if known
+9. For each rendered object:
+   a. RA/Dec → Alt/Az → screen coords
+   b. Style by discovery status (historical / confirmed / candidate)
+10. Render: sky background → starfield → overlays → UI panels
+11. Present
 ```
 
+### 5.8 Universe Engine Query Pattern (Sprint 07+)
+
+All astronomical data flows through a single `Universe` object.
+Skychart, imaging, and science modes all query the same engine.
+
 ```
-1. Timer tick → delta time
-2. Input poll (SDL2 events)
-3. Observatory update (time, weather, pointing)
-4. Catalog query (visible stars for current FOV + magnitude limit)
-5. Astro transforms (RA/Dec → Alt/Az → screen coords)
-6. Atmosphere apply (refraction, extinction, seeing)
-7. Render starfield (instanced draw, GPU)
-8. Render sky background (gradient, light pollution)
-9. Post-process (bloom, tone map, PSF convolution)
-10. UI overlay (HUD panels)
-11. Present swapchain image
+Universe::query_fov(ra, dec, radius, mag_limit, flags)
+  → StarCatalogProvider     (Tycho-2, future Gaia)
+  → DsoCatalogProvider      (Messier, future NGC/IC)
+  → SolarSystemProvider     (Sun, Moon, planets)
+  → ProceduralProvider      (stars, galaxies, nebulae beyond catalogs)
+  → merged, sorted result: vector<CelestialObject>
 ```
+
+Every object has a 64-bit ID: `(type << 56) | source_id`.
+Every object is a `CelestialObject` with type-specific data in a union.
+Providers implement a common `DataProvider` interface.
+New data sources are added as new providers — the query interface doesn't change.
 
 ---
 
@@ -406,40 +455,68 @@ Star Entry (compact, 32 bytes):
 - Horizon + cardinal markers
 - Stellarium-style interactive UI (toolbar, panels, selection, info)
 
-### Phase 2: Instrument Foundation (Sprints 06-10)
-- Solar system (Sole, Luna, pianeti — effemeridi VSOP87/Meeus)
-- Skychart atmosphere toggle (on/off)
-- Telescope model (aperture, focal length, FOV, resolution limit)
-- Atmospheric model applied to imaging (refraction, extinction, seeing)
-- CCD/CMOS sensor simulation (noise, dark current, gain, exposure)
-- Astrophotography pipeline (stacking, calibration, stretching)
-- Bloom, PSF, diffraction spikes (imaging mode only)
-- NGC/IC catalog (~13,000 objects)
-- Gaia DR3 streaming foundation
+### Phase 2: Universe & Discovery Foundations (Sprints 06-08)
+- Solar system with Meeus ephemeris (Sun, Moon, planets) — Sprint 06
+- Skychart atmosphere toggle (on/off for planning) — Sprint 06
+- Universe Engine: unified query across all data sources — Sprint 07
+- Procedural foundation (stars beyond Tycho-2 limit) — Sprint 07
+- Knowledge System: stratified properties, historical vs discovered — Sprint 08
+- Observation Sessions: time-based, SNR accumulation — Sprint 08
+- Sub-universe hierarchy architecture — Sprint 08
+- Mock instrument for end-to-end vertical slice — Sprint 08
 
-### Phase 3: Deep Universe & Discovery (Sprints 11+)
-- Procedural universe foundation (seed-based generation)
-- Large scale structure, galaxy generation
-- Stellar population synthesis, planetary systems
-- Transient events (supernovae, novae, variable stars)
-- Discovery mechanics (detection, confirmation, follow-up)
-- Spectroscopy, photometry, astrometry tools
-- Light curve analysis, transit detection
-- Parallax measurement over time (the game title)
-- Research progression, career system
+### Phase 3: Real Instruments (Sprints 09-11)
+- Telescope model (aperture, focal length, FOV, angular resolution)
+- Sensor simulation (CCD/CMOS, noise, dark current, gain, exposure)
+- Imaging mode rendering (atmosphere applied, PSF, bloom, diffraction spikes)
+- All-sky camera (sky quality monitoring, timelapses)
+- Astrophotography pipeline (stacking, calibration, stretching)
+- Photometry analysis tools (light curves, periodograms)
+- First real discovery loop: find transiting exoplanets, variable stars
+
+### Phase 4: Advanced Science (Sprints 12-15)
+- Spectroscopy (low and high resolution)
+- Radial velocity measurements
+- Deeper catalogs (NGC/IC, Gaia DR3 streaming)
+- Sub-universe activation (resolving M31 into stars, Sirius into planets)
+- Procedural exoplanet systems
+- Discovery gamification (milestones, publication system)
+
+### Phase 5: Frontier Instruments (Sprints 16+)
+- Interferometry (angular resolution beyond diffraction limit)
+- Radio, X-ray, polarimetry
+- Transient event system (supernovae, novae, GRBs)
+- Sci-fi instruments: direct imaging of exoplanets, surface maps
+- Cosmological survey mode (distant quasars, high-z galaxies)
 - Multi-observatory management
-- Advanced/sci-fi instruments
+- Research progression, career system
 
 ---
 
 ## 8. Current Sprint
 
-**Sprint:** 06 — Solar System & Atmosphere Toggle (PLANNED)
-**Goal:** Sun, Moon, major planets via VSOP87/Meeus ephemeris; skychart atmosphere on/off toggle
+**Sprint:** 06 — Solar System & Atmosphere Toggle (READY)
+**Goal:** Sun, Moon, major planets via Meeus ephemeris; skychart atmosphere on/off toggle
 
 See: `docs/sprints/sprint_06.md`
+Prompts: `docs/sprints/sprint_06_prompts.md`
+
+**Next:**
+- Sprint 07 — Universe Engine (refactor all data into unified architecture)
+- Sprint 08 — Knowledge System & Observation Sessions (foundations of discovery)
 
 **Previous:** Sprint 01-05 ✅ — Phase 1 Planetarium Core complete
+
+**Roadmap:**
+```
+Sprint 06: Solar System + Atmosphere Toggle
+Sprint 07: Universe Engine (unify data, procedural foundation)
+Sprint 08: Knowledge System + Observation Sessions (mock instrument E2E)
+Sprint 09: First real instrument — telescope + CCD + photometry + allsky
+Sprint 10: Spectroscopy + real analysis tools
+Sprint 11: Sub-universe activation (stars inside M31, planets in Sirius)
+Sprint 12+: Interferometry, multi-band, sci-fi instruments
+```
 
 ---
 

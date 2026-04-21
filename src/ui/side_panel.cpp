@@ -137,7 +137,7 @@ void SidePanel::create_sky_group(const SidePanelCallbacks& callbacks)
 
     m_slider_mag_limit = std::make_unique<Slider>(
         "MLIM", dummy, 200.0f,
-        1.0f, 14.0f, 0.5f);
+        1.0f, 20.0f, 0.5f);
     m_slider_mag_limit->set_value(6.5f);
     m_slider_mag_limit->set_format_string("{:.1f}");
 

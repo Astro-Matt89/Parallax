@@ -8,6 +8,8 @@ add_executable(parallax
     knowledge/measurement_technique.hpp
     knowledge/property_descriptor.hpp
     knowledge/measurement_record.hpp
+    knowledge/property_registry.hpp
+    knowledge/property_registry.cpp
     universe/object_id.hpp
     universe/celestial_object.hpp
     universe/data_provider.hpp

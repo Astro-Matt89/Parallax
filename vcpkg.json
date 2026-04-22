@@ -10,6 +10,7 @@
         "glm",
         "spdlog",
         "vulkan-memory-allocator",
-        "doctest"
+        "doctest",
+        "nlohmann-json"
     ]
 }

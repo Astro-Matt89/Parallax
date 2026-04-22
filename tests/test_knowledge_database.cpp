@@ -12,6 +12,7 @@
 #include "knowledge/object_knowledge.hpp"
 
 #include <filesystem>
+#include <fstream>
 #include <cstdint>
 
 using namespace parallax::knowledge;
@@ -182,7 +183,7 @@ TEST_CASE("load returns false for non-existent file")
 
 TEST_CASE("load returns false for malformed JSON")
 {
-    const auto tmp = std::filesystem::temp_directory_path() / "plx_bad.json";
+    const auto tmp = std::filesystem::temp_directory_path() / "plx_bad_json_test.json";
     {
         std::ofstream ofs(tmp);
         ofs << "{ this is not valid json }}}";

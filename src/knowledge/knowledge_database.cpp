@@ -98,12 +98,11 @@ void KnowledgeDatabase::add_detection(std::uint64_t id, std::uint64_t session_id
 {
     ObjectKnowledge& ok = ensure_entry(id);
 
-    ok.independent_detections++;
-
     const auto it = std::find(ok.session_ids.begin(), ok.session_ids.end(), session_id);
     if (it == ok.session_ids.end())
     {
         ok.session_ids.push_back(session_id);
+        ok.independent_detections++;
     }
 
     if (ok.independent_detections >= 2u)

@@ -11,6 +11,14 @@
 namespace parallax::observation
 {
 
+namespace
+{
+    /// Mock SNR accumulation rate (SNR units per hour).
+    /// MOCK placeholder — Sprint 09+ will replace with a real SNR model
+    /// (instrument aperture, target magnitude, sky brightness, seeing, airmass, etc.).
+    constexpr double kMockSnrPerHour = 5.0;
+} // namespace
+
 // =============================================================================
 // Constructor
 // =============================================================================
@@ -53,7 +61,7 @@ void ObservationSession::tick(double                          current_jd,
         // MOCK placeholder. Sprint 09+ will replace with a real SNR model
         // (instrument aperture, target magnitude, sky brightness, seeing,
         // airmass, etc.).
-        const double snr_gain = 5.0 * dt_hours;
+        const double snr_gain = kMockSnrPerHour * dt_hours;
 
         m_progress.accumulated_snr += snr_gain;
         m_progress.elapsed_hours   += dt_hours;
@@ -94,7 +102,8 @@ void ObservationSession::tick(double                          current_jd,
 DataRecord ObservationSession::produce_data() const
 {
     DataRecord rec;
-    rec.id               = 0;   // Caller / scheduler assigns on harvest.
+    rec.id               = 0;   // Reserved; the Knowledge System or caller assigns
+                                // a unique record ID when ingesting the record.
     rec.session_id       = m_id;
     rec.target_object_id = m_params.target_object_id;
     rec.type             = DataType::Mock;

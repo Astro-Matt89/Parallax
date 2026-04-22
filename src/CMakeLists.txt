@@ -10,6 +10,10 @@ add_executable(parallax
     knowledge/measurement_record.hpp
     knowledge/property_registry.hpp
     knowledge/property_registry.cpp
+    knowledge/object_knowledge.hpp
+    knowledge/knowledge_database.hpp
+    knowledge/knowledge_database.cpp
+    knowledge/knowledge_database_init.cpp
     universe/object_id.hpp
     universe/celestial_object.hpp
     universe/data_provider.hpp
@@ -83,6 +87,7 @@ target_link_libraries(parallax PRIVATE
     glm::glm
     spdlog::spdlog
     GPUOpen::VulkanMemoryAllocator
+    nlohmann_json::nlohmann_json
 )
 
 # -----------------------------------------------------------------

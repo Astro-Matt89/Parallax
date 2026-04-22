@@ -224,3 +224,26 @@ target_link_libraries(test_property_registry PRIVATE
 )
 
 add_test(NAME PropertyRegistry COMMAND test_property_registry)
+
+# -----------------------------------------------------------------
+# Test: KnowledgeDatabase                         <- SPRINT 08 Task 8.3
+# -----------------------------------------------------------------
+find_package(nlohmann_json CONFIG REQUIRED)
+
+add_executable(test_knowledge_database
+    test_knowledge_database.cpp
+    "${CMAKE_SOURCE_DIR}/src/knowledge/knowledge_database.cpp"
+    "${CMAKE_SOURCE_DIR}/src/knowledge/property_registry.cpp"
+)
+
+target_include_directories(test_knowledge_database PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_knowledge_database PRIVATE
+    doctest::doctest
+    glm::glm
+    nlohmann_json::nlohmann_json
+)
+
+add_test(NAME KnowledgeDatabase COMMAND test_knowledge_database)

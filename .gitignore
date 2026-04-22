@@ -45,6 +45,8 @@ build/
 build-debug/
 build-release/
 build-tests/
+build_check/
+build_*/
 
 # CodeQL
 _codeql_detected_source_root

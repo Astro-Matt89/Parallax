@@ -247,3 +247,23 @@ target_link_libraries(test_knowledge_database PRIVATE
 )
 
 add_test(NAME KnowledgeDatabase COMMAND test_knowledge_database)
+
+# -----------------------------------------------------------------
+# Test: DataArchive                                <- SPRINT 08 Task 8.6
+# -----------------------------------------------------------------
+add_executable(test_data_archive
+    test_data_archive.cpp
+    "${CMAKE_SOURCE_DIR}/src/observation/data_archive.cpp"
+)
+
+target_include_directories(test_data_archive PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_data_archive PRIVATE
+    doctest::doctest
+    nlohmann_json::nlohmann_json
+    spdlog::spdlog
+)
+
+add_test(NAME DataArchive COMMAND test_data_archive)

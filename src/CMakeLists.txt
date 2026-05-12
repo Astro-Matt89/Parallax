@@ -10,6 +10,8 @@ add_executable(parallax
     observation/observation_session.cpp
     observation/session_scheduler.hpp
     observation/session_scheduler.cpp
+    observation/data_archive.hpp
+    observation/data_archive.cpp
     knowledge/knowledge_level.hpp
     knowledge/measurement_technique.hpp
     knowledge/property_descriptor.hpp

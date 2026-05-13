@@ -6,7 +6,10 @@
 #include "catalog/catalog_loader.hpp"
 #include "core/logger.hpp"
 
+#include <algorithm>
+#include <functional>
 #include <numbers>
+#include <string>
 
 namespace parallax::universe
 {
@@ -238,6 +241,26 @@ CelestialObject StarCatalogProvider::make_object(const catalog::StarEntry& star)
     // must use resolve_hip() instead of reading this field directly.
     sd.hip_id = star.catalog_id;
     obj.data  = sd;
+
+    obj.is_container       = true;
+    obj.parent_container_id = 0;
+
+    // catalog_id is this provider's stable canonical identifier
+    // (HIP number for Hipparcos, hashed TYC identifier for Tycho-2).
+    const std::string stable_id = std::to_string(star.catalog_id);
+    obj.sub_universe_seed = static_cast<u64>(std::hash<std::string>{}(stable_id));
+
+    const double distance_pc = static_cast<double>(sd.distance_pc);
+    if (distance_pc > 0.0)
+    {
+        const double clamped_distance_pc = std::max(distance_pc, 10.0);
+        obj.containment_angular_radius_arcsec = static_cast<float>(10.0 / clamped_distance_pc);
+    }
+    else
+    {
+        // Fallback for catalog stars without a valid distance estimate.
+        obj.containment_angular_radius_arcsec = 0.1f;
+    }
 
     return obj;
 }

@@ -6,7 +6,9 @@
 #include "core/logger.hpp"
 
 #include <cmath>
+#include <functional>
 #include <numbers>
+#include <string>
 
 namespace parallax::universe
 {
@@ -172,6 +174,17 @@ CelestialObject SolarSystemProvider::make_object(
     // Waxing when elongation < 180° (Moon moving toward opposition).
     sd.waxing = (body_index == 1) ? (moon_elongation_deg < 180.0) : true;
     obj.data = sd;
+
+    if (body_index == 0)
+    {
+        obj.is_container = true;
+        obj.sub_universe_seed = static_cast<u64>(std::hash<std::string>{}("sun"));
+        // Sun is an abstract container for its planets — planets already exist as real objects; this region
+        // encloses them.
+        obj.containment_angular_radius_arcsec = static_cast<float>(state.angular_diameter_arcsec / 2.0 + 100.0);
+    }
+
+    obj.parent_container_id = 0;
 
     return obj;
 }

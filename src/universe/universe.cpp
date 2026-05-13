@@ -258,6 +258,41 @@ std::optional<CelestialObject> Universe::query_object(u64 id) const
 }
 
 // =============================================================================
+// can_resolve_sub_universe
+// =============================================================================
+
+bool Universe::can_resolve_sub_universe(u64 object_id, double instrument_resolution_arcsec) const
+{
+    const auto object = query_object(object_id);
+    if (!object.has_value())
+    {
+        return false;
+    }
+
+    if (!object->is_container || object->containment_angular_radius_arcsec <= 0.0f)
+    {
+        return false;
+    }
+
+    return instrument_resolution_arcsec < static_cast<double>(object->containment_angular_radius_arcsec);
+}
+
+// =============================================================================
+// get_parent
+// =============================================================================
+
+std::optional<u64> Universe::get_parent(u64 object_id) const
+{
+    const auto object = query_object(object_id);
+    if (!object.has_value())
+    {
+        return std::nullopt;
+    }
+
+    return object->parent_container_id;
+}
+
+// =============================================================================
 // get_name
 // =============================================================================
 

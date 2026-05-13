@@ -86,6 +86,12 @@ struct CelestialObject
     // --- Type-specific payload ---
     std::variant<std::monostate, StarData, SolarSystemData, DsoData, GalaxyData> data;
 
+    // --- Sub-universe hierarchy ---
+    bool  is_container                      {false};
+    u64   sub_universe_seed                 {0};
+    float containment_angular_radius_arcsec {0.0f};
+    u64   parent_container_id               {0};   ///< 0 = top-level (Milky Way)
+
     // --- Helper predicates ---
 
     /// @brief True for objects from real astronomical catalogs.

@@ -24,6 +24,8 @@ class Universe;
 namespace parallax::analysis
 {
 
+// Intentionally coupled to MeasurementRecord so this mock stays aligned with
+// the canonical value type defined by the knowledge module.
 using MeasurementValue = decltype(knowledge::MeasurementRecord::value);
 
 struct KnowledgeUpdate

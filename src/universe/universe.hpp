@@ -117,6 +117,20 @@ public:
     /// Returns std::nullopt for ObjectType::Unknown or unrecognised prefixes.
     [[nodiscard]] std::optional<CelestialObject> query_object(u64 id) const;
 
+    /// @brief Check whether an object's sub-universe can be resolved by the instrument.
+    ///
+    /// Returns false when the object does not exist, is not a container, or has no
+    /// positive containment radius.
+    [[nodiscard]] bool can_resolve_sub_universe(
+        u64 object_id,
+        double instrument_resolution_arcsec) const;
+
+    /// @brief Return the parent container id for an object.
+    ///
+    /// Returns std::nullopt only when the object id cannot be resolved.
+    /// A returned value of 0 means top-level (Milky Way).
+    [[nodiscard]] std::optional<u64> get_parent(u64 object_id) const;
+
     // -------------------------------------------------------------------------
     // Name / annotation lookups
     // -------------------------------------------------------------------------

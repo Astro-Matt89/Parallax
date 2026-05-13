@@ -7,8 +7,10 @@
 #include "core/logger.hpp"
 
 #include <cmath>
+#include <functional>
 #include <limits>
 #include <numbers>
+#include <string>
 
 namespace parallax::universe
 {
@@ -196,6 +198,16 @@ CelestialObject DsoCatalogProvider::make_object(const catalog::DsoEntry& dso,
     dd.dso_type    = dso.type;
     // surface_brightness, ngc_id, ic_id are not available in DsoEntry — remain zero.
     obj.data = dd;
+
+    if (dso.size_arcmin > 0.0f)
+    {
+        obj.is_container = true;
+        obj.sub_universe_seed = static_cast<u64>(
+            std::hash<std::string>{}("M" + std::to_string(messier_number)));
+        obj.containment_angular_radius_arcsec = static_cast<float>(dso.size_arcmin * 60.0f / 2.0f);
+    }
+
+    obj.parent_container_id = 0;
 
     return obj;
 }

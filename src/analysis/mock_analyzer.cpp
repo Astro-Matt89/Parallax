@@ -20,6 +20,7 @@ namespace
 constexpr double kSnrThresholdL1 = 5.0;
 constexpr double kSnrThresholdL2 = 20.0;
 constexpr double kSnrThresholdL3 = 50.0;
+constexpr double kParallaxToDistancePcFactor = 1000.0;
 
 constexpr double kBaseUncertaintyRaDec  = 1.0e-3;
 constexpr double kBaseUncertaintyMag    = 1.0e-2;
@@ -129,7 +130,9 @@ MockAnalyzer::analyze(const observation::DataRecord& record,
             }
             else
             {
-                add_update("distance_pc", 1000.0 / parallax_mas, kBaseUncertaintyDistance);
+                add_update("distance_pc",
+                           kParallaxToDistancePcFactor / parallax_mas,
+                           kBaseUncertaintyDistance);
             }
         }
         else if (star_data->distance_pc > 0.0f)

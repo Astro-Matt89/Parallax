@@ -81,9 +81,9 @@ MockAnalyzer::analyze(const observation::DataRecord& record,
     const double snr = record.achieved_snr;
     std::vector<KnowledgeUpdate> updates;
 
-    auto add_update = [&](std::string_view property_name,
-                          MeasurementValue value,
-                          double           base_uncertainty)
+    auto add_measurement_update = [&](std::string_view property_name,
+                                      MeasurementValue value,
+                                      double           base_uncertainty)
     {
         if (!property_exists(object.type, property_name))
         {
@@ -102,14 +102,14 @@ MockAnalyzer::analyze(const observation::DataRecord& record,
 
     if (snr >= kSnrThresholdL1)
     {
-        add_update("ra", object.ra, kBaseUncertaintyRaDec);
-        add_update("dec", object.dec, kBaseUncertaintyRaDec);
-        add_update("mag_v", static_cast<double>(object.mag_v), kBaseUncertaintyMag);
+        add_measurement_update("ra", object.ra, kBaseUncertaintyRaDec);
+        add_measurement_update("dec", object.dec, kBaseUncertaintyRaDec);
+        add_measurement_update("mag_v", static_cast<double>(object.mag_v), kBaseUncertaintyMag);
     }
 
     if (snr >= kSnrThresholdL2)
     {
-        add_update("color_bv", static_cast<double>(object.color_bv), kBaseUncertaintyColor);
+        add_measurement_update("color_bv", static_cast<double>(object.color_bv), kBaseUncertaintyColor);
 
         // `spectral_type` exists in PropertyRegistry but no corresponding field
         // currently exists on CelestialObject/StarData, so no update is emitted.
@@ -120,26 +120,26 @@ MockAnalyzer::analyze(const observation::DataRecord& record,
         if (star_data->parallax_mas > 0.0f)
         {
             const double parallax_mas = static_cast<double>(star_data->parallax_mas);
-            add_update("parallax_mas", parallax_mas, kBaseUncertaintyParallax);
+            add_measurement_update("parallax_mas", parallax_mas, kBaseUncertaintyParallax);
 
             if (star_data->distance_pc > 0.0f)
             {
-                add_update("distance_pc",
-                           static_cast<double>(star_data->distance_pc),
-                           kBaseUncertaintyDistance);
+                add_measurement_update("distance_pc",
+                                       static_cast<double>(star_data->distance_pc),
+                                       kBaseUncertaintyDistance);
             }
             else
             {
-                add_update("distance_pc",
-                           kParallaxToDistancePcFactor / parallax_mas,
-                           kBaseUncertaintyDistance);
+                add_measurement_update("distance_pc",
+                                       kParallaxToDistancePcFactor / parallax_mas,
+                                       kBaseUncertaintyDistance);
             }
         }
         else if (star_data->distance_pc > 0.0f)
         {
-            add_update("distance_pc",
-                       static_cast<double>(star_data->distance_pc),
-                       kBaseUncertaintyDistance);
+            add_measurement_update("distance_pc",
+                                   static_cast<double>(star_data->distance_pc),
+                                   kBaseUncertaintyDistance);
         }
     }
 

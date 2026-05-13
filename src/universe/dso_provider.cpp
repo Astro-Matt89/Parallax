@@ -182,7 +182,7 @@ std::size_t DsoCatalogProvider::get_count() const
 // =============================================================================
 
 CelestialObject DsoCatalogProvider::make_object(const catalog::DsoEntry& dso,
-                                                  std::uint32_t messier_number) noexcept
+                                                 std::uint32_t messier_number) noexcept
 {
     CelestialObject obj;
 

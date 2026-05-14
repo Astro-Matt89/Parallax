@@ -21,6 +21,7 @@
 #include "core/types.hpp"
 #include "rendering/camera.hpp"
 #include "rendering/line_renderer.hpp"
+#include "rendering/render_style.hpp"
 #include "ui/font.hpp"
 #include "universe/celestial_object.hpp"
 
@@ -98,14 +99,21 @@ namespace parallax::rendering
         ///
         /// Also appends to the internal screen-objects list (for selection picking).
         ///
+        /// Visual styles:
+        ///   Historical  — unchanged catalog rendering.
+        ///   Confirmed   — +15% brightness boost (player-discovered body, ≥ 2 detections).
+        ///   Candidate   — magenta tint (player-detected once, not yet confirmed).
+        ///
         /// @param screen_pos  Pre-projected NDC position (from Application).
         /// @param alt_rad     Altitude of the body (radians) — stored in screen object.
         /// @param az_rad      Azimuth of the body (radians) — stored in screen object.
         /// @param obj         CelestialObject with ObjectType::SolarSystemBody.
+        /// @param style       RenderStyle — Historical, Confirmed, or Candidate.
         void add_celestial_object(Vec2f screen_pos,
                                   f64 alt_rad,
                                   f64 az_rad,
-                                  const universe::CelestialObject& obj);
+                                  const universe::CelestialObject& obj,
+                                  RenderStyle style = RenderStyle::Historical);
 
         // ---------------------------------------------------------------
         // Legacy path (deprecated)

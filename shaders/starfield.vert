@@ -10,7 +10,7 @@
 //   point_size_scale  = base size for brightest star (6.0)
 //   mag_limit         = current magnitude limit slider value
 //   brightest_mag     = brightest star in buffer
-//   padding           = unused
+//   render_style      = 0.0 = Historical, 1.0 = Confirmed, 2.0 = Candidate
 // -----------------------------------------------------------------
 
 layout(set = 0, binding = 0) readonly buffer StarBuffer {
@@ -21,7 +21,7 @@ layout(push_constant) uniform PushConstants {
     float point_size_scale;
     float mag_limit;
     float brightest_mag;
-    float padding;
+    float render_style;  // 0=Historical, 1=Confirmed, 2=Candidate
 };
 
 layout(location = 0) out float v_brightness;
@@ -97,4 +97,23 @@ void main()
     v_brightness = max(0.15, 0.2 + 0.8 * norm);
 
     v_color = bv_to_rgb(star.w);
+
+    // -----------------------------------------------------------------
+    // Apply render style tinting
+    //   Confirmed  (+15% brightness, subtle cyan tint): discovered and
+    //              independently verified by the player.
+    //   Candidate  (magenta tint): detected once, not yet confirmed.
+    // Historical stars (render_style == 0.0) are unchanged.
+    // -----------------------------------------------------------------
+    if (render_style > 1.5)
+    {
+        // Candidate: distinctive magenta tint
+        v_color = mix(v_color, vec3(1.0, 0.0, 1.0), 0.55);
+    }
+    else if (render_style > 0.5)
+    {
+        // Confirmed: +15% brightness boost + subtle cyan tint
+        v_brightness = min(1.0, v_brightness * 1.15);
+        v_color = mix(v_color, vec3(0.3, 0.9, 1.0), 0.25);
+    }
 }

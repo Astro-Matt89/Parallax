@@ -62,6 +62,16 @@ KnowledgeLevel KnowledgeDatabase::get_level(std::uint64_t id) const
     return it->second.current_level;
 }
 
+bool KnowledgeDatabase::is_confirmed(std::uint64_t id) const
+{
+    const auto it = m_entries.find(id);
+    if (it == m_entries.end())
+    {
+        return false;
+    }
+    return it->second.is_confirmed;
+}
+
 std::optional<MeasurementRecord>
 KnowledgeDatabase::get_measurement(std::uint64_t id, std::string_view property) const
 {

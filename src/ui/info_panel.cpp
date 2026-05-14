@@ -2,14 +2,18 @@
 /// @brief Right-side info panel implementation.
 ///
 /// SPRINT 05 Task 5.5
+/// SPRINT 08 Task 8.9 — knowledge-aware property display
 
 #include "ui/info_panel.hpp"
 
 #include "core/logger.hpp"
 #include "core/types.hpp"
+#include "knowledge/knowledge_level.hpp"
+#include "knowledge/property_descriptor.hpp"
 
 #include <cmath>
 #include <cstdio>
+#include <format>
 
 namespace parallax::ui
 {
@@ -72,6 +76,7 @@ void InfoPanel::layout_widgets(u32 viewport_width, u32 viewport_height)
 // =================================================================
 
 void InfoPanel::update(const Selection& selection,
+                       const knowledge::KnowledgeDatabase* knowledge_db,
                        Vec2f mouse_pos, bool mouse_clicked, f32 dt,
                        u32 viewport_width, u32 viewport_height)
 {
@@ -103,10 +108,93 @@ void InfoPanel::update(const Selection& selection,
     layout_widgets(viewport_width, viewport_height);
 
     // -----------------------------------------------------------------
-    // Build display text from selection
+    // Build knowledge label and extra properties         ← Task 8.9
     // -----------------------------------------------------------------
+    m_knowledge_label.clear();
+    m_knowledge_extra_props.clear();
+
     const auto& sel = selection.get_selection();
     m_display_type = sel.type;
+
+    // Determine knowledge label from celestial_obj (populated by Universe path).
+    const auto& cobj = sel.celestial_obj;
+    const bool is_real_obj = cobj.is_real();
+
+    if (cobj.id != 0 && knowledge_db)
+    {
+        if (is_real_obj)
+        {
+            m_knowledge_label = "HISTORICAL";
+
+            // Show L4+ properties for which the player has measurements.
+            // Enumerate via PropertyRegistry — no hard-coded property names.
+            const auto props = knowledge::PropertyRegistry::get_properties(cobj.type);
+
+            for (const auto& pd : props)
+            {
+                if (pd.unlocks_at <= knowledge::kHistoricalBaselineLevel)
+                {
+                    continue;  // L1-L3 already shown via catalog fields below
+                }
+
+                const auto meas = knowledge_db->get_measurement(cobj.id, pd.name);
+                if (meas.has_value())
+                {
+                    m_knowledge_extra_props.push_back(
+                        std::format("  {:<18} {:.4g}", pd.name, meas->value));
+                }
+            }
+        }
+        else
+        {
+            // Procedural object: label depends on confirmation state.
+            if (knowledge_db->is_confirmed(cobj.id))
+            {
+                m_knowledge_label = "DISCOVERED";
+            }
+            else if (knowledge_db->is_known(cobj.id))
+            {
+                m_knowledge_label = "UNCONFIRMED CANDIDATE";
+            }
+
+            if (knowledge_db->is_known(cobj.id))
+            {
+                const knowledge::KnowledgeLevel level = knowledge_db->get_level(cobj.id);
+
+                // Show only properties at or below the current knowledge level.
+                // Missing measurements shown as "?".
+                const auto props = knowledge::PropertyRegistry::get_properties(cobj.type);
+
+                for (const auto& pd : props)
+                {
+                    if (pd.unlocks_at > level)
+                    {
+                        // Property not yet accessible — show placeholder
+                        m_knowledge_extra_props.push_back(
+                            std::format("  {:<18} ?", pd.name));
+                    }
+                    else
+                    {
+                        const auto meas = knowledge_db->get_measurement(cobj.id, pd.name);
+                        if (meas.has_value())
+                        {
+                            m_knowledge_extra_props.push_back(
+                                std::format("  {:<18} {:.4g}", pd.name, meas->value));
+                        }
+                        else
+                        {
+                            m_knowledge_extra_props.push_back(
+                                std::format("  {:<18} ?", pd.name));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // -----------------------------------------------------------------
+    // Build display text from selection
+    // -----------------------------------------------------------------
 
     if (sel.type == SelectedObjectType::Star)
     {
@@ -386,6 +474,18 @@ void InfoPanel::render(BitmapFont& font, rendering::LineRenderer& lines,
     font.draw_text("Properties", cx, cy, 1.0f, widget_colors::kTextDim);
     cy += kRowHeight;
 
+    // Knowledge label — "HISTORICAL", "DISCOVERED", "UNCONFIRMED CANDIDATE"
+    if (!m_knowledge_label.empty())
+    {
+        const Vec3f label_color = (m_knowledge_label == "HISTORICAL")
+            ? Vec3f{0.5f, 0.8f, 0.5f}    // green — real catalog object
+            : (m_knowledge_label == "DISCOVERED")
+                ? Vec3f{0.3f, 0.9f, 1.0f}  // cyan — confirmed discovery
+                : Vec3f{1.0f, 0.55f, 0.1f}; // orange — unconfirmed candidate
+        font.draw_text(m_knowledge_label, cx, cy, 1.0f, label_color);
+        cy += kRowHeight;
+    }
+
     font.draw_text(m_mag_text, cx, cy, 1.0f, widget_colors::kTextBright);
     cy += kRowHeight;
 
@@ -429,6 +529,19 @@ void InfoPanel::render(BitmapFont& font, rendering::LineRenderer& lines,
     {
         font.draw_text(m_illum_text, cx, cy, 1.0f, widget_colors::kTextBright);
         cy += kRowHeight;
+    }
+
+    // Knowledge-database extra properties (L4+ for historical, registry-driven for procedural)
+    if (!m_knowledge_extra_props.empty())
+    {
+        cy += 2.0f;
+        font.draw_text("Knowledge", cx, cy, 1.0f, widget_colors::kTextDim);
+        cy += kRowHeight;
+        for (const auto& prop_line : m_knowledge_extra_props)
+        {
+            font.draw_text(prop_line, cx, cy, 1.0f, widget_colors::kTextBright);
+            cy += kRowHeight;
+        }
     }
 
     cy += 4.0f;

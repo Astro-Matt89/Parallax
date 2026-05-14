@@ -10,6 +10,7 @@
 #include "catalog/star_entry.hpp"
 #include "core/types.hpp"
 #include "rendering/camera.hpp"
+#include "rendering/render_style.hpp"
 #include "universe/celestial_object.hpp"
 #include "vulkan/context.hpp"
 
@@ -37,7 +38,7 @@ namespace parallax::rendering
         f32 point_size_scale;   ///< Base point size for brightest star
         f32 mag_limit;          ///< Current magnitude limit (for shader normalization)
         f32 brightest_mag;      ///< Brightest magnitude in buffer (or fixed reference)
-        f32 padding;            ///< Alignment padding
+        f32 render_style;       ///< 0=Historical, 1=Confirmed, 2=Candidate
     };
 
     /// @brief Manages starfield rendering for skychart mode.
@@ -46,7 +47,7 @@ namespace parallax::rendering
     ///
     /// **Universe path (new):**
     ///   1. begin_frame(mag_limit)
-    ///   2. add_celestial_object(screen_pos, obj)  — call once per visible star/procedural star
+    ///   2. add_celestial_object(screen_pos, obj, style)  — call once per visible star/procedural star
     ///   3. end_frame()  — uploads batch to GPU
     ///   4. draw(cmd)
     ///
@@ -76,7 +77,7 @@ namespace parallax::rendering
 
         /// @brief Start a new frame's star batch.
         ///
-        /// Clears the pending vertex buffer and sets the magnitude limit for
+        /// Clears the pending vertex buffers and sets the magnitude limit for
         /// shader normalisation.  Must be called before any add_celestial_object().
         ///
         /// @param mag_limit  Faintest magnitude to render (inclusive).
@@ -85,13 +86,16 @@ namespace parallax::rendering
         /// @brief Add one star or procedural star to the current frame's render batch.
         ///
         /// Reads @p obj.mag_v and @p obj.color_bv and appends a StarVertex to the
-        /// pending buffer.  Silently drops the object if the buffer is full.
+        /// appropriate pending buffer based on @p style.
+        /// Silently drops the object if the buffer is full.
         /// Handles both ObjectType::Star and ObjectType::ProceduralStar identically.
         ///
         /// @param screen_pos  Pre-projected screen NDC position (from Application).
         /// @param obj         CelestialObject (type must be Star or ProceduralStar).
+        /// @param style       RenderStyle — Historical, Confirmed, or Candidate.
         void add_celestial_object(Vec2f screen_pos,
-                                  const parallax::universe::CelestialObject& obj);
+                                  const parallax::universe::CelestialObject& obj,
+                                  RenderStyle style = RenderStyle::Historical);
 
         /// @brief Finalise the batch and upload to the GPU storage buffer.
         ///
@@ -163,6 +167,11 @@ namespace parallax::rendering
 
         u32 m_visible_count = 0;
 
+        /// Per-style star counts (set by end_frame, consumed by draw).
+        u32 m_count_historical = 0;
+        u32 m_count_confirmed  = 0;
+        u32 m_count_candidate  = 0;
+
         StarfieldPushConstants m_push_constants = {6.0f, 6.5f, -1.5f, 0.0f};
 
         /// Fixed reference magnitude for normalization (Sirius-class).
@@ -174,8 +183,11 @@ namespace parallax::rendering
         /// @brief Screen NDC of each visible star (parallel to m_visible_indices).
         std::vector<Vec2f> m_visible_screen_positions;
 
-        /// @brief Pending vertex batch accumulated by the Universe path.
-        std::vector<StarVertex> m_pending_vertices;
+        /// @brief Pending vertex batches accumulated by the Universe path.
+        /// Historical stars are stored first so their draw call is emitted first.
+        std::vector<StarVertex> m_pending_vertices;       ///< Historical
+        std::vector<StarVertex> m_pending_confirmed;      ///< Confirmed procedural
+        std::vector<StarVertex> m_pending_candidate;      ///< Candidate procedural
     };
 
 } // namespace parallax::rendering

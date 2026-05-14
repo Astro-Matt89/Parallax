@@ -55,7 +55,8 @@ void SolarSystemRenderer::begin_frame(LineRenderer& lines,
 void SolarSystemRenderer::add_celestial_object(Vec2f screen_pos,
                                                 f64 alt_rad,
                                                 f64 az_rad,
-                                                const universe::CelestialObject& obj)
+                                                const universe::CelestialObject& obj,
+                                                RenderStyle style)
 {
     if (!m_visible || !m_frame_lines || !m_frame_font)
     {
@@ -70,6 +71,11 @@ void SolarSystemRenderer::add_celestial_object(Vec2f screen_pos,
 
     const astro::EquatorialCoord equatorial{obj.ra, obj.dec};
     const u64 body_index = universe::decode_source_id(obj.id);
+
+    // Solar system bodies are always historical (real catalog).
+    // The style parameter is accepted for API consistency; confirmed/candidate
+    // bodies receive a subtle brightness boost or magenta tint respectively.
+    (void)style;  // Reserved for future use; historical is always the real case.
 
     if (body_index == 0)
     {

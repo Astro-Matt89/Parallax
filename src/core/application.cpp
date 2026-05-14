@@ -233,6 +233,8 @@ void Application::init()
     //      and no procedural objects appear (none discovered yet).
     m_knowledge = std::make_unique<knowledge::KnowledgeDatabase>();
     PLX_CORE_INFO("KnowledgeDatabase initialized (empty — historical rendering active)");
+    // TODO(Sprint 08 Task 8.11): Call initialize_from_historical_catalogs() here once
+    //                             the full session/analysis pipeline is wired.
 
     // 10b. Load constellation overlay — resolve via Universe                ← SPRINT 04 Task 4.2
     {

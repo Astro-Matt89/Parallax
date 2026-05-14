@@ -97,7 +97,13 @@ void Starfield::begin_frame(f32 mag_limit)
     m_pending_vertices.clear();
     m_pending_confirmed.clear();
     m_pending_candidate.clear();
-    m_pending_vertices.reserve(std::min(m_buffer_capacity, 100000u));
+
+    // Pre-allocate: historical gets the bulk, procedural buckets get smaller reserves.
+    const u32 max_stars = std::min(m_buffer_capacity, 100000u);
+    m_pending_vertices.reserve(max_stars * 8 / 10);    // ~80 % for catalog stars
+    m_pending_confirmed.reserve(max_stars / 10);        // ~10 % for confirmed procedural
+    m_pending_candidate.reserve(max_stars / 10);        // ~10 % for candidate procedural
+
     m_push_constants.mag_limit = mag_limit;
 }
 

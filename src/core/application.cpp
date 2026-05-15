@@ -18,6 +18,13 @@
 
 #include "core/application.hpp"
 
+#include "analysis/mock_analyzer.hpp"
+#include "core/user_data_path.hpp"
+#include "instruments/mock_instrument.hpp"
+#include "knowledge/knowledge_database.hpp"
+#include "knowledge/knowledge_level.hpp"
+#include "observation/data_archive.hpp"
+#include "observation/session_scheduler.hpp"
 #include "rendering/render_style.hpp"                    // ← SPRINT 08 Task 8.9
 
 #include <glm/trigonometric.hpp>
@@ -29,6 +36,7 @@
 #include <format>
 #include <limits>
 #include <string>
+#include <unordered_set>
 
 namespace
 {
@@ -44,6 +52,22 @@ void check_vk(VkResult result, const char* operation)
 
 constexpr float kDefaultSnrRatePerHour = 5.0f;
 constexpr std::size_t kCompletedSessionsDisplayLimit = 10;
+
+std::string knowledge_level_to_text(parallax::knowledge::KnowledgeLevel level)
+{
+    using parallax::knowledge::KnowledgeLevel;
+
+    switch (level)
+    {
+        case KnowledgeLevel::Detected:      return "L1";
+        case KnowledgeLevel::Classified:    return "L2";
+        case KnowledgeLevel::Characterized: return "L3";
+        case KnowledgeLevel::Detailed:      return "L4";
+        case KnowledgeLevel::Resolved:      return "L5";
+        case KnowledgeLevel::FullyMapped:   return "L6";
+        default:                            return "L0";
+    }
+}
 
 std::string format_object_label(const parallax::universe::Universe& universe, parallax::u64 object_id)
 {
@@ -311,18 +335,36 @@ void Application::init()
                       m_universe->get_real_object_count());
     }
 
-    // 10c. KnowledgeDatabase — default-constructed (empty).                 ← SPRINT 08 Task 8.9
-    //      initialize_from_historical_catalogs() is called in Task 8.11 once
-    //      the full session/analysis pipeline is wired.  For now the DB is
-    //      empty: all real catalog objects render as Historical (is_real()),
-    //      and no procedural objects appear (none discovered yet).
+    // 10c. Sprint 08 integration modules.
     m_knowledge = std::make_unique<knowledge::KnowledgeDatabase>();
+
+    const std::filesystem::path save_dir = user_data_save_dir();
+    const std::filesystem::path knowledge_path = save_dir / "knowledge.json";
+    if (std::filesystem::exists(knowledge_path) && m_knowledge->load(knowledge_path))
+    {
+        PLX_CORE_INFO("Loaded knowledge save: {}", knowledge_path.string());
+    }
+    else
+    {
+        m_knowledge->initialize_from_historical_catalogs(*m_universe);
+        PLX_CORE_INFO("Initialized knowledge from historical catalogs (will save to: {})",
+                      knowledge_path.string());
+    }
+
     m_scheduler = std::make_unique<observation::SessionScheduler>();
     m_archive = std::make_unique<observation::DataArchive>();
+    const std::filesystem::path archive_path = save_dir / "archive.json";
+    if (std::filesystem::exists(archive_path) && m_archive->load(archive_path))
+    {
+        PLX_CORE_INFO("Loaded data archive save: {}", archive_path.string());
+    }
+    else
+    {
+        PLX_CORE_INFO("Initialized empty data archive: {}", archive_path.string());
+    }
+
     m_mock_instrument = std::make_unique<instruments::MockInstrument>(1, "Magic Instrument");
-    PLX_CORE_INFO("KnowledgeDatabase initialized (empty — historical rendering active)");
-    // TODO(Sprint 08 Task 8.11): Call initialize_from_historical_catalogs() here once
-    //                             the full session/analysis pipeline is wired.
+    m_analyzer = std::make_unique<analysis::MockAnalyzer>();
 
     // 10b. Load constellation overlay — resolve via Universe                ← SPRINT 04 Task 4.2
     {
@@ -391,6 +433,32 @@ void Application::init()
 
 void Application::shutdown()
 {
+    if (m_knowledge)
+    {
+        const std::filesystem::path save_dir = user_data_save_dir();
+        const std::filesystem::path knowledge_path = save_dir / "knowledge.json";
+        if (!m_knowledge->save(knowledge_path))
+        {
+            PLX_CORE_WARN("Failed to save knowledge database: {}", knowledge_path.string());
+        }
+    }
+
+    if (m_archive)
+    {
+        const std::filesystem::path save_dir = user_data_save_dir();
+        const std::filesystem::path archive_path = save_dir / "archive.json";
+        if (!m_archive->save(archive_path))
+        {
+            PLX_CORE_WARN("Failed to save data archive: {}", archive_path.string());
+        }
+    }
+
+    m_analyzer.reset();
+    m_mock_instrument.reset();
+    m_archive.reset();
+    m_scheduler.reset();
+    m_knowledge.reset();
+
     if (!m_context) return;
 
     m_context->wait_idle();
@@ -760,6 +828,58 @@ void Application::update_simulation(f64 delta_time_sec)
     // Advance Julian Date
     m_julian_date += (delta_time_sec * m_time_scale) / 86400.0;
 
+    if (m_scheduler && m_universe)
+    {
+        m_scheduler->update(m_julian_date, delta_time_sec, *m_universe);
+
+        std::vector<std::uint64_t> completed_ids;
+        for (const auto* session : m_scheduler->get_completed())
+        {
+            completed_ids.push_back(session->id());
+        }
+
+        for (const std::uint64_t session_id : completed_ids)
+        {
+            auto maybe = m_scheduler->harvest(session_id);
+            if (!maybe.has_value())
+            {
+                continue;
+            }
+
+            observation::DataRecord data = std::move(*maybe);
+            // DataArchive is keyed by DataRecord::id; bind it to session_id for
+            // mock-session records so each harvested session persists as a unique row.
+            data.id = data.session_id;
+
+            if (m_analyzer && m_knowledge)
+            {
+                const auto updates = m_analyzer->analyze(data, *m_universe);
+                std::unordered_set<u64> detection_targets;
+                for (const auto& update : updates)
+                {
+                    if (update.object_id != 0 && !detection_targets.contains(update.object_id))
+                    {
+                        m_knowledge->add_detection(update.object_id, session_id);
+                        detection_targets.insert(update.object_id);
+                    }
+
+                    m_knowledge->record_measurement(
+                        update.object_id,
+                        update.property_name,
+                        update.value,
+                        update.uncertainty,
+                        update.snr,
+                        session_id);
+                }
+            }
+
+            if (m_archive)
+            {
+                m_archive->add(std::make_unique<observation::DataRecord>(std::move(data)));
+            }
+        }
+    }
+
     // Compute Local Sidereal Time
     const f64 lst = astro::TimeSystem::lmst(m_julian_date, m_observer.longitude_rad);
 
@@ -1033,25 +1153,34 @@ void Application::update_simulation(f64 delta_time_sec)
                 });
             }
 
-            const auto completed = m_scheduler->get_completed();
-            std::vector<const observation::ObservationSession*> sorted = completed;
-            std::sort(sorted.begin(), sorted.end(),
-                      [](const observation::ObservationSession* lhs,
-                         const observation::ObservationSession* rhs)
+        }
+
+        if (m_archive)
+        {
+            auto completed = m_archive->get_all();
+            std::sort(completed.begin(), completed.end(),
+                      [](const observation::DataRecord* lhs, const observation::DataRecord* rhs)
                       {
-                          return lhs->id() > rhs->id();
+                          return lhs->session_id > rhs->session_id;
                       });
 
-            const std::size_t max_count = std::min<std::size_t>(kCompletedSessionsDisplayLimit, sorted.size());
+            const std::size_t max_count = std::min<std::size_t>(kCompletedSessionsDisplayLimit, completed.size());
             completed_entries.reserve(max_count);
             for (std::size_t i = 0; i < max_count; ++i)
             {
-                const auto* session = sorted[i];
+                const auto* record = completed[i];
+                std::string level_text = "--";
+                if (m_knowledge && record->target_object_id != 0)
+                {
+                    level_text = knowledge_level_to_text(m_knowledge->get_level(record->target_object_id));
+                }
+
                 completed_entries.push_back(ui::SessionsPanelCompletedEntry{
-                    .session_id = session->id(),
-                    .target_name = format_object_label(*m_universe, session->parameters().target_object_id),
-                    .technique = session->parameters().technique,
-                    .final_snr = static_cast<f32>(session->progress().accumulated_snr),
+                    .session_id = record->session_id,
+                    .target_name = format_object_label(*m_universe, record->target_object_id),
+                    .technique = record->technique,
+                    .final_snr = static_cast<f32>(record->achieved_snr),
+                    .level_achieved = std::move(level_text),
                 });
             }
         }

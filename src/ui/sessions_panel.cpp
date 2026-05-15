@@ -146,9 +146,9 @@ void SessionsPanel::render(BitmapFont& font, rendering::LineRenderer& lines, VkE
 
     for (const auto& entry : m_completed_entries)
     {
-        // TODO(Task 8.11): Replace pending level placeholder with actual analyzer-derived level.
-        const std::string line = std::format("✓ {}  {}  SNR {:.1f}  pending",
-                                             entry.target_name, entry.technique, entry.final_snr);
+        const std::string level_text = entry.level_achieved.empty() ? "--" : entry.level_achieved;
+        const std::string line = std::format("✓ {}  {}  SNR {:.1f}  {}",
+                                             entry.target_name, entry.technique, entry.final_snr, level_text);
         font.draw_text(line, cx, cy, 1.0f, widget_colors::kTextBright);
         cy += kRowHeight;
     }

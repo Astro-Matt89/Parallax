@@ -3,16 +3,12 @@
 /// @file application.hpp
 /// @brief Main application class — lifecycle, main loop, frame rendering.
 
-#include "knowledge/knowledge_database.hpp"              // ← SPRINT 08 Task 8.9
-#include "observation/data_archive.hpp"
-#include "observation/session_scheduler.hpp"
 #include "astro/atmosphere.hpp"
 #include "astro/coordinates.hpp"
 #include "astro/time_system.hpp"
 #include "core/input.hpp"
 #include "core/types.hpp"
 #include "core/window.hpp"
-#include "instruments/mock_instrument.hpp"
 #include "overlay/constellations.hpp"                     // ← SPRINT 04 Task 4.2
 #include "overlay/coord_grid.hpp"                         // ← SPRINT 04 Task 4.3
 #include "overlay/horizon.hpp"                            // ← SPRINT 04 Task 4.4
@@ -45,8 +41,30 @@
 #include <memory>
 #include <vector>
 
+namespace parallax::analysis
+{
+    class MockAnalyzer;
+}
+
+namespace parallax::instruments
+{
+    class MockInstrument;
+}
+
+namespace parallax::knowledge
+{
+    class KnowledgeDatabase;
+}
+
+namespace parallax::observation
+{
+    class DataArchive;
+    class SessionScheduler;
+}
+
 namespace parallax::core
 {
+
     /// @brief Top-level application class that owns all subsystems and drives the main loop.
     ///
     /// Lifecycle: init() in constructor → run() drives main_loop() → shutdown() in destructor.
@@ -133,6 +151,7 @@ namespace parallax::core
         std::unique_ptr<observation::SessionScheduler> m_scheduler;
         std::unique_ptr<observation::DataArchive> m_archive;
         std::unique_ptr<instruments::MockInstrument> m_mock_instrument;
+        std::unique_ptr<analysis::MockAnalyzer> m_analyzer;
 
         /// @brief Reusable per-frame visible objects buffer (cleared by query_fov each frame).
         std::vector<universe::CelestialObject> m_frame_objects;

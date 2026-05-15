@@ -2,6 +2,7 @@
 /// @brief Data archive panel implementation.
 
 #include "ui/data_archive_panel.hpp"
+#include "ui/widgets.hpp"  // widget_colors::* (kBorder, kTextBright, kTextDim, ...)
 
 #include <algorithm>
 #include <format>

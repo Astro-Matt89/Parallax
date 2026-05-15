@@ -39,6 +39,7 @@ struct SessionsPanelCompletedEntry
     std::string target_name;
     std::string technique;
     f32 final_snr = 0.0f;
+    std::string level_achieved;
 };
 
 class SessionsPanel

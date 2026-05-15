@@ -41,6 +41,8 @@ add_executable(parallax
     core/logger.cpp
     core/window.cpp
     core/application.cpp
+    core/user_data_path.hpp
+    core/user_data_path.cpp
     core/input.cpp
     vulkan/context.cpp
     vulkan/swapchain.cpp

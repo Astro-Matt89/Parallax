@@ -433,25 +433,23 @@ void Application::init()
 
 void Application::shutdown()
 {
-    if (m_knowledge || m_archive)
+    if (m_knowledge)
     {
         const std::filesystem::path save_dir = user_data_save_dir();
-        if (m_knowledge)
+        const std::filesystem::path knowledge_path = save_dir / "knowledge.json";
+        if (!m_knowledge->save(knowledge_path))
         {
-            const std::filesystem::path knowledge_path = save_dir / "knowledge.json";
-            if (!m_knowledge->save(knowledge_path))
-            {
-                PLX_CORE_WARN("Failed to save knowledge database: {}", knowledge_path.string());
-            }
+            PLX_CORE_WARN("Failed to save knowledge database: {}", knowledge_path.string());
         }
+    }
 
-        if (m_archive)
+    if (m_archive)
+    {
+        const std::filesystem::path save_dir = user_data_save_dir();
+        const std::filesystem::path archive_path = save_dir / "archive.json";
+        if (!m_archive->save(archive_path))
         {
-            const std::filesystem::path archive_path = save_dir / "archive.json";
-            if (!m_archive->save(archive_path))
-            {
-                PLX_CORE_WARN("Failed to save data archive: {}", archive_path.string());
-            }
+            PLX_CORE_WARN("Failed to save data archive: {}", archive_path.string());
         }
     }
 

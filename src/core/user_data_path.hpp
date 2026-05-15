@@ -15,4 +15,3 @@ namespace parallax::core
 [[nodiscard]] std::filesystem::path user_data_save_dir() noexcept;
 
 } // namespace parallax::core
-

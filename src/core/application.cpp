@@ -43,6 +43,7 @@ void check_vk(VkResult result, const char* operation)
 }
 
 constexpr float kDefaultSnrRatePerHour = 5.0f;
+constexpr std::size_t kCompletedSessionsDisplayLimit = 10;
 
 std::string format_object_label(const parallax::universe::Universe& universe, parallax::u64 object_id)
 {
@@ -1041,7 +1042,7 @@ void Application::update_simulation(f64 delta_time_sec)
                           return lhs->id() > rhs->id();
                       });
 
-            const std::size_t max_count = std::min<std::size_t>(10, sorted.size());
+            const std::size_t max_count = std::min<std::size_t>(kCompletedSessionsDisplayLimit, sorted.size());
             completed_entries.reserve(max_count);
             for (std::size_t i = 0; i < max_count; ++i)
             {

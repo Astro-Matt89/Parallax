@@ -42,6 +42,8 @@ void check_vk(VkResult result, const char* operation)
     }
 }
 
+constexpr float kDefaultSnrRatePerHour = 5.0f;
+
 std::string format_object_label(const parallax::universe::Universe& universe, parallax::u64 object_id)
 {
     if (object_id == 0)
@@ -1026,7 +1028,7 @@ void Application::update_simulation(f64 delta_time_sec)
                         params.planned_duration_hours
                         * static_cast<double>(m_mock_instrument
                                                    ? m_mock_instrument->get_snr_rate_per_hour()
-                                                   : 5.0f)),
+                                                   : kDefaultSnrRatePerHour)),
                 });
             }
 

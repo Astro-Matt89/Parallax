@@ -13,6 +13,13 @@
 namespace parallax::ui
 {
 
+namespace
+{
+constexpr f32 kObserveButtonWidth = 72.0f;
+constexpr f32 kSessionsButtonWidth = 74.0f;
+constexpr f32 kDataButtonWidth = 56.0f;
+} // namespace
+
 // =================================================================
 // Initialization
 // =================================================================
@@ -65,15 +72,15 @@ void Toolbar::create_overlay_group(const ToolbarCallbacks& callbacks)
         callbacks.toggle_atmosphere ? callbacks.toggle_atmosphere : []() {});
 
     m_btn_observe = std::make_unique<ToggleButton>(
-        "OBSERVE", dummy_pos, Vec2f{72.0f, kButtonH},
+        "OBSERVE", dummy_pos, Vec2f{kObserveButtonWidth, kButtonH},
         callbacks.toggle_observe_panel ? callbacks.toggle_observe_panel : []() {});
 
     m_btn_sessions = std::make_unique<ToggleButton>(
-        "SESSIONS", dummy_pos, Vec2f{74.0f, kButtonH},
+        "SESSIONS", dummy_pos, Vec2f{kSessionsButtonWidth, kButtonH},
         callbacks.toggle_sessions_panel ? callbacks.toggle_sessions_panel : []() {});
 
     m_btn_data = std::make_unique<ToggleButton>(
-        "DATA", dummy_pos, Vec2f{56.0f, kButtonH},
+        "DATA", dummy_pos, Vec2f{kDataButtonWidth, kButtonH},
         callbacks.toggle_data_panel ? callbacks.toggle_data_panel : []() {});
 }
 
@@ -149,7 +156,7 @@ void Toolbar::layout_widgets(u32 viewport_width, u32 viewport_height)
 
     // Group 1: overlay toggles + observation panel toggles.
     const f32 overlay_w = kButtonW * 5.0f + 56.0f + kButtonSpacing * 8.0f
-                           + kButtonW + 72.0f + 74.0f + 56.0f;
+                           + kButtonW + kObserveButtonWidth + kSessionsButtonWidth + kDataButtonWidth;
 
     // Group 2: time controls (4 buttons + speed text)
     const f32 time_btn_w = 36.0f;
@@ -192,13 +199,13 @@ void Toolbar::layout_widgets(u32 viewport_width, u32 viewport_height)
     x += kButtonW + kButtonSpacing;
 
     m_btn_observe->set_position({x, widget_y});
-    x += 72.0f + kButtonSpacing;
+    x += kObserveButtonWidth + kButtonSpacing;
 
     m_btn_sessions->set_position({x, widget_y});
-    x += 74.0f + kButtonSpacing;
+    x += kSessionsButtonWidth + kButtonSpacing;
 
     m_btn_data->set_position({x, widget_y});
-    x += 56.0f + kGroupSpacing;
+    x += kDataButtonWidth + kGroupSpacing;
 
     // --- Group 2: Time controls ---
     m_btn_time_rev->set_position({x, widget_y});

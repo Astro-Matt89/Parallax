@@ -277,14 +277,18 @@ void InfoPanel::update(const Selection& selection,
                 continue;
             }
 
-            if (is_unconfirmed || pd.unlocks_at > level)
+            if (is_unconfirmed)
+            {
+                continue;
+            }
+
+            if (pd.unlocks_at > level)
             {
                 m_property_lines.push_back(std::format("{} = ? (unknown)", pd.name));
+                continue;
             }
-            else
-            {
-                m_property_lines.push_back(std::format("{} = ? (unknown)", pd.name));
-            }
+
+            m_property_lines.push_back(std::format("{} = ? (unknown)", pd.name));
         }
     }
 

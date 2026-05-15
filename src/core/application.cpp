@@ -28,6 +28,7 @@
 #include <filesystem>
 #include <format>
 #include <limits>
+#include <string>
 
 namespace
 {
@@ -39,6 +40,42 @@ void check_vk(VkResult result, const char* operation)
         PLX_CORE_CRITICAL("Vulkan error in {}: VkResult = {}", operation, static_cast<int>(result));
         std::abort();
     }
+}
+
+std::string format_object_label(const parallax::universe::Universe& universe, parallax::u64 object_id)
+{
+    if (object_id == 0)
+    {
+        return "[Survey]";
+    }
+
+    const std::string_view known_name = universe.get_name(object_id);
+    if (!known_name.empty())
+    {
+        return std::string{known_name};
+    }
+
+    if (const auto object = universe.query_object(object_id); object.has_value())
+    {
+        const parallax::u64 source_id = parallax::universe::decode_source_id(object_id);
+        switch (object->type)
+        {
+            case parallax::universe::ObjectType::Star:
+                return std::format("HIP {}", source_id);
+            case parallax::universe::ObjectType::DeepSkyObject:
+            case parallax::universe::ObjectType::Galaxy:
+                return std::format("M{}", source_id);
+            case parallax::universe::ObjectType::SolarSystemBody:
+                return std::format("Body {}", source_id);
+            case parallax::universe::ObjectType::ProceduralStar:
+            case parallax::universe::ObjectType::ProceduralDso:
+                return std::format("PRC {:016X}", object_id);
+            default:
+                return std::format("ID {}", object_id);
+        }
+    }
+
+    return std::format("ID {}", object_id);
 }
 
 } // anonymous namespace
@@ -124,6 +161,21 @@ void Application::init()
         cb.cycle_grid            = [this]() { m_coord_grid.cycle_type(); };
         cb.toggle_horizon        = [this]() { m_horizon.toggle_visible(); };
         cb.toggle_atmosphere     = [this]() { toggle_atmosphere(); };  // ← SPRINT 06 Task 6.7
+        cb.toggle_observe_panel  = [this]()
+        {
+            m_show_instrument_panel = !m_show_instrument_panel;
+            m_instrument_panel.set_visible(m_show_instrument_panel);
+        };
+        cb.toggle_sessions_panel = [this]()
+        {
+            m_show_sessions_panel = !m_show_sessions_panel;
+            m_sessions_panel.set_visible(m_show_sessions_panel);
+        };
+        cb.toggle_data_panel     = [this]()
+        {
+            m_show_data_archive_panel = !m_show_data_archive_panel;
+            m_data_archive_panel.set_visible(m_show_data_archive_panel);
+        };
         cb.time_reverse          = [this]()
         {
             if (m_time_scale >= 0.0) { m_time_scale = -1.0; }
@@ -186,10 +238,40 @@ void Application::init()
             PLX_CORE_INFO("Tracking {}", m_selection.is_tracking() ? "enabled" : "disabled");
         };
         cb.goto_object = [this]() { /* TODO: future telescope slew command */ };
+        cb.observe_this = [this](u64 target_id) { request_observe(target_id); };
         m_info_panel.init(cb);
     }
 
-    // 9f. Selection — load star names                      ← SPRINT 05 Task 5.5
+    // 9f. Observation workflow panels                        ← SPRINT 08 Task 8.10
+    {
+        ui::InstrumentPanelCallbacks observe_cb;
+        observe_cb.schedule = [this](const observation::SessionParameters& params)
+        {
+            if (m_scheduler)
+            {
+                const u64 id = m_scheduler->schedule(params);
+                PLX_CORE_INFO("Scheduled observation session {}", id);
+            }
+        };
+        m_instrument_panel.init(observe_cb);
+        m_instrument_panel.set_visible(false);
+
+        ui::SessionsPanelCallbacks sessions_cb;
+        sessions_cb.abort_session = [this](u64 session_id)
+        {
+            if (m_scheduler)
+            {
+                m_scheduler->abort(session_id);
+            }
+        };
+        m_sessions_panel.init(sessions_cb);
+        m_sessions_panel.set_visible(false);
+
+        m_data_archive_panel.init();
+        m_data_archive_panel.set_visible(false);
+    }
+
+    // 9g. Selection — load star names                      ← SPRINT 05 Task 5.5
     {
         const std::filesystem::path star_names_path{"data/catalogs/star_names.csv"};
         if (m_selection.load_star_names(star_names_path))
@@ -232,6 +314,9 @@ void Application::init()
     //      empty: all real catalog objects render as Historical (is_real()),
     //      and no procedural objects appear (none discovered yet).
     m_knowledge = std::make_unique<knowledge::KnowledgeDatabase>();
+    m_scheduler = std::make_unique<observation::SessionScheduler>();
+    m_archive = std::make_unique<observation::DataArchive>();
+    m_mock_instrument = std::make_unique<instruments::MockInstrument>(1, "Magic Instrument");
     PLX_CORE_INFO("KnowledgeDatabase initialized (empty — historical rendering active)");
     // TODO(Sprint 08 Task 8.11): Call initialize_from_historical_catalogs() here once
     //                             the full session/analysis pipeline is wired.
@@ -371,6 +456,17 @@ void Application::set_atmosphere(bool on)
     m_atmosphere_on = on;
 }
 
+void Application::request_observe(u64 target_id)
+{
+    if (target_id == 0)
+    {
+        return;
+    }
+
+    m_show_instrument_panel = true;
+    m_instrument_panel.open_for_selected_object(target_id);
+}
+
 // =================================================================
 // Input processing — mouse priority + key bindings      ← SPRINT 05 Task 5.6
 //
@@ -398,7 +494,10 @@ void Application::process_input()
     const bool mouse_over_ui = m_panel_system.is_mouse_over_ui(mouse_pos)
                             || m_toolbar.is_mouse_over(mouse_pos)
                             || m_side_panel.is_mouse_over(mouse_pos)
-                            || m_info_panel.is_mouse_over(mouse_pos);
+                            || m_info_panel.is_mouse_over(mouse_pos)
+                            || m_instrument_panel.is_mouse_over(mouse_pos)
+                            || m_sessions_panel.is_mouse_over(mouse_pos)
+                            || m_data_archive_panel.is_mouse_over(mouse_pos);
 
     // =================================================================
     // Step 2: Route mouse input based on priority
@@ -816,6 +915,9 @@ void Application::update_simulation(f64 delta_time_sec)
             .grid_visible           = m_coord_grid.get_type() != overlay::GridType::None,
             .horizon_visible        = m_horizon.is_visible(),
             .atmosphere_on          = m_atmosphere_on,
+            .observe_panel_visible  = m_show_instrument_panel,
+            .sessions_panel_visible = m_show_sessions_panel,
+            .data_panel_visible     = m_show_data_archive_panel,
             .time_scale             = m_time_scale,
             .time_paused            = (m_time_scale == 0.0),
             .fov_deg                = m_camera->get_fov_deg(),
@@ -874,6 +976,121 @@ void Application::update_simulation(f64 delta_time_sec)
         m_input->was_click(),
         static_cast<f32>(delta_time_sec),
         viewport.width, viewport.height);
+
+    // --- Instrument panel update ---
+    {
+        ui::InstrumentPanelState observe_state;
+        observe_state.has_selection = m_selection.has_selection();
+        if (observe_state.has_selection)
+        {
+            observe_state.selected_object_id = m_selection.get_selection().celestial_obj.id;
+            observe_state.selected_object_name =
+                format_object_label(*m_universe, observe_state.selected_object_id);
+        }
+        observe_state.center_ra_rad = camera_eq.ra;
+        observe_state.center_dec_rad = camera_eq.dec;
+        observe_state.fov_rad = fov_rad;
+        observe_state.current_julian_date = m_julian_date;
+
+        m_instrument_panel.update(
+            observe_state,
+            m_input->get_mouse_position(),
+            m_input->was_click(),
+            m_input->is_left_button_down(),
+            static_cast<f32>(delta_time_sec),
+            viewport.width, viewport.height);
+        m_show_instrument_panel = m_instrument_panel.is_visible();
+    }
+
+    // --- Sessions panel update ---
+    {
+        std::vector<ui::SessionsPanelEntry> active_entries;
+        std::vector<ui::SessionsPanelCompletedEntry> completed_entries;
+
+        if (m_scheduler)
+        {
+            const auto active = m_scheduler->get_active();
+            active_entries.reserve(active.size());
+            for (const auto* session : active)
+            {
+                const auto& params = session->parameters();
+                const auto& progress = session->progress();
+                active_entries.push_back(ui::SessionsPanelEntry{
+                    .session_id = session->id(),
+                    .target_name = format_object_label(*m_universe, params.target_object_id),
+                    .technique = params.technique,
+                    .completion_fraction = static_cast<f32>(progress.completion_fraction),
+                    .elapsed_hours = static_cast<f32>(progress.elapsed_hours),
+                    .accumulated_snr = static_cast<f32>(progress.accumulated_snr),
+                    .expected_snr = static_cast<f32>(
+                        params.planned_duration_hours
+                        * static_cast<double>(m_mock_instrument
+                                                   ? m_mock_instrument->get_snr_rate_per_hour()
+                                                   : 5.0f)),
+                });
+            }
+
+            const auto completed = m_scheduler->get_completed();
+            std::vector<const observation::ObservationSession*> sorted = completed;
+            std::sort(sorted.begin(), sorted.end(),
+                      [](const observation::ObservationSession* lhs,
+                         const observation::ObservationSession* rhs)
+                      {
+                          return lhs->id() > rhs->id();
+                      });
+
+            const std::size_t max_count = std::min<std::size_t>(10, sorted.size());
+            completed_entries.reserve(max_count);
+            for (std::size_t i = 0; i < max_count; ++i)
+            {
+                const auto* session = sorted[i];
+                completed_entries.push_back(ui::SessionsPanelCompletedEntry{
+                    .session_id = session->id(),
+                    .target_name = format_object_label(*m_universe, session->parameters().target_object_id),
+                    .technique = session->parameters().technique,
+                    .final_snr = static_cast<f32>(session->progress().accumulated_snr),
+                });
+            }
+        }
+
+        m_sessions_panel.update(
+            std::move(active_entries),
+            std::move(completed_entries),
+            m_input->get_mouse_position(),
+            m_input->was_click(),
+            static_cast<f32>(delta_time_sec),
+            viewport.width, viewport.height);
+    }
+
+    // --- Data archive panel update ---
+    {
+        std::vector<ui::DataArchivePanelRow> rows;
+        if (m_archive)
+        {
+            auto records = m_archive->get_all();
+            std::sort(records.begin(), records.end(),
+                      [](const observation::DataRecord* lhs, const observation::DataRecord* rhs)
+                      {
+                          return lhs->observation_jd > rhs->observation_jd;
+                      });
+
+            rows.reserve(records.size());
+            for (std::size_t i = 0; i < records.size(); ++i)
+            {
+                rows.push_back(ui::DataArchivePanelRow{
+                    .index = i,
+                    .record = records[i],
+                    .target_name = format_object_label(*m_universe, records[i]->target_object_id),
+                });
+            }
+        }
+
+        m_data_archive_panel.update(
+            std::move(rows),
+            m_input->get_mouse_position(),
+            m_input->was_click(),
+            viewport.width, viewport.height);
+    }
 
     // --- HUD update ---
     const f32 fps = (m_delta_time > 0.0) ? static_cast<f32>(1.0 / m_delta_time) : 0.0f;
@@ -962,7 +1179,7 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
     // 4. Panel backgrounds (transparent filled quads — behind UI content)
     m_panel_system.render_backgrounds(cmd, extent);
 
-    // 5. UI panel content: toolbar, side panel, info panel
+    // 5. UI panel content
     //    Each render() call submits text to the shared font queue and border
     //    lines to the line renderer; a second line_renderer→render() then
     //    flushes the UI border lines before the text draw call.
@@ -970,6 +1187,9 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
     m_toolbar.render(m_hud->get_font(), *m_line_renderer, m_panel_system, cmd, extent);
     m_side_panel.render(m_hud->get_font(), *m_line_renderer, extent);
     m_info_panel.render(m_hud->get_font(), *m_line_renderer, extent);
+    m_instrument_panel.render(m_hud->get_font(), *m_line_renderer, extent);
+    m_sessions_panel.render(m_hud->get_font(), *m_line_renderer, extent);
+    m_data_archive_panel.render(m_hud->get_font(), *m_line_renderer, extent);
     m_line_renderer->render(cmd);   // flush UI border lines
 
     // 6. All text: HUD panels + toolbar + side panel + info panel (single GPU draw call)

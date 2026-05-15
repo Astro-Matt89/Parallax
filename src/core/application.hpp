@@ -4,12 +4,15 @@
 /// @brief Main application class — lifecycle, main loop, frame rendering.
 
 #include "knowledge/knowledge_database.hpp"              // ← SPRINT 08 Task 8.9
+#include "observation/data_archive.hpp"
+#include "observation/session_scheduler.hpp"
 #include "astro/atmosphere.hpp"
 #include "astro/coordinates.hpp"
 #include "astro/time_system.hpp"
 #include "core/input.hpp"
 #include "core/types.hpp"
 #include "core/window.hpp"
+#include "instruments/mock_instrument.hpp"
 #include "overlay/constellations.hpp"                     // ← SPRINT 04 Task 4.2
 #include "overlay/coord_grid.hpp"                         // ← SPRINT 04 Task 4.3
 #include "overlay/horizon.hpp"                            // ← SPRINT 04 Task 4.4
@@ -20,10 +23,13 @@
 #include "rendering/sky_background.hpp"
 #include "rendering/starfield.hpp"
 #include "ui/hud.hpp"
+#include "ui/instrument_panel.hpp"
 #include "ui/info_panel.hpp"                              // ← SPRINT 05 Task 5.5
 #include "ui/panel_system.hpp"                            // ← SPRINT 05 Task 5.1
 #include "ui/selection.hpp"                               // ← SPRINT 05 Task 5.5
 #include "ui/side_panel.hpp"                              // ← SPRINT 05 Task 5.4
+#include "ui/sessions_panel.hpp"
+#include "ui/data_archive_panel.hpp"
 #include "ui/toolbar.hpp"                                 // ← SPRINT 05 Task 5.3
 #include "universe/celestial_object.hpp"                  // ← SPRINT 07 Task 7.7
 #include "universe/universe.hpp"                          // ← SPRINT 07 Task 7.7
@@ -92,6 +98,7 @@ namespace parallax::core
 
         void process_input();
         void update_simulation(f64 delta_time_sec);
+        void request_observe(u64 target_id);
 
         void record_command_buffer(VkCommandBuffer cmd, uint32_t image_index);
 
@@ -123,6 +130,9 @@ namespace parallax::core
         /// @brief Player's knowledge state — drives rendering style and info panel.
         ///                                                              ← SPRINT 08 Task 8.9
         std::unique_ptr<knowledge::KnowledgeDatabase> m_knowledge;
+        std::unique_ptr<observation::SessionScheduler> m_scheduler;
+        std::unique_ptr<observation::DataArchive> m_archive;
+        std::unique_ptr<instruments::MockInstrument> m_mock_instrument;
 
         /// @brief Reusable per-frame visible objects buffer (cleared by query_fov each frame).
         std::vector<universe::CelestialObject> m_frame_objects;
@@ -144,6 +154,13 @@ namespace parallax::core
         ui::SidePanel m_side_panel;                          // Task 5.4  Left side panel
         ui::Selection m_selection;                            // Task 5.5  Object selection system
         ui::InfoPanel m_info_panel;                           // Task 5.5  Right info panel
+        ui::InstrumentPanel m_instrument_panel;               // Sprint 08 Task 8.10
+        ui::SessionsPanel m_sessions_panel;                   // Sprint 08 Task 8.10
+        ui::DataArchivePanel m_data_archive_panel;            // Sprint 08 Task 8.10
+
+        bool m_show_instrument_panel = false;
+        bool m_show_sessions_panel = false;
+        bool m_show_data_archive_panel = false;
 
         // -----------------------------------------------------------------
         // Simulation state

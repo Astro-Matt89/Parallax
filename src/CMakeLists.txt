@@ -73,6 +73,9 @@ add_executable(parallax
     ui/side_panel.cpp
     ui/selection.cpp
     ui/info_panel.cpp
+    ui/instrument_panel.cpp
+    ui/sessions_panel.cpp
+    ui/data_archive_panel.cpp
 )
 
 target_include_directories(parallax PRIVATE

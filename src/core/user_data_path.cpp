@@ -26,10 +26,6 @@ std::filesystem::path user_data_save_dir() noexcept
     {
         path = std::filesystem::path(home) / "Library" / "Application Support" / "Parallax" / "save";
     }
-    else if (const char* xdg = std::getenv("XDG_DATA_HOME"); xdg != nullptr)
-    {
-        path = std::filesystem::path(xdg) / "parallax" / "save";
-    }
 #else
     if (const char* xdg = std::getenv("XDG_DATA_HOME"); xdg != nullptr)
     {
@@ -53,4 +49,3 @@ std::filesystem::path user_data_save_dir() noexcept
 }
 
 } // namespace parallax::core
-

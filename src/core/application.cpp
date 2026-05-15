@@ -347,7 +347,8 @@ void Application::init()
     else
     {
         m_knowledge->initialize_from_historical_catalogs(*m_universe);
-        PLX_CORE_INFO("Initialized knowledge from catalogs: {}", knowledge_path.string());
+        PLX_CORE_INFO("Initialized knowledge from historical catalogs (will save to: {})",
+                      knowledge_path.string());
     }
 
     m_scheduler = std::make_unique<observation::SessionScheduler>();
@@ -848,6 +849,8 @@ void Application::update_simulation(f64 delta_time_sec)
             }
 
             observation::DataRecord data = std::move(*maybe);
+            // DataArchive is keyed by DataRecord::id; bind it to session_id for
+            // mock-session records so each harvested session persists as a unique row.
             data.id = data.session_id;
 
             if (m_analyzer && m_knowledge)

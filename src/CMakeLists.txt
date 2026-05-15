@@ -58,6 +58,7 @@ add_executable(parallax
     rendering/sky_background.cpp
     rendering/solar_system_renderer.cpp
     rendering/solar_system_renderer_helpers.cpp
+    rendering/render_style.hpp
     rendering/starfield.cpp
     rendering/line_renderer.cpp
     rendering/dso_renderer.cpp

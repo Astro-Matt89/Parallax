@@ -27,7 +27,8 @@ void DsoRenderer::begin_frame(LineRenderer& lines, ui::BitmapFont& font, VkExten
 }
 
 void DsoRenderer::add_celestial_object(Vec2f screen_pos,
-                                       const universe::CelestialObject& obj)
+                                       const universe::CelestialObject& obj,
+                                       RenderStyle style)
 {
     if (!m_visible || !m_frame_lines || !m_frame_font)
     {
@@ -44,16 +45,35 @@ void DsoRenderer::add_celestial_object(Vec2f screen_pos,
     // Build label: "M<num>" from source_id (Messier number).
     const std::string label = std::format("M{}", universe::decode_source_id(obj.id));
 
-    draw_dso_at(screen_pos, dso_data->dso_type, label);
+    draw_dso_at(screen_pos, dso_data->dso_type, label, style);
 
     ++m_rendered_count;
 }
 
 void DsoRenderer::draw_dso_at(Vec2f screen_pos,
                                catalog::DsoType dso_type,
-                               std::string_view label) const
+                               std::string_view label,
+                               RenderStyle style) const
 {
-    draw_icon(dso_type, screen_pos, kIconColor, kIconRadiusNdc, *m_frame_lines);
+    // Select icon and label colors by render style.
+    //   Historical  — unchanged magenta-pink catalog look.
+    //   Confirmed   — cyan tint (player-verified discovery).
+    //   Candidate   — orange tint (single unconfirmed detection).
+    Vec4f icon_color  = kIconColor;
+    Vec3f label_color = kLabelColor;
+
+    if (style == RenderStyle::Confirmed)
+    {
+        icon_color  = kIconColorConfirmed;
+        label_color = kLabelColorConfirmed;
+    }
+    else if (style == RenderStyle::Candidate)
+    {
+        icon_color  = kIconColorCandidate;
+        label_color = kLabelColorCandidate;
+    }
+
+    draw_icon(dso_type, screen_pos, icon_color, kIconRadiusNdc, *m_frame_lines);
 
     const Vec2f px = ndc_to_pixel(screen_pos, m_frame_viewport);
     const f32 offset_x = kIconRadiusNdc * static_cast<f32>(m_frame_viewport.width) * 0.5f + 4.0f;
@@ -61,7 +81,7 @@ void DsoRenderer::draw_dso_at(Vec2f screen_pos,
     m_frame_font->draw_text(std::string{label},
                             px.x + offset_x,
                             px.y - 8.0f,
-                            kLabelScale, kLabelColor);
+                            kLabelScale, label_color);
 }
 
 // =================================================================

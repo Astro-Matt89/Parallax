@@ -3,6 +3,7 @@
 /// @file application.hpp
 /// @brief Main application class — lifecycle, main loop, frame rendering.
 
+#include "knowledge/knowledge_database.hpp"              // ← SPRINT 08 Task 8.9
 #include "astro/atmosphere.hpp"
 #include "astro/coordinates.hpp"
 #include "astro/time_system.hpp"
@@ -118,6 +119,10 @@ namespace parallax::core
 
         /// @brief Universe facade over all data providers (stars, DSOs, SS, procedural).
         std::unique_ptr<universe::Universe> m_universe;
+
+        /// @brief Player's knowledge state — drives rendering style and info panel.
+        ///                                                              ← SPRINT 08 Task 8.9
+        std::unique_ptr<knowledge::KnowledgeDatabase> m_knowledge;
 
         /// @brief Reusable per-frame visible objects buffer (cleared by query_fov each frame).
         std::vector<universe::CelestialObject> m_frame_objects;

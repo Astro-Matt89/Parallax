@@ -20,6 +20,7 @@
 #include "core/types.hpp"
 #include "rendering/camera.hpp"
 #include "rendering/line_renderer.hpp"
+#include "rendering/render_style.hpp"
 #include "ui/font.hpp"
 #include "universe/celestial_object.hpp"
 
@@ -36,7 +37,7 @@ namespace parallax::rendering
     ///
     /// **Universe path (new):**
     ///   1. begin_frame(lines, font, viewport)
-    ///   2. add_celestial_object(screen_pos, obj)  — one call per visible DSO
+    ///   2. add_celestial_object(screen_pos, obj, style)  — one call per visible DSO
     ///
     /// **Legacy path (deprecated):**
     ///   1. update(camera, observer, lst_rad, catalog, lines, font, viewport)
@@ -67,10 +68,17 @@ namespace parallax::rendering
         /// Reads type information from @c std::get_if<DsoData>(&obj.data).
         /// If the object has no DsoData, rendering is skipped (defensive).
         ///
+        /// Visual styles:
+        ///   Historical  — unchanged catalog colors (magenta-pink).
+        ///   Confirmed   — cyan tint (player-discovered, verified ≥ 2 detections).
+        ///   Candidate   — orange tint (player-detected once, not yet confirmed).
+        ///
         /// @param screen_pos  Pre-projected NDC position (from Application).
         /// @param obj         CelestialObject with ObjectType::DeepSkyObject.
+        /// @param style       RenderStyle — Historical, Confirmed, or Candidate.
         void add_celestial_object(Vec2f screen_pos,
-                                  const universe::CelestialObject& obj);
+                                  const universe::CelestialObject& obj,
+                                  RenderStyle style = RenderStyle::Historical);
 
         // ---------------------------------------------------------------
         // Legacy path (deprecated)
@@ -103,7 +111,8 @@ namespace parallax::rendering
         /// @brief Dispatch to draw_icon() and emit the label at the given screen position.
         void draw_dso_at(Vec2f screen_pos,
                          catalog::DsoType dso_type,
-                         std::string_view label) const;
+                         std::string_view label,
+                         RenderStyle style) const;
 
         /// @brief Draw the type-appropriate icon at the given NDC position.
         static void draw_icon(catalog::DsoType type,
@@ -147,11 +156,23 @@ namespace parallax::rendering
         ui::BitmapFont* m_frame_font    = nullptr;
         VkExtent2D     m_frame_viewport = {};
 
-        /// @brief Icon color: magenta-pink (RGBA).
+        /// @brief Icon color: magenta-pink (RGBA) — Historical style.
         static constexpr Vec4f kIconColor{0.8f, 0.4f, 0.6f, 0.7f};
 
-        /// @brief Label color (RGB for BitmapFont).
+        /// @brief Icon color for Confirmed discoveries: cyan.
+        static constexpr Vec4f kIconColorConfirmed{0.3f, 0.85f, 1.0f, 0.85f};
+
+        /// @brief Icon color for Candidate detections: orange.
+        static constexpr Vec4f kIconColorCandidate{1.0f, 0.55f, 0.1f, 0.7f};
+
+        /// @brief Label color (RGB for BitmapFont) — Historical style.
         static constexpr Vec3f kLabelColor{0.8f, 0.4f, 0.6f};
+
+        /// @brief Label color for Confirmed discoveries: cyan.
+        static constexpr Vec3f kLabelColorConfirmed{0.3f, 0.85f, 1.0f};
+
+        /// @brief Label color for Candidate detections: orange.
+        static constexpr Vec3f kLabelColorCandidate{1.0f, 0.55f, 0.1f};
 
         /// @brief Icon radius in NDC units (≈12px at 1080p).
         static constexpr f32 kIconRadiusNdc = 0.015f;

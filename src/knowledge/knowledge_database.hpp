@@ -64,6 +64,11 @@ public:
     /// Returns KnowledgeLevel::Unknown when the object is not in the database.
     [[nodiscard]] KnowledgeLevel get_level(std::uint64_t id) const;
 
+    /// @brief Returns true if the object has been independently detected at least twice.
+    ///
+    /// Returns false when the object is not in the database.
+    [[nodiscard]] bool is_confirmed(std::uint64_t id) const;
+
     /// @brief Returns the most recent measurement for a named property, or nullopt.
     [[nodiscard]] std::optional<MeasurementRecord>
         get_measurement(std::uint64_t id, std::string_view property) const;

@@ -12,12 +12,17 @@
 ///   - Alt/Az (formatted)
 ///   - Magnitude, B-V, spectral type, constellation
 ///   - DSO: type, angular size
+///   - Knowledge label: HISTORICAL / DISCOVERED / UNCONFIRMED CANDIDATE (Sprint 08)
+///   - Knowledge properties from PropertyRegistry (Sprint 08)
 ///   - TRACK button: camera follows object
 ///   - GOTO button: placeholder for telescope control
 ///
 /// SPRINT 05 Task 5.5
+/// SPRINT 08 Task 8.9  — knowledge-aware display
 
 #include "core/types.hpp"
+#include "knowledge/knowledge_database.hpp"
+#include "knowledge/property_registry.hpp"
 #include "rendering/line_renderer.hpp"
 #include "ui/font.hpp"
 #include "ui/selection.hpp"
@@ -26,6 +31,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace parallax::ui
 {
@@ -71,13 +77,15 @@ public:
     void init(const InfoPanelCallbacks& callbacks);
 
     /// @brief Update panel state from current selection.
-    /// @param selection  Current selection system state.
-    /// @param mouse_pos  Current mouse position in screen pixels.
-    /// @param mouse_clicked True if left mouse button was clicked this frame.
-    /// @param dt         Delta time in seconds.
+    /// @param selection      Current selection system state.
+    /// @param knowledge_db   Player's knowledge database (may be nullptr).
+    /// @param mouse_pos      Current mouse position in screen pixels.
+    /// @param mouse_clicked  True if left mouse button was clicked this frame.
+    /// @param dt             Delta time in seconds.
     /// @param viewport_width  Current viewport width.
     /// @param viewport_height Current viewport height.
     void update(const Selection& selection,
+                const knowledge::KnowledgeDatabase* knowledge_db,
                 Vec2f mouse_pos, bool mouse_clicked, f32 dt,
                 u32 viewport_width, u32 viewport_height);
 
@@ -152,6 +160,13 @@ private:
     std::string m_phase_text;       ///< Solar System phase angle
     std::string m_illum_text;       ///< Solar System illumination fraction
     std::string m_tracking_text;    ///< "TRACKING" or empty
+
+    /// @brief Knowledge label: "HISTORICAL", "DISCOVERED", "UNCONFIRMED CANDIDATE", or empty.
+    std::string m_knowledge_label;
+
+    /// @brief Extra properties from the KnowledgeDatabase (L4+ for historical, any measured
+    ///        for procedural), enumerated via PropertyRegistry. Each entry is "key  value".
+    std::vector<std::string> m_knowledge_extra_props;
 
     /// @brief Currently selected type (for conditional display logic).
     SelectedObjectType m_display_type = SelectedObjectType::None;

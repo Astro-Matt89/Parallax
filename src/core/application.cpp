@@ -1,6 +1,8 @@
 /// @file application.cpp
 /// @brief Application implementation — skychart mode.
 ///
+/// SPRINT 08 Task 8.9: Knowledge-aware rendering. Procedural objects skipped unless
+///                     discovered; Confirmed/Candidate styled differently.
 /// SPRINT 07 Task 7.7: Rewired through Universe facade.
 /// SPRINT 06 Task 6.7: Canonical frame-loop order documented in update_simulation().
 /// SPRINT 04 Task 4.7: Full overlay integration.
@@ -15,6 +17,8 @@
 ///   8. HUD (always on top)
 
 #include "core/application.hpp"
+
+#include "rendering/render_style.hpp"                    // ← SPRINT 08 Task 8.9
 
 #include <glm/trigonometric.hpp>
 
@@ -221,6 +225,16 @@ void Application::init()
         PLX_CORE_INFO("Universe initialized: {} real objects",
                       m_universe->get_real_object_count());
     }
+
+    // 10c. KnowledgeDatabase — default-constructed (empty).                 ← SPRINT 08 Task 8.9
+    //      initialize_from_historical_catalogs() is called in Task 8.11 once
+    //      the full session/analysis pipeline is wired.  For now the DB is
+    //      empty: all real catalog objects render as Historical (is_real()),
+    //      and no procedural objects appear (none discovered yet).
+    m_knowledge = std::make_unique<knowledge::KnowledgeDatabase>();
+    PLX_CORE_INFO("KnowledgeDatabase initialized (empty — historical rendering active)");
+    // TODO(Sprint 08 Task 8.11): Call initialize_from_historical_catalogs() here once
+    //                             the full session/analysis pipeline is wired.
 
     // 10b. Load constellation overlay — resolve via Universe                ← SPRINT 04 Task 4.2
     {
@@ -722,6 +736,28 @@ void Application::update_simulation(f64 delta_time_sec)
             continue;  // Below horizon when atmosphere culling is on
         }
 
+        // -----------------------------------------------------------------
+        // Knowledge-aware filter                              ← Task 8.9
+        //
+        // Real catalog objects (is_real()) always render as Historical.
+        // Procedural objects are skipped unless the player has discovered
+        // them (is_known).  Discovered procedural objects render as
+        // Confirmed (≥ 2 independent detections) or Candidate (1 detection).
+        // -----------------------------------------------------------------
+        rendering::RenderStyle style = rendering::RenderStyle::Historical;
+
+        if (!obj.is_real())
+        {
+            if (!m_knowledge->is_known(obj.id))
+            {
+                continue;  // Undiscovered procedural object — never visible
+            }
+
+            style = m_knowledge->is_confirmed(obj.id)
+                        ? rendering::RenderStyle::Confirmed
+                        : rendering::RenderStyle::Candidate;
+        }
+
         const auto screen_opt = astro::Coordinates::horizontal_to_screen(hz, pointing, fov_rad);
         if (!screen_opt.has_value())
         {
@@ -734,15 +770,15 @@ void Application::update_simulation(f64 delta_time_sec)
         {
             case universe::ObjectType::Star:
             case universe::ObjectType::ProceduralStar:
-                m_starfield->add_celestial_object(screen, obj);
+                m_starfield->add_celestial_object(screen, obj, style);
                 break;
 
             case universe::ObjectType::SolarSystemBody:
-                m_solar_system_renderer.add_celestial_object(screen, hz.alt, hz.az, obj);
+                m_solar_system_renderer.add_celestial_object(screen, hz.alt, hz.az, obj, style);
                 break;
 
             case universe::ObjectType::DeepSkyObject:
-                m_dso_renderer.add_celestial_object(screen, obj);
+                m_dso_renderer.add_celestial_object(screen, obj, style);
                 break;
 
             default:
@@ -833,6 +869,7 @@ void Application::update_simulation(f64 delta_time_sec)
     // --- InfoPanel update ---
     m_info_panel.update(
         m_selection,
+        m_knowledge.get(),
         m_input->get_mouse_position(),
         m_input->was_click(),
         static_cast<f32>(delta_time_sec),

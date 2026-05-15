@@ -95,29 +95,49 @@ Starfield::~Starfield()
 void Starfield::begin_frame(f32 mag_limit)
 {
     m_pending_vertices.clear();
-    m_pending_vertices.reserve(std::min(m_buffer_capacity, 100000u));
+    m_pending_confirmed.clear();
+    m_pending_candidate.clear();
+
+    // Pre-allocate: historical gets the bulk, procedural buckets get smaller reserves.
+    const u32 max_stars = std::min(m_buffer_capacity, 100000u);
+    m_pending_vertices.reserve(max_stars * 8 / 10);    // ~80 % for catalog stars
+    m_pending_confirmed.reserve(max_stars / 10);        // ~10 % for confirmed procedural
+    m_pending_candidate.reserve(max_stars / 10);        // ~10 % for candidate procedural
+
     m_push_constants.mag_limit = mag_limit;
 }
 
 void Starfield::add_celestial_object(Vec2f screen_pos,
-                                     const universe::CelestialObject& obj)
+                                     const universe::CelestialObject& obj,
+                                     RenderStyle style)
 {
-    if (m_pending_vertices.size() >= m_buffer_capacity)
+    if (m_pending_vertices.size() + m_pending_confirmed.size() + m_pending_candidate.size()
+            >= m_buffer_capacity)
     {
         return;
     }
 
-    m_pending_vertices.push_back(StarVertex{
+    const StarVertex v{
         .screen_x = screen_pos.x,
         .screen_y = screen_pos.y,
         .mag_v    = obj.mag_v,
         .color_bv = obj.color_bv,
-    });
+    };
+
+    switch (style)
+    {
+        case RenderStyle::Confirmed:  m_pending_confirmed.push_back(v); break;
+        case RenderStyle::Candidate:  m_pending_candidate.push_back(v); break;
+        default:                      m_pending_vertices.push_back(v);  break;
+    }
 }
 
 void Starfield::end_frame()
 {
-    m_visible_count = static_cast<u32>(m_pending_vertices.size());
+    m_count_historical = static_cast<u32>(m_pending_vertices.size());
+    m_count_confirmed  = static_cast<u32>(m_pending_confirmed.size());
+    m_count_candidate  = static_cast<u32>(m_pending_candidate.size());
+    m_visible_count    = m_count_historical + m_count_confirmed + m_count_candidate;
 
     if (m_visible_count == 0)
     {
@@ -125,15 +145,31 @@ void Starfield::end_frame()
         return;
     }
 
-    // Compute brightest magnitude for push constant normalisation.
+    // Compute brightest magnitude across all buckets for push constant normalisation.
     f32 min_mag = std::numeric_limits<f32>::max();
-    for (const auto& v : m_pending_vertices)
+    const auto scan = [&](const std::vector<StarVertex>& bucket)
     {
-        if (v.mag_v < min_mag) min_mag = v.mag_v;
-    }
+        for (const auto& v : bucket)
+        {
+            if (v.mag_v < min_mag) min_mag = v.mag_v;
+        }
+    };
+    scan(m_pending_vertices);
+    scan(m_pending_confirmed);
+    scan(m_pending_candidate);
     m_push_constants.brightest_mag = min_mag;
 
-    upload_star_data(m_pending_vertices);
+    // Concatenate all three buckets: historical first, confirmed, candidate.
+    std::vector<StarVertex> all_vertices;
+    all_vertices.reserve(m_visible_count);
+    all_vertices.insert(all_vertices.end(),
+                        m_pending_vertices.begin(), m_pending_vertices.end());
+    all_vertices.insert(all_vertices.end(),
+                        m_pending_confirmed.begin(), m_pending_confirmed.end());
+    all_vertices.insert(all_vertices.end(),
+                        m_pending_candidate.begin(), m_pending_candidate.end());
+
+    upload_star_data(all_vertices);
 }
 
 // -----------------------------------------------------------------
@@ -212,6 +248,11 @@ void Starfield::update(std::span<const catalog::StarEntry> stars,
     m_push_constants.brightest_mag = (m_visible_count > 0) ? min_mag : kReferenceMag;
     m_push_constants.mag_limit = mag_limit;
 
+    // Treat all legacy stars as Historical so the new draw() path works correctly.
+    m_count_historical = m_visible_count;
+    m_count_confirmed  = 0;
+    m_count_candidate  = 0;
+
     if (m_visible_count > 0)
     {
         upload_star_data(vertices);
@@ -245,9 +286,43 @@ void Starfield::draw(VkCommandBuffer cmd) const
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
     vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
                             m_pipeline_layout, 0, 1, &m_descriptor_set, 0, nullptr);
-    vkCmdPushConstants(cmd, m_pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT,
-                       0, sizeof(StarfieldPushConstants), &m_push_constants);
-    vkCmdDraw(cmd, 1, m_visible_count, 0, 0);
+
+    // Issue up to three draw calls — one per render style.
+    // Stars are stored in the buffer as: [historical... | confirmed... | candidate...].
+    // firstInstance shifts gl_InstanceIndex into each group's sub-range.
+    u32 first = 0;
+
+    if (m_count_historical > 0)
+    {
+        // Historical: render_style = 0.0 — unchanged catalog rendering.
+        auto pc = m_push_constants;
+        pc.render_style = 0.0f;
+        vkCmdPushConstants(cmd, m_pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT,
+                           0, sizeof(StarfieldPushConstants), &pc);
+        vkCmdDraw(cmd, 1, m_count_historical, 0, first);
+        first += m_count_historical;
+    }
+
+    if (m_count_confirmed > 0)
+    {
+        // Confirmed: render_style = 1.0 — +15% brightness + subtle cyan tint.
+        auto pc = m_push_constants;
+        pc.render_style = 1.0f;
+        vkCmdPushConstants(cmd, m_pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT,
+                           0, sizeof(StarfieldPushConstants), &pc);
+        vkCmdDraw(cmd, 1, m_count_confirmed, 0, first);
+        first += m_count_confirmed;
+    }
+
+    if (m_count_candidate > 0)
+    {
+        // Candidate: render_style = 2.0 — distinctive magenta tint.
+        auto pc = m_push_constants;
+        pc.render_style = 2.0f;
+        vkCmdPushConstants(cmd, m_pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT,
+                           0, sizeof(StarfieldPushConstants), &pc);
+        vkCmdDraw(cmd, 1, m_count_candidate, 0, first);
+    }
 }
 
 u32 Starfield::get_visible_count() const { return m_visible_count; }

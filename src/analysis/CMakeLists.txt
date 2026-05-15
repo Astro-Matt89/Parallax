@@ -3,6 +3,6 @@
 # -----------------------------------------------------------------
 
 target_sources(parallax PRIVATE
-    analysis/mock_analyzer.hpp
-    analysis/mock_analyzer.cpp
+    mock_analyzer.hpp
+    mock_analyzer.cpp
 )

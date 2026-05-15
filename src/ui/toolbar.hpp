@@ -48,6 +48,9 @@ namespace parallax::ui
         bool grid_visible           = false;
         bool horizon_visible        = false;
         bool atmosphere_on          = true;  ///< Atmosphere toggle state ← SPRINT 06 Task 6.7
+        bool observe_panel_visible  = false;
+        bool sessions_panel_visible = false;
+        bool data_panel_visible     = false;
 
         // Time
         f64 time_scale = 1.0;
@@ -75,6 +78,9 @@ namespace parallax::ui
         std::function<void()> cycle_grid;
         std::function<void()> toggle_horizon;
         std::function<void()> toggle_atmosphere;  ///< Atmosphere toggle ← SPRINT 06 Task 6.7
+        std::function<void()> toggle_observe_panel;
+        std::function<void()> toggle_sessions_panel;
+        std::function<void()> toggle_data_panel;
 
         // Time controls (equivalent to keyboard -, Space, +, =)
         std::function<void()> time_reverse;
@@ -202,6 +208,9 @@ namespace parallax::ui
         std::unique_ptr<ToggleButton> m_btn_grid;
         std::unique_ptr<ToggleButton> m_btn_horiz;
         std::unique_ptr<ToggleButton> m_btn_atmo;  ///< Atmosphere toggle ← SPRINT 06 Task 6.7
+        std::unique_ptr<ToggleButton> m_btn_observe;
+        std::unique_ptr<ToggleButton> m_btn_sessions;
+        std::unique_ptr<ToggleButton> m_btn_data;
 
         // -----------------------------------------------------------------
         // Widgets — Time group

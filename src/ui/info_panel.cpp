@@ -14,9 +14,83 @@
 #include <cmath>
 #include <cstdio>
 #include <format>
+#include <optional>
 
 namespace parallax::ui
 {
+
+namespace
+{
+std::string knowledge_level_to_text(knowledge::KnowledgeLevel level)
+{
+    switch (level)
+    {
+        case knowledge::KnowledgeLevel::Detected:      return "L1";
+        case knowledge::KnowledgeLevel::Classified:    return "L2";
+        case knowledge::KnowledgeLevel::Characterized: return "L3";
+        case knowledge::KnowledgeLevel::Detailed:      return "L4";
+        case knowledge::KnowledgeLevel::Resolved:      return "L5";
+        case knowledge::KnowledgeLevel::FullyMapped:   return "L6";
+        default:                                       return "L0";
+    }
+}
+
+std::optional<double> get_catalog_property_value(const universe::CelestialObject& object, std::string_view property_name)
+{
+    if (property_name == "ra")
+    {
+        return object.ra;
+    }
+    if (property_name == "dec")
+    {
+        return object.dec;
+    }
+    if (property_name == "mag_v")
+    {
+        return static_cast<double>(object.mag_v);
+    }
+    if (property_name == "color_bv")
+    {
+        return static_cast<double>(object.color_bv);
+    }
+    if (property_name == "size_arcmin")
+    {
+        if (const auto* dso = std::get_if<universe::DsoData>(&object.data))
+        {
+            return static_cast<double>(dso->size_arcmin);
+        }
+    }
+    if (property_name == "distance_au")
+    {
+        if (const auto* solar = std::get_if<universe::SolarSystemData>(&object.data))
+        {
+            return static_cast<double>(solar->distance_au);
+        }
+    }
+    if (property_name == "angular_diameter_arcsec")
+    {
+        if (const auto* solar = std::get_if<universe::SolarSystemData>(&object.data))
+        {
+            return static_cast<double>(solar->apparent_diameter_arcsec);
+        }
+    }
+    if (property_name == "parallax_mas")
+    {
+        if (const auto* star = std::get_if<universe::StarData>(&object.data))
+        {
+            return static_cast<double>(star->parallax_mas);
+        }
+    }
+    if (property_name == "distance_pc")
+    {
+        if (const auto* star = std::get_if<universe::StarData>(&object.data))
+        {
+            return static_cast<double>(star->distance_pc);
+        }
+    }
+    return std::nullopt;
+}
+} // namespace
 
 // =================================================================
 // Initialization
@@ -35,8 +109,18 @@ void InfoPanel::init(const InfoPanelCallbacks& callbacks)
         "GOTO", dummy, btn_size,
         callbacks.goto_object ? callbacks.goto_object : []() {});
 
+    m_btn_observe = std::make_unique<Button>(
+        "OBSERVE THIS", dummy, Vec2f{120.0f, 28.0f},
+        [this, cb = callbacks.observe_this]()
+        {
+            if (cb)
+            {
+                cb(m_display_type != SelectedObjectType::None ? m_selection_id : 0);
+            }
+        });
+
     m_initialized = true;
-    PLX_CORE_INFO("InfoPanel initialized (TRACK + GOTO buttons)");
+    PLX_CORE_INFO("InfoPanel initialized (TRACK + GOTO + OBSERVE THIS buttons)");
 }
 
 // =================================================================
@@ -69,6 +153,7 @@ void InfoPanel::layout_widgets(u32 viewport_width, u32 viewport_height)
 
     m_btn_track->set_position({cx, btn_y});
     m_btn_goto->set_position({cx + 130.0f, btn_y});
+    m_btn_observe->set_position({cx, btn_y - 34.0f});
 }
 
 // =================================================================
@@ -111,84 +196,99 @@ void InfoPanel::update(const Selection& selection,
     // Build knowledge label and extra properties         ← Task 8.9
     // -----------------------------------------------------------------
     m_knowledge_label.clear();
-    m_knowledge_extra_props.clear();
+    m_property_lines.clear();
+    m_knowledge_level_text.clear();
 
     const auto& sel = selection.get_selection();
     m_display_type = sel.type;
+    m_selection_id = sel.celestial_obj.id;
 
     // Determine knowledge label from celestial_obj (populated by Universe path).
     const auto& cobj = sel.celestial_obj;
     const bool is_real_obj = cobj.is_real();
 
-    if (cobj.id != 0 && knowledge_db)
+    if (cobj.id != 0)
     {
         if (is_real_obj)
         {
             m_knowledge_label = "HISTORICAL";
-
-            // Show L4+ properties for which the player has measurements.
-            // Enumerate via PropertyRegistry — no hard-coded property names.
-            const auto props = knowledge::PropertyRegistry::get_properties(cobj.type);
-
-            for (const auto& pd : props)
-            {
-                if (pd.unlocks_at <= knowledge::kHistoricalBaselineLevel)
-                {
-                    continue;  // L1-L3 already shown via catalog fields below
-                }
-
-                const auto meas = knowledge_db->get_measurement(cobj.id, pd.name);
-                if (meas.has_value())
-                {
-                    m_knowledge_extra_props.push_back(
-                        std::format("  {:<18} {:.4g}", pd.name, meas->value));
-                }
-            }
+            m_knowledge_level_text = "L3";
         }
         else
         {
             // Procedural object: label depends on confirmation state.
-            if (knowledge_db->is_confirmed(cobj.id))
+            if (knowledge_db && knowledge_db->is_confirmed(cobj.id))
             {
                 m_knowledge_label = "DISCOVERED";
             }
-            else if (knowledge_db->is_known(cobj.id))
+            else if (knowledge_db && knowledge_db->is_known(cobj.id))
             {
                 m_knowledge_label = "UNCONFIRMED CANDIDATE";
             }
-
-            if (knowledge_db->is_known(cobj.id))
+            else
             {
-                const knowledge::KnowledgeLevel level = knowledge_db->get_level(cobj.id);
-
-                // Show only properties at or below the current knowledge level.
-                // Missing measurements shown as "?".
-                const auto props = knowledge::PropertyRegistry::get_properties(cobj.type);
-
-                for (const auto& pd : props)
-                {
-                    if (pd.unlocks_at > level)
-                    {
-                        // Property not yet accessible — show placeholder
-                        m_knowledge_extra_props.push_back(
-                            std::format("  {:<18} ?", pd.name));
-                    }
-                    else
-                    {
-                        const auto meas = knowledge_db->get_measurement(cobj.id, pd.name);
-                        if (meas.has_value())
-                        {
-                            m_knowledge_extra_props.push_back(
-                                std::format("  {:<18} {:.4g}", pd.name, meas->value));
-                        }
-                        else
-                        {
-                            m_knowledge_extra_props.push_back(
-                                std::format("  {:<18} ?", pd.name));
-                        }
-                    }
-                }
+                m_knowledge_label = "UNCONFIRMED CANDIDATE";
             }
+        }
+
+        const auto props = knowledge::PropertyRegistry::get_properties(cobj.type);
+        knowledge::KnowledgeLevel level = knowledge::kHistoricalBaselineLevel;
+        if (knowledge_db && knowledge_db->is_known(cobj.id))
+        {
+            level = knowledge_db->get_level(cobj.id);
+        }
+        m_knowledge_level_text = knowledge_level_to_text(level);
+
+        for (const auto& pd : props)
+        {
+            const bool is_unconfirmed = (m_knowledge_label == "UNCONFIRMED CANDIDATE");
+            std::optional<knowledge::MeasurementRecord> measured;
+            if (knowledge_db)
+            {
+                measured = knowledge_db->get_measurement(cobj.id, pd.name);
+            }
+
+            if (measured.has_value())
+            {
+                if (measured->uncertainty > 0.0f)
+                {
+                    m_property_lines.push_back(std::format("{} = {:.6g} ± {:.3g}",
+                                                           pd.name, measured->value,
+                                                           static_cast<double>(measured->uncertainty)));
+                }
+                else
+                {
+                    m_property_lines.push_back(std::format("{} = {:.6g}", pd.name, measured->value));
+                }
+                continue;
+            }
+
+            if (is_real_obj && pd.unlocks_at <= knowledge::kHistoricalBaselineLevel)
+            {
+                const auto catalog_value = get_catalog_property_value(cobj, pd.name);
+                if (catalog_value.has_value())
+                {
+                    m_property_lines.push_back(std::format("{} = {:.6g}", pd.name, *catalog_value));
+                }
+                else
+                {
+                    m_property_lines.push_back(std::format("{} = ? (unknown)", pd.name));
+                }
+                continue;
+            }
+
+            if (is_unconfirmed)
+            {
+                continue;
+            }
+
+            if (pd.unlocks_at > level)
+            {
+                m_property_lines.push_back(std::format("{} = ? (unknown)", pd.name));
+                continue;
+            }
+
+            m_property_lines.push_back(std::format("{} = ? (unknown)", pd.name));
         }
     }
 
@@ -355,6 +455,7 @@ void InfoPanel::update(const Selection& selection,
     m_btn_track->set_label(selection.is_tracking() ? "UNTRACK" : "TRACK");
     m_btn_track->update(mouse_pos, mouse_clicked, dt);
     m_btn_goto->update(mouse_pos, mouse_clicked, dt);
+    m_btn_observe->update(mouse_pos, mouse_clicked, dt);
 }
 
 // =================================================================
@@ -486,6 +587,12 @@ void InfoPanel::render(BitmapFont& font, rendering::LineRenderer& lines,
         cy += kRowHeight;
     }
 
+    if (!m_knowledge_level_text.empty())
+    {
+        font.draw_text("Knowledge " + m_knowledge_level_text, cx, cy, 1.0f, widget_colors::kTextBright);
+        cy += kRowHeight;
+    }
+
     font.draw_text(m_mag_text, cx, cy, 1.0f, widget_colors::kTextBright);
     cy += kRowHeight;
 
@@ -531,13 +638,13 @@ void InfoPanel::render(BitmapFont& font, rendering::LineRenderer& lines,
         cy += kRowHeight;
     }
 
-    // Knowledge-database extra properties (L4+ for historical, registry-driven for procedural)
-    if (!m_knowledge_extra_props.empty())
+    // Registry-driven property list
+    if (!m_property_lines.empty())
     {
         cy += 2.0f;
-        font.draw_text("Knowledge", cx, cy, 1.0f, widget_colors::kTextDim);
+        font.draw_text("Registry Properties", cx, cy, 1.0f, widget_colors::kTextDim);
         cy += kRowHeight;
-        for (const auto& prop_line : m_knowledge_extra_props)
+        for (const auto& prop_line : m_property_lines)
         {
             font.draw_text(prop_line, cx, cy, 1.0f, widget_colors::kTextBright);
             cy += kRowHeight;
@@ -556,6 +663,7 @@ void InfoPanel::render(BitmapFont& font, rendering::LineRenderer& lines,
     // -----------------------------------------------------------------
     // Buttons
     // -----------------------------------------------------------------
+    m_btn_observe->render(font, lines, vp);
     m_btn_track->render(font, lines, vp);
     m_btn_goto->render(font, lines, vp);
 }

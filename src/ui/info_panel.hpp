@@ -48,6 +48,9 @@ struct InfoPanelCallbacks
 
     /// @brief GOTO placeholder — future telescope slew command.
     std::function<void()> goto_object;
+
+    /// @brief Open InstrumentPanel for currently selected object.
+    std::function<void(u64)> observe_this;
 };
 
 // =================================================================
@@ -73,7 +76,7 @@ public:
     InfoPanel& operator=(InfoPanel&&) = delete;
 
     /// @brief Initialize widgets.
-    /// @param callbacks Actions for TRACK/GOTO buttons.
+    /// @param callbacks Actions for TRACK/GOTO/OBSERVE THIS buttons.
     void init(const InfoPanelCallbacks& callbacks);
 
     /// @brief Update panel state from current selection.
@@ -140,6 +143,7 @@ private:
     // -----------------------------------------------------------------
     std::unique_ptr<Button> m_btn_track;
     std::unique_ptr<Button> m_btn_goto;
+    std::unique_ptr<Button> m_btn_observe;
 
     // -----------------------------------------------------------------
     // Display text (rebuilt each frame from SelectedObject)
@@ -164,12 +168,15 @@ private:
     /// @brief Knowledge label: "HISTORICAL", "DISCOVERED", "UNCONFIRMED CANDIDATE", or empty.
     std::string m_knowledge_label;
 
-    /// @brief Extra properties from the KnowledgeDatabase (L4+ for historical, any measured
-    ///        for procedural), enumerated via PropertyRegistry. Each entry is "key  value".
-    std::vector<std::string> m_knowledge_extra_props;
+    /// @brief Knowledge level text (e.g. "L3").
+    std::string m_knowledge_level_text;
+
+    /// @brief Property lines built via PropertyRegistry.
+    std::vector<std::string> m_property_lines;
 
     /// @brief Currently selected type (for conditional display logic).
     SelectedObjectType m_display_type = SelectedObjectType::None;
+    u64 m_selection_id = 0;
 };
 
 } // namespace parallax::ui

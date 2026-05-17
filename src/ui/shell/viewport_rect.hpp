@@ -60,13 +60,37 @@ namespace parallax::ui::shell
             return width > 0 && height > 0;
         }
 
-        /// @return True if the given framebuffer pixel falls inside this rect.
+        /// @return True if the framebuffer pixel (@p px, @p py) is inside.
         [[nodiscard]] constexpr bool contains(i32 px, i32 py) const noexcept
         {
             return px >= static_cast<i32>(x)
                 && py >= static_cast<i32>(y)
                 && px <  static_cast<i32>(x + width)
                 && py <  static_cast<i32>(y + height);
+        }
+
+        /// @return True if the framebuffer pixel @p p is inside the rect.
+        [[nodiscard]] bool contains(Vec2f p) const noexcept
+        {
+            return contains(static_cast<i32>(p.x), static_cast<i32>(p.y));
+        }
+
+        /// @return Centre point of the rect in framebuffer pixels (float).
+        [[nodiscard]] Vec2f get_center() const noexcept
+        {
+            return Vec2f{
+                static_cast<f32>(x) + 0.5f * static_cast<f32>(width),
+                static_cast<f32>(y) + 0.5f * static_cast<f32>(height)
+            };
+        }
+
+        /// @return Width and height of the rect as a 2D vector (in pixels).
+        [[nodiscard]] Vec2f get_size() const noexcept
+        {
+            return Vec2f{
+                static_cast<f32>(width),
+                static_cast<f32>(height)
+            };
         }
 
         /// @return True if this rect is identical to @p other.

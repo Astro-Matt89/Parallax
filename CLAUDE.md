@@ -465,16 +465,19 @@ Star Entry (compact, 32 bytes):
 - Sub-universe hierarchy architecture — Sprint 08
 - Mock instrument for end-to-end vertical slice — Sprint 08
 
-### Phase 3: Real Instruments (Sprints 09-11)
-- Telescope model (aperture, focal length, FOV, angular resolution)
-- Sensor simulation (CCD/CMOS, noise, dark current, gain, exposure)
-- Imaging mode rendering (atmosphere applied, PSF, bloom, diffraction spikes)
-- All-sky camera (sky quality monitoring, timelapses)
-- Astrophotography pipeline (stacking, calibration, stretching)
-- Photometry analysis tools (light curves, periodograms)
-- First real discovery loop: find transiting exoplanets, variable stars
+### Phase 3: UI Shell & Real Instruments (Sprints 09-12)
+- UI Shell refactor: tab-based architecture, persistent sidebar/topbar/statusbar — Sprint 09
+- Lunar base setting (Tycho Crater) — Sprint 09
+- Multi-pane split-screen with drag-resize — Sprint 09
+- Telescope model (aperture, focal length, FOV, angular resolution) — Sprint 10
+- Sensor simulation (CCD/CMOS, noise, dark current, gain, exposure) — Sprint 10
+- Imaging mode rendering (atmosphere applied, PSF, bloom, diffraction spikes) — Sprint 10
+- All-sky camera (sky quality monitoring, timelapses) — Sprint 10
+- Astrophotography pipeline (stacking, calibration, stretching) — Sprint 11
+- Photometry analysis tools (light curves, periodograms) — Sprint 11
+- First real discovery loop: find transiting exoplanets, variable stars — Sprint 11
 
-### Phase 4: Advanced Science (Sprints 12-15)
+### Phase 4: Advanced Science (Sprints 13-16)
 - Spectroscopy (low and high resolution)
 - Radial velocity measurements
 - Deeper catalogs (NGC/IC, Gaia DR3 streaming)
@@ -482,18 +485,70 @@ Star Entry (compact, 32 bytes):
 - Procedural exoplanet systems
 - Discovery gamification (milestones, publication system)
 
-### Phase 5: Frontier Instruments (Sprints 16+)
-- Interferometry (angular resolution beyond diffraction limit)
+### Phase 5: Frontier Instruments (Sprints 17+)
+- Earth-Moon interferometry (EHT-scale sci-fi)
+- Multi-instrument coordination (network of telescopes)
 - Radio, X-ray, polarimetry
 - Transient event system (supernovae, novae, GRBs)
 - Sci-fi instruments: direct imaging of exoplanets, surface maps
 - Cosmological survey mode (distant quasars, high-z galaxies)
-- Multi-observatory management
+- Multi-observatory management (Moon + Earth + orbital)
 - Research progression, career system
 
 ---
 
-## 8. Current Sprint
+## 8. UI Architecture (Sprint 09+)
+
+The game's UI follows a persistent shell pattern, NOT a planetarium-with-panels.
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│ TOP BAR: app │ location │ time │ atmosphere │ FPS                │
+├─────────┬────────────────────────────────────────────────────────┤
+│         │                                                         │
+│ SIDEBAR │  TAB AREA (recursive panes with draggable splitters)   │
+│ - Instr.│                                                         │
+│ - Tabs  │  Multiple tabs can be visible side-by-side             │
+│ - Time  │  Each tab is alive even when not visible (state persists)│
+│         │                                                         │
+├─────────┴────────────────────────────────────────────────────────┤
+│ STATUS BAR: active sessions │ notifications │ time scale          │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+**Tab set:**
+- PLANETARIUM — skychart (one tab among many, not the primary view)
+- IMAGING — live telescope feed (Sprint 10+)
+- SPECTROSCOPY — spectrum visualization (Sprint 11+)
+- ANALYSIS — data analysis workspace (Sprint 10+)
+- ARCHIVE — collected data records
+- ENCYCLOPEDIA — knowledge browser
+- ALL-SKY — all-sky camera (Sprint 10+)
+- BASE — lunar base management
+
+**Key principles:**
+- Sidebar is fixed (always visible)
+- Tab panes use docking/tiling, not floating windows
+- Multiple tabs can be visible simultaneously via split-screen
+- Tab state persists when navigating away
+- All tabs available from start (placeholders until activated)
+- Retro green terminal aesthetic throughout
+
+## 9. Game Setting
+
+Default player location: **Tycho Crater Base, Moon**.
+- Lat -43.31°, Lon -11.36°, Elev -1.2 km
+- No atmosphere (vacuum)
+- Earth visible as celestial object (Sprint 10+ to render)
+- Foundation for Earth-Moon interferometry sci-fi gameplay (Sprint 17+)
+
+Additional observer locations available (for instruments deployed there):
+- Earth: La Palma, Mauna Kea, Paranal, McDonald Observatory
+- (Future) Space orbit, Mars, other bodies
+
+---
+
+## 10. Current Sprint
 
 **Sprint:** 06 — Solar System & Atmosphere Toggle (READY)
 **Goal:** Sun, Moon, major planets via Meeus ephemeris; skychart atmosphere on/off toggle
@@ -501,9 +556,11 @@ Star Entry (compact, 32 bytes):
 See: `docs/sprints/sprint_06.md`
 Prompts: `docs/sprints/sprint_06_prompts.md`
 
-**Next:**
-- Sprint 07 — Universe Engine (refactor all data into unified architecture)
-- Sprint 08 — Knowledge System & Observation Sessions (foundations of discovery)
+**Pending:**
+- Sprint 07 — Universe Engine (unified data architecture)
+- Sprint 08 — Knowledge System + Observation Sessions ✅ COMPLETE
+- Sprint 09 — UI Shell Refactor (tab-based, lunar base setting)
+- Sprint 10 — First real instrument (telescope + CCD + imaging tab)
 
 **Previous:** Sprint 01-05 ✅ — Phase 1 Planetarium Core complete
 
@@ -511,11 +568,13 @@ Prompts: `docs/sprints/sprint_06_prompts.md`
 ```
 Sprint 06: Solar System + Atmosphere Toggle
 Sprint 07: Universe Engine (unify data, procedural foundation)
-Sprint 08: Knowledge System + Observation Sessions (mock instrument E2E)
-Sprint 09: First real instrument — telescope + CCD + photometry + allsky
-Sprint 10: Spectroscopy + real analysis tools
-Sprint 11: Sub-universe activation (stars inside M31, planets in Sirius)
-Sprint 12+: Interferometry, multi-band, sci-fi instruments
+Sprint 08: Knowledge System + Observation Sessions (mock instrument E2E) ✅
+Sprint 09: UI Shell Refactor (tab system, lunar base setting)
+Sprint 10: First real instrument — telescope + CCD + Imaging tab + AllSky
+Sprint 11: Photometry analysis tools + first real discoveries
+Sprint 12: Spectroscopy
+Sprint 13: Sub-universe activation (stars inside M31, planets in Sirius)
+Sprint 14+: Earth-Moon interferometry, advanced instruments
 ```
 
 ---

@@ -82,6 +82,10 @@ add_executable(parallax
     ui/shell/shell_types.hpp
     ui/shell/viewport_rect.hpp
     ui/shell/tab_id.hpp
+    ui/shell/pane.hpp
+    ui/shell/pane.cpp
+    ui/shell/pane_tree.hpp
+    ui/shell/pane_tree.cpp
 )
 
 target_include_directories(parallax PRIVATE

@@ -267,3 +267,23 @@ target_link_libraries(test_data_archive PRIVATE
 )
 
 add_test(NAME DataArchive COMMAND test_data_archive)
+
+# -----------------------------------------------------------------
+# Test: PaneTree                                  <- SPRINT 09 Task 9.2
+# -----------------------------------------------------------------
+add_executable(test_pane_tree
+    test_pane_tree.cpp
+    "${CMAKE_SOURCE_DIR}/src/ui/shell/pane.cpp"
+    "${CMAKE_SOURCE_DIR}/src/ui/shell/pane_tree.cpp"
+)
+
+target_include_directories(test_pane_tree PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_pane_tree PRIVATE
+    doctest::doctest
+    glm::glm
+)
+
+add_test(NAME PaneTree COMMAND test_pane_tree)

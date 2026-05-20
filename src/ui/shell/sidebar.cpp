@@ -350,7 +350,11 @@ namespace parallax::ui::shell
         // -----------------------------------------------------------------
         // INSTRUMENTS
         // -----------------------------------------------------------------
-        m_font.draw_text("INSTRUMENTS", static_cast<f32>(content_x), static_cast<f32>(cursor_y), 1.0f, kSectionHeaderColor);
+        m_font.draw_text("INSTRUMENTS",
+                         static_cast<f32>(content_x),
+                         static_cast<f32>(cursor_y),
+                         1.0f,
+                         kSectionHeaderColor);
         cursor_y += static_cast<i32>(kSectionHeaderH);
 
         for (i32 i = 0; i < static_cast<i32>(m_state.instruments.size()); ++i)
@@ -369,7 +373,11 @@ namespace parallax::ui::shell
                 draw_row_highlight(row.rect, kHoverHighlight);
             }
 
-            m_font.draw_text(entry.name, static_cast<f32>(row.rect.x), static_cast<f32>(row.rect.y + 1), 1.0f, kContentColor);
+            m_font.draw_text(entry.name,
+                             static_cast<f32>(row.rect.x),
+                             static_cast<f32>(row.rect.y + 1),
+                             1.0f,
+                             kContentColor);
 
             const f32 status_x = static_cast<f32>(row.rect.x) + (static_cast<f32>(entry.name.size()) + 2.0f) * kGlyphW;
             m_font.draw_text(entry.status, status_x, static_cast<f32>(row.rect.y + 1), 1.0f, kStatusColor);
@@ -477,7 +485,11 @@ namespace parallax::ui::shell
         if (m_state.stats.empty())
         {
             // We intentionally keep the STATS header visible even when empty.
-            m_font.draw_text("(no stats yet)", static_cast<f32>(content_x), static_cast<f32>(cursor_y + 1), 1.0f, kInactiveColor);
+            m_font.draw_text("(no stats yet)",
+                             static_cast<f32>(content_x),
+                             static_cast<f32>(cursor_y + 1),
+                             1.0f,
+                             kInactiveColor);
         }
 
         for (i32 i = 0; i < static_cast<i32>(m_state.stats.size()); ++i)

@@ -134,7 +134,9 @@ namespace parallax::ui::shell
         draw_section(m_state.location_name, kContentColor);
         draw_separator();
 
-        const std::string jd_and_time = fmt::format("{}  {}", fmt::format("JD {:.2f}", m_state.julian_date), m_state.civil_time);
+        const std::string jd_and_time = fmt::format("{}  {}",
+                                                    fmt::format("JD {:.2f}", m_state.julian_date),
+                                                    m_state.civil_time);
         draw_section(jd_and_time, kContentColor);
         draw_separator();
 

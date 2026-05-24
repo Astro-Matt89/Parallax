@@ -251,7 +251,9 @@ namespace parallax::ui::shell
         if (!m_notifications.empty() && m_current_index < m_notifications.size())
         {
             const NotificationItem& current = m_notifications[m_current_index];
-            const std::string notification_text = fmt::format("{} {}", severity_icon(current.severity), current.message);
+            const std::string notification_text = fmt::format("{} {}",
+                                                              severity_icon(current.severity),
+                                                              current.message);
             draw_section(notification_text, severity_color(current.severity));
         }
 

@@ -88,6 +88,10 @@ add_executable(parallax
     ui/shell/pane_tree.cpp
     ui/shell/sidebar.hpp
     ui/shell/sidebar.cpp
+    ui/shell/top_bar.hpp
+    ui/shell/top_bar.cpp
+    ui/shell/status_bar.hpp
+    ui/shell/status_bar.cpp
 )
 
 target_include_directories(parallax PRIVATE

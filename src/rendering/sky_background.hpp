@@ -11,6 +11,8 @@
 
 #include <filesystem>
 
+namespace parallax::ui::shell { struct ViewportRect; }
+
 namespace parallax::rendering
 {
     /// @brief Sky parameters controlling the appearance of the night sky.
@@ -52,6 +54,12 @@ namespace parallax::rendering
         f32 _pad0 = 0.0f;        ///< Padding to complete vec4 row 2
     };
 
+    struct SkyViewportPushConstants
+    {
+        Vec2f viewport_origin{0.0f, 0.0f};
+        Vec2f viewport_size{1.0f, 1.0f};
+    };
+
     /// @brief Renders a procedural sky gradient as a fullscreen pass.
     ///
     /// Uses a fullscreen triangle (3 vertices, no vertex buffer) with a uniform
@@ -82,14 +90,16 @@ namespace parallax::rendering
         /// @brief Update sky parameters and camera state for this frame.
         /// @param params Sky parameters (Bortle scale, sun/moon position).
         /// @param camera The camera (pointing direction + FOV).
-        void update_params(const SkyParams& params, const Camera& camera);
+        /// @param aspect_ratio Active viewport width / height.
+        void update_params(const SkyParams& params, const Camera& camera, f32 aspect_ratio);
 
         /// @brief Record draw commands into a command buffer.
         ///
         /// Draws a fullscreen triangle with the sky gradient.
         /// Must be called inside an active render pass, BEFORE starfield rendering.
         /// @param cmd The command buffer to record into.
-        void draw(VkCommandBuffer cmd) const;
+        /// @param viewport The active framebuffer viewport.
+        void draw(VkCommandBuffer cmd, const ui::shell::ViewportRect& viewport) const;
 
         /// @brief Update the viewport extent (after swapchain recreation).
         /// @param extent The new swapchain extent.

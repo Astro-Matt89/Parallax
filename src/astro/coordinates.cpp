@@ -98,8 +98,14 @@ EquatorialCoord Coordinates::horizontal_to_equatorial(
 std::optional<Vec2f> Coordinates::horizontal_to_screen(
     const HorizontalCoord& star,
     const HorizontalCoord& pointing,
-    f64 fov_rad)
+    f64 fov_rad,
+    f64 aspect_ratio)
 {
+    if (aspect_ratio <= 0.0)
+    {
+        return std::nullopt;
+    }
+
     const f64 delta_az = star.az - pointing.az;
 
     const f64 sin_alt_s = std::sin(star.alt);
@@ -115,9 +121,12 @@ std::optional<Vec2f> Coordinates::horizontal_to_screen(
     // Clamp for numerical safety, then check FOV boundary
     const f64 separation = std::acos(std::clamp(cos_sep, -1.0, 1.0));
 
-    // Use a generous margin: screen diagonal of a square FOV is FOV * sqrt(2)/2.
-    // We use 0.75 as a safe margin to avoid clipping corners.
-    if (separation > fov_rad * 0.75)
+    const f64 tan_half_vertical   = std::tan(fov_rad * 0.5);
+    const f64 tan_half_horizontal = tan_half_vertical * aspect_ratio;
+    const f64 half_diagonal = std::atan(std::sqrt(
+        tan_half_vertical * tan_half_vertical + tan_half_horizontal * tan_half_horizontal));
+
+    if (separation > half_diagonal)
     {
         return std::nullopt;
     }
@@ -136,12 +145,13 @@ std::optional<Vec2f> Coordinates::horizontal_to_screen(
     const f64 proj_y = dy / cos_sep;
 
     // Scale: normalize so that FOV/2 maps to screen edge (±1)
-    const f64 scale = 1.0 / std::tan(fov_rad * 0.5);
+    const f64 scale_y = 1.0 / tan_half_vertical;
+    const f64 scale_x = scale_y / aspect_ratio;
 
     // +X = East (right on screen in observer's view)
     // -Y = Vulkan NDC correction: negate so higher altitude = screen up
-    const auto screen_x = static_cast<f32>( proj_x * scale);
-    const auto screen_y = static_cast<f32>(-proj_y * scale);
+    const auto screen_x = static_cast<f32>( proj_x * scale_x);
+    const auto screen_y = static_cast<f32>(-proj_y * scale_y);
 
     // Final bounds check in normalized screen space
     if (std::abs(screen_x) > 1.0f || std::abs(screen_y) > 1.0f)
@@ -166,7 +176,8 @@ std::optional<Vec2f> Coordinates::project_radec_to_screen(
     const ObserverLocation& observer,
     f64 lst_rad,
     const HorizontalCoord& pointing,
-    f64 fov_rad)
+    f64 fov_rad,
+    f64 aspect_ratio)
 {
     // Step 1: RA/Dec → Alt/Az
     const EquatorialCoord eq{.ra = ra_rad, .dec = dec_rad};
@@ -179,7 +190,7 @@ std::optional<Vec2f> Coordinates::project_radec_to_screen(
     }
 
     // Step 3: Alt/Az → screen NDC
-    return horizontal_to_screen(hz, pointing, fov_rad);
+    return horizontal_to_screen(hz, pointing, fov_rad, aspect_ratio);
 }
 
 // -----------------------------------------------------------------

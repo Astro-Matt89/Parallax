@@ -22,10 +22,10 @@
 #include "ui/instrument_panel.hpp"
 #include "ui/info_panel.hpp"                              // ← SPRINT 05 Task 5.5
 #include "ui/panel_system.hpp"                            // ← SPRINT 05 Task 5.1
-#include "ui/selection.hpp"                               // ← SPRINT 05 Task 5.5
 #include "ui/side_panel.hpp"                              // ← SPRINT 05 Task 5.4
 #include "ui/sessions_panel.hpp"
 #include "ui/data_archive_panel.hpp"
+#include "ui/tabs/planetarium_tab.hpp"
 #include "ui/toolbar.hpp"                                 // ← SPRINT 05 Task 5.3
 #include "universe/celestial_object.hpp"                  // ← SPRINT 07 Task 7.7
 #include "universe/universe.hpp"                          // ← SPRINT 07 Task 7.7
@@ -93,7 +93,7 @@ namespace parallax::core
         // -----------------------------------------------------------------
 
         /// @brief Returns true when the atmosphere is enabled (twilight gradient + horizon culling).
-        [[nodiscard]] bool is_atmosphere_on() const { return m_atmosphere_on; }
+        [[nodiscard]] bool is_atmosphere_on() const;
 
         /// @brief Toggle atmosphere on/off and log the change.
         void toggle_atmosphere();
@@ -131,12 +131,10 @@ namespace parallax::core
         std::unique_ptr<vulkan::Context> m_context;
         std::unique_ptr<vulkan::Swapchain> m_swapchain;
         std::unique_ptr<vulkan::Pipeline> m_pipeline;       ///< Render pass + framebuffers (from Sprint 01)
-        std::unique_ptr<rendering::SkyBackground> m_sky_background;
-        std::unique_ptr<rendering::Starfield> m_starfield;
-        std::unique_ptr<rendering::LineRenderer> m_line_renderer;  // ← SPRINT 04 Task 4.1
-        std::unique_ptr<rendering::Camera> m_camera;
+        std::unique_ptr<rendering::LineRenderer> m_line_renderer;  // UI borders / shell chrome
         std::unique_ptr<Input> m_input;
         std::unique_ptr<ui::Hud> m_hud;                     ///< Retro HUD overlay  ← SPRINT 03 Task 3.6
+        std::unique_ptr<ui::tabs::PlanetariumTab> m_planetarium_tab;
 
         // -----------------------------------------------------------------
         // Universe facade                                   ← SPRINT 07 Task 7.7
@@ -153,25 +151,12 @@ namespace parallax::core
         std::unique_ptr<instruments::MockInstrument> m_mock_instrument;
         std::unique_ptr<analysis::MockAnalyzer> m_analyzer;
 
-        /// @brief Reusable per-frame visible objects buffer (cleared by query_fov each frame).
-        std::vector<universe::CelestialObject> m_frame_objects;
-
-        // -----------------------------------------------------------------
-        // Overlays                                          ← SPRINT 04
-        // -----------------------------------------------------------------
-        overlay::Constellations m_constellations;            // Task 4.2
-        overlay::CoordGrid m_coord_grid;                     // Task 4.3
-        overlay::Horizon m_horizon;                          // Task 4.4
-        rendering::DsoRenderer m_dso_renderer;               // Task 4.5
-        rendering::SolarSystemRenderer m_solar_system_renderer; // ← SPRINT 06 Task 6.5
-
         // -----------------------------------------------------------------
         // UI subsystems                                     ← SPRINT 05
         // -----------------------------------------------------------------
         ui::PanelSystem m_panel_system;                      // Task 5.1  Batched panel backgrounds
         ui::Toolbar m_toolbar;                               // Task 5.3  Bottom toolbar
         ui::SidePanel m_side_panel;                          // Task 5.4  Left side panel
-        ui::Selection m_selection;                            // Task 5.5  Object selection system
         ui::InfoPanel m_info_panel;                           // Task 5.5  Right info panel
         ui::InstrumentPanel m_instrument_panel;               // Sprint 08 Task 8.10
         ui::SessionsPanel m_sessions_panel;                   // Sprint 08 Task 8.10
@@ -190,27 +175,7 @@ namespace parallax::core
         astro::ObserverLocation m_observer;  ///< Observer geographic location
 
         // -----------------------------------------------------------------
-        // Atmosphere model                                                    ← SPRINT 03 Task 3.3
-        // -----------------------------------------------------------------
-        astro::Atmosphere m_atmosphere;
-
-        // -----------------------------------------------------------------
-        // Sky parameters
-        // -----------------------------------------------------------------
-        rendering::SkyParams m_sky_params;
-
-        /// @brief Atmosphere toggle: true = Bortle gradient + twilight glow;
-        ///        false = pure black sky (all objects still rendered). Key: 'A'.
-        bool m_atmosphere_on = true;
-
-        /// @brief Cached Sun altitude in degrees — computed each frame in update_simulation().
-        ///        Shared between sky background, solar system renderer, and HUD.
-        f32 m_sun_altitude_deg = -90.0f;  ///< ← SPRINT 06 Task 6.7
-
         f64 m_elevation_m = 0.0;  ///< Observer elevation above sea level (metres)
-
-        /// @brief Logged once after the first frame with procedural data.
-        bool m_procedural_first_tick_logged = false; ///< ← SPRINT 07 Task 7.7
 
         /// @brief Wall-clock time tracking for delta_time computation.
         std::chrono::steady_clock::time_point m_last_frame_time;

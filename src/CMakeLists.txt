@@ -92,6 +92,8 @@ add_executable(parallax
     ui/shell/top_bar.cpp
     ui/shell/status_bar.hpp
     ui/shell/status_bar.cpp
+    ui/tabs/planetarium_tab.hpp
+    ui/tabs/planetarium_tab.cpp
 )
 
 target_include_directories(parallax PRIVATE

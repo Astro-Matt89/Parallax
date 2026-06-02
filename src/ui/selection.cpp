@@ -107,12 +107,11 @@ void Selection::try_select_from_objects(Vec2f click_ndc,
                                         const astro::ObserverLocation& observer,
                                         f64 lst_rad,
                                         const rendering::Camera& camera,
-                                        VkExtent2D viewport)
+                                        const shell::ViewportRect& viewport)
 {
-    (void)viewport; // Picking is in NDC space
-
     const auto pointing = camera.get_pointing();
     const f64 fov_rad   = camera.get_fov_rad();
+    const f64 aspect_ratio = static_cast<f64>(viewport.aspect());
 
     f32 best_dist_sq = kPickRadiusNdc * kPickRadiusNdc;
     bool found = false;
@@ -128,7 +127,7 @@ void Selection::try_select_from_objects(Vec2f click_ndc,
             {obj.ra, obj.dec}, observer, lst_rad);
 
         const auto screen_opt = astro::Coordinates::horizontal_to_screen(
-            hz, pointing, fov_rad);
+            hz, pointing, fov_rad, aspect_ratio);
 
         if (!screen_opt.has_value())
         {
@@ -298,7 +297,8 @@ void Selection::update_from_objects(std::span<const universe::CelestialObject> o
                                     std::span<const rendering::SolarSystemScreenObject> ss_objects,
                                     const astro::ObserverLocation& observer,
                                     f64 lst_rad,
-                                    const rendering::Camera& camera)
+                                    const rendering::Camera& camera,
+                                    const shell::ViewportRect& viewport)
 {
     (void)objects; // RA/Dec stored in m_selection from try_select_from_objects
 
@@ -334,6 +334,7 @@ void Selection::update_from_objects(std::span<const universe::CelestialObject> o
     // Stars and DSOs: re-project stored RA/Dec.
     const auto pointing = camera.get_pointing();
     const f64 fov_rad   = camera.get_fov_rad();
+    const f64 aspect_ratio = static_cast<f64>(viewport.aspect());
 
     const auto hz = astro::Coordinates::equatorial_to_horizontal(
         {m_selection.ra_rad, m_selection.dec_rad}, observer, lst_rad);
@@ -342,7 +343,7 @@ void Selection::update_from_objects(std::span<const universe::CelestialObject> o
     m_selection.az_rad        = hz.az;
     m_selection.above_horizon = hz.alt >= 0.0;
 
-    const auto screen_opt = astro::Coordinates::horizontal_to_screen(hz, pointing, fov_rad);
+    const auto screen_opt = astro::Coordinates::horizontal_to_screen(hz, pointing, fov_rad, aspect_ratio);
     if (screen_opt.has_value())
     {
         m_selection.screen_ndc = screen_opt.value();
@@ -361,7 +362,7 @@ void Selection::try_select(Vec2f click_ndc,
                            const astro::ObserverLocation& observer,
                            f64 lst_rad,
                            const rendering::Camera& camera,
-                           VkExtent2D viewport)
+                           const shell::ViewportRect& viewport)
 {
     // Delegate to the Solar System-aware overload with an empty SS span.
     try_select(click_ndc,
@@ -380,10 +381,8 @@ void Selection::try_select(Vec2f click_ndc,
                            const astro::ObserverLocation& observer,
                            f64 lst_rad,
                            const rendering::Camera& camera,
-                           VkExtent2D viewport)
+                           const shell::ViewportRect& viewport)
 {
-    (void)viewport;  // Not needed — picking is in NDC space
-
     f32 best_dist_sq = kPickRadiusNdc * kPickRadiusNdc;
     bool found = false;
 
@@ -479,6 +478,7 @@ void Selection::try_select(Vec2f click_ndc,
     // -----------------------------------------------------------------
     const auto pointing = camera.get_pointing();
     const f64 fov_rad = camera.get_fov_rad();
+    const f64 aspect_ratio = static_cast<f64>(viewport.aspect());
 
     for (std::size_t i = 0; i < dsos.size(); ++i)
     {
@@ -492,7 +492,7 @@ void Selection::try_select(Vec2f click_ndc,
 
         // Project to screen
         auto screen_opt = astro::Coordinates::project_radec_to_screen(
-            dso.ra, dso.dec, observer, lst_rad, pointing, fov_rad);
+            dso.ra, dso.dec, observer, lst_rad, pointing, fov_rad, aspect_ratio);
 
         if (!screen_opt.has_value())
         {
@@ -583,12 +583,13 @@ void Selection::update(std::span<const catalog::StarEntry> stars,
                        std::span<const catalog::DsoEntry> dsos,
                        const astro::ObserverLocation& observer,
                        f64 lst_rad,
-                       const rendering::Camera& camera)
+                       const rendering::Camera& camera,
+                       const shell::ViewportRect& viewport)
 {
     // Delegate to the Solar System-aware overload with an empty SS span.
     update(stars, dsos,
            std::span<const rendering::SolarSystemScreenObject>{},
-           observer, lst_rad, camera);
+           observer, lst_rad, camera, viewport);
 }
 
 void Selection::update(std::span<const catalog::StarEntry> stars,
@@ -596,7 +597,8 @@ void Selection::update(std::span<const catalog::StarEntry> stars,
                        std::span<const rendering::SolarSystemScreenObject> ss_objects,
                        const astro::ObserverLocation& observer,
                        f64 lst_rad,
-                       const rendering::Camera& camera)
+                       const rendering::Camera& camera,
+                       const shell::ViewportRect& viewport)
 {
     // Stars/DSOs spans are available for future use (e.g. re-reading updated data)
     // but RA/Dec are already stored in m_selection from try_select().
@@ -643,6 +645,7 @@ void Selection::update(std::span<const catalog::StarEntry> stars,
     // Re-project RA/Dec to screen each frame (object position changes with time)
     const auto pointing = camera.get_pointing();
     const f64 fov_rad = camera.get_fov_rad();
+    const f64 aspect_ratio = static_cast<f64>(viewport.aspect());
 
     // Recompute Alt/Az
     const auto hz = astro::Coordinates::equatorial_to_horizontal(
@@ -654,7 +657,7 @@ void Selection::update(std::span<const catalog::StarEntry> stars,
     // Recompute screen position
     auto screen_opt = astro::Coordinates::project_radec_to_screen(
         m_selection.ra_rad, m_selection.dec_rad,
-        observer, lst_rad, pointing, fov_rad);
+        observer, lst_rad, pointing, fov_rad, aspect_ratio);
 
     if (screen_opt.has_value())
     {
@@ -672,7 +675,7 @@ void Selection::update(std::span<const catalog::StarEntry> stars,
 // =================================================================
 
 void Selection::render_indicator(rendering::LineRenderer& lines,
-                                 VkExtent2D viewport) const
+                                 const shell::ViewportRect& viewport) const
 {
     (void)viewport;  // Indicator is drawn in NDC space
 

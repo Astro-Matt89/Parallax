@@ -19,6 +19,7 @@
 #include "rendering/line_renderer.hpp"
 #include "rendering/solar_system_renderer.hpp"
 #include "ui/font.hpp"
+#include "ui/shell/viewport_rect.hpp"
 #include "universe/celestial_object.hpp"
 
 #include <filesystem>
@@ -166,7 +167,7 @@ public:
                                  const astro::ObserverLocation& observer,
                                  f64 lst_rad,
                                  const rendering::Camera& camera,
-                                 VkExtent2D viewport);
+                                 const shell::ViewportRect& viewport);
 
     /// @brief Refresh the selected object's screen position and Alt/Az for this frame.
     ///
@@ -183,7 +184,8 @@ public:
                              std::span<const rendering::SolarSystemScreenObject> ss_objects,
                              const astro::ObserverLocation& observer,
                              f64 lst_rad,
-                             const rendering::Camera& camera);
+                             const rendering::Camera& camera,
+                             const shell::ViewportRect& viewport);
 
     // ---------------------------------------------------------------
     // Legacy path (deprecated)
@@ -211,7 +213,7 @@ public:
                     const astro::ObserverLocation& observer,
                     f64 lst_rad,
                     const rendering::Camera& camera,
-                    VkExtent2D viewport);
+                    const shell::ViewportRect& viewport);
 
     /// @brief Attempt to select nearest Star, DSO, or Solar System body.
     ///
@@ -227,7 +229,7 @@ public:
                     const astro::ObserverLocation& observer,
                     f64 lst_rad,
                     const rendering::Camera& camera,
-                    VkExtent2D viewport);
+                    const shell::ViewportRect& viewport);
 
     /// @brief Update the selected object's screen position and Alt/Az for this frame.
     ///
@@ -236,7 +238,8 @@ public:
                 std::span<const catalog::DsoEntry> dsos,
                 const astro::ObserverLocation& observer,
                 f64 lst_rad,
-                const rendering::Camera& camera);
+                const rendering::Camera& camera,
+                const shell::ViewportRect& viewport);
 
     /// @brief Update the selected object's screen position and Alt/Az for this frame.
     ///
@@ -247,7 +250,8 @@ public:
                 std::span<const rendering::SolarSystemScreenObject> ss_objects,
                 const astro::ObserverLocation& observer,
                 f64 lst_rad,
-                const rendering::Camera& camera);
+                const rendering::Camera& camera,
+                const shell::ViewportRect& viewport);
 
     // ---------------------------------------------------------------
     // Common
@@ -255,7 +259,7 @@ public:
 
     /// @brief Render the selection indicator: yellow crosshair + circle.
     void render_indicator(rendering::LineRenderer& lines,
-                          VkExtent2D viewport) const;
+                          const shell::ViewportRect& viewport) const;
 
     /// @brief Clear the current selection.
     void clear();

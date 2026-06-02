@@ -34,6 +34,8 @@
 #include <string>
 #include <vector>
 
+namespace parallax::ui::shell { struct ViewportRect; }
+
 namespace parallax::overlay
 {
     /// @brief Grid display mode.
@@ -67,7 +69,7 @@ namespace parallax::overlay
                     f64 lst_rad,
                     rendering::LineRenderer& lines,
                     ui::BitmapFont& font,
-                    VkExtent2D viewport);
+                    const ui::shell::ViewportRect& viewport);
 
         void set_type(GridType type);
         [[nodiscard]] GridType get_type() const;
@@ -85,13 +87,13 @@ namespace parallax::overlay
                                   f64 lst_rad,
                                   rendering::LineRenderer& lines,
                                   ui::BitmapFont& font,
-                                  VkExtent2D viewport);
+                                  const ui::shell::ViewportRect& viewport);
 
         /// @brief Draw the horizontal (Alt/Az) grid.
         void draw_altaz_grid(const rendering::Camera& camera,
                              rendering::LineRenderer& lines,
                              ui::BitmapFont& font,
-                             VkExtent2D viewport);
+                             const ui::shell::ViewportRect& viewport);
 
         /// @brief Submit a sampled curve as line strip segments, skipping gaps.
         ///
@@ -102,7 +104,7 @@ namespace parallax::overlay
                                  rendering::LineRenderer& lines);
 
         /// @brief Convert NDC [-1,1] to screen pixel coordinates.
-        [[nodiscard]] static Vec2f ndc_to_pixel(Vec2f ndc, VkExtent2D viewport);
+        [[nodiscard]] static Vec2f ndc_to_pixel(Vec2f ndc, const ui::shell::ViewportRect& viewport);
 
         GridType m_type = GridType::None;
 

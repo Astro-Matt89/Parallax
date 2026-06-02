@@ -27,6 +27,12 @@ layout(location = 0) in vec2 v_uv;
 
 layout(location = 0) out vec4 frag_color;
 
+layout(push_constant) uniform ViewportPC
+{
+    vec2 viewport_origin;
+    vec2 viewport_size;
+} pc;
+
 layout(set = 0, binding = 0) uniform SkyUBO
 {
     // Row 0 (bytes 0–15)
@@ -267,7 +273,8 @@ void main()
     }
 
     // ---- Dithering: break 8-bit banding artifacts ----
-    float dither = triangular_dither(gl_FragCoord.xy);
+    vec2 local_coord = (gl_FragCoord.xy - pc.viewport_origin) / max(pc.viewport_size, vec2(1.0));
+    float dither = triangular_dither(local_coord * pc.viewport_size);
     base += vec3(dither);
 
     // Clamp to valid linear range

@@ -22,6 +22,7 @@
 #include "rendering/line_renderer.hpp"
 #include "rendering/render_style.hpp"
 #include "ui/font.hpp"
+#include "ui/shell/viewport_rect.hpp"
 #include "universe/celestial_object.hpp"
 
 #include <vulkan/vulkan.h>
@@ -61,7 +62,9 @@ namespace parallax::rendering
         /// Stores references to the shared line renderer, font, and viewport
         /// for use by subsequent add_celestial_object() calls.  Call once per
         /// frame before any add_celestial_object().
-        void begin_frame(LineRenderer& lines, ui::BitmapFont& font, VkExtent2D viewport);
+        void begin_frame(LineRenderer& lines,
+                         ui::BitmapFont& font,
+                         const ui::shell::ViewportRect& viewport);
 
         /// @brief Draw a single DSO icon + label at the given pre-projected screen position.
         ///
@@ -94,7 +97,7 @@ namespace parallax::rendering
                     std::span<const catalog::DsoEntry> catalog,
                     LineRenderer& lines,
                     ui::BitmapFont& font,
-                    VkExtent2D viewport);
+                    const ui::shell::ViewportRect& viewport);
 
         // ---------------------------------------------------------------
         // Common
@@ -146,7 +149,7 @@ namespace parallax::rendering
                                       u32 segments = 24);
 
         /// @brief Convert NDC to pixel coordinates.
-        [[nodiscard]] static Vec2f ndc_to_pixel(Vec2f ndc, VkExtent2D viewport);
+        [[nodiscard]] static Vec2f ndc_to_pixel(Vec2f ndc, const ui::shell::ViewportRect& viewport);
 
         bool m_visible = true;
         u32 m_rendered_count = 0;
@@ -154,7 +157,7 @@ namespace parallax::rendering
         /// @brief Transient per-frame rendering context (set by begin_frame).
         LineRenderer*  m_frame_lines    = nullptr;
         ui::BitmapFont* m_frame_font    = nullptr;
-        VkExtent2D     m_frame_viewport = {};
+        ui::shell::ViewportRect m_frame_viewport{};
 
         /// @brief Icon color: magenta-pink (RGBA) — Historical style.
         static constexpr Vec4f kIconColor{0.8f, 0.4f, 0.6f, 0.7f};

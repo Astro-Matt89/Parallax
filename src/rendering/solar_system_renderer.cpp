@@ -11,6 +11,7 @@
 
 #include "astro/coordinates.hpp"
 #include "core/logger.hpp"
+#include "ui/shell/viewport_rect.hpp"
 
 #include <glm/gtc/constants.hpp>
 
@@ -40,9 +41,9 @@ static constexpr std::array<u32, 7> kPlanetIdMap = {
 // =================================================================
 
 void SolarSystemRenderer::begin_frame(LineRenderer& lines,
-                                       ui::BitmapFont& font,
-                                       VkExtent2D viewport,
-                                       bool atmosphere_on)
+                                      ui::BitmapFont& font,
+                                      const ui::shell::ViewportRect& viewport,
+                                      bool atmosphere_on)
 {
     m_frame_lines    = &lines;
     m_frame_font     = &font;
@@ -217,7 +218,7 @@ void SolarSystemRenderer::update(const astro::SolarSystem::AllBodies& bodies,
                                  f64 lst_rad,
                                  LineRenderer& lines,
                                  ui::BitmapFont& font,
-                                 VkExtent2D viewport,
+                                 const ui::shell::ViewportRect& viewport,
                                  bool atmosphere_on)
 {
     m_rendered_count = 0;
@@ -275,10 +276,10 @@ void SolarSystemRenderer::render_sun(const astro::CelestialBodyState& sun,
                                      f64 lst_rad,
                                      LineRenderer& lines,
                                      ui::BitmapFont& font,
-                                     VkExtent2D viewport,
+                                     const ui::shell::ViewportRect& viewport,
                                      bool atmosphere_on)
 {
-    const auto proj = project_body(sun, camera, observer, lst_rad, atmosphere_on);
+    const auto proj = project_body(sun, camera, observer, lst_rad, viewport.aspect(), atmosphere_on);
     if (!proj)
     {
         return;
@@ -341,10 +342,10 @@ void SolarSystemRenderer::render_moon(const astro::CelestialBodyState& moon,
                                       f64 lst_rad,
                                       LineRenderer& lines,
                                       ui::BitmapFont& font,
-                                      VkExtent2D viewport,
+                                      const ui::shell::ViewportRect& viewport,
                                       bool atmosphere_on)
 {
-    const auto proj = project_body(moon, camera, observer, lst_rad, atmosphere_on);
+    const auto proj = project_body(moon, camera, observer, lst_rad, viewport.aspect(), atmosphere_on);
     if (!proj)
     {
         return;
@@ -396,10 +397,10 @@ void SolarSystemRenderer::render_planet(const astro::CelestialBodyState& body,
                                         f64 lst_rad,
                                         LineRenderer& lines,
                                         ui::BitmapFont& font,
-                                        VkExtent2D viewport,
+                                        const ui::shell::ViewportRect& viewport,
                                         bool atmosphere_on)
 {
-    const auto proj = project_body(body, camera, observer, lst_rad, atmosphere_on);
+    const auto proj = project_body(body, camera, observer, lst_rad, viewport.aspect(), atmosphere_on);
     if (!proj)
     {
         return;
@@ -454,6 +455,7 @@ SolarSystemRenderer::project_body(const astro::CelestialBodyState& body,
                                   const Camera& camera,
                                   const astro::ObserverLocation& observer,
                                   f64 lst_rad,
+                                  f64 aspect_ratio,
                                   bool atmosphere_on)
 {
     const auto pointing = camera.get_pointing();
@@ -468,12 +470,12 @@ SolarSystemRenderer::project_body(const astro::CelestialBodyState& body,
         // Shared pipeline — horizon cull + FOV cull + gnomonic projection
         screen = astro::Coordinates::project_radec_to_screen(
             body.equatorial.ra, body.equatorial.dec,
-            observer, lst_rad, pointing, fov_rad);
+            observer, lst_rad, pointing, fov_rad, aspect_ratio);
     }
     else
     {
         // Atmosphere off → bypass horizon cull, keep FOV cull
-        screen = astro::Coordinates::horizontal_to_screen(hz, pointing, fov_rad);
+        screen = astro::Coordinates::horizontal_to_screen(hz, pointing, fov_rad, aspect_ratio);
     }
 
     if (!screen)
@@ -588,10 +590,12 @@ void SolarSystemRenderer::draw_moon_phase(Vec2f center_ndc,
 // NDC → pixel conversion
 // =================================================================
 
-Vec2f SolarSystemRenderer::ndc_to_pixel(Vec2f ndc, VkExtent2D viewport)
+Vec2f SolarSystemRenderer::ndc_to_pixel(Vec2f ndc, const ui::shell::ViewportRect& viewport)
 {
-    const f32 px = (ndc.x + 1.0f) * 0.5f * static_cast<f32>(viewport.width);
-    const f32 py = (ndc.y + 1.0f) * 0.5f * static_cast<f32>(viewport.height);
+    const f32 px = static_cast<f32>(viewport.x)
+                 + (ndc.x + 1.0f) * 0.5f * static_cast<f32>(viewport.width);
+    const f32 py = static_cast<f32>(viewport.y)
+                 + (ndc.y + 1.0f) * 0.5f * static_cast<f32>(viewport.height);
     return {px, py};
 }
 

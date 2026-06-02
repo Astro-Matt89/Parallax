@@ -11,6 +11,7 @@
 #include "universe/universe.hpp"
 
 #include "core/logger.hpp"
+#include "ui/shell/viewport_rect.hpp"
 
 #include <cmath>
 #include <fstream>
@@ -268,7 +269,7 @@ void Constellations::update(const rendering::Camera& camera,
                             f64 lst_rad,
                             rendering::LineRenderer& lines,
                             ui::BitmapFont& font,
-                            VkExtent2D viewport)
+                            const ui::shell::ViewportRect& viewport)
 {
     const bool use_universe = (m_universe != nullptr);
     const bool use_legacy   = !use_universe && !m_catalog.empty();
@@ -281,6 +282,7 @@ void Constellations::update(const rendering::Camera& camera,
     // Extract camera params — SAME values the starfield uses
     const auto pointing = camera.get_pointing();
     const f64 fov_rad = camera.get_fov_rad();
+    const f64 aspect_ratio = static_cast<f64>(viewport.aspect());
 
     const f32 vw = static_cast<f32>(viewport.width);
     const f32 vh = static_cast<f32>(viewport.height);
@@ -324,10 +326,10 @@ void Constellations::update(const rendering::Camera& camera,
 
             // RA/Dec → screen NDC via THE SAME shared function as starfield
             const auto s1 = astro::Coordinates::project_radec_to_screen(
-                ra1, dec1, observer, lst_rad, pointing, fov_rad);
+                ra1, dec1, observer, lst_rad, pointing, fov_rad, aspect_ratio);
 
             const auto s2 = astro::Coordinates::project_radec_to_screen(
-                ra2, dec2, observer, lst_rad, pointing, fov_rad);
+                ra2, dec2, observer, lst_rad, pointing, fov_rad, aspect_ratio);
 
             if (!s1.has_value() || !s2.has_value())
             {
@@ -351,8 +353,8 @@ void Constellations::update(const rendering::Camera& camera,
             const f32 cy_ndc = sum_sy / static_cast<f32>(screen_count);
 
             // NDC [-1,1] → pixel coordinates
-            const f32 px = (cx_ndc + 1.0f) * 0.5f * vw;
-            const f32 py = (cy_ndc + 1.0f) * 0.5f * vh;
+            const f32 px = static_cast<f32>(viewport.x) + (cx_ndc + 1.0f) * 0.5f * vw;
+            const f32 py = static_cast<f32>(viewport.y) + (cy_ndc + 1.0f) * 0.5f * vh;
 
             // Center the label (8 px per char at scale 1.0)
             const f32 label_w = static_cast<f32>(

@@ -8,6 +8,7 @@
 #include "overlay/horizon.hpp"
 
 #include "core/logger.hpp"
+#include "ui/shell/viewport_rect.hpp"
 
 #include <cmath>
 #include <optional>
@@ -23,14 +24,14 @@ namespace parallax::overlay
 void Horizon::update(const rendering::Camera& camera,
                      rendering::LineRenderer& lines,
                      ui::BitmapFont& font,
-                     VkExtent2D viewport)
+                     const ui::shell::ViewportRect& viewport)
 {
     if (!m_visible)
     {
         return;
     }
 
-    draw_horizon_line(camera, lines);
+    draw_horizon_line(camera, lines, viewport);
     draw_cardinal_markers(camera, lines, font, viewport);
 }
 
@@ -51,10 +52,12 @@ bool Horizon::is_visible() const { return m_visible; }
 // =================================================================
 
 void Horizon::draw_horizon_line(const rendering::Camera& camera,
-                                rendering::LineRenderer& lines)
+                                rendering::LineRenderer& lines,
+                                const ui::shell::ViewportRect& viewport)
 {
     const auto pointing = camera.get_pointing();
     const f64 fov_rad = camera.get_fov_rad();
+    const f64 aspect_ratio = static_cast<f64>(viewport.aspect());
 
     std::vector<std::optional<Vec2f>> points;
     points.reserve(kHorizonSamples);
@@ -66,7 +69,7 @@ void Horizon::draw_horizon_line(const rendering::Camera& camera,
 
         const astro::HorizontalCoord hz{.alt = 0.0, .az = az_rad};
         points.push_back(astro::Coordinates::horizontal_to_screen(
-            hz, pointing, fov_rad));
+            hz, pointing, fov_rad, aspect_ratio));
     }
 
     // Submit consecutive visible pairs as line segments
@@ -94,10 +97,11 @@ void Horizon::draw_horizon_line(const rendering::Camera& camera,
 void Horizon::draw_cardinal_markers(const rendering::Camera& camera,
                                     rendering::LineRenderer& lines,
                                     ui::BitmapFont& font,
-                                    VkExtent2D viewport)
+                                    const ui::shell::ViewportRect& viewport)
 {
     const auto pointing = camera.get_pointing();
     const f64 fov_rad = camera.get_fov_rad();
+    const f64 aspect_ratio = static_cast<f64>(viewport.aspect());
 
     const f64 tick_alt_rad = kTickAltDeg * astro_constants::kDegToRad;
 
@@ -109,12 +113,12 @@ void Horizon::draw_cardinal_markers(const rendering::Camera& camera,
         // Horizon point
         const astro::HorizontalCoord hz_base{.alt = 0.0, .az = az_rad};
         const auto base_ndc = astro::Coordinates::horizontal_to_screen(
-            hz_base, pointing, fov_rad);
+            hz_base, pointing, fov_rad, aspect_ratio);
 
         // Tick top — slightly above horizon
         const astro::HorizontalCoord hz_tick{.alt = tick_alt_rad, .az = az_rad};
         const auto tick_ndc = astro::Coordinates::horizontal_to_screen(
-            hz_tick, pointing, fov_rad);
+            hz_tick, pointing, fov_rad, aspect_ratio);
 
         // Draw tick line if both endpoints are on screen
         if (base_ndc.has_value() && tick_ndc.has_value())
@@ -148,10 +152,12 @@ void Horizon::draw_cardinal_markers(const rendering::Camera& camera,
 // NDC → pixel conversion (same formula as CoordGrid)
 // =================================================================
 
-Vec2f Horizon::ndc_to_pixel(Vec2f ndc, VkExtent2D viewport)
+Vec2f Horizon::ndc_to_pixel(Vec2f ndc, const ui::shell::ViewportRect& viewport)
 {
-    const f32 px = (ndc.x + 1.0f) * 0.5f * static_cast<f32>(viewport.width);
-    const f32 py = (ndc.y + 1.0f) * 0.5f * static_cast<f32>(viewport.height);
+    const f32 px = static_cast<f32>(viewport.x)
+                 + (ndc.x + 1.0f) * 0.5f * static_cast<f32>(viewport.width);
+    const f32 py = static_cast<f32>(viewport.y)
+                 + (ndc.y + 1.0f) * 0.5f * static_cast<f32>(viewport.height);
     return {px, py};
 }
 

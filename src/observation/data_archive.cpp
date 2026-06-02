@@ -149,6 +149,12 @@ void DataArchive::clear()
     m_records.clear();
 }
 
+bool DataArchive::remove_record(std::uint64_t record_id)
+{
+    const auto erased = m_records.erase(record_id);
+    return erased > 0;
+}
+
 // =============================================================================
 // Queries
 // =============================================================================

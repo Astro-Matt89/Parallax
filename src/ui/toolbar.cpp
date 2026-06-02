@@ -17,7 +17,6 @@ namespace
 {
 constexpr f32 kObserveButtonWidth = 72.0f;
 constexpr f32 kSessionsButtonWidth = 74.0f;
-constexpr f32 kDataButtonWidth = 56.0f;
 } // namespace
 
 // =================================================================
@@ -32,7 +31,7 @@ void Toolbar::init(const ToolbarCallbacks& callbacks)
 
     m_initialized = true;
     PLX_CORE_INFO("Toolbar initialized (3 groups, {} buttons, 1 slider)",
-                  9 + 4);  // overlay group adds OBSERVE/SESSIONS/DATA
+                  8 + 4);  // overlay group adds OBSERVE/SESSIONS
 }
 
 // =================================================================
@@ -78,10 +77,6 @@ void Toolbar::create_overlay_group(const ToolbarCallbacks& callbacks)
     m_btn_sessions = std::make_unique<ToggleButton>(
         "SESSIONS", dummy_pos, Vec2f{kSessionsButtonWidth, kButtonH},
         callbacks.toggle_sessions_panel ? callbacks.toggle_sessions_panel : []() {});
-
-    m_btn_data = std::make_unique<ToggleButton>(
-        "DATA", dummy_pos, Vec2f{kDataButtonWidth, kButtonH},
-        callbacks.toggle_data_panel ? callbacks.toggle_data_panel : []() {});
 }
 
 // =================================================================
@@ -155,8 +150,8 @@ void Toolbar::layout_widgets(u32 viewport_width, u32 viewport_height)
     // Compute total width of all groups
 
     // Group 1: overlay toggles + observation panel toggles.
-    const f32 overlay_w = kButtonW * 5.0f + 56.0f + kButtonSpacing * 8.0f
-                           + kButtonW + kObserveButtonWidth + kSessionsButtonWidth + kDataButtonWidth;
+    const f32 overlay_w = kButtonW * 5.0f + 56.0f + kButtonSpacing * 7.0f
+                           + kButtonW + kObserveButtonWidth + kSessionsButtonWidth;
 
     // Group 2: time controls (4 buttons + speed text)
     const f32 time_btn_w = 36.0f;
@@ -202,10 +197,7 @@ void Toolbar::layout_widgets(u32 viewport_width, u32 viewport_height)
     x += kObserveButtonWidth + kButtonSpacing;
 
     m_btn_sessions->set_position({x, widget_y});
-    x += kSessionsButtonWidth + kButtonSpacing;
-
-    m_btn_data->set_position({x, widget_y});
-    x += kDataButtonWidth + kGroupSpacing;
+    x += kSessionsButtonWidth + kGroupSpacing;
 
     // --- Group 2: Time controls ---
     m_btn_time_rev->set_position({x, widget_y});
@@ -296,7 +288,6 @@ void Toolbar::update(Vec2f mouse_pos, bool mouse_clicked, bool mouse_down, f32 d
     m_btn_atmo->set_active(state.atmosphere_on);        // ← SPRINT 06 Task 6.7
     m_btn_observe->set_active(state.observe_panel_visible);
     m_btn_sessions->set_active(state.sessions_panel_visible);
-    m_btn_data->set_active(state.data_panel_visible);
 
     // Sync FOV slider (only if not currently dragging)
     if (!m_slider_fov->is_dragging())
@@ -350,7 +341,6 @@ void Toolbar::update(Vec2f mouse_pos, bool mouse_clicked, bool mouse_down, f32 d
     m_btn_atmo->update(mouse_pos, mouse_clicked, dt);   // ← SPRINT 06 Task 6.7
     m_btn_observe->update(mouse_pos, mouse_clicked, dt);
     m_btn_sessions->update(mouse_pos, mouse_clicked, dt);
-    m_btn_data->update(mouse_pos, mouse_clicked, dt);
 
     m_btn_time_rev->update(mouse_pos, mouse_clicked, dt);
     m_btn_time_pause->update(mouse_pos, mouse_clicked, dt);
@@ -384,11 +374,10 @@ void Toolbar::render(BitmapFont& font, rendering::LineRenderer& lines,
     m_btn_atmo->render(font, lines, vp);    // ← SPRINT 06 Task 6.7
     m_btn_observe->render(font, lines, vp);
     m_btn_sessions->render(font, lines, vp);
-    m_btn_data->render(font, lines, vp);
 
     // --- Group separator line 1 ---
     {
-        const f32 sep_x = m_btn_data->get_position().x + m_btn_data->get_size().x
+        const f32 sep_x = m_btn_sessions->get_position().x + m_btn_sessions->get_size().x
                           + kGroupSpacing * 0.5f;
         const f32 sep_top = m_toolbar_y + 6.0f;
         const f32 sep_bot = m_toolbar_y + kToolbarHeight - 6.0f;

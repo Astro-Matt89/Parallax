@@ -186,11 +186,6 @@ void Application::init()
             m_show_sessions_panel = !m_show_sessions_panel;
             m_sessions_panel.set_visible(m_show_sessions_panel);
         };
-        cb.toggle_data_panel     = [this]()
-        {
-            m_show_data_archive_panel = !m_show_data_archive_panel;
-            m_data_archive_panel.set_visible(m_show_data_archive_panel);
-        };
         cb.time_reverse          = [this]()
         {
             if (m_time_scale >= 0.0) { m_time_scale = -1.0; }
@@ -282,9 +277,6 @@ void Application::init()
         };
         m_sessions_panel.init(sessions_cb);
         m_sessions_panel.set_visible(false);
-
-        m_data_archive_panel.init();
-        m_data_archive_panel.set_visible(false);
     }
 
     // =================================================================
@@ -541,8 +533,7 @@ void Application::process_input()
                             || m_side_panel.is_mouse_over(mouse_pos)
                             || m_info_panel.is_mouse_over(mouse_pos)
                             || m_instrument_panel.is_mouse_over(mouse_pos)
-                            || m_sessions_panel.is_mouse_over(mouse_pos)
-                            || m_data_archive_panel.is_mouse_over(mouse_pos);
+                            || m_sessions_panel.is_mouse_over(mouse_pos);
 
     // =================================================================
     // Step 2: Route mouse input based on priority
@@ -762,7 +753,6 @@ void Application::update_simulation(f64 delta_time_sec)
             .atmosphere_on          = m_planetarium_tab->is_atmosphere_on(),
             .observe_panel_visible  = m_show_instrument_panel,
             .sessions_panel_visible = m_show_sessions_panel,
-            .data_panel_visible     = m_show_data_archive_panel,
             .time_scale             = m_time_scale,
             .time_paused            = (m_time_scale == 0.0),
             .fov_deg                = m_planetarium_tab->get_fov_deg(),
@@ -916,36 +906,6 @@ void Application::update_simulation(f64 delta_time_sec)
             viewport.width, viewport.height);
     }
 
-    // --- Data archive panel update ---
-    {
-        std::vector<ui::DataArchivePanelRow> rows;
-        if (m_archive)
-        {
-            auto records = m_archive->get_all();
-            std::sort(records.begin(), records.end(),
-                      [](const observation::DataRecord* lhs, const observation::DataRecord* rhs)
-                      {
-                          return lhs->observation_jd > rhs->observation_jd;
-                      });
-
-            rows.reserve(records.size());
-            for (std::size_t i = 0; i < records.size(); ++i)
-            {
-                rows.push_back(ui::DataArchivePanelRow{
-                    .index = i,
-                    .record = records[i],
-                    .target_name = format_object_label(*m_universe, records[i]->target_object_id),
-                });
-            }
-        }
-
-        m_data_archive_panel.update(
-            std::move(rows),
-            m_input->get_mouse_position(),
-            m_input->was_click(),
-            viewport.width, viewport.height);
-    }
-
     // --- HUD update ---
     const f32 fps = (m_delta_time > 0.0) ? static_cast<f32>(1.0 / m_delta_time) : 0.0f;
 
@@ -1047,7 +1007,6 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
     m_info_panel.render(m_hud->get_font(), *m_line_renderer, extent);
     m_instrument_panel.render(m_hud->get_font(), *m_line_renderer, extent);
     m_sessions_panel.render(m_hud->get_font(), *m_line_renderer, extent);
-    m_data_archive_panel.render(m_hud->get_font(), *m_line_renderer, extent);
     m_line_renderer->render(cmd);   // flush UI border lines
 
     // 6. All text: HUD panels + toolbar + side panel + info panel (single GPU draw call)

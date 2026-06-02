@@ -24,7 +24,6 @@
 #include "ui/panel_system.hpp"                            // ← SPRINT 05 Task 5.1
 #include "ui/side_panel.hpp"                              // ← SPRINT 05 Task 5.4
 #include "ui/sessions_panel.hpp"
-#include "ui/data_archive_panel.hpp"
 #include "ui/tabs/planetarium_tab.hpp"
 #include "ui/toolbar.hpp"                                 // ← SPRINT 05 Task 5.3
 #include "universe/celestial_object.hpp"                  // ← SPRINT 07 Task 7.7
@@ -160,11 +159,9 @@ namespace parallax::core
         ui::InfoPanel m_info_panel;                           // Task 5.5  Right info panel
         ui::InstrumentPanel m_instrument_panel;               // Sprint 08 Task 8.10
         ui::SessionsPanel m_sessions_panel;                   // Sprint 08 Task 8.10
-        ui::DataArchivePanel m_data_archive_panel;            // Sprint 08 Task 8.10
 
         bool m_show_instrument_panel = false;
         bool m_show_sessions_panel = false;
-        bool m_show_data_archive_panel = false;
 
         // -----------------------------------------------------------------
         // Simulation state

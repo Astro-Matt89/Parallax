@@ -188,6 +188,7 @@ void Starfield::update(std::span<const catalog::StarEntry> stars,
     const auto pointing = camera.get_pointing();
     const f64 fov_rad = camera.get_fov_rad();
     const f32 mag_limit = camera.get_magnitude_limit();
+    constexpr f64 aspect_ratio = 1.0;
 
     // Diagnostic counters
     u32 diag_pass_mag     = 0;
@@ -214,7 +215,7 @@ void Starfield::update(std::span<const catalog::StarEntry> stars,
 
         // 2-4. RA/Dec → screen NDC via SHARED projection function
         const auto screen_pos = astro::Coordinates::project_radec_to_screen(
-            star.ra, star.dec, observer, lst, pointing, fov_rad);
+            star.ra, star.dec, observer, lst, pointing, fov_rad, aspect_ratio);
 
         if (!screen_pos.has_value())
         {

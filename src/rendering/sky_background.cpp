@@ -4,6 +4,7 @@
 #include "rendering/sky_background.hpp"
 
 #include "core/logger.hpp"
+#include "ui/shell/viewport_rect.hpp"
 
 #include <vulkan/vulkan.h>
 
@@ -106,7 +107,7 @@ SkyBackground::~SkyBackground()
 // update_params() — cache sky state for this frame
 // =================================================================
 
-void SkyBackground::update_params(const SkyParams& params, const Camera& camera)
+void SkyBackground::update_params(const SkyParams& params, const Camera& camera, f32 aspect_ratio)
 {
     const auto pointing = camera.get_pointing();
 
@@ -114,8 +115,7 @@ void SkyBackground::update_params(const SkyParams& params, const Camera& camera)
         .camera_alt_rad    = static_cast<f32>(pointing.alt),
         .camera_az_rad     = static_cast<f32>(pointing.az),
         .fov_rad           = static_cast<f32>(camera.get_fov_rad()),
-        .aspect_ratio      = static_cast<f32>(m_extent.width)
-                           / static_cast<f32>(std::max(m_extent.height, 1u)),
+        .aspect_ratio      = aspect_ratio,
         .bortle_scale      = params.bortle_scale,
         .sun_altitude_deg  = params.sun_altitude_deg,
         .sun_azimuth_deg   = params.sun_azimuth_deg,
@@ -133,13 +133,30 @@ void SkyBackground::update_params(const SkyParams& params, const Camera& camera)
 // draw() — record fullscreen triangle draw
 // =================================================================
 
-void SkyBackground::draw(VkCommandBuffer cmd) const
+void SkyBackground::draw(VkCommandBuffer cmd, const ui::shell::ViewportRect& viewport) const
 {
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
     vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
                             m_pipeline_layout, 0, 1,
                             &m_descriptor_set, 0, nullptr);
+
+    const SkyViewportPushConstants push_constants{
+        .viewport_origin = {
+            static_cast<f32>(viewport.x),
+            static_cast<f32>(viewport.y)
+        },
+        .viewport_size = {
+            static_cast<f32>(std::max(viewport.width, 1u)),
+            static_cast<f32>(std::max(viewport.height, 1u))
+        }
+    };
+    vkCmdPushConstants(cmd,
+                       m_pipeline_layout,
+                       VK_SHADER_STAGE_FRAGMENT_BIT,
+                       0,
+                       sizeof(SkyViewportPushConstants),
+                       &push_constants);
 
     // Fullscreen triangle: 3 vertices, 1 instance, no vertex buffer
     vkCmdDraw(cmd, 3, 1, 0, 0);
@@ -375,13 +392,19 @@ void SkyBackground::create_pipeline(VkRenderPass render_pass,
     color_blending.pAttachments = &color_blend_attachment;
 
     // -----------------------------------------------------------------
-    // Pipeline layout: descriptor set (UBO), no push constants
+    // Pipeline layout: descriptor set (UBO) + viewport push constants
     // -----------------------------------------------------------------
+    VkPushConstantRange push_range{};
+    push_range.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    push_range.offset = 0;
+    push_range.size = sizeof(SkyViewportPushConstants);
+
     VkPipelineLayoutCreateInfo layout_info{};
     layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     layout_info.setLayoutCount = 1;
     layout_info.pSetLayouts = &m_descriptor_set_layout;
-    layout_info.pushConstantRangeCount = 0;
+    layout_info.pushConstantRangeCount = 1;
+    layout_info.pPushConstantRanges = &push_range;
 
     check_vk(vkCreatePipelineLayout(device, &layout_info, nullptr, &m_pipeline_layout),
              "vkCreatePipelineLayout (sky)");

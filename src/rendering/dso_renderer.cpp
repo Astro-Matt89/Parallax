@@ -7,6 +7,7 @@
 #include "rendering/dso_renderer.hpp"
 
 #include "core/logger.hpp"
+#include "ui/shell/viewport_rect.hpp"
 
 #include <cmath>
 #include <format>
@@ -18,7 +19,9 @@ namespace parallax::rendering
 // Universe path — new API
 // =================================================================
 
-void DsoRenderer::begin_frame(LineRenderer& lines, ui::BitmapFont& font, VkExtent2D viewport)
+void DsoRenderer::begin_frame(LineRenderer& lines,
+                              ui::BitmapFont& font,
+                              const ui::shell::ViewportRect& viewport)
 {
     m_frame_lines    = &lines;
     m_frame_font     = &font;
@@ -94,7 +97,7 @@ void DsoRenderer::update(const Camera& camera,
                          std::span<const catalog::DsoEntry> catalog,
                          LineRenderer& lines,
                          ui::BitmapFont& font,
-                         VkExtent2D viewport)
+                         const ui::shell::ViewportRect& viewport)
 {
     m_rendered_count = 0;
 
@@ -106,6 +109,7 @@ void DsoRenderer::update(const Camera& camera,
     const auto pointing = camera.get_pointing();
     const f64 fov_rad = camera.get_fov_rad();
     const f32 mag_limit = camera.get_magnitude_limit();
+    const f64 aspect_ratio = static_cast<f64>(viewport.aspect());
 
     for (const auto& dso : catalog)
     {
@@ -117,7 +121,7 @@ void DsoRenderer::update(const Camera& camera,
 
         // Project RA/Dec → screen NDC via shared pipeline
         const auto pos = astro::Coordinates::project_radec_to_screen(
-            dso.ra, dso.dec, observer, lst_rad, pointing, fov_rad);
+            dso.ra, dso.dec, observer, lst_rad, pointing, fov_rad, aspect_ratio);
 
         if (!pos.has_value())
         {
@@ -313,10 +317,12 @@ void DsoRenderer::draw_plain_circle(Vec2f center, f32 radius,
 // NDC → pixel conversion
 // =================================================================
 
-Vec2f DsoRenderer::ndc_to_pixel(Vec2f ndc, VkExtent2D viewport)
+Vec2f DsoRenderer::ndc_to_pixel(Vec2f ndc, const ui::shell::ViewportRect& viewport)
 {
-    const f32 px = (ndc.x + 1.0f) * 0.5f * static_cast<f32>(viewport.width);
-    const f32 py = (ndc.y + 1.0f) * 0.5f * static_cast<f32>(viewport.height);
+    const f32 px = static_cast<f32>(viewport.x)
+                 + (ndc.x + 1.0f) * 0.5f * static_cast<f32>(viewport.width);
+    const f32 py = static_cast<f32>(viewport.y)
+                 + (ndc.y + 1.0f) * 0.5f * static_cast<f32>(viewport.height);
     return {px, py};
 }
 

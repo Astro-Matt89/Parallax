@@ -26,6 +26,7 @@
 
 // Forward declare to avoid pulling universe headers into the overlay layer.
 namespace parallax::universe { class Universe; }
+namespace parallax::ui::shell { struct ViewportRect; }
 
 namespace parallax::overlay
 {
@@ -95,7 +96,7 @@ namespace parallax::overlay
                     f64 lst_rad,
                     rendering::LineRenderer& lines,
                     ui::BitmapFont& font,
-                    VkExtent2D viewport);
+                    const ui::shell::ViewportRect& viewport);
 
         void set_visible(bool visible);
         void toggle_visible();

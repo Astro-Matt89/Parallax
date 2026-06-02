@@ -23,6 +23,7 @@
 #include "rendering/line_renderer.hpp"
 #include "rendering/render_style.hpp"
 #include "ui/font.hpp"
+#include "ui/shell/viewport_rect.hpp"
 #include "universe/celestial_object.hpp"
 
 #include <vulkan/vulkan.h>
@@ -88,7 +89,7 @@ namespace parallax::rendering
         ///                       have already passed horizon culling (or not).
         void begin_frame(LineRenderer& lines,
                          ui::BitmapFont& font,
-                         VkExtent2D viewport,
+                         const ui::shell::ViewportRect& viewport,
                          bool atmosphere_on);
 
         /// @brief Draw a single Solar System body icon + label at the given screen position.
@@ -140,7 +141,7 @@ namespace parallax::rendering
                     f64 lst_rad,
                     LineRenderer& lines,
                     ui::BitmapFont& font,
-                    VkExtent2D viewport,
+                    const ui::shell::ViewportRect& viewport,
                     bool atmosphere_on);
 
         // ---------------------------------------------------------------
@@ -201,7 +202,7 @@ namespace parallax::rendering
                         f64 lst_rad,
                         LineRenderer& lines,
                         ui::BitmapFont& font,
-                        VkExtent2D viewport,
+                        const ui::shell::ViewportRect& viewport,
                         bool atmosphere_on);
 
         /// @brief Render the Moon icon: white circle + phase shadow + label.
@@ -212,7 +213,7 @@ namespace parallax::rendering
                          f64 lst_rad,
                          LineRenderer& lines,
                          ui::BitmapFont& font,
-                         VkExtent2D viewport,
+                         const ui::shell::ViewportRect& viewport,
                          bool atmosphere_on);
 
         /// @brief Render a planet icon: colored filled circle + label.
@@ -223,7 +224,7 @@ namespace parallax::rendering
                            f64 lst_rad,
                            LineRenderer& lines,
                            ui::BitmapFont& font,
-                           VkExtent2D viewport,
+                           const ui::shell::ViewportRect& viewport,
                            bool atmosphere_on);
 
         /// @brief Draw a filled circle approximation using concentric line circles.
@@ -257,7 +258,7 @@ namespace parallax::rendering
         [[nodiscard]] static f32 magnitude_to_radius_ndc(f32 magnitude);
 
     private:
-        [[nodiscard]] static Vec2f ndc_to_pixel(Vec2f ndc, VkExtent2D viewport);
+        [[nodiscard]] static Vec2f ndc_to_pixel(Vec2f ndc, const ui::shell::ViewportRect& viewport);
 
         /// @brief Try to project a body to screen, respecting horizon culling.
         ///
@@ -274,6 +275,7 @@ namespace parallax::rendering
             const Camera& camera,
             const astro::ObserverLocation& observer,
             f64 lst_rad,
+            f64 aspect_ratio,
             bool atmosphere_on);
 
         bool m_visible = true;
@@ -285,7 +287,7 @@ namespace parallax::rendering
         /// @brief Transient per-frame rendering context (set by begin_frame).
         LineRenderer*   m_frame_lines       = nullptr;
         ui::BitmapFont* m_frame_font        = nullptr;
-        VkExtent2D      m_frame_viewport    = {};
+        ui::shell::ViewportRect m_frame_viewport{};
         bool            m_frame_atm_on      = true;
 
         // -----------------------------------------------------------------

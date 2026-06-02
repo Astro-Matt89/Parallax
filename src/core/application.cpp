@@ -156,37 +156,25 @@ void Application::init()
     PLX_CORE_INFO("Shader directory: {}", shader_dir.string());
     m_pipeline = std::make_unique<vulkan::Pipeline>(*m_context, *m_swapchain, shader_dir);
 
-    // 6. Sky background
-    m_sky_background = std::make_unique<rendering::SkyBackground>(
-        *m_context, m_pipeline->get_render_pass(), shader_dir, m_swapchain->get_extent());
-
-    // 7. Starfield renderer (skychart mode — no atmosphere parameter)
-    //    Buffer increased to 300k for Tycho-2 at high MLIM           ← SPRINT 05 Task 5.0
-    m_starfield = std::make_unique<rendering::Starfield>(
-        *m_context, m_pipeline->get_render_pass(), shader_dir, 300000);
-
-    // 7b. Line renderer for overlays (constellations, grids, horizon)  ← SPRINT 04 Task 4.1
+    // 6. Line renderer for UI border passes
     m_line_renderer = std::make_unique<rendering::LineRenderer>(
         *m_context, m_pipeline->get_render_pass(), shader_dir);
 
-    // 8. Camera
-    m_camera = std::make_unique<rendering::Camera>();
-
-    // 9. HUD overlay
+    // 7. HUD overlay
     m_hud = std::make_unique<ui::Hud>(
         *m_context, m_pipeline->get_render_pass(), shader_dir);
 
-    // 9b. PanelSystem — batched panel backgrounds           ← SPRINT 05 Task 5.1
+    // 7b. PanelSystem — batched panel backgrounds           ← SPRINT 05 Task 5.1
     m_panel_system.init(*m_context, m_pipeline->get_render_pass(), shader_dir);
 
-    // 9c. Toolbar                                           ← SPRINT 05 Task 5.3
+    // 7c. Toolbar                                           ← SPRINT 05 Task 5.3
     {
         ui::ToolbarCallbacks cb;
-        cb.toggle_constellations = [this]() { m_constellations.toggle_visible(); };
+        cb.toggle_constellations = [this]() { m_planetarium_tab->toggle_constellations(); };
         cb.toggle_stars          = [this]() { /* TODO: add Starfield visibility toggle */ };
-        cb.toggle_dso            = [this]() { m_dso_renderer.toggle_visible(); };
-        cb.cycle_grid            = [this]() { m_coord_grid.cycle_type(); };
-        cb.toggle_horizon        = [this]() { m_horizon.toggle_visible(); };
+        cb.toggle_dso            = [this]() { m_planetarium_tab->toggle_dso(); };
+        cb.cycle_grid            = [this]() { m_planetarium_tab->cycle_grid(); };
+        cb.toggle_horizon        = [this]() { m_planetarium_tab->toggle_horizon(); };
         cb.toggle_atmosphere     = [this]() { toggle_atmosphere(); };  // ← SPRINT 06 Task 6.7
         cb.toggle_observe_panel  = [this]()
         {
@@ -222,11 +210,11 @@ void Application::init()
             m_julian_date = astro::TimeSystem::now_as_jd();
             m_time_scale = 1.0;
         };
-        cb.set_fov = [this](f64 fov_deg) { m_camera->set_fov(fov_deg); };
+        cb.set_fov = [this](f64 fov_deg) { m_planetarium_tab->set_fov(fov_deg); };
         m_toolbar.init(cb);
     }
 
-    // 9d. SidePanel                                         ← SPRINT 05 Task 5.4
+    // 7d. SidePanel                                         ← SPRINT 05 Task 5.4
     {
         ui::SidePanelCallbacks cb;
         cb.set_location = [this](f64 lat_deg, f64 lon_deg, f64 elev_m, f32 bortle)
@@ -234,18 +222,18 @@ void Application::init()
             m_observer.latitude_rad  = glm::radians(lat_deg);
             m_observer.longitude_rad = glm::radians(lon_deg);
             m_elevation_m            = elev_m;
-            m_sky_params.bortle_scale = bortle;
+            m_planetarium_tab->set_bortle_scale(bortle);
             PLX_CORE_INFO("Observer location set: {:.2f}N {:.2f}E {:.0f}m Bortle {}",
                           lat_deg, lon_deg, elev_m, static_cast<int>(bortle));
         };
         cb.set_bortle = [this](f32 bortle)
         {
-            m_sky_params.bortle_scale = bortle;
+            m_planetarium_tab->set_bortle_scale(bortle);
             PLX_CORE_INFO("Bortle scale: {}", static_cast<int>(bortle));
         };
         cb.set_magnitude_limit = [this](f32 mag)
         {
-            m_camera->set_magnitude_limit(mag);
+            m_planetarium_tab->set_magnitude_limit(mag);
             PLX_CORE_INFO("Magnitude limit: {:.1f}", mag);
         };
         cb.set_time_scale = [this](f64 scale)
@@ -256,20 +244,21 @@ void Application::init()
         m_side_panel.init(cb);
     }
 
-    // 9e. InfoPanel                                         ← SPRINT 05 Task 5.5
+    // 7e. InfoPanel                                         ← SPRINT 05 Task 5.5
     {
         ui::InfoPanelCallbacks cb;
         cb.track = [this]()
         {
-            m_selection.set_tracking(!m_selection.is_tracking());
-            PLX_CORE_INFO("Tracking {}", m_selection.is_tracking() ? "enabled" : "disabled");
+            m_planetarium_tab->toggle_tracking();
+            PLX_CORE_INFO("Tracking {}",
+                          m_planetarium_tab->get_selection().is_tracking() ? "enabled" : "disabled");
         };
         cb.goto_object = [this]() { /* TODO: future telescope slew command */ };
         cb.observe_this = [this](u64 target_id) { request_observe(target_id); };
         m_info_panel.init(cb);
     }
 
-    // 9f. Observation workflow panels                        ← SPRINT 08 Task 8.10
+    // 7f. Observation workflow panels                        ← SPRINT 08 Task 8.10
     {
         ui::InstrumentPanelCallbacks observe_cb;
         observe_cb.schedule = [this](const observation::SessionParameters& params)
@@ -298,21 +287,8 @@ void Application::init()
         m_data_archive_panel.set_visible(false);
     }
 
-    // 9g. Selection — load star names                      ← SPRINT 05 Task 5.5
-    {
-        const std::filesystem::path star_names_path{"data/catalogs/star_names.csv"};
-        if (m_selection.load_star_names(star_names_path))
-        {
-            PLX_CORE_INFO("Star names loaded: {} entries", m_selection.get_name_count());
-        }
-        else
-        {
-            PLX_CORE_WARN("Star names not found at {}", star_names_path.string());
-        }
-    }
-
     // =================================================================
-    // 10. Universe facade — replaces all direct catalog loading.
+    // 8. Universe facade — replaces all direct catalog loading.
     //     ← SPRINT 07 Task 7.7
     // =================================================================
     {
@@ -335,7 +311,7 @@ void Application::init()
                       m_universe->get_real_object_count());
     }
 
-    // 10c. Sprint 08 integration modules.
+    // 8b. Sprint 08 integration modules.
     m_knowledge = std::make_unique<knowledge::KnowledgeDatabase>();
 
     const std::filesystem::path save_dir = user_data_save_dir();
@@ -366,23 +342,13 @@ void Application::init()
     m_mock_instrument = std::make_unique<instruments::MockInstrument>(1, "Magic Instrument");
     m_analyzer = std::make_unique<analysis::MockAnalyzer>();
 
-    // 10b. Load constellation overlay — resolve via Universe                ← SPRINT 04 Task 4.2
-    {
-        const std::filesystem::path const_lines{"data/catalogs/constellation_lines.csv"};
-        const std::filesystem::path const_names{"data/catalogs/constellation_names.csv"};
-        if (m_constellations.load(const_lines, const_names))
-        {
-            m_constellations.resolve_via_universe(m_universe.get());
-        }
-    }
-
-    // 11. Observer: La Palma, Canary Islands
+    // 9. Observer: La Palma, Canary Islands
     m_observer = astro::ObserverLocation{
         .latitude_rad  = glm::radians(28.76),
         .longitude_rad = glm::radians(-17.89),
     };
 
-    // 12. Simulation time
+    // 10. Simulation time
     m_julian_date = astro::TimeSystem::now_as_jd();
     m_time_scale = 1.0;
     {
@@ -394,23 +360,20 @@ void Application::init()
                       -glm::degrees(m_observer.longitude_rad));
     }
 
-    // 13. Sky parameters — ephemeris fields (sun/moon) are set each frame in update_simulation.
-    m_sky_params = rendering::SkyParams{
-        .bortle_scale = 4.0f,
-        // sun_altitude_deg, sun_azimuth_deg, moon_altitude_deg, moon_azimuth_deg,
-        // moon_illumination, atmosphere_enabled — all use struct defaults; overwritten each frame.
-    };
+    // 11. Planetarium tab
+    m_planetarium_tab = std::make_unique<ui::tabs::PlanetariumTab>(
+        *m_context,
+        *m_swapchain,
+        m_pipeline->get_render_pass(),
+        shader_dir,
+        *m_universe,
+        *m_knowledge,
+        m_hud->get_font(),
+        m_julian_date,
+        m_observer);
+    m_planetarium_tab->set_bortle_scale(4.0f);
 
-    // 14. Atmosphere model: KEPT for future imaging mode, not used in skychart
-    m_atmosphere.set_params(astro::AtmosphereParams{
-        .pressure_mbar = 1013.25f,
-        .temperature_c = 15.0f,
-        .extinction_coeff = 0.20f,
-        .bortle_scale = m_sky_params.bortle_scale,
-    });
-    PLX_CORE_INFO("Atmosphere model initialized (dormant — skychart mode)");
-
-    // 15-17. Command pool, sync, frame time
+    // 12-14. Command pool, sync, frame time
     create_command_pool();
     create_command_buffers();
     create_sync_objects();
@@ -418,13 +381,13 @@ void Application::init()
 
     // Log initial overlay states
     PLX_CORE_INFO("Overlays: CONST={} GRID={} DSO={} HORIZ={}",
-                  m_constellations.is_visible() ? "ON" : "OFF",
-                  m_coord_grid.get_type_name(),
-                  m_dso_renderer.is_visible() ? "ON" : "OFF",
-                  m_horizon.is_visible() ? "ON" : "OFF");
+                  m_planetarium_tab->constellations_visible() ? "ON" : "OFF",
+                  m_planetarium_tab->grid_type_name(),
+                  m_planetarium_tab->dso_visible() ? "ON" : "OFF",
+                  m_planetarium_tab->horizon_visible() ? "ON" : "OFF");
 
     PLX_CORE_INFO("Application initialized — skychart mode, MLIM {:.1f}",
-                  m_camera->get_magnitude_limit());
+                  m_planetarium_tab->get_magnitude_limit());
 }
 
 // =================================================================
@@ -471,10 +434,9 @@ void Application::shutdown()
     }
 
     m_panel_system.destroy();   // ← SPRINT 05 Task 5.1 (destroy before HUD)
+    m_planetarium_tab.reset();
     m_hud.reset();
-    m_line_renderer.reset();    // ← SPRINT 04 Task 4.1 (destroy before starfield)
-    m_starfield.reset();
-    m_sky_background.reset();
+    m_line_renderer.reset();
     m_pipeline.reset();
     m_swapchain.reset();
     m_context.reset();
@@ -516,15 +478,19 @@ void Application::main_loop()
 // Atmosphere toggle API                           ← SPRINT 06 Task 6.7
 // =================================================================
 
+bool Application::is_atmosphere_on() const
+{
+    return m_planetarium_tab->is_atmosphere_on();
+}
+
 void Application::toggle_atmosphere()
 {
-    m_atmosphere_on = !m_atmosphere_on;
-    PLX_CORE_INFO("Atmosphere: {}", m_atmosphere_on ? "ON (twilight gradient)" : "OFF (pure black)");
+    m_planetarium_tab->toggle_atmosphere();
 }
 
 void Application::set_atmosphere(bool on)
 {
-    m_atmosphere_on = on;
+    m_planetarium_tab->set_atmosphere(on);
 }
 
 void Application::request_observe(u64 target_id)
@@ -557,7 +523,15 @@ void Application::request_observe(u64 target_id)
 void Application::process_input()
 {
     const Vec2f mouse_pos = m_input->get_mouse_position();
-    const VkExtent2D viewport = m_swapchain->get_extent();
+    const VkExtent2D extent = m_swapchain->get_extent();
+    const ui::shell::ViewportRect planetarium_viewport{
+        .x = 0,
+        .y = 0,
+        .width = extent.width,
+        .height = extent.height
+    };
+
+    m_planetarium_tab->set_viewport(planetarium_viewport);
 
     // =================================================================
     // Step 1: Determine if mouse is over any UI panel
@@ -575,109 +549,57 @@ void Application::process_input()
     // =================================================================
     if (mouse_over_ui)
     {
-        // --- Priority 1: UI panels consume mouse input ---
         m_panel_system.process_input(*m_input, mouse_pos);
         m_input->set_cursor(CursorStyle::Hand);
     }
     else
     {
-        // --- Sky interaction ---
+        ui::shell::InputEvent event{};
+        event.inside_viewport = planetarium_viewport.contains(
+            static_cast<i32>(mouse_pos.x),
+            static_cast<i32>(mouse_pos.y));
+        event.scroll_delta = m_input->get_scroll_delta();
+        event.is_dragging = m_input->is_mouse_dragging();
+        event.drag_delta = m_input->get_mouse_drag_delta();
+        event.mouse_delta = event.drag_delta;
 
-        // Priority 3: Drag on sky → camera pan
-        if (m_input->is_mouse_dragging())
+        if (event.inside_viewport)
         {
-            const auto drag = m_input->get_mouse_drag_delta();
-            const f64 fov = m_camera->get_fov_rad();
-            const f64 sensitivity = fov / static_cast<f64>(m_window->get_width());
-
-            const f64 delta_az  = -static_cast<f64>(drag.x) * sensitivity;
-            const f64 delta_alt = -static_cast<f64>(drag.y) * sensitivity;
-            m_camera->pan(delta_az, delta_alt);
-
-            m_input->set_cursor(CursorStyle::SizeAll);
+            event.mouse_pos = {
+                mouse_pos.x - static_cast<f32>(planetarium_viewport.x),
+                mouse_pos.y - static_cast<f32>(planetarium_viewport.y)
+            };
         }
-        // Priority 2: Click on sky (not drag) → object selection
-        else if (m_input->was_click())
+
+        if (m_input->was_click())
         {
             const Vec2f click_pos = m_input->get_click_position();
-
-            const f32 ndc_x = (2.0f * click_pos.x / static_cast<f32>(viewport.width)) - 1.0f;
-            const f32 ndc_y = (2.0f * click_pos.y / static_cast<f32>(viewport.height)) - 1.0f;
-            const Vec2f click_ndc = {ndc_x, ndc_y};
-
-            m_selection.try_select_from_objects(
-                click_ndc,
-                m_frame_objects,
-                m_observer,
-                astro::TimeSystem::lmst(m_julian_date, m_observer.longitude_rad),
-                *m_camera,
-                viewport);
-
-            if (m_selection.has_selection())
+            if (planetarium_viewport.contains(static_cast<i32>(click_pos.x), static_cast<i32>(click_pos.y)))
             {
-                const auto& sel = m_selection.get_selection();
-                if (sel.type == ui::SelectedObjectType::Star)
-                {
-                    if (sel.is_procedural)
-                    {
-                        PLX_CORE_INFO("Selected procedural star: {} mag {:.2f} ({:.4f}, {:.4f})",
-                                      sel.designation, sel.mag_v, sel.ra_rad, sel.dec_rad);
-                    }
-                    else
-                    {
-                        PLX_CORE_INFO("Selected star: HIP {} mag {:.2f} ({:.4f}, {:.4f})",
-                                      sel.hip_id, sel.mag_v, sel.ra_rad, sel.dec_rad);
-                    }
-                }
-                else if (sel.type == ui::SelectedObjectType::Dso)
-                {
-                    PLX_CORE_INFO("Selected DSO: {}", sel.designation);
-                }
-                else if (sel.type == ui::SelectedObjectType::SolarSystem)
-                {
-                    PLX_CORE_INFO("Selected Solar System body: {} (body_id {})",
-                                  sel.body_name, sel.body_id);
-                }
+                event.was_click = true;
+                event.click_button = ui::shell::MouseButton::Left;
+                event.click_pos = {
+                    click_pos.x - static_cast<f32>(planetarium_viewport.x),
+                    click_pos.y - static_cast<f32>(planetarium_viewport.y)
+                };
             }
-            else
-            {
-                PLX_CORE_TRACE("Click on sky: no object found near cursor");
-            }
+        }
 
-            m_input->set_cursor(CursorStyle::Crosshair);
+        m_planetarium_tab->on_input(event, planetarium_viewport);
+
+        if (event.inside_viewport)
+        {
+            m_input->set_cursor(event.is_dragging ? CursorStyle::SizeAll : CursorStyle::Crosshair);
         }
         else
         {
-            // Hovering over sky, not dragging or clicking
-            m_input->set_cursor(CursorStyle::Crosshair);
-        }
-
-        // Priority 4: Scroll on sky → camera zoom
-        const f32 scroll = m_input->get_scroll_delta();
-        if (scroll != 0.0f)
-        {
-            const f64 zoom_factor = 1.0 - static_cast<f64>(scroll) * 0.1;
-            m_camera->zoom(zoom_factor);
+            m_input->set_cursor(CursorStyle::Arrow);
         }
     }
 
     // =================================================================
     // Keyboard bindings (always active regardless of mouse state)
     // =================================================================
-
-    if (m_input->is_key_pressed(SDL_SCANCODE_RIGHTBRACKET) ||
-        m_input->is_key_pressed(SDL_SCANCODE_PAGEDOWN))
-    {
-        m_camera->adjust_magnitude_limit(0.5f);
-        PLX_CORE_INFO("Magnitude limit: {:.1f} (fainter)", m_camera->get_magnitude_limit());
-    }
-
-    if (m_input->is_key_pressed(SDL_SCANCODE_LEFTBRACKET) ||
-        m_input->is_key_pressed(SDL_SCANCODE_PAGEUP))
-    {
-        m_camera->adjust_magnitude_limit(-0.5f);
-        PLX_CORE_INFO("Magnitude limit: {:.1f} (brighter)", m_camera->get_magnitude_limit());
-    }
 
     if (m_input->is_key_pressed(SDL_SCANCODE_1)) { m_time_scale = 1.0;     PLX_CORE_INFO("Time scale: x1"); }
     if (m_input->is_key_pressed(SDL_SCANCODE_2)) { m_time_scale = 10.0;    PLX_CORE_INFO("Time scale: x10"); }
@@ -724,84 +646,18 @@ void Application::process_input()
 
     if (m_input->is_key_pressed(SDL_SCANCODE_B))
     {
-        f32 bortle = m_sky_params.bortle_scale + 1.0f;
+        f32 bortle = m_planetarium_tab->get_bortle_scale() + 1.0f;
         if (bortle > 9.0f) bortle = 1.0f;
-        m_sky_params.bortle_scale = bortle;
-
-        auto atmo_params = m_atmosphere.get_params();
-        atmo_params.bortle_scale = bortle;
-        m_atmosphere.set_params(atmo_params);
-
+        m_planetarium_tab->set_bortle_scale(bortle);
         PLX_CORE_INFO("Bortle scale: {}", static_cast<int>(bortle));
     }
 
-    // Overlay toggles
-    if (m_input->is_key_pressed(SDL_SCANCODE_C))
-    {
-        m_constellations.toggle_visible();
-        PLX_CORE_INFO("Constellations {}",
-                      m_constellations.is_visible() ? "shown" : "hidden");
-    }
+    const bool had_selection = m_planetarium_tab->has_selection();
+    m_planetarium_tab->handle_keyboard(*m_input);
 
-    if (m_input->is_key_pressed(SDL_SCANCODE_G))
+    if (m_input->is_key_pressed(SDL_SCANCODE_ESCAPE) && !had_selection)
     {
-        m_coord_grid.cycle_type();
-        PLX_CORE_INFO("Coordinate grid: {}", m_coord_grid.get_type_name());
-    }
-
-    if (m_input->is_key_pressed(SDL_SCANCODE_D))
-    {
-        m_dso_renderer.toggle_visible();
-        PLX_CORE_INFO("DSOs {}", m_dso_renderer.is_visible() ? "shown" : "hidden");
-    }
-
-    if (m_input->is_key_pressed(SDL_SCANCODE_P))
-    {
-        m_solar_system_renderer.toggle_visible();
-        PLX_CORE_INFO("Solar System {}", m_solar_system_renderer.is_visible() ? "shown" : "hidden");
-    }
-
-    if (m_input->is_key_pressed(SDL_SCANCODE_O))
-    {
-        m_horizon.toggle_visible();
-        PLX_CORE_INFO("Horizon {}", m_horizon.is_visible() ? "shown" : "hidden");
-    }
-
-    if (m_input->is_key_pressed(SDL_SCANCODE_A))
-    {
-        toggle_atmosphere();
-    }
-
-    // Selection: Escape clears first, then closes window
-    if (m_input->is_key_pressed(SDL_SCANCODE_ESCAPE))
-    {
-        if (m_selection.has_selection())
-        {
-            m_selection.clear();
-            PLX_CORE_INFO("Selection cleared");
-        }
-        else
-        {
-            m_window->request_close();
-        }
-    }
-
-    // F — Toggle tracking on selected object
-    if (m_input->is_key_pressed(SDL_SCANCODE_F))
-    {
-       if (m_selection.has_selection())
-       {
-           m_selection.set_tracking(!m_selection.is_tracking());
-           PLX_CORE_INFO("Tracking {}",
-                         m_selection.is_tracking() ? "enabled" : "disabled");
-       }
-   }
-
-    // Camera reset
-    if (m_input->is_key_pressed(SDL_SCANCODE_R))
-    {
-        m_camera->reset();
-        PLX_CORE_INFO("Camera reset (MLIM {:.1f})", m_camera->get_magnitude_limit());
+        m_window->request_close();
     }
 }
 
@@ -880,171 +736,37 @@ void Application::update_simulation(f64 delta_time_sec)
         }
     }
 
-    // Compute Local Sidereal Time
-    const f64 lst = astro::TimeSystem::lmst(m_julian_date, m_observer.longitude_rad);
-
-    // --- Universe update --- (must be before query_fov)
-    m_universe->update(m_julian_date);
-
-    // --- Procedural first-tick log ---
-    if (!m_procedural_first_tick_logged)
-    {
-        PLX_CORE_INFO("Procedural provider active — master seed 0xA5735E5D, nside=64 cells");
-        m_procedural_first_tick_logged = true;
-    }
-
-    // --- Update sky parameters with live Sun/Moon Alt/Az (same as before) ---
-    {
-        const auto ss_bodies  = astro::SolarSystem::compute_all(m_julian_date);
-        const auto moon_state = astro::SolarSystem::compute_moon_full(m_julian_date);
-
-        const auto sun_hz  = astro::Coordinates::equatorial_to_horizontal(
-            ss_bodies.sun.equatorial, m_observer, lst);
-        const auto moon_hz = astro::Coordinates::equatorial_to_horizontal(
-            ss_bodies.moon.equatorial, m_observer, lst);
-
-        m_sky_params.sun_altitude_deg  = static_cast<f32>(sun_hz.alt  * astro_constants::kRadToDeg);
-        m_sky_params.sun_azimuth_deg   = static_cast<f32>(sun_hz.az   * astro_constants::kRadToDeg);
-        m_sky_params.moon_altitude_deg = static_cast<f32>(moon_hz.alt * astro_constants::kRadToDeg);
-        m_sky_params.moon_azimuth_deg  = static_cast<f32>(moon_hz.az  * astro_constants::kRadToDeg);
-        m_sky_params.moon_illumination = moon_state.body.illumination;
-        m_sky_params.atmosphere_enabled = m_atmosphere_on;
-
-        m_sun_altitude_deg = m_sky_params.sun_altitude_deg;
-    }
-
-    // Update sky background (visual context only)
-    m_sky_background->update_params(m_sky_params, *m_camera);
-
-    // Clear line renderer for this frame
-    m_line_renderer->begin_frame();
-
     const VkExtent2D viewport = m_swapchain->get_extent();
+    m_planetarium_tab->set_viewport({
+        .x = 0,
+        .y = 0,
+        .width = viewport.width,
+        .height = viewport.height
+    });
+    m_planetarium_tab->update(delta_time_sec);
 
-    // Coordinate grid (submit first — it goes behind overlays in the line batch)
-    m_coord_grid.update(*m_camera, m_observer, lst,
-                        *m_line_renderer, m_hud->get_font(), viewport);
-
-    // ---  query_fov → m_frame_objects  ---
-    const auto pointing  = m_camera->get_pointing();
-    const f64  fov_rad   = m_camera->get_fov_rad();
-    const f32  mag_limit = m_camera->get_magnitude_limit();
-
-    // Convert camera pointing (Alt/Az) → RA/Dec for the FOV query
-    const auto camera_eq = astro::Coordinates::horizontal_to_equatorial(
-        pointing, m_observer, lst);
-
-    // Query radius = FOV half-angle (gnomonic), padded by 25 %
-    const f64 query_radius_deg = glm::degrees(fov_rad * 0.75);
-
-    m_universe->query_fov(camera_eq.ra, camera_eq.dec,
-                          query_radius_deg, mag_limit,
-                          universe::QueryFlags::All,
-                          m_frame_objects);
-
-    // --- Begin renderer frames ---
-    m_starfield->begin_frame(mag_limit);
-    m_solar_system_renderer.begin_frame(*m_line_renderer, m_hud->get_font(), viewport, m_atmosphere_on);
-    m_dso_renderer.begin_frame(*m_line_renderer, m_hud->get_font(), viewport);
-
-    // --- Dispatch per-frame objects ---
-    for (const auto& obj : m_frame_objects)
-    {
-        const auto hz = astro::Coordinates::equatorial_to_horizontal(
-            {obj.ra, obj.dec}, m_observer, lst);
-
-        if (m_atmosphere_on && hz.alt < 0.0)
-        {
-            continue;  // Below horizon when atmosphere culling is on
-        }
-
-        // -----------------------------------------------------------------
-        // Knowledge-aware filter                              ← Task 8.9
-        //
-        // Real catalog objects (is_real()) always render as Historical.
-        // Procedural objects are skipped unless the player has discovered
-        // them (is_known).  Discovered procedural objects render as
-        // Confirmed (≥ 2 independent detections) or Candidate (1 detection).
-        // -----------------------------------------------------------------
-        rendering::RenderStyle style = rendering::RenderStyle::Historical;
-
-        if (!obj.is_real())
-        {
-            if (!m_knowledge->is_known(obj.id))
-            {
-                continue;  // Undiscovered procedural object — never visible
-            }
-
-            style = m_knowledge->is_confirmed(obj.id)
-                        ? rendering::RenderStyle::Confirmed
-                        : rendering::RenderStyle::Candidate;
-        }
-
-        const auto screen_opt = astro::Coordinates::horizontal_to_screen(hz, pointing, fov_rad);
-        if (!screen_opt.has_value())
-        {
-            continue;  // Outside FOV
-        }
-
-        const Vec2f screen = screen_opt.value();
-
-        switch (obj.type)
-        {
-            case universe::ObjectType::Star:
-            case universe::ObjectType::ProceduralStar:
-                m_starfield->add_celestial_object(screen, obj, style);
-                break;
-
-            case universe::ObjectType::SolarSystemBody:
-                m_solar_system_renderer.add_celestial_object(screen, hz.alt, hz.az, obj, style);
-                break;
-
-            case universe::ObjectType::DeepSkyObject:
-                m_dso_renderer.add_celestial_object(screen, obj, style);
-                break;
-
-            default:
-                break; // Galaxy / ProceduralDso — not yet rendered
-        }
-    }
-
-    // Finalise starfield GPU upload
-    m_starfield->end_frame();
-
-    // --- Constellation lines + labels (over stars) ---
-    m_constellations.update(*m_camera, m_observer, lst,
-                            *m_line_renderer, m_hud->get_font(), viewport);
-
-    // --- Horizon line + cardinal markers ---
-    m_horizon.update(*m_camera, *m_line_renderer, m_hud->get_font(), viewport);
-
-    // --- Selection — refresh screen position + Alt/Az each frame ---
-    m_selection.update_from_objects(m_frame_objects,
-                                    m_solar_system_renderer.get_screen_objects(),
-                                    m_observer, lst, *m_camera);
-
-    // --- Selection indicator ---
-    if (m_selection.has_selection())
-    {
-        m_selection.render_indicator(*m_line_renderer, viewport);
-    }
+    const f64 lst = astro::TimeSystem::lmst(m_julian_date, m_observer.longitude_rad);
+    const auto& camera = m_planetarium_tab->get_camera();
+    const auto pointing = camera.get_pointing();
+    const f64 fov_rad = camera.get_fov_rad();
+    const auto camera_eq = astro::Coordinates::horizontal_to_equatorial(pointing, m_observer, lst);
 
     // --- Toolbar update ---
     {
         const ui::ToolbarState toolbar_state{
-            .constellations_visible = m_constellations.is_visible(),
+            .constellations_visible = m_planetarium_tab->constellations_visible(),
             .stars_visible          = true,
-            .dso_visible            = m_dso_renderer.is_visible(),
-            .grid_visible           = m_coord_grid.get_type() != overlay::GridType::None,
-            .horizon_visible        = m_horizon.is_visible(),
-            .atmosphere_on          = m_atmosphere_on,
+            .dso_visible            = m_planetarium_tab->dso_visible(),
+            .grid_visible           = m_planetarium_tab->grid_type() != overlay::GridType::None,
+            .horizon_visible        = m_planetarium_tab->horizon_visible(),
+            .atmosphere_on          = m_planetarium_tab->is_atmosphere_on(),
             .observe_panel_visible  = m_show_instrument_panel,
             .sessions_panel_visible = m_show_sessions_panel,
             .data_panel_visible     = m_show_data_archive_panel,
             .time_scale             = m_time_scale,
             .time_paused            = (m_time_scale == 0.0),
-            .fov_deg                = m_camera->get_fov_deg(),
-            .magnitude_limit        = m_camera->get_magnitude_limit(),
+            .fov_deg                = m_planetarium_tab->get_fov_deg(),
+            .magnitude_limit        = m_planetarium_tab->get_magnitude_limit(),
         };
         m_toolbar.update(
             m_input->get_mouse_position(),
@@ -1079,8 +801,8 @@ void Application::update_simulation(f64 delta_time_sec)
             .julian_date     = m_julian_date,
             .time_scale      = m_time_scale,
             .time_paused     = (m_time_scale == 0.0),
-            .bortle_scale    = m_sky_params.bortle_scale,
-            .magnitude_limit = m_camera->get_magnitude_limit(),
+            .bortle_scale    = m_planetarium_tab->get_bortle_scale(),
+            .magnitude_limit = m_planetarium_tab->get_magnitude_limit(),
         };
         m_side_panel.update(
             m_input->get_mouse_position(),
@@ -1093,7 +815,7 @@ void Application::update_simulation(f64 delta_time_sec)
 
     // --- InfoPanel update ---
     m_info_panel.update(
-        m_selection,
+        m_planetarium_tab->get_selection(),
         m_knowledge.get(),
         m_input->get_mouse_position(),
         m_input->was_click(),
@@ -1103,10 +825,10 @@ void Application::update_simulation(f64 delta_time_sec)
     // --- Instrument panel update ---
     {
         ui::InstrumentPanelState observe_state;
-        observe_state.has_selection = m_selection.has_selection();
+        observe_state.has_selection = m_planetarium_tab->has_selection();
         if (observe_state.has_selection)
         {
-            observe_state.selected_object_id = m_selection.get_selection().celestial_obj.id;
+            observe_state.selected_object_id = m_planetarium_tab->get_selection().get_selection().celestial_obj.id;
             observe_state.selected_object_name =
                 format_object_label(*m_universe, observe_state.selected_object_id);
         }
@@ -1233,21 +955,21 @@ void Application::update_simulation(f64 delta_time_sec)
         .utc_hours               = 0.0,
         .altitude_deg            = pointing.alt * astro_constants::kRadToDeg,
         .azimuth_deg             = pointing.az  * astro_constants::kRadToDeg,
-        .fov_deg                 = m_camera->get_fov_deg(),
-        .magnitude_limit         = m_camera->get_magnitude_limit(),
+        .fov_deg                 = m_planetarium_tab->get_fov_deg(),
+        .magnitude_limit         = m_planetarium_tab->get_magnitude_limit(),
         .latitude_deg            = m_observer.latitude_rad  * astro_constants::kRadToDeg,
         .longitude_deg           = m_observer.longitude_rad * astro_constants::kRadToDeg,
-        .bortle_scale            = m_sky_params.bortle_scale,
+        .bortle_scale            = m_planetarium_tab->get_bortle_scale(),
         .fps                     = fps,
-        .visible_stars           = m_starfield->get_visible_count(),
-        .total_stars             = static_cast<u32>(m_frame_objects.size()),
+        .visible_stars           = m_planetarium_tab->visible_star_count(),
+        .total_stars             = static_cast<u32>(m_planetarium_tab->get_frame_objects().size()),
         .time_scale              = m_time_scale,
-        .overlay_const           = m_constellations.is_visible(),
-        .overlay_grid_name       = m_coord_grid.get_type_name(),
-        .overlay_dso             = m_dso_renderer.is_visible(),
-        .overlay_horizon         = m_horizon.is_visible(),
-        .sun_altitude_deg        = m_sun_altitude_deg,
-        .atmosphere_on           = m_atmosphere_on,
+        .overlay_const           = m_planetarium_tab->constellations_visible(),
+        .overlay_grid_name       = m_planetarium_tab->grid_type_name(),
+        .overlay_dso             = m_planetarium_tab->dso_visible(),
+        .overlay_horizon         = m_planetarium_tab->horizon_visible(),
+        .sun_altitude_deg        = m_planetarium_tab->get_sun_altitude_deg(),
+        .atmosphere_on           = m_planetarium_tab->is_atmosphere_on(),
     });
 
     // Periodic logging
@@ -1256,9 +978,9 @@ void Application::update_simulation(f64 delta_time_sec)
     {
         PLX_CORE_TRACE(
             "Universe: {} frame objects | visible stars={} | MLIM {:.1f}",
-            m_frame_objects.size(),
-            m_starfield->get_visible_count(),
-            mag_limit);
+            m_planetarium_tab->get_frame_objects().size(),
+            m_planetarium_tab->visible_star_count(),
+            m_planetarium_tab->get_magnitude_limit());
     }
 }
 
@@ -1299,14 +1021,18 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
     VkRect2D scissor{{0, 0}, extent};
     vkCmdSetScissor(cmd, 0, 1, &scissor);
 
-    // 1. Sky background
-    m_sky_background->draw(cmd);
+    const ui::shell::ViewportRect planetarium_viewport{
+        .x = 0,
+        .y = 0,
+        .width = extent.width,
+        .height = extent.height
+    };
 
-    // 2. Starfield (additive blending)
-    m_starfield->draw(cmd);
+    // 1-3. Planetarium tab
+    m_planetarium_tab->render(cmd, planetarium_viewport);
 
-    // 3. Sky overlay lines: grid → constellations → DSOs → horizon + selection indicator
-    m_line_renderer->render(cmd);
+    vkCmdSetViewport(cmd, 0, 1, &vp);
+    vkCmdSetScissor(cmd, 0, 1, &scissor);
 
     // 4. Panel backgrounds (transparent filled quads — behind UI content)
     m_panel_system.render_backgrounds(cmd, extent);
@@ -1426,7 +1152,12 @@ void Application::recreate_swapchain()
         std::filesystem::path{PLX_SHADER_DIR});
 
     const auto extent = m_swapchain->get_extent();
-    m_sky_background->set_extent(extent);
+    m_planetarium_tab->set_viewport({
+        .x = 0,
+        .y = 0,
+        .width = extent.width,
+        .height = extent.height
+    });
 
     for (auto sem : m_render_finished_semaphores)
     {

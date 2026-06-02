@@ -68,12 +68,14 @@ namespace parallax::astro
         ///
         /// @param star Horizontal coordinates of the star.
         /// @param pointing Horizontal coordinates of the camera center.
-        /// @param fov_rad Field of view in radians (full angular width).
+        /// @param fov_rad Field of view in radians (vertical full angular width).
+        /// @param aspect_ratio Viewport width / height.
         /// @return Normalized screen coordinates in [-1, 1], or std::nullopt if off screen.
         [[nodiscard]] static std::optional<Vec2f> horizontal_to_screen(
             const HorizontalCoord& star,
             const HorizontalCoord& pointing,
-            f64 fov_rad
+            f64 fov_rad,
+            f64 aspect_ratio = 1.0
         );
 
         /// @brief Full RA/Dec → screen NDC projection pipeline.                ← SPRINT 04
@@ -92,6 +94,7 @@ namespace parallax::astro
         /// @param lst_rad Local Mean Sidereal Time in radians.
         /// @param pointing Camera pointing direction (Alt/Az).
         /// @param fov_rad Camera field of view in radians.
+        /// @param aspect_ratio Viewport width / height.
         /// @return Screen NDC in [-1, 1], or std::nullopt if below horizon or off screen.
         [[nodiscard]] static std::optional<Vec2f> project_radec_to_screen(
             f64 ra_rad,
@@ -99,7 +102,8 @@ namespace parallax::astro
             const ObserverLocation& observer,
             f64 lst_rad,
             const HorizontalCoord& pointing,
-            f64 fov_rad
+            f64 fov_rad,
+            f64 aspect_ratio = 1.0
         );
 
     private:

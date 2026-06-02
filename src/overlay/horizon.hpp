@@ -30,6 +30,8 @@
 #include <optional>
 #include <vector>
 
+namespace parallax::ui::shell { struct ViewportRect; }
+
 namespace parallax::overlay
 {
     /// @brief Horizon line with N/NE/E/SE/S/SW/W/NW cardinal direction markers.
@@ -52,7 +54,7 @@ namespace parallax::overlay
         void update(const rendering::Camera& camera,
                     rendering::LineRenderer& lines,
                     ui::BitmapFont& font,
-                    VkExtent2D viewport);
+                    const ui::shell::ViewportRect& viewport);
 
         void set_visible(bool visible);
         void toggle_visible();
@@ -61,16 +63,17 @@ namespace parallax::overlay
     private:
         /// @brief Draw the continuous horizon line at Alt = 0°.
         void draw_horizon_line(const rendering::Camera& camera,
-                               rendering::LineRenderer& lines);
+                               rendering::LineRenderer& lines,
+                               const ui::shell::ViewportRect& viewport);
 
         /// @brief Draw tick marks and labels at the 8 cardinal/intercardinal directions.
         void draw_cardinal_markers(const rendering::Camera& camera,
                                    rendering::LineRenderer& lines,
                                    ui::BitmapFont& font,
-                                   VkExtent2D viewport);
+                                   const ui::shell::ViewportRect& viewport);
 
         /// @brief Convert NDC [-1,1] to screen pixel coordinates.
-        [[nodiscard]] static Vec2f ndc_to_pixel(Vec2f ndc, VkExtent2D viewport);
+        [[nodiscard]] static Vec2f ndc_to_pixel(Vec2f ndc, const ui::shell::ViewportRect& viewport);
 
         bool m_visible = true;
 

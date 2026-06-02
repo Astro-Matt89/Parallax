@@ -10,6 +10,7 @@
 #include "overlay/coord_grid.hpp"
 
 #include "core/logger.hpp"
+#include "ui/shell/viewport_rect.hpp"
 
 #include <cmath>
 #include <cstdio>
@@ -29,7 +30,7 @@ void CoordGrid::update(const rendering::Camera& camera,
                        f64 lst_rad,
                        rendering::LineRenderer& lines,
                        ui::BitmapFont& font,
-                       VkExtent2D viewport)
+                       const ui::shell::ViewportRect& viewport)
 {
     if (m_type == GridType::None)
     {
@@ -94,10 +95,11 @@ void CoordGrid::draw_equatorial_grid(const rendering::Camera& camera,
                                      f64 lst_rad,
                                      rendering::LineRenderer& lines,
                                      ui::BitmapFont& font,
-                                     VkExtent2D viewport)
+                                     const ui::shell::ViewportRect& viewport)
 {
     const auto pointing = camera.get_pointing();
     const f64 fov_rad = camera.get_fov_rad();
+    const f64 aspect_ratio = static_cast<f64>(viewport.aspect());
 
     // ---------------------------------------------------------------
     // RA lines: 24 lines at RA = 0h, 1h, …, 23h
@@ -118,7 +120,7 @@ void CoordGrid::draw_equatorial_grid(const rendering::Camera& camera,
                 astro_constants::kPi;
 
             points.push_back(astro::Coordinates::project_radec_to_screen(
-                ra_rad, dec_rad, observer, lst_rad, pointing, fov_rad));
+                ra_rad, dec_rad, observer, lst_rad, pointing, fov_rad, aspect_ratio));
         }
 
         submit_curve(points, kEqColor, lines);
@@ -144,7 +146,7 @@ void CoordGrid::draw_equatorial_grid(const rendering::Camera& camera,
                 static_cast<f64>(kSamplesPerLine - 1) * astro_constants::kTwoPi;
 
             points.push_back(astro::Coordinates::project_radec_to_screen(
-                ra_rad, dec_rad, observer, lst_rad, pointing, fov_rad));
+                ra_rad, dec_rad, observer, lst_rad, pointing, fov_rad, aspect_ratio));
         }
 
         submit_curve(points, is_equator ? kEqBrightColor : kEqColor, lines);
@@ -157,7 +159,7 @@ void CoordGrid::draw_equatorial_grid(const rendering::Camera& camera,
     {
         const f64 ra_rad = static_cast<f64>(h) * astro_constants::kHourToRad;
         const auto pos = astro::Coordinates::project_radec_to_screen(
-            ra_rad, 0.0, observer, lst_rad, pointing, fov_rad);
+            ra_rad, 0.0, observer, lst_rad, pointing, fov_rad, aspect_ratio);
 
         if (pos.has_value())
         {
@@ -186,7 +188,7 @@ void CoordGrid::draw_equatorial_grid(const rendering::Camera& camera,
         const f64 dec_deg = static_cast<f64>(d) * 10.0;
         const f64 dec_rad = dec_deg * astro_constants::kDegToRad;
         const auto pos = astro::Coordinates::project_radec_to_screen(
-            0.0, dec_rad, observer, lst_rad, pointing, fov_rad);
+            0.0, dec_rad, observer, lst_rad, pointing, fov_rad, aspect_ratio);
 
         if (pos.has_value())
         {
@@ -216,10 +218,11 @@ void CoordGrid::draw_equatorial_grid(const rendering::Camera& camera,
 void CoordGrid::draw_altaz_grid(const rendering::Camera& camera,
                                 rendering::LineRenderer& lines,
                                 ui::BitmapFont& font,
-                                VkExtent2D viewport)
+                                const ui::shell::ViewportRect& viewport)
 {
     const auto pointing = camera.get_pointing();
     const f64 fov_rad = camera.get_fov_rad();
+    const f64 aspect_ratio = static_cast<f64>(viewport.aspect());
 
     // ---------------------------------------------------------------
     // Azimuth lines: 24 lines at Az = 0°, 15°, 30°, …, 345°
@@ -240,7 +243,7 @@ void CoordGrid::draw_altaz_grid(const rendering::Camera& camera,
 
             const astro::HorizontalCoord hz{.alt = alt_rad, .az = az_rad};
             points.push_back(astro::Coordinates::horizontal_to_screen(
-                hz, pointing, fov_rad));
+                hz, pointing, fov_rad, aspect_ratio));
         }
 
         submit_curve(points, kAzColor, lines);
@@ -267,7 +270,7 @@ void CoordGrid::draw_altaz_grid(const rendering::Camera& camera,
 
             const astro::HorizontalCoord hz{.alt = alt_rad, .az = az_rad};
             points.push_back(astro::Coordinates::horizontal_to_screen(
-                hz, pointing, fov_rad));
+                hz, pointing, fov_rad, aspect_ratio));
         }
 
         submit_curve(points, is_horizon ? kAzBrightColor : kAzColor, lines);
@@ -283,7 +286,7 @@ void CoordGrid::draw_altaz_grid(const rendering::Camera& camera,
 
         const astro::HorizontalCoord hz{.alt = 0.0, .az = az_rad};
         const auto pos = astro::Coordinates::horizontal_to_screen(
-            hz, pointing, fov_rad);
+            hz, pointing, fov_rad, aspect_ratio);
 
         if (pos.has_value())
         {
@@ -308,7 +311,7 @@ void CoordGrid::draw_altaz_grid(const rendering::Camera& camera,
 
         const astro::HorizontalCoord hz{.alt = alt_rad, .az = 0.0};
         const auto pos = astro::Coordinates::horizontal_to_screen(
-            hz, pointing, fov_rad);
+            hz, pointing, fov_rad, aspect_ratio);
 
         if (pos.has_value())
         {
@@ -349,13 +352,15 @@ void CoordGrid::submit_curve(const std::vector<std::optional<Vec2f>>& points,
 // NDC → pixel conversion
 // =================================================================
 
-Vec2f CoordGrid::ndc_to_pixel(Vec2f ndc, VkExtent2D viewport)
+Vec2f CoordGrid::ndc_to_pixel(Vec2f ndc, const ui::shell::ViewportRect& viewport)
 {
     // NDC [-1, 1] → pixel [0, width/height]
     // Vulkan NDC: -1 = top/left, +1 = bottom/right (Y already flipped
     // by horizontal_to_screen which negates proj_y for Vulkan)
-    const f32 px = (ndc.x + 1.0f) * 0.5f * static_cast<f32>(viewport.width);
-    const f32 py = (ndc.y + 1.0f) * 0.5f * static_cast<f32>(viewport.height);
+    const f32 px = static_cast<f32>(viewport.x)
+                 + (ndc.x + 1.0f) * 0.5f * static_cast<f32>(viewport.width);
+    const f32 py = static_cast<f32>(viewport.y)
+                 + (ndc.y + 1.0f) * 0.5f * static_cast<f32>(viewport.height);
     return {px, py};
 }
 

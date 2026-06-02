@@ -157,6 +157,26 @@ TEST_CASE("clear empties the archive")
     CHECK(archive.get_all().empty());
 }
 
+TEST_CASE("remove_record removes existing record and reports success")
+{
+    DataArchive archive;
+    archive.add(make_record(1u));
+    archive.add(make_record(2u));
+
+    CHECK(archive.remove_record(1u) == true);
+    CHECK(archive.get_by_id(1u) == nullptr);
+    CHECK(archive.size() == 1u);
+}
+
+TEST_CASE("remove_record returns false when id is missing")
+{
+    DataArchive archive;
+    archive.add(make_record(5u));
+
+    CHECK(archive.remove_record(999u) == false);
+    CHECK(archive.size() == 1u);
+}
+
 // =============================================================================
 // JSON round-trip
 // =============================================================================

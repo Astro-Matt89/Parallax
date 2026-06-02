@@ -77,7 +77,6 @@ add_executable(parallax
     ui/info_panel.cpp
     ui/instrument_panel.cpp
     ui/sessions_panel.cpp
-    ui/data_archive_panel.cpp
     # Sprint 09 — UI Shell foundation (Task 9.1)
     ui/shell/shell_types.hpp
     ui/shell/viewport_rect.hpp
@@ -94,6 +93,8 @@ add_executable(parallax
     ui/shell/status_bar.cpp
     ui/tabs/planetarium_tab.hpp
     ui/tabs/planetarium_tab.cpp
+    ui/tabs/archive_tab.hpp
+    ui/tabs/archive_tab.cpp
 )
 
 target_include_directories(parallax PRIVATE

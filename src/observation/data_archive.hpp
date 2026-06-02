@@ -46,6 +46,10 @@ public:
     /// @brief Remove all records from the archive.
     void clear();
 
+    /// @brief Remove a record by ID.
+    /// @return True if a record existed and was removed.
+    [[nodiscard]] bool remove_record(std::uint64_t record_id);
+
     // -------------------------------------------------------------------------
     // Queries
     // -------------------------------------------------------------------------

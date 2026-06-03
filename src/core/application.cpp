@@ -239,21 +239,7 @@ void Application::init()
         m_side_panel.init(cb);
     }
 
-    // 7e. InfoPanel                                         ← SPRINT 05 Task 5.5
-    {
-        ui::InfoPanelCallbacks cb;
-        cb.track = [this]()
-        {
-            m_planetarium_tab->toggle_tracking();
-            PLX_CORE_INFO("Tracking {}",
-                          m_planetarium_tab->get_selection().is_tracking() ? "enabled" : "disabled");
-        };
-        cb.goto_object = [this]() { /* TODO: future telescope slew command */ };
-        cb.observe_this = [this](u64 target_id) { request_observe(target_id); };
-        m_info_panel.init(cb);
-    }
-
-    // 7f. Observation workflow panels                        ← SPRINT 08 Task 8.10
+    // 7e. Observation workflow panels                        ← SPRINT 08 Task 8.10
     {
         ui::InstrumentPanelCallbacks observe_cb;
         observe_cb.schedule = [this](const observation::SessionParameters& params)
@@ -531,7 +517,6 @@ void Application::process_input()
     const bool mouse_over_ui = m_panel_system.is_mouse_over_ui(mouse_pos)
                             || m_toolbar.is_mouse_over(mouse_pos)
                             || m_side_panel.is_mouse_over(mouse_pos)
-                            || m_info_panel.is_mouse_over(mouse_pos)
                             || m_instrument_panel.is_mouse_over(mouse_pos)
                             || m_sessions_panel.is_mouse_over(mouse_pos);
 
@@ -803,15 +788,6 @@ void Application::update_simulation(f64 delta_time_sec)
             side_state);
     }
 
-    // --- InfoPanel update ---
-    m_info_panel.update(
-        m_planetarium_tab->get_selection(),
-        m_knowledge.get(),
-        m_input->get_mouse_position(),
-        m_input->was_click(),
-        static_cast<f32>(delta_time_sec),
-        viewport.width, viewport.height);
-
     // --- Instrument panel update ---
     {
         ui::InstrumentPanelState observe_state;
@@ -951,8 +927,8 @@ void Application::update_simulation(f64 delta_time_sec)
 // 2. Starfield (instanced points, additive)
 // 3. Sky overlay lines: grid → constellations → DSOs → horizon → selection indicator
 // 4. Panel backgrounds (transparent filled quads)
-// 5. UI border lines: toolbar separators, side panel / info panel borders
-// 6. All text: HUD + toolbar + side panel + info panel (batched, single draw call)
+// 5. UI border lines: toolbar / side panel / workflow panel borders
+// 6. All text: HUD + toolbar + side panel + workflow panels (batched, single draw call)
 // =================================================================
 
 void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_index)
@@ -1004,12 +980,11 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
     m_line_renderer->begin_frame();
     m_toolbar.render(m_hud->get_font(), *m_line_renderer, m_panel_system, cmd, extent);
     m_side_panel.render(m_hud->get_font(), *m_line_renderer, extent);
-    m_info_panel.render(m_hud->get_font(), *m_line_renderer, extent);
     m_instrument_panel.render(m_hud->get_font(), *m_line_renderer, extent);
     m_sessions_panel.render(m_hud->get_font(), *m_line_renderer, extent);
     m_line_renderer->render(cmd);   // flush UI border lines
 
-    // 6. All text: HUD panels + toolbar + side panel + info panel (single GPU draw call)
+    // 6. All text: HUD panels + toolbar + side panel + workflow panels (single GPU draw call)
     m_hud->render(cmd, extent);
 
     vkCmdEndRenderPass(cmd);

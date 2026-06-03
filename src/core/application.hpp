@@ -20,7 +20,6 @@
 #include "rendering/starfield.hpp"
 #include "ui/hud.hpp"
 #include "ui/instrument_panel.hpp"
-#include "ui/info_panel.hpp"                              // ← SPRINT 05 Task 5.5
 #include "ui/panel_system.hpp"                            // ← SPRINT 05 Task 5.1
 #include "ui/side_panel.hpp"                              // ← SPRINT 05 Task 5.4
 #include "ui/sessions_panel.hpp"
@@ -142,7 +141,7 @@ namespace parallax::core
         /// @brief Universe facade over all data providers (stars, DSOs, SS, procedural).
         std::unique_ptr<universe::Universe> m_universe;
 
-        /// @brief Player's knowledge state — drives rendering style and info panel.
+        /// @brief Player's knowledge state — drives rendering style and encyclopedia details.
         ///                                                              ← SPRINT 08 Task 8.9
         std::unique_ptr<knowledge::KnowledgeDatabase> m_knowledge;
         std::unique_ptr<observation::SessionScheduler> m_scheduler;
@@ -156,7 +155,6 @@ namespace parallax::core
         ui::PanelSystem m_panel_system;                      // Task 5.1  Batched panel backgrounds
         ui::Toolbar m_toolbar;                               // Task 5.3  Bottom toolbar
         ui::SidePanel m_side_panel;                          // Task 5.4  Left side panel
-        ui::InfoPanel m_info_panel;                           // Task 5.5  Right info panel
         ui::InstrumentPanel m_instrument_panel;               // Sprint 08 Task 8.10
         ui::SessionsPanel m_sessions_panel;                   // Sprint 08 Task 8.10
 

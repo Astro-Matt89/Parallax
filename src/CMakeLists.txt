@@ -96,6 +96,14 @@ add_executable(parallax
     ui/tabs/archive_tab.cpp
     ui/tabs/encyclopedia_tab.hpp
     ui/tabs/encyclopedia_tab.cpp
+    ui/tabs/allsky_tab.hpp
+    ui/tabs/allsky_tab.cpp
+    ui/tabs/analysis_tab.hpp
+    ui/tabs/analysis_tab.cpp
+    ui/tabs/imaging_tab.hpp
+    ui/tabs/imaging_tab.cpp
+    ui/tabs/spectroscopy_tab.hpp
+    ui/tabs/spectroscopy_tab.cpp
 )
 
 target_include_directories(parallax PRIVATE

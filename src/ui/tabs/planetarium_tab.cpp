@@ -9,6 +9,7 @@
 #include "vulkan/swapchain.hpp"
 
 #include <SDL2/SDL_scancode.h>
+#include <spdlog/spdlog.h>
 
 #include <algorithm>
 #include <filesystem>
@@ -24,14 +25,14 @@ namespace parallax::ui::tabs
                                    const knowledge::KnowledgeDatabase& knowledge,
                                    BitmapFont& font,
                                    f64& julian_date,
-                                   const astro::ObserverLocation& observer)
+                                   const astro::ObserverRegistry& observer_registry)
         : m_context(context)
         , m_swapchain(swapchain)
         , m_universe(universe)
         , m_knowledge(knowledge)
         , m_font(font)
         , m_julian_date(julian_date)
-        , m_observer(observer)
+        , m_observer_registry(observer_registry)
     {
         m_sky_background = std::make_unique<rendering::SkyBackground>(
             m_context,
@@ -83,7 +84,16 @@ namespace parallax::ui::tabs
         static_cast<void>(delta_time);
 
         const shell::ViewportRect viewport = current_viewport();
-        const f64 lst = astro::TimeSystem::lmst(m_julian_date, m_observer.longitude_rad);
+        const i32 active_index = m_observer_registry.get_active_index();
+        const astro::ObserverLocation& observer = m_observer_registry.get_active();
+        if (active_index != m_last_seen_active_index)
+        {
+            m_last_seen_active_index = active_index;
+        }
+
+        const bool atmosphere_on = atmosphere_effectively_on();
+        const bool horizon_culling_on = m_atmosphere_on || !observer.has_atmosphere;
+        const f64 lst = astro::TimeSystem::lmst(m_julian_date, observer.longitude_rad);
 
         m_universe.update(m_julian_date);
 
@@ -98,25 +108,26 @@ namespace parallax::ui::tabs
 
         const auto sun_hz = astro::Coordinates::equatorial_to_horizontal(
             ss_bodies.sun.equatorial,
-            m_observer,
+            observer,
             lst);
         const auto moon_hz = astro::Coordinates::equatorial_to_horizontal(
             ss_bodies.moon.equatorial,
-            m_observer,
+            observer,
             lst);
 
+        m_sky_params.bortle_scale = observer.bortle_scale;
         m_sky_params.sun_altitude_deg  = static_cast<f32>(sun_hz.alt * astro_constants::kRadToDeg);
         m_sky_params.sun_azimuth_deg   = static_cast<f32>(sun_hz.az * astro_constants::kRadToDeg);
         m_sky_params.moon_altitude_deg = static_cast<f32>(moon_hz.alt * astro_constants::kRadToDeg);
         m_sky_params.moon_azimuth_deg  = static_cast<f32>(moon_hz.az * astro_constants::kRadToDeg);
         m_sky_params.moon_illumination = moon_state.body.illumination;
-        m_sky_params.atmosphere_enabled = m_atmosphere_on;
+        m_sky_params.atmosphere_enabled = atmosphere_on;
         m_sun_altitude_deg = m_sky_params.sun_altitude_deg;
 
         m_sky_background->update_params(m_sky_params, *m_camera, viewport.aspect());
         m_line_renderer->begin_frame();
 
-        m_coord_grid.update(*m_camera, m_observer, lst, *m_line_renderer, m_font, viewport);
+        m_coord_grid.update(*m_camera, observer, lst, *m_line_renderer, m_font, viewport);
 
         const auto pointing = m_camera->get_pointing();
         const f64 fov_rad = m_camera->get_fov_rad();
@@ -125,7 +136,7 @@ namespace parallax::ui::tabs
 
         const auto camera_eq = astro::Coordinates::horizontal_to_equatorial(
             pointing,
-            m_observer,
+            observer,
             lst);
 
         const f64 query_radius_deg = std::clamp(fov_rad * 0.75 * astro_constants::kRadToDeg, 0.0, 180.0);
@@ -139,17 +150,17 @@ namespace parallax::ui::tabs
             m_frame_objects);
 
         m_starfield->begin_frame(mag_limit);
-        m_solar_system_renderer.begin_frame(*m_line_renderer, m_font, viewport, m_atmosphere_on);
+        m_solar_system_renderer.begin_frame(*m_line_renderer, m_font, viewport, horizon_culling_on);
         m_dso_renderer.begin_frame(*m_line_renderer, m_font, viewport);
 
         for (const auto& obj : m_frame_objects)
         {
             const auto hz = astro::Coordinates::equatorial_to_horizontal(
                 {obj.ra, obj.dec},
-                m_observer,
+                observer,
                 lst);
 
-            if (m_atmosphere_on && hz.alt < 0.0)
+            if (horizon_culling_on && hz.alt < 0.0)
             {
                 continue;
             }
@@ -199,12 +210,12 @@ namespace parallax::ui::tabs
         }
 
         m_starfield->end_frame();
-        m_constellations.update(*m_camera, m_observer, lst, *m_line_renderer, m_font, viewport);
+        m_constellations.update(*m_camera, observer, lst, *m_line_renderer, m_font, viewport);
         m_horizon.update(*m_camera, *m_line_renderer, m_font, viewport);
         m_selection.update_from_objects(
             m_frame_objects,
             m_solar_system_renderer.get_screen_objects(),
-            m_observer,
+            observer,
             lst,
             *m_camera,
             viewport);
@@ -238,6 +249,7 @@ namespace parallax::ui::tabs
         }
 
         m_viewport = viewport;
+        const astro::ObserverLocation& observer = m_observer_registry.get_active();
 
         if (event.is_dragging)
         {
@@ -252,12 +264,12 @@ namespace parallax::ui::tabs
             const f32 ndc_x = (2.0f * event.click_pos.x / static_cast<f32>(viewport.width)) - 1.0f;
             const f32 ndc_y = (2.0f * event.click_pos.y / static_cast<f32>(viewport.height)) - 1.0f;
             const Vec2f click_ndc{ndc_x, ndc_y};
-            const f64 lst = astro::TimeSystem::lmst(m_julian_date, m_observer.longitude_rad);
+            const f64 lst = astro::TimeSystem::lmst(m_julian_date, observer.longitude_rad);
 
             m_selection.try_select_from_objects(
                 click_ndc,
                 m_frame_objects,
-                m_observer,
+                observer,
                 lst,
                 *m_camera,
                 viewport);
@@ -403,7 +415,14 @@ namespace parallax::ui::tabs
     void PlanetariumTab::toggle_atmosphere()
     {
         m_atmosphere_on = !m_atmosphere_on;
-        PLX_CORE_INFO("Atmosphere: {}", m_atmosphere_on ? "ON (twilight gradient)" : "OFF (pure black)");
+        const astro::ObserverLocation& observer = m_observer_registry.get_active();
+        if (m_atmosphere_on && !observer.has_atmosphere)
+        {
+            spdlog::debug("Atmosphere preference enabled at vacuum site '{}'; effect remains disabled",
+                          observer.name);
+        }
+
+        PLX_CORE_INFO("Atmosphere: {}", atmosphere_effectively_on() ? "ON (twilight gradient)" : "OFF (pure black)");
     }
 
     void PlanetariumTab::toggle_tracking()
@@ -428,7 +447,7 @@ namespace parallax::ui::tabs
 
     void PlanetariumTab::set_bortle_scale(f32 bortle_scale)
     {
-        m_sky_params.bortle_scale = bortle_scale;
+        static_cast<void>(bortle_scale);
     }
 
     bool PlanetariumTab::is_atmosphere_on() const noexcept
@@ -436,9 +455,17 @@ namespace parallax::ui::tabs
         return m_atmosphere_on;
     }
 
+    bool PlanetariumTab::atmosphere_effectively_on() const noexcept
+    {
+        // TopBar consumes this via Shell in Task 9.11:
+        //   state.vacuum_site   = active.parent_body != ParentBody::Earth;
+        //   state.atmosphere_on = atmosphere_effectively_on();
+        return m_atmosphere_on && m_observer_registry.get_active().has_atmosphere;
+    }
+
     f32 PlanetariumTab::get_bortle_scale() const noexcept
     {
-        return m_sky_params.bortle_scale;
+        return m_observer_registry.get_active().bortle_scale;
     }
 
     f32 PlanetariumTab::get_sun_altitude_deg() const noexcept

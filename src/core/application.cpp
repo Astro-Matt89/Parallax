@@ -111,6 +111,7 @@ namespace parallax::core
 {
 
 Application::Application()
+    : m_observer_registry(astro::ObserverRegistry::create_default())
 {
     init();
 }
@@ -214,17 +215,16 @@ void Application::init()
         ui::SidePanelCallbacks cb;
         cb.set_location = [this](f64 lat_deg, f64 lon_deg, f64 elev_m, f32 bortle)
         {
-            m_observer.latitude_rad  = glm::radians(lat_deg);
-            m_observer.longitude_rad = glm::radians(lon_deg);
-            m_elevation_m            = elev_m;
-            m_planetarium_tab->set_bortle_scale(bortle);
-            PLX_CORE_INFO("Observer location set: {:.2f}N {:.2f}E {:.0f}m Bortle {}",
-                          lat_deg, lon_deg, elev_m, static_cast<int>(bortle));
+            static_cast<void>(lat_deg);
+            static_cast<void>(lon_deg);
+            static_cast<void>(elev_m);
+            static_cast<void>(bortle);
+            PLX_CORE_INFO("Location switching has moved to the BASE tab (Sprint 09 Task 9.11 wires it up).");
         };
         cb.set_bortle = [this](f32 bortle)
         {
-            m_planetarium_tab->set_bortle_scale(bortle);
-            PLX_CORE_INFO("Bortle scale: {}", static_cast<int>(bortle));
+            static_cast<void>(bortle);
+            PLX_CORE_INFO("Bortle scale now follows the active observer selected in the BASE tab.");
         };
         cb.set_magnitude_limit = [this](f32 mag)
         {
@@ -320,25 +320,21 @@ void Application::init()
     m_mock_instrument = std::make_unique<instruments::MockInstrument>(1, "Magic Instrument");
     m_analyzer = std::make_unique<analysis::MockAnalyzer>();
 
-    // 9. Observer: La Palma, Canary Islands
-    m_observer = astro::ObserverLocation{
-        .latitude_rad  = glm::radians(28.76),
-        .longitude_rad = glm::radians(-17.89),
-    };
-
-    // 10. Simulation time
+    // 9. Simulation time
     m_julian_date = astro::TimeSystem::now_as_jd();
     m_time_scale = 1.0;
     {
+        const astro::ObserverLocation& active_observer = m_observer_registry.get_active();
         const auto dt = astro::TimeSystem::from_julian_date(m_julian_date);
         PLX_CORE_INFO("Simulation start: JD {:.6f} ({:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:04.1f} UTC)",
                       m_julian_date, dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second);
-        PLX_CORE_INFO("Observer: La Palma ({:.2f}N, {:.2f}W)",
-                      glm::degrees(m_observer.latitude_rad),
-                      -glm::degrees(m_observer.longitude_rad));
+        PLX_CORE_INFO("Observer: {} ({:.2f}, {:.2f})",
+                      active_observer.name,
+                      glm::degrees(active_observer.latitude_rad),
+                      glm::degrees(active_observer.longitude_rad));
     }
 
-    // 11. Planetarium tab
+    // 10. Planetarium tab
     m_planetarium_tab = std::make_unique<ui::tabs::PlanetariumTab>(
         *m_context,
         *m_swapchain,
@@ -348,8 +344,7 @@ void Application::init()
         *m_knowledge,
         m_hud->get_font(),
         m_julian_date,
-        m_observer);
-    m_planetarium_tab->set_bortle_scale(4.0f);
+        m_observer_registry);
 
     // 12-14. Command pool, sync, frame time
     create_command_pool();
@@ -622,10 +617,7 @@ void Application::process_input()
 
     if (m_input->is_key_pressed(SDL_SCANCODE_B))
     {
-        f32 bortle = m_planetarium_tab->get_bortle_scale() + 1.0f;
-        if (bortle > 9.0f) bortle = 1.0f;
-        m_planetarium_tab->set_bortle_scale(bortle);
-        PLX_CORE_INFO("Bortle scale: {}", static_cast<int>(bortle));
+        PLX_CORE_INFO("Bortle scale now follows the active observer selected in the BASE tab.");
     }
 
     const bool had_selection = m_planetarium_tab->has_selection();
@@ -657,6 +649,8 @@ void Application::process_input()
 
 void Application::update_simulation(f64 delta_time_sec)
 {
+    const astro::ObserverLocation& active_observer = m_observer_registry.get_active();
+
     // Advance Julian Date
     m_julian_date += (delta_time_sec * m_time_scale) / 86400.0;
 
@@ -721,11 +715,11 @@ void Application::update_simulation(f64 delta_time_sec)
     });
     m_planetarium_tab->update(delta_time_sec);
 
-    const f64 lst = astro::TimeSystem::lmst(m_julian_date, m_observer.longitude_rad);
+    const f64 lst = astro::TimeSystem::lmst(m_julian_date, active_observer.longitude_rad);
     const auto& camera = m_planetarium_tab->get_camera();
     const auto pointing = camera.get_pointing();
     const f64 fov_rad = camera.get_fov_rad();
-    const auto camera_eq = astro::Coordinates::horizontal_to_equatorial(pointing, m_observer, lst);
+    const auto camera_eq = astro::Coordinates::horizontal_to_equatorial(pointing, active_observer, lst);
 
     // --- Toolbar update ---
     {
@@ -767,16 +761,16 @@ void Application::update_simulation(f64 delta_time_sec)
         const auto lst_str = std::format("{:02d}h {:02d}m {:02d}s", lst_h, lst_m, lst_s);
 
         const ui::SidePanelState side_state{
-            .latitude_deg    = m_observer.latitude_rad  * astro_constants::kRadToDeg,
-            .longitude_deg   = m_observer.longitude_rad * astro_constants::kRadToDeg,
-            .elevation_m     = m_elevation_m,
+            .latitude_deg    = active_observer.latitude_rad  * astro_constants::kRadToDeg,
+            .longitude_deg   = active_observer.longitude_rad * astro_constants::kRadToDeg,
+            .elevation_m     = active_observer.elevation_m,
             .selected_preset = -1,
             .utc_string      = utc_str,
             .lst_string      = lst_str,
             .julian_date     = m_julian_date,
             .time_scale      = m_time_scale,
             .time_paused     = (m_time_scale == 0.0),
-            .bortle_scale    = m_planetarium_tab->get_bortle_scale(),
+            .bortle_scale    = active_observer.bortle_scale,
             .magnitude_limit = m_planetarium_tab->get_magnitude_limit(),
         };
         m_side_panel.update(
@@ -893,9 +887,9 @@ void Application::update_simulation(f64 delta_time_sec)
         .azimuth_deg             = pointing.az  * astro_constants::kRadToDeg,
         .fov_deg                 = m_planetarium_tab->get_fov_deg(),
         .magnitude_limit         = m_planetarium_tab->get_magnitude_limit(),
-        .latitude_deg            = m_observer.latitude_rad  * astro_constants::kRadToDeg,
-        .longitude_deg           = m_observer.longitude_rad * astro_constants::kRadToDeg,
-        .bortle_scale            = m_planetarium_tab->get_bortle_scale(),
+        .latitude_deg            = active_observer.latitude_rad  * astro_constants::kRadToDeg,
+        .longitude_deg           = active_observer.longitude_rad * astro_constants::kRadToDeg,
+        .bortle_scale            = active_observer.bortle_scale,
         .fps                     = fps,
         .visible_stars           = m_planetarium_tab->visible_star_count(),
         .total_stars             = static_cast<u32>(m_planetarium_tab->get_frame_objects().size()),
@@ -905,7 +899,7 @@ void Application::update_simulation(f64 delta_time_sec)
         .overlay_dso             = m_planetarium_tab->dso_visible(),
         .overlay_horizon         = m_planetarium_tab->horizon_visible(),
         .sun_altitude_deg        = m_planetarium_tab->get_sun_altitude_deg(),
-        .atmosphere_on           = m_planetarium_tab->is_atmosphere_on(),
+        .atmosphere_on           = m_planetarium_tab->atmosphere_effectively_on(),
     });
 
     // Periodic logging

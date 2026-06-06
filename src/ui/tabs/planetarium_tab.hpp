@@ -1,6 +1,7 @@
 #pragma once
 
 #include "astro/coordinates.hpp"
+#include "astro/observer_registry.hpp"
 #include "core/input.hpp"
 #include "core/types.hpp"
 #include "overlay/constellations.hpp"
@@ -59,7 +60,7 @@ namespace parallax::ui::tabs
                        const knowledge::KnowledgeDatabase& knowledge,
                        BitmapFont& font,
                        f64& julian_date,
-                       const astro::ObserverLocation& observer);
+                       const astro::ObserverRegistry& observer_registry);
         ~PlanetariumTab() override = default;
 
         PlanetariumTab(const PlanetariumTab&)            = delete;
@@ -93,6 +94,7 @@ namespace parallax::ui::tabs
         void set_bortle_scale(f32 bortle_scale);
 
         [[nodiscard]] bool is_atmosphere_on() const noexcept;
+        [[nodiscard]] bool atmosphere_effectively_on() const noexcept;
         [[nodiscard]] f32 get_bortle_scale() const noexcept;
         [[nodiscard]] f32 get_sun_altitude_deg() const noexcept;
         [[nodiscard]] bool constellations_visible() const noexcept;
@@ -118,7 +120,7 @@ namespace parallax::ui::tabs
         const knowledge::KnowledgeDatabase& m_knowledge;
         BitmapFont& m_font;
         f64& m_julian_date;
-        const astro::ObserverLocation& m_observer;
+        const astro::ObserverRegistry& m_observer_registry;
 
         std::unique_ptr<rendering::SkyBackground> m_sky_background;
         std::unique_ptr<rendering::Starfield> m_starfield;
@@ -139,5 +141,6 @@ namespace parallax::ui::tabs
         f32 m_sun_altitude_deg = -90.0f;
         bool m_procedural_first_tick_logged = false;
         shell::ViewportRect m_viewport{};
+        i32 m_last_seen_active_index = -1;
     };
 }

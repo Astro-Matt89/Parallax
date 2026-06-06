@@ -95,6 +95,18 @@ namespace parallax::ui::tabs
         const bool horizon_culling_on = m_atmosphere_on || !observer.has_atmosphere;
         const f64 lst = astro::TimeSystem::lmst(m_julian_date, observer.longitude_rad);
 
+        if (m_shell_tracking_target_id.has_value())
+        {
+            if (const auto tracked = m_universe.query_object(m_shell_tracking_target_id.value()); tracked.has_value())
+            {
+                const astro::HorizontalCoord hz = astro::Coordinates::equatorial_to_horizontal(
+                    {tracked->ra, tracked->dec},
+                    observer,
+                    lst);
+                m_camera->set_pointing(hz.alt, hz.az);
+            }
+        }
+
         m_universe.update(m_julian_date);
 
         if (!m_procedural_first_tick_logged)
@@ -438,6 +450,30 @@ namespace parallax::ui::tabs
     void PlanetariumTab::clear_selection()
     {
         m_selection.clear();
+    }
+
+    void PlanetariumTab::center_on(const u64 object_id)
+    {
+        const auto target = m_universe.query_object(object_id);
+        if (!target.has_value())
+        {
+            PLX_CORE_WARN("PlanetariumTab::center_on could not find object {}", object_id);
+            return;
+        }
+
+        const astro::ObserverLocation& observer = m_observer_registry.get_active();
+        const f64 lst = astro::TimeSystem::lmst(m_julian_date, observer.longitude_rad);
+        const astro::HorizontalCoord hz = astro::Coordinates::equatorial_to_horizontal(
+            {target->ra, target->dec},
+            observer,
+            lst);
+        m_camera->set_pointing(hz.alt, hz.az);
+    }
+
+    void PlanetariumTab::start_tracking(const u64 object_id)
+    {
+        m_shell_tracking_target_id = object_id;
+        center_on(object_id);
     }
 
     void PlanetariumTab::set_atmosphere(bool on)

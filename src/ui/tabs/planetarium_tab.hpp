@@ -22,6 +22,7 @@
 
 #include <filesystem>
 #include <memory>
+#include <optional>
 #include <span>
 #include <vector>
 
@@ -90,6 +91,8 @@ namespace parallax::ui::tabs
         void toggle_atmosphere();
         void toggle_tracking();
         void clear_selection();
+        void center_on(u64 object_id);
+        void start_tracking(u64 object_id);
         void set_atmosphere(bool on);
         void set_bortle_scale(f32 bortle_scale);
 
@@ -142,5 +145,6 @@ namespace parallax::ui::tabs
         bool m_procedural_first_tick_logged = false;
         shell::ViewportRect m_viewport{};
         i32 m_last_seen_active_index = -1;
+        std::optional<u64> m_shell_tracking_target_id;
     };
 }

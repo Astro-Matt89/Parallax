@@ -5,6 +5,7 @@
 
 #include "astro/atmosphere.hpp"
 #include "astro/coordinates.hpp"
+#include "astro/observer_registry.hpp"
 #include "astro/time_system.hpp"
 #include "core/input.hpp"
 #include "core/types.hpp"
@@ -90,7 +91,7 @@ namespace parallax::core
         // Atmosphere toggle API                          ← SPRINT 06 Task 6.7
         // -----------------------------------------------------------------
 
-        /// @brief Returns true when the atmosphere is enabled (twilight gradient + horizon culling).
+        /// @brief Returns the user's atmosphere preference toggle.
         [[nodiscard]] bool is_atmosphere_on() const;
 
         /// @brief Toggle atmosphere on/off and log the change.
@@ -167,10 +168,7 @@ namespace parallax::core
         f64 m_julian_date = 0.0;            ///< Current simulation time (JD)
         f64 m_time_scale = 1.0;             ///< 1.0 = real-time, 0.0 = paused
         f64 m_delta_time = 0.0;             ///< Last frame delta for FPS display
-        astro::ObserverLocation m_observer;  ///< Observer geographic location
-
-        // -----------------------------------------------------------------
-        f64 m_elevation_m = 0.0;  ///< Observer elevation above sea level (metres)
+        astro::ObserverRegistry m_observer_registry;
 
         /// @brief Wall-clock time tracking for delta_time computation.
         std::chrono::steady_clock::time_point m_last_frame_time;

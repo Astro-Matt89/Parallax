@@ -3,6 +3,7 @@
 /// @file coordinates.hpp
 /// @brief Astronomical coordinate transforms: Equatorial, Horizontal, Screen projection.
 
+#include "astro/observer.hpp"
 #include "core/types.hpp"
 
 #include <optional>
@@ -21,13 +22,6 @@ namespace parallax::astro
     {
         f64 alt;    ///< Altitude (radians, -π/2..+π/2, negative = below horizon)
         f64 az;     ///< Azimuth (radians, 0..2π, 0=North, π/2=East)
-    };
-
-    /// @brief Observer geographic location.
-    struct ObserverLocation
-    {
-        f64 latitude_rad;   ///< Geographic latitude (radians, north positive)
-        f64 longitude_rad;  ///< Geographic longitude (radians, east positive)
     };
 
     /// @brief Static utility class for astronomical coordinate transformations.

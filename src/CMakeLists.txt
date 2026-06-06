@@ -48,6 +48,9 @@ add_executable(parallax
     vulkan/swapchain.cpp
     vulkan/pipeline.cpp
     astro/time_system.cpp
+    astro/observer.hpp
+    astro/observer_registry.hpp
+    astro/observer_registry.cpp
     astro/coordinates.cpp
     astro/atmosphere.cpp
     astro/sky_state.cpp
@@ -104,6 +107,8 @@ add_executable(parallax
     ui/tabs/imaging_tab.cpp
     ui/tabs/spectroscopy_tab.hpp
     ui/tabs/spectroscopy_tab.cpp
+    ui/tabs/base_tab.hpp
+    ui/tabs/base_tab.cpp
 )
 
 target_include_directories(parallax PRIVATE

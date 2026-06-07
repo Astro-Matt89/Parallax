@@ -686,17 +686,12 @@ namespace parallax::ui::shell
             tab_for(pane->get_active_tab()).render(cmd, rect);
         }
 
-        m_line_renderer.begin_frame();
-        draw_splitters_recursive(m_line_renderer,
-                                 m_pane_tree->get_root(),
-                                 center_area,
-                                 Vec2f{static_cast<f32>(extent.width), static_cast<f32>(extent.height)});
-        m_sidebar->render(m_line_renderer, m_panel_system, cmd, extent, sidebar_rect);
-        m_top_bar->render(m_line_renderer, m_panel_system, cmd, extent, top_bar_rect);
-        m_status_bar->render(m_line_renderer, m_panel_system, cmd, extent, status_bar_rect);
-        m_line_renderer.render(cmd);
-        m_font.render(cmd, extent);
-
+        // Reset viewport+scissor to the full window BEFORE chrome draw calls
+        // fire. The last tab to render left the Vulkan viewport pointing at its
+        // pane rect; if we do not reset here, the sidebar/topbar/statusbar
+        // geometry (authored in window-pixel space, NDC-mapped against the full
+        // window) gets squashed into that pane rect, and the on-screen positions
+        // no longer match the hit-rects used by handle_input.
         VkViewport full_viewport{};
         full_viewport.x = static_cast<f32>(window_rect.x);
         full_viewport.y = static_cast<f32>(window_rect.y);
@@ -710,6 +705,17 @@ namespace parallax::ui::shell
         full_scissor.offset = {static_cast<i32>(window_rect.x), static_cast<i32>(window_rect.y)};
         full_scissor.extent = {window_rect.width, window_rect.height};
         vkCmdSetScissor(cmd, 0, 1, &full_scissor);
+
+        m_line_renderer.begin_frame();
+        draw_splitters_recursive(m_line_renderer,
+                                 m_pane_tree->get_root(),
+                                 center_area,
+                                 Vec2f{static_cast<f32>(extent.width), static_cast<f32>(extent.height)});
+        m_sidebar->render(m_line_renderer, m_panel_system, cmd, extent, sidebar_rect);
+        m_top_bar->render(m_line_renderer, m_panel_system, cmd, extent, top_bar_rect);
+        m_status_bar->render(m_line_renderer, m_panel_system, cmd, extent, status_bar_rect);
+        m_line_renderer.render(cmd);
+        m_font.render(cmd, extent);
     }
 
     InputEvent Shell::make_local_event(const InputEvent& screen_event, const ViewportRect& rect) const

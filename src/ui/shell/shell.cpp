@@ -170,7 +170,7 @@ namespace parallax::ui::shell
                     }
 
                     const std::optional<TabId> tab = tab_from_persistence_key(tab_json.get<std::string>());
-                    if (tab.has_value() && !std::ranges::contains(desired_tabs, tab.value()))
+                    if (tab.has_value() && std::ranges::find(desired_tabs, tab.value()) == desired_tabs.end())
                     {
                         desired_tabs.push_back(tab.value());
                     }
@@ -200,7 +200,7 @@ namespace parallax::ui::shell
                 if (node.contains("active_tab") && node["active_tab"].is_string())
                 {
                     const std::optional<TabId> loaded_active = tab_from_persistence_key(node["active_tab"].get<std::string>());
-                    if (loaded_active.has_value() && std::ranges::contains(desired_tabs, loaded_active.value()))
+                    if (loaded_active.has_value() && std::ranges::find(desired_tabs, loaded_active.value()) != desired_tabs.end())
                     {
                         active_tab = loaded_active.value();
                     }

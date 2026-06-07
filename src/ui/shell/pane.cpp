@@ -216,7 +216,7 @@ namespace parallax::ui::shell
         }
 
         const bool first_empty_leaf = m_first->is_empty_leaf();
-        const bool second_empty_leaf = m_second->is_empty_leaf();
+        [[maybe_unused]] const bool second_empty_leaf = m_second->is_empty_leaf();
         assert(first_empty_leaf || second_empty_leaf);
         Pane* survivor = first_empty_leaf ? m_second.get() : m_first.get();
 

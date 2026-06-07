@@ -24,6 +24,7 @@
 #include "knowledge/knowledge_database.hpp"
 #include "observation/data_archive.hpp"
 #include "observation/session_scheduler.hpp"
+#include "ui/tabs/planetarium_tab.hpp"
 
 #include <glm/trigonometric.hpp>
 

@@ -287,3 +287,9 @@ target_link_libraries(test_pane_tree PRIVATE
 )
 
 add_test(NAME PaneTree COMMAND test_pane_tree)
+
+target_link_libraries(test_pane_tree PRIVATE
+    doctest::doctest
+    glm::glm
+    Vulkan::Vulkan
+)

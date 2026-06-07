@@ -10,23 +10,10 @@
 #include "core/input.hpp"
 #include "core/types.hpp"
 #include "core/window.hpp"
-#include "overlay/constellations.hpp"                     // ← SPRINT 04 Task 4.2
-#include "overlay/coord_grid.hpp"                         // ← SPRINT 04 Task 4.3
-#include "overlay/horizon.hpp"                            // ← SPRINT 04 Task 4.4
-#include "rendering/camera.hpp"
-#include "rendering/dso_renderer.hpp"                     // ← SPRINT 04 Task 4.5
-#include "rendering/solar_system_renderer.hpp"            // ← SPRINT 06 Task 6.5
-#include "rendering/line_renderer.hpp"                    // ← SPRINT 04 Task 4.1
-#include "rendering/sky_background.hpp"
-#include "rendering/starfield.hpp"
 #include "ui/hud.hpp"
-#include "ui/instrument_panel.hpp"
 #include "ui/panel_system.hpp"                            // ← SPRINT 05 Task 5.1
-#include "ui/side_panel.hpp"                              // ← SPRINT 05 Task 5.4
-#include "ui/sessions_panel.hpp"
-#include "ui/tabs/planetarium_tab.hpp"
-#include "ui/toolbar.hpp"                                 // ← SPRINT 05 Task 5.3
-#include "universe/celestial_object.hpp"                  // ← SPRINT 07 Task 7.7
+#include "ui/selection.hpp"
+#include "ui/shell/shell.hpp"
 #include "universe/universe.hpp"                          // ← SPRINT 07 Task 7.7
 #include "vulkan/context.hpp"
 #include "vulkan/pipeline.hpp"
@@ -40,15 +27,9 @@
 #include <memory>
 #include <vector>
 
-namespace parallax::analysis
-{
-    class MockAnalyzer;
-}
-
-namespace parallax::instruments
-{
-    class MockInstrument;
-}
+namespace parallax::analysis { class MockAnalyzer; }
+namespace parallax::instruments { class MockInstrument; }
+namespace parallax::rendering { class LineRenderer; }
 
 namespace parallax::knowledge
 {
@@ -115,8 +96,6 @@ namespace parallax::core
 
         void process_input();
         void update_simulation(f64 delta_time_sec);
-        void request_observe(u64 target_id);
-
         void record_command_buffer(VkCommandBuffer cmd, uint32_t image_index);
 
         static constexpr uint32_t kMaxFramesInFlight = 2;
@@ -133,7 +112,8 @@ namespace parallax::core
         std::unique_ptr<rendering::LineRenderer> m_line_renderer;  // UI borders / shell chrome
         std::unique_ptr<Input> m_input;
         std::unique_ptr<ui::Hud> m_hud;                     ///< Retro HUD overlay  ← SPRINT 03 Task 3.6
-        std::unique_ptr<ui::tabs::PlanetariumTab> m_planetarium_tab;
+        std::unique_ptr<ui::Selection> m_selection;
+        std::unique_ptr<ui::shell::Shell> m_shell;
 
         // -----------------------------------------------------------------
         // Universe facade                                   ← SPRINT 07 Task 7.7
@@ -151,16 +131,9 @@ namespace parallax::core
         std::unique_ptr<analysis::MockAnalyzer> m_analyzer;
 
         // -----------------------------------------------------------------
-        // UI subsystems                                     ← SPRINT 05
+        // UI subsystems                                     ← SPRINT 09
         // -----------------------------------------------------------------
-        ui::PanelSystem m_panel_system;                      // Task 5.1  Batched panel backgrounds
-        ui::Toolbar m_toolbar;                               // Task 5.3  Bottom toolbar
-        ui::SidePanel m_side_panel;                          // Task 5.4  Left side panel
-        ui::InstrumentPanel m_instrument_panel;               // Sprint 08 Task 8.10
-        ui::SessionsPanel m_sessions_panel;                   // Sprint 08 Task 8.10
-
-        bool m_show_instrument_panel = false;
-        bool m_show_sessions_panel = false;
+        ui::PanelSystem m_panel_system;                      // Reused by shell chrome rendering
 
         // -----------------------------------------------------------------
         // Simulation state

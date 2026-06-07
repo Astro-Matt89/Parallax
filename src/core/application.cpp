@@ -22,10 +22,8 @@
 #include "core/user_data_path.hpp"
 #include "instruments/mock_instrument.hpp"
 #include "knowledge/knowledge_database.hpp"
-#include "knowledge/knowledge_level.hpp"
 #include "observation/data_archive.hpp"
 #include "observation/session_scheduler.hpp"
-#include "rendering/render_style.hpp"                    // ← SPRINT 08 Task 8.9
 
 #include <glm/trigonometric.hpp>
 
@@ -48,61 +46,6 @@ void check_vk(VkResult result, const char* operation)
         PLX_CORE_CRITICAL("Vulkan error in {}: VkResult = {}", operation, static_cast<int>(result));
         std::abort();
     }
-}
-
-constexpr float kDefaultSnrRatePerHour = 5.0f;
-constexpr std::size_t kCompletedSessionsDisplayLimit = 10;
-
-std::string knowledge_level_to_text(parallax::knowledge::KnowledgeLevel level)
-{
-    using parallax::knowledge::KnowledgeLevel;
-
-    switch (level)
-    {
-        case KnowledgeLevel::Detected:      return "L1";
-        case KnowledgeLevel::Classified:    return "L2";
-        case KnowledgeLevel::Characterized: return "L3";
-        case KnowledgeLevel::Detailed:      return "L4";
-        case KnowledgeLevel::Resolved:      return "L5";
-        case KnowledgeLevel::FullyMapped:   return "L6";
-        default:                            return "L0";
-    }
-}
-
-std::string format_object_label(const parallax::universe::Universe& universe, parallax::u64 object_id)
-{
-    if (object_id == 0)
-    {
-        return "[Survey]";
-    }
-
-    const std::string_view known_name = universe.get_name(object_id);
-    if (!known_name.empty())
-    {
-        return std::string{known_name};
-    }
-
-    if (const auto object = universe.query_object(object_id); object.has_value())
-    {
-        const parallax::u64 source_id = parallax::universe::decode_source_id(object_id);
-        switch (object->type)
-        {
-            case parallax::universe::ObjectType::Star:
-                return std::format("HIP {}", source_id);
-            case parallax::universe::ObjectType::DeepSkyObject:
-            case parallax::universe::ObjectType::Galaxy:
-                return std::format("M{}", source_id);
-            case parallax::universe::ObjectType::SolarSystemBody:
-                return std::format("Body {}", source_id);
-            case parallax::universe::ObjectType::ProceduralStar:
-            case parallax::universe::ObjectType::ProceduralDso:
-                return std::format("PRC {:016X}", object_id);
-            default:
-                return std::format("ID {}", object_id);
-        }
-    }
-
-    return std::format("ID {}", object_id);
 }
 
 } // anonymous namespace
@@ -165,105 +108,8 @@ void Application::init()
     m_hud = std::make_unique<ui::Hud>(
         *m_context, m_pipeline->get_render_pass(), shader_dir);
 
-    // 7b. PanelSystem — batched panel backgrounds           ← SPRINT 05 Task 5.1
+    // 7b. PanelSystem (reused by shell chrome rendering)
     m_panel_system.init(*m_context, m_pipeline->get_render_pass(), shader_dir);
-
-    // 7c. Toolbar                                           ← SPRINT 05 Task 5.3
-    {
-        ui::ToolbarCallbacks cb;
-        cb.toggle_constellations = [this]() { m_planetarium_tab->toggle_constellations(); };
-        cb.toggle_stars          = [this]() { /* TODO: add Starfield visibility toggle */ };
-        cb.toggle_dso            = [this]() { m_planetarium_tab->toggle_dso(); };
-        cb.cycle_grid            = [this]() { m_planetarium_tab->cycle_grid(); };
-        cb.toggle_horizon        = [this]() { m_planetarium_tab->toggle_horizon(); };
-        cb.toggle_atmosphere     = [this]() { toggle_atmosphere(); };  // ← SPRINT 06 Task 6.7
-        cb.toggle_observe_panel  = [this]()
-        {
-            m_show_instrument_panel = !m_show_instrument_panel;
-            m_instrument_panel.set_visible(m_show_instrument_panel);
-        };
-        cb.toggle_sessions_panel = [this]()
-        {
-            m_show_sessions_panel = !m_show_sessions_panel;
-            m_sessions_panel.set_visible(m_show_sessions_panel);
-        };
-        cb.time_reverse          = [this]()
-        {
-            if (m_time_scale >= 0.0) { m_time_scale = -1.0; }
-            else { m_time_scale *= 2.0; }
-        };
-        cb.time_pause_toggle = [this]()
-        {
-            m_time_scale = (m_time_scale != 0.0) ? 0.0 : 1.0;
-        };
-        cb.time_forward = [this]()
-        {
-            if (m_time_scale <= 0.0) { m_time_scale = 1.0; }
-            else { m_time_scale *= 2.0; }
-        };
-        cb.time_reset_now = [this]()
-        {
-            m_julian_date = astro::TimeSystem::now_as_jd();
-            m_time_scale = 1.0;
-        };
-        cb.set_fov = [this](f64 fov_deg) { m_planetarium_tab->set_fov(fov_deg); };
-        m_toolbar.init(cb);
-    }
-
-    // 7d. SidePanel                                         ← SPRINT 05 Task 5.4
-    {
-        ui::SidePanelCallbacks cb;
-        cb.set_location = [this](f64 lat_deg, f64 lon_deg, f64 elev_m, f32 bortle)
-        {
-            static_cast<void>(lat_deg);
-            static_cast<void>(lon_deg);
-            static_cast<void>(elev_m);
-            static_cast<void>(bortle);
-            PLX_CORE_INFO("Location switching has moved to the BASE tab (Sprint 09 Task 9.11 wires it up).");
-        };
-        cb.set_bortle = [this](f32 bortle)
-        {
-            static_cast<void>(bortle);
-            PLX_CORE_INFO("Bortle scale now follows the active observer selected in the BASE tab.");
-        };
-        cb.set_magnitude_limit = [this](f32 mag)
-        {
-            m_planetarium_tab->set_magnitude_limit(mag);
-            PLX_CORE_INFO("Magnitude limit: {:.1f}", mag);
-        };
-        cb.set_time_scale = [this](f64 scale)
-        {
-            m_time_scale = scale;
-            PLX_CORE_INFO("Time scale: x{}", scale);
-        };
-        m_side_panel.init(cb);
-    }
-
-    // 7e. Observation workflow panels                        ← SPRINT 08 Task 8.10
-    {
-        ui::InstrumentPanelCallbacks observe_cb;
-        observe_cb.schedule = [this](const observation::SessionParameters& params)
-        {
-            if (m_scheduler)
-            {
-                const u64 id = m_scheduler->schedule(params);
-                PLX_CORE_INFO("Scheduled observation session {}", id);
-            }
-        };
-        m_instrument_panel.init(observe_cb);
-        m_instrument_panel.set_visible(false);
-
-        ui::SessionsPanelCallbacks sessions_cb;
-        sessions_cb.abort_session = [this](u64 session_id)
-        {
-            if (m_scheduler)
-            {
-                m_scheduler->abort(session_id);
-            }
-        };
-        m_sessions_panel.init(sessions_cb);
-        m_sessions_panel.set_visible(false);
-    }
 
     // =================================================================
     // 8. Universe facade — replaces all direct catalog loading.
@@ -334,17 +180,61 @@ void Application::init()
                       glm::degrees(active_observer.longitude_rad));
     }
 
-    // 10. Planetarium tab
-    m_planetarium_tab = std::make_unique<ui::tabs::PlanetariumTab>(
-        *m_context,
-        *m_swapchain,
-        m_pipeline->get_render_pass(),
-        shader_dir,
-        *m_universe,
-        *m_knowledge,
-        m_hud->get_font(),
-        m_julian_date,
-        m_observer_registry);
+    m_selection = std::make_unique<ui::Selection>();
+    m_shell = std::make_unique<ui::shell::Shell>(m_hud->get_font(),
+                                                  *m_line_renderer,
+                                                  m_panel_system,
+                                                  *m_context,
+                                                  *m_swapchain,
+                                                  m_pipeline->get_render_pass(),
+                                                  shader_dir,
+                                                  *m_universe,
+                                                  *m_knowledge,
+                                                  *m_archive,
+                                                  *m_scheduler,
+                                                  m_observer_registry,
+                                                  *m_selection,
+                                                  *m_input,
+                                                  m_julian_date,
+                                                  m_time_scale);
+    m_shell->set_callbacks({
+        .on_pause_toggle = [this]()
+        {
+            m_time_scale = (m_time_scale == 0.0) ? 1.0 : 0.0;
+        },
+        .on_time_scale_set = [this](const f64 scale)
+        {
+            m_time_scale = scale;
+        },
+        .on_time_scale_up = [this]()
+        {
+            if (m_time_scale == 0.0)
+            {
+                m_time_scale = 1.0;
+            }
+            else
+            {
+                m_time_scale *= 2.0;
+            }
+        },
+        .on_time_scale_down = [this]()
+        {
+            if (m_time_scale == 0.0)
+            {
+                m_time_scale = 1.0;
+            }
+            else
+            {
+                m_time_scale *= 0.5;
+            }
+        },
+        .on_time_reset = [this]()
+        {
+            m_julian_date = astro::TimeSystem::now_as_jd();
+            m_time_scale = 1.0;
+        }
+    });
+    m_shell->init();
 
     // 12-14. Command pool, sync, frame time
     create_command_pool();
@@ -352,15 +242,7 @@ void Application::init()
     create_sync_objects();
     m_last_frame_time = std::chrono::steady_clock::now();
 
-    // Log initial overlay states
-    PLX_CORE_INFO("Overlays: CONST={} GRID={} DSO={} HORIZ={}",
-                  m_planetarium_tab->constellations_visible() ? "ON" : "OFF",
-                  m_planetarium_tab->grid_type_name(),
-                  m_planetarium_tab->dso_visible() ? "ON" : "OFF",
-                  m_planetarium_tab->horizon_visible() ? "ON" : "OFF");
-
-    PLX_CORE_INFO("Application initialized — skychart mode, MLIM {:.1f}",
-                  m_planetarium_tab->get_magnitude_limit());
+    PLX_CORE_INFO("Application initialized — shell integration active");
 }
 
 // =================================================================
@@ -369,6 +251,11 @@ void Application::init()
 
 void Application::shutdown()
 {
+    if (m_shell)
+    {
+        m_shell->save_layout();
+    }
+
     if (m_knowledge)
     {
         const std::filesystem::path save_dir = user_data_save_dir();
@@ -391,9 +278,11 @@ void Application::shutdown()
 
     m_analyzer.reset();
     m_mock_instrument.reset();
+    m_shell.reset();
     m_archive.reset();
     m_scheduler.reset();
     m_knowledge.reset();
+    m_selection.reset();
 
     if (!m_context) return;
 
@@ -407,7 +296,6 @@ void Application::shutdown()
     }
 
     m_panel_system.destroy();   // ← SPRINT 05 Task 5.1 (destroy before HUD)
-    m_planetarium_tab.reset();
     m_hud.reset();
     m_line_renderer.reset();
     m_pipeline.reset();
@@ -453,28 +341,23 @@ void Application::main_loop()
 
 bool Application::is_atmosphere_on() const
 {
-    return m_planetarium_tab->is_atmosphere_on();
+    return m_shell ? m_shell->get_planetarium_tab().is_atmosphere_on() : true;
 }
 
 void Application::toggle_atmosphere()
 {
-    m_planetarium_tab->toggle_atmosphere();
+    if (m_shell)
+    {
+        m_shell->get_planetarium_tab().toggle_atmosphere();
+    }
 }
 
 void Application::set_atmosphere(bool on)
 {
-    m_planetarium_tab->set_atmosphere(on);
-}
-
-void Application::request_observe(u64 target_id)
-{
-    if (target_id == 0)
+    if (m_shell)
     {
-        return;
+        m_shell->get_planetarium_tab().set_atmosphere(on);
     }
-
-    m_show_instrument_panel = true;
-    m_instrument_panel.open_for_selected_object(target_id);
 }
 
 // =================================================================
@@ -495,135 +378,38 @@ void Application::request_observe(u64 target_id)
 
 void Application::process_input()
 {
-    const Vec2f mouse_pos = m_input->get_mouse_position();
+    if (!m_shell)
+    {
+        return;
+    }
+
+    ui::shell::InputEvent event{};
+    event.mouse_pos = m_input->get_mouse_position();
+    event.mouse_delta = m_input->get_mouse_drag_delta();
+    event.is_dragging = m_input->is_mouse_dragging();
+    event.drag_delta = m_input->get_mouse_drag_delta();
+    event.scroll_delta = m_input->get_scroll_delta();
+
     const VkExtent2D extent = m_swapchain->get_extent();
-    const ui::shell::ViewportRect planetarium_viewport{
+    const ui::shell::ViewportRect window{
         .x = 0,
         .y = 0,
         .width = extent.width,
         .height = extent.height
     };
+    event.inside_viewport = window.contains(event.mouse_pos);
 
-    m_planetarium_tab->set_viewport(planetarium_viewport);
-
-    // =================================================================
-    // Step 1: Determine if mouse is over any UI panel
-    // =================================================================
-    const bool mouse_over_ui = m_panel_system.is_mouse_over_ui(mouse_pos)
-                            || m_toolbar.is_mouse_over(mouse_pos)
-                            || m_side_panel.is_mouse_over(mouse_pos)
-                            || m_instrument_panel.is_mouse_over(mouse_pos)
-                            || m_sessions_panel.is_mouse_over(mouse_pos);
-
-    // =================================================================
-    // Step 2: Route mouse input based on priority
-    // =================================================================
-    if (mouse_over_ui)
+    if (m_input->was_click())
     {
-        m_panel_system.process_input(*m_input, mouse_pos);
-        m_input->set_cursor(CursorStyle::Hand);
-    }
-    else
-    {
-        ui::shell::InputEvent event{};
-        event.inside_viewport = planetarium_viewport.contains(
-            static_cast<i32>(mouse_pos.x),
-            static_cast<i32>(mouse_pos.y));
-        event.scroll_delta = m_input->get_scroll_delta();
-        event.is_dragging = m_input->is_mouse_dragging();
-        event.drag_delta = m_input->get_mouse_drag_delta();
-        event.mouse_delta = event.drag_delta;
-
-        if (event.inside_viewport)
-        {
-            event.mouse_pos = {
-                mouse_pos.x - static_cast<f32>(planetarium_viewport.x),
-                mouse_pos.y - static_cast<f32>(planetarium_viewport.y)
-            };
-        }
-
-        if (m_input->was_click())
-        {
-            const Vec2f click_pos = m_input->get_click_position();
-            if (planetarium_viewport.contains(static_cast<i32>(click_pos.x), static_cast<i32>(click_pos.y)))
-            {
-                event.was_click = true;
-                event.click_button = ui::shell::MouseButton::Left;
-                event.click_pos = {
-                    click_pos.x - static_cast<f32>(planetarium_viewport.x),
-                    click_pos.y - static_cast<f32>(planetarium_viewport.y)
-                };
-            }
-        }
-
-        m_planetarium_tab->on_input(event, planetarium_viewport);
-
-        if (event.inside_viewport)
-        {
-            m_input->set_cursor(event.is_dragging ? CursorStyle::SizeAll : CursorStyle::Crosshair);
-        }
-        else
-        {
-            m_input->set_cursor(CursorStyle::Arrow);
-        }
+        event.was_click = true;
+        event.click_button = ui::shell::MouseButton::Left;
+        event.click_pos = m_input->get_click_position();
     }
 
-    // =================================================================
-    // Keyboard bindings (always active regardless of mouse state)
-    // =================================================================
+    const bool consumed = m_shell->on_input(event);
+    m_input->set_cursor(consumed ? CursorStyle::Hand : (event.is_dragging ? CursorStyle::SizeAll : CursorStyle::Crosshair));
 
-    if (m_input->is_key_pressed(SDL_SCANCODE_1)) { m_time_scale = 1.0;     PLX_CORE_INFO("Time scale: x1"); }
-    if (m_input->is_key_pressed(SDL_SCANCODE_2)) { m_time_scale = 10.0;    PLX_CORE_INFO("Time scale: x10"); }
-    if (m_input->is_key_pressed(SDL_SCANCODE_3)) { m_time_scale = 100.0;   PLX_CORE_INFO("Time scale: x100"); }
-    if (m_input->is_key_pressed(SDL_SCANCODE_4)) { m_time_scale = 1000.0;  PLX_CORE_INFO("Time scale: x1000"); }
-    if (m_input->is_key_pressed(SDL_SCANCODE_5)) { m_time_scale = 10000.0; PLX_CORE_INFO("Time scale: x10000"); }
-
-    if (m_input->is_key_pressed(SDL_SCANCODE_0) ||
-        m_input->is_key_pressed(SDL_SCANCODE_SPACE))
-    {
-        if (m_time_scale != 0.0) { m_time_scale = 0.0; PLX_CORE_INFO("Time paused"); }
-        else { m_time_scale = 1.0; PLX_CORE_INFO("Time resumed: x1"); }
-    }
-
-    if (m_input->is_key_pressed(SDL_SCANCODE_MINUS))
-    {
-        if (m_time_scale == 0.0) m_time_scale = -1.0;
-        else if (m_time_scale > 0.0) m_time_scale = -m_time_scale;
-        PLX_CORE_INFO("Time scale: x{}", static_cast<int>(m_time_scale));
-    }
-
-    if (m_input->is_key_pressed(SDL_SCANCODE_EQUALS))
-    {
-        m_julian_date = astro::TimeSystem::now_as_jd();
-        m_time_scale = 1.0;
-        const auto dt = astro::TimeSystem::from_julian_date(m_julian_date);
-        PLX_CORE_INFO("Time reset to now: {:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02.0f} UTC (x1)",
-                      dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second);
-    }
-
-    // UI controls
-    if (m_input->is_key_pressed(SDL_SCANCODE_H))
-    {
-        m_hud->toggle_visible();
-        PLX_CORE_INFO("HUD {}", m_hud->is_visible() ? "shown" : "hidden");
-    }
-
-    if (m_input->is_key_pressed(SDL_SCANCODE_T))
-    {
-        m_hud->toggle_time_format();
-        const char* format_names[] = {"UTC", "LST", "JD"};
-        PLX_CORE_INFO("Time display: {}", format_names[static_cast<int>(m_hud->get_time_format())]);
-    }
-
-    if (m_input->is_key_pressed(SDL_SCANCODE_B))
-    {
-        PLX_CORE_INFO("Bortle scale now follows the active observer selected in the BASE tab.");
-    }
-
-    const bool had_selection = m_planetarium_tab->has_selection();
-    m_planetarium_tab->handle_keyboard(*m_input);
-
-    if (m_input->is_key_pressed(SDL_SCANCODE_ESCAPE) && !had_selection)
+    if (m_input->is_key_pressed(SDL_SCANCODE_ESCAPE))
     {
         m_window->request_close();
     }
@@ -649,9 +435,6 @@ void Application::process_input()
 
 void Application::update_simulation(f64 delta_time_sec)
 {
-    const astro::ObserverLocation& active_observer = m_observer_registry.get_active();
-
-    // Advance Julian Date
     m_julian_date += (delta_time_sec * m_time_scale) / 86400.0;
 
     if (m_scheduler && m_universe)
@@ -703,214 +486,19 @@ void Application::update_simulation(f64 delta_time_sec)
             {
                 m_archive->add(std::make_unique<observation::DataRecord>(std::move(data)));
             }
-        }
-    }
 
-    const VkExtent2D viewport = m_swapchain->get_extent();
-    m_planetarium_tab->set_viewport({
-        .x = 0,
-        .y = 0,
-        .width = viewport.width,
-        .height = viewport.height
-    });
-    m_planetarium_tab->update(delta_time_sec);
-
-    const f64 lst = astro::TimeSystem::lmst(m_julian_date, active_observer.longitude_rad);
-    const auto& camera = m_planetarium_tab->get_camera();
-    const auto pointing = camera.get_pointing();
-    const f64 fov_rad = camera.get_fov_rad();
-    const auto camera_eq = astro::Coordinates::horizontal_to_equatorial(pointing, active_observer, lst);
-
-    // --- Toolbar update ---
-    {
-        const ui::ToolbarState toolbar_state{
-            .constellations_visible = m_planetarium_tab->constellations_visible(),
-            .stars_visible          = true,
-            .dso_visible            = m_planetarium_tab->dso_visible(),
-            .grid_visible           = m_planetarium_tab->grid_type() != overlay::GridType::None,
-            .horizon_visible        = m_planetarium_tab->horizon_visible(),
-            .atmosphere_on          = m_planetarium_tab->is_atmosphere_on(),
-            .observe_panel_visible  = m_show_instrument_panel,
-            .sessions_panel_visible = m_show_sessions_panel,
-            .time_scale             = m_time_scale,
-            .time_paused            = (m_time_scale == 0.0),
-            .fov_deg                = m_planetarium_tab->get_fov_deg(),
-            .magnitude_limit        = m_planetarium_tab->get_magnitude_limit(),
-        };
-        m_toolbar.update(
-            m_input->get_mouse_position(),
-            m_input->was_click(),
-            m_input->is_left_button_down(),
-            static_cast<f32>(delta_time_sec),
-            viewport.width, viewport.height,
-            toolbar_state);
-    }
-
-    // --- SidePanel update ---
-    {
-        const auto dt_utc = astro::TimeSystem::from_julian_date(m_julian_date);
-        const auto utc_str = std::format("{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}",
-            dt_utc.year, dt_utc.month, dt_utc.day,
-            dt_utc.hour, dt_utc.minute, static_cast<i32>(dt_utc.second));
-
-        const f64 lst_hours = lst * astro_constants::kRadToHour;
-        const i32 lst_h = static_cast<i32>(lst_hours);
-        const f64 lst_m_frac = (lst_hours - static_cast<f64>(lst_h)) * 60.0;
-        const i32 lst_m = static_cast<i32>(lst_m_frac);
-        const i32 lst_s = static_cast<i32>((lst_m_frac - static_cast<f64>(lst_m)) * 60.0);
-        const auto lst_str = std::format("{:02d}h {:02d}m {:02d}s", lst_h, lst_m, lst_s);
-
-        const ui::SidePanelState side_state{
-            .latitude_deg    = active_observer.latitude_rad  * astro_constants::kRadToDeg,
-            .longitude_deg   = active_observer.longitude_rad * astro_constants::kRadToDeg,
-            .elevation_m     = active_observer.elevation_m,
-            .selected_preset = -1,
-            .utc_string      = utc_str,
-            .lst_string      = lst_str,
-            .julian_date     = m_julian_date,
-            .time_scale      = m_time_scale,
-            .time_paused     = (m_time_scale == 0.0),
-            .bortle_scale    = active_observer.bortle_scale,
-            .magnitude_limit = m_planetarium_tab->get_magnitude_limit(),
-        };
-        m_side_panel.update(
-            m_input->get_mouse_position(),
-            m_input->was_click(),
-            m_input->is_left_button_down(),
-            static_cast<f32>(delta_time_sec),
-            viewport.width, viewport.height,
-            side_state);
-    }
-
-    // --- Instrument panel update ---
-    {
-        ui::InstrumentPanelState observe_state;
-        observe_state.has_selection = m_planetarium_tab->has_selection();
-        if (observe_state.has_selection)
-        {
-            observe_state.selected_object_id = m_planetarium_tab->get_selection().get_selection().celestial_obj.id;
-            observe_state.selected_object_name =
-                format_object_label(*m_universe, observe_state.selected_object_id);
-        }
-        observe_state.center_ra_rad = camera_eq.ra;
-        observe_state.center_dec_rad = camera_eq.dec;
-        observe_state.fov_rad = fov_rad;
-        observe_state.current_julian_date = m_julian_date;
-
-        m_instrument_panel.update(
-            observe_state,
-            m_input->get_mouse_position(),
-            m_input->was_click(),
-            m_input->is_left_button_down(),
-            static_cast<f32>(delta_time_sec),
-            viewport.width, viewport.height);
-        m_show_instrument_panel = m_instrument_panel.is_visible();
-    }
-
-    // --- Sessions panel update ---
-    {
-        std::vector<ui::SessionsPanelEntry> active_entries;
-        std::vector<ui::SessionsPanelCompletedEntry> completed_entries;
-
-        if (m_scheduler)
-        {
-            const auto active = m_scheduler->get_active();
-            active_entries.reserve(active.size());
-            for (const auto* session : active)
+            if (m_shell)
             {
-                const auto& params = session->parameters();
-                const auto& progress = session->progress();
-                active_entries.push_back(ui::SessionsPanelEntry{
-                    .session_id = session->id(),
-                    .target_name = format_object_label(*m_universe, params.target_object_id),
-                    .technique = params.technique,
-                    .completion_fraction = static_cast<f32>(progress.completion_fraction),
-                    .elapsed_hours = static_cast<f32>(progress.elapsed_hours),
-                    .accumulated_snr = static_cast<f32>(progress.accumulated_snr),
-                    .expected_snr = static_cast<f32>(
-                        params.planned_duration_hours
-                        * static_cast<double>(m_mock_instrument
-                                                   ? m_mock_instrument->get_snr_rate_per_hour()
-                                                   : kDefaultSnrRatePerHour)),
-                });
-            }
-
-        }
-
-        if (m_archive)
-        {
-            auto completed = m_archive->get_all();
-            std::sort(completed.begin(), completed.end(),
-                      [](const observation::DataRecord* lhs, const observation::DataRecord* rhs)
-                      {
-                          return lhs->session_id > rhs->session_id;
-                      });
-
-            const std::size_t max_count = std::min<std::size_t>(kCompletedSessionsDisplayLimit, completed.size());
-            completed_entries.reserve(max_count);
-            for (std::size_t i = 0; i < max_count; ++i)
-            {
-                const auto* record = completed[i];
-                std::string level_text = "--";
-                if (m_knowledge && record->target_object_id != 0)
-                {
-                    level_text = knowledge_level_to_text(m_knowledge->get_level(record->target_object_id));
-                }
-
-                completed_entries.push_back(ui::SessionsPanelCompletedEntry{
-                    .session_id = record->session_id,
-                    .target_name = format_object_label(*m_universe, record->target_object_id),
-                    .technique = record->technique,
-                    .final_snr = static_cast<f32>(record->achieved_snr),
-                    .level_achieved = std::move(level_text),
-                });
+                m_shell->push_notification(
+                    std::format("Observation session {} completed", session_id),
+                    ui::shell::NotificationSeverity::Info);
             }
         }
-
-        m_sessions_panel.update(
-            std::move(active_entries),
-            std::move(completed_entries),
-            m_input->get_mouse_position(),
-            m_input->was_click(),
-            static_cast<f32>(delta_time_sec),
-            viewport.width, viewport.height);
     }
 
-    // --- HUD update ---
-    const f32 fps = (m_delta_time > 0.0) ? static_cast<f32>(1.0 / m_delta_time) : 0.0f;
-
-    m_hud->update(ui::HudData{
-        .julian_date             = m_julian_date,
-        .local_sidereal_time_rad = lst,
-        .utc_hours               = 0.0,
-        .altitude_deg            = pointing.alt * astro_constants::kRadToDeg,
-        .azimuth_deg             = pointing.az  * astro_constants::kRadToDeg,
-        .fov_deg                 = m_planetarium_tab->get_fov_deg(),
-        .magnitude_limit         = m_planetarium_tab->get_magnitude_limit(),
-        .latitude_deg            = active_observer.latitude_rad  * astro_constants::kRadToDeg,
-        .longitude_deg           = active_observer.longitude_rad * astro_constants::kRadToDeg,
-        .bortle_scale            = active_observer.bortle_scale,
-        .fps                     = fps,
-        .visible_stars           = m_planetarium_tab->visible_star_count(),
-        .total_stars             = static_cast<u32>(m_planetarium_tab->get_frame_objects().size()),
-        .time_scale              = m_time_scale,
-        .overlay_const           = m_planetarium_tab->constellations_visible(),
-        .overlay_grid_name       = m_planetarium_tab->grid_type_name(),
-        .overlay_dso             = m_planetarium_tab->dso_visible(),
-        .overlay_horizon         = m_planetarium_tab->horizon_visible(),
-        .sun_altitude_deg        = m_planetarium_tab->get_sun_altitude_deg(),
-        .atmosphere_on           = m_planetarium_tab->atmosphere_effectively_on(),
-    });
-
-    // Periodic logging
-    ++m_frame_counter;
-    if (m_frame_counter % 60 == 0)
+    if (m_shell)
     {
-        PLX_CORE_TRACE(
-            "Universe: {} frame objects | visible stars={} | MLIM {:.1f}",
-            m_planetarium_tab->get_frame_objects().size(),
-            m_planetarium_tab->visible_star_count(),
-            m_planetarium_tab->get_magnitude_limit());
+        m_shell->update(delta_time_sec);
     }
 }
 
@@ -951,35 +539,15 @@ void Application::record_command_buffer(VkCommandBuffer cmd, uint32_t image_inde
     VkRect2D scissor{{0, 0}, extent};
     vkCmdSetScissor(cmd, 0, 1, &scissor);
 
-    const ui::shell::ViewportRect planetarium_viewport{
-        .x = 0,
-        .y = 0,
-        .width = extent.width,
-        .height = extent.height
-    };
-
-    // 1-3. Planetarium tab
-    m_planetarium_tab->render(cmd, planetarium_viewport);
-
-    vkCmdSetViewport(cmd, 0, 1, &vp);
-    vkCmdSetScissor(cmd, 0, 1, &scissor);
-
-    // 4. Panel backgrounds (transparent filled quads — behind UI content)
-    m_panel_system.render_backgrounds(cmd, extent);
-
-    // 5. UI panel content
-    //    Each render() call submits text to the shared font queue and border
-    //    lines to the line renderer; a second line_renderer→render() then
-    //    flushes the UI border lines before the text draw call.
-    m_line_renderer->begin_frame();
-    m_toolbar.render(m_hud->get_font(), *m_line_renderer, m_panel_system, cmd, extent);
-    m_side_panel.render(m_hud->get_font(), *m_line_renderer, extent);
-    m_instrument_panel.render(m_hud->get_font(), *m_line_renderer, extent);
-    m_sessions_panel.render(m_hud->get_font(), *m_line_renderer, extent);
-    m_line_renderer->render(cmd);   // flush UI border lines
-
-    // 6. All text: HUD panels + toolbar + side panel + workflow panels (single GPU draw call)
-    m_hud->render(cmd, extent);
+    if (m_shell)
+    {
+        m_shell->render(cmd, {
+            .x = 0,
+            .y = 0,
+            .width = extent.width,
+            .height = extent.height
+        });
+    }
 
     vkCmdEndRenderPass(cmd);
 
@@ -1080,12 +648,6 @@ void Application::recreate_swapchain()
         std::filesystem::path{PLX_SHADER_DIR});
 
     const auto extent = m_swapchain->get_extent();
-    m_planetarium_tab->set_viewport({
-        .x = 0,
-        .y = 0,
-        .width = extent.width,
-        .height = extent.height
-    });
 
     for (auto sem : m_render_finished_semaphores)
     {

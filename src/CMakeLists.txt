@@ -74,11 +74,7 @@ add_executable(parallax
     ui/hud.cpp
     ui/panel_system.cpp
     ui/widgets.cpp
-    ui/toolbar.cpp
-    ui/side_panel.cpp
     ui/selection.cpp
-    ui/instrument_panel.cpp
-    ui/sessions_panel.cpp
     # Sprint 09 — UI Shell foundation (Task 9.1)
     ui/shell/shell_types.hpp
     ui/shell/viewport_rect.hpp
@@ -93,6 +89,8 @@ add_executable(parallax
     ui/shell/top_bar.cpp
     ui/shell/status_bar.hpp
     ui/shell/status_bar.cpp
+    ui/shell/shell.hpp
+    ui/shell/shell.cpp
     ui/tabs/planetarium_tab.hpp
     ui/tabs/planetarium_tab.cpp
     ui/tabs/archive_tab.hpp

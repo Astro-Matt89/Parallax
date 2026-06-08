@@ -140,6 +140,14 @@ namespace parallax::ui::tabs
         std::vector<universe::CelestialObject> m_frame_objects;
 
         rendering::SkyParams m_sky_params;
+        astro::ObserverLocation m_frame_observer{};
+        f64 m_frame_lst = 0.0;
+        astro::HorizontalCoord m_frame_pointing{0.0, 0.0};
+        f64 m_frame_fov_rad = 1.0;
+        f64 m_frame_aspect_ratio = 1.0;
+        f32 m_frame_mag_limit = 6.0f;
+        bool m_frame_horizon_culling_on = true;
+        bool m_frame_atmosphere_on = true;
         bool m_atmosphere_on = true;
         f32 m_sun_altitude_deg = -90.0f;
         bool m_procedural_first_tick_logged = false;

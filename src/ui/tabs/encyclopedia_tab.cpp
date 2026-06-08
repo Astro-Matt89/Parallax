@@ -6,6 +6,7 @@
 #include "knowledge/property_registry.hpp"
 #include "rendering/line_renderer.hpp"
 #include "ui/font.hpp"
+#include "ui/tabs/tab_render_helpers.hpp"
 #include "ui/widgets.hpp"
 #include "universe/object_id.hpp"
 #include "universe/universe.hpp"
@@ -636,6 +637,7 @@ namespace parallax::ui::tabs
                              enabled ? kHeaderColor : kDimColor);
         }
 
+        shell::apply_full_viewport_pane_scissor(cmd, extent, rect);
         m_line_renderer.render(cmd);
         m_font.render(cmd, extent);
     }

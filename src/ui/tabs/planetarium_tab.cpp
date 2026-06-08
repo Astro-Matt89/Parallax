@@ -4,6 +4,7 @@
 #include "core/logger.hpp"
 #include "knowledge/knowledge_database.hpp"
 #include "ui/font.hpp"
+#include "ui/tabs/tab_render_helpers.hpp"
 #include "universe/universe.hpp"
 #include "vulkan/context.hpp"
 #include "vulkan/swapchain.hpp"
@@ -33,6 +34,7 @@ namespace parallax::ui::tabs
         , m_font(font)
         , m_julian_date(julian_date)
         , m_observer_registry(observer_registry)
+        , m_frame_observer(observer_registry.get_active())
     {
         m_sky_background = std::make_unique<rendering::SkyBackground>(
             m_context,
@@ -85,15 +87,15 @@ namespace parallax::ui::tabs
 
         const shell::ViewportRect viewport = current_viewport();
         const i32 active_index = m_observer_registry.get_active_index();
-        const astro::ObserverLocation& observer = m_observer_registry.get_active();
+        m_frame_observer = m_observer_registry.get_active();
         if (active_index != m_last_seen_active_index)
         {
             m_last_seen_active_index = active_index;
         }
 
-        const bool atmosphere_on = atmosphere_effectively_on();
-        const bool horizon_culling_on = m_atmosphere_on || !observer.has_atmosphere;
-        const f64 lst = astro::TimeSystem::lmst(m_julian_date, observer.longitude_rad);
+        m_frame_atmosphere_on = atmosphere_effectively_on();
+        m_frame_horizon_culling_on = m_atmosphere_on || !m_frame_observer.has_atmosphere;
+        m_frame_lst = astro::TimeSystem::lmst(m_julian_date, m_frame_observer.longitude_rad);
 
         if (m_shell_tracking_target_id.has_value())
         {
@@ -101,8 +103,8 @@ namespace parallax::ui::tabs
             {
                 const astro::HorizontalCoord hz = astro::Coordinates::equatorial_to_horizontal(
                     {tracked->ra, tracked->dec},
-                    observer,
-                    lst);
+                    m_frame_observer,
+                    m_frame_lst);
                 m_camera->set_pointing(hz.alt, hz.az);
             }
         }
@@ -120,59 +122,74 @@ namespace parallax::ui::tabs
 
         const auto sun_hz = astro::Coordinates::equatorial_to_horizontal(
             ss_bodies.sun.equatorial,
-            observer,
-            lst);
+            m_frame_observer,
+            m_frame_lst);
         const auto moon_hz = astro::Coordinates::equatorial_to_horizontal(
             ss_bodies.moon.equatorial,
-            observer,
-            lst);
+            m_frame_observer,
+            m_frame_lst);
 
-        m_sky_params.bortle_scale = observer.bortle_scale;
+        m_sky_params.bortle_scale = m_frame_observer.bortle_scale;
         m_sky_params.sun_altitude_deg  = static_cast<f32>(sun_hz.alt * astro_constants::kRadToDeg);
         m_sky_params.sun_azimuth_deg   = static_cast<f32>(sun_hz.az * astro_constants::kRadToDeg);
         m_sky_params.moon_altitude_deg = static_cast<f32>(moon_hz.alt * astro_constants::kRadToDeg);
         m_sky_params.moon_azimuth_deg  = static_cast<f32>(moon_hz.az * astro_constants::kRadToDeg);
         m_sky_params.moon_illumination = moon_state.body.illumination;
-        m_sky_params.atmosphere_enabled = atmosphere_on;
+        m_sky_params.atmosphere_enabled = m_frame_atmosphere_on;
         m_sun_altitude_deg = m_sky_params.sun_altitude_deg;
 
         m_sky_background->update_params(m_sky_params, *m_camera, viewport.aspect());
-        m_line_renderer->begin_frame();
-
-        m_coord_grid.update(*m_camera, observer, lst, *m_line_renderer, m_font, viewport);
-
-        const auto pointing = m_camera->get_pointing();
-        const f64 fov_rad = m_camera->get_fov_rad();
-        const f32 mag_limit = m_camera->get_magnitude_limit();
-        const f64 aspect_ratio = static_cast<f64>(viewport.aspect());
+        m_frame_pointing = m_camera->get_pointing();
+        m_frame_fov_rad = m_camera->get_fov_rad();
+        m_frame_mag_limit = m_camera->get_magnitude_limit();
+        m_frame_aspect_ratio = static_cast<f64>(viewport.aspect());
 
         const auto camera_eq = astro::Coordinates::horizontal_to_equatorial(
-            pointing,
-            observer,
-            lst);
+            m_frame_pointing,
+            m_frame_observer,
+            m_frame_lst);
 
-        const f64 query_radius_deg = std::clamp(fov_rad * 0.75 * astro_constants::kRadToDeg, 0.0, 180.0);
+        const f64 query_radius_deg = std::clamp(m_frame_fov_rad * 0.75 * astro_constants::kRadToDeg, 0.0, 180.0);
 
         m_universe.query_fov(
             camera_eq.ra,
             camera_eq.dec,
             query_radius_deg,
-            mag_limit,
+            m_frame_mag_limit,
             universe::QueryFlags::All,
             m_frame_objects);
+        m_selection.update_from_objects(
+            m_frame_objects,
+            m_solar_system_renderer.get_screen_objects(),
+            m_frame_observer,
+            m_frame_lst,
+            *m_camera,
+            viewport);
+    }
 
-        m_starfield->begin_frame(mag_limit);
-        m_solar_system_renderer.begin_frame(*m_line_renderer, m_font, viewport, horizon_culling_on);
+    void PlanetariumTab::render(VkCommandBuffer cmd, const shell::ViewportRect& viewport)
+    {
+        if (!viewport.is_valid())
+        {
+            return;
+        }
+
+        m_viewport = viewport;
+        m_line_renderer->begin_frame();
+        m_coord_grid.update(*m_camera, m_frame_observer, m_frame_lst, *m_line_renderer, m_font, viewport);
+
+        m_starfield->begin_frame(m_frame_mag_limit);
+        m_solar_system_renderer.begin_frame(*m_line_renderer, m_font, viewport, m_frame_horizon_culling_on);
         m_dso_renderer.begin_frame(*m_line_renderer, m_font, viewport);
 
         for (const auto& obj : m_frame_objects)
         {
             const auto hz = astro::Coordinates::equatorial_to_horizontal(
                 {obj.ra, obj.dec},
-                observer,
-                lst);
+                m_frame_observer,
+                m_frame_lst);
 
-            if (horizon_culling_on && hz.alt < 0.0)
+            if (m_frame_horizon_culling_on && hz.alt < 0.0)
             {
                 continue;
             }
@@ -192,9 +209,9 @@ namespace parallax::ui::tabs
 
             const auto screen_opt = astro::Coordinates::horizontal_to_screen(
                 hz,
-                pointing,
-                fov_rad,
-                aspect_ratio);
+                m_frame_pointing,
+                m_frame_fov_rad,
+                m_frame_aspect_ratio);
             if (!screen_opt.has_value())
             {
                 continue;
@@ -222,33 +239,17 @@ namespace parallax::ui::tabs
         }
 
         m_starfield->end_frame();
-        m_constellations.update(*m_camera, observer, lst, *m_line_renderer, m_font, viewport);
+        m_constellations.update(*m_camera, m_frame_observer, m_frame_lst, *m_line_renderer, m_font, viewport);
         m_horizon.update(*m_camera, *m_line_renderer, m_font, viewport);
-        m_selection.update_from_objects(
-            m_frame_objects,
-            m_solar_system_renderer.get_screen_objects(),
-            observer,
-            lst,
-            *m_camera,
-            viewport);
-
         if (m_selection.has_selection())
         {
             m_selection.render_indicator(*m_line_renderer, viewport);
         }
-    }
 
-    void PlanetariumTab::render(VkCommandBuffer cmd, const shell::ViewportRect& viewport)
-    {
-        if (!viewport.is_valid())
-        {
-            return;
-        }
-
-        m_viewport = viewport;
         apply_viewport(cmd, viewport);
         m_sky_background->draw(cmd, viewport);
         m_starfield->draw(cmd);
+        shell::apply_full_viewport_pane_scissor(cmd, m_swapchain.get_extent(), viewport);
         m_line_renderer->render(cmd);
         m_font.render(cmd, m_swapchain.get_extent());
     }

@@ -3,6 +3,7 @@
 #include "core/logger.hpp"
 #include "rendering/line_renderer.hpp"
 #include "ui/font.hpp"
+#include "ui/tabs/tab_render_helpers.hpp"
 #include "ui/widgets.hpp"
 #include "vulkan/swapchain.hpp"
 
@@ -415,6 +416,7 @@ void ArchiveTab::render(VkCommandBuffer cmd, const shell::ViewportRect &rect) {
     }
   }
 
+  shell::apply_full_viewport_pane_scissor(cmd, extent, rect);
   m_line_renderer.render(cmd);
   m_font.render(cmd, extent);
 

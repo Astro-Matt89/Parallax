@@ -485,8 +485,32 @@ Star Entry (compact, 32 bytes):
 - Procedural exoplanet systems
 - Discovery gamification (milestones, publication system)
 
-### Phase 5: Frontier Instruments (Sprints 17+)
-- Earth-Moon interferometry (EHT-scale sci-fi)
+### Phase 5: Visual Identity — The "Wow" (two dedicated rendering sprints)
+Placed AFTER instrument/science foundations are solid. Do NOT anticipate.
+
+**"All-Sky Wow" — contemplative beauty (the sky captured by all-sky cameras):**
+The skychart stays schematic forever — it is a navigation map, not a beauty shot.
+The contemplative "wow" belongs to the ALL-SKY CAMERAS, which are real physical
+instruments (fisheye / equiangular) that capture the whole sky beautifully.
+- Milky Way as volumetric structure (luminous band, dark dust lanes)
+- Diffuse nebulae visible to the wide field (volumetric/billboard)
+- Bloom, diffraction spikes, glare on bright sources
+- Earth seen from the Moon (iconic hanging crescent, in the all-sky frame)
+- Twilight, airglow, zodiacal light, atmospheric scattering (Earth stations)
+- Lunar landscape horizon in the all-sky frame (from Tycho base)
+- Real all-sky images: savable, shareable
+- Timelapse capture (sequence of frames over accelerated time)
+- Screenshot mode, color grading
+
+**"Imaging Wow" — earned beauty (what the Glasswing Array reveals):**
+- Photorealistic resolved procedural objects
+- Nebula filaments, HII regions, star-forming structures
+- Resolved galaxy detail (interferometry/sub-universe permitting)
+- Planetary surface maps rendered beautifully
+- Multispectral false-color compositing with artistic control
+
+### Phase 6: Frontier Instruments (later sprints)
+- Earth-Moon interferometry expansion (EHT-scale, more stations)
 - Multi-instrument coordination (network of telescopes)
 - Radio, X-ray, polarimetry
 - Transient event system (supernovae, novae, GRBs)
@@ -494,6 +518,43 @@ Star Entry (compact, 32 bytes):
 - Cosmological survey mode (distant quasars, high-z galaxies)
 - Multi-observatory management (Moon + Earth + orbital)
 - Research progression, career system
+
+---
+
+## 7b. Visual Identity (the "Wow" aesthetic)
+
+**Direction: Space Engine photorealism filtered through high-resolution pixel-art sensibility.**
+
+Parallax is both a rigorous scientific instrument AND a game that should make
+players stop and stare. Scientific accuracy and beauty are not in tension —
+the discipline is to make accuracy *beautiful*.
+
+The aesthetic target:
+- **Photorealistic cosmic structure** like Space Engine — real nebula colors,
+  accurate stellar populations, believable galaxy morphology, true sky brightness
+- **High-resolution pixel-art treatment** — ordered dithering, controlled palettes,
+  coherent grain, sub-pixel intensity. NOT chunky low-res pixels; rather the
+  disciplined color/luminance handling of fine pixel art at full resolution
+- **Retro scientific instrument feel** — UI and overlays stay terminal-green and
+  CRT-flavored, but the sky itself is rich and deep
+
+When the rendering sprints arrive:
+- Dithering as an aesthetic choice, not a limitation
+- Tone mapping preserving the sky's vast dynamic range
+- Palettes informed by real astronomical imaging but stylized for coherence
+- Bloom/diffraction that feel optical, not video-game-glowy
+- A consistent recognizable "Parallax look" — neither pure sim nor pure stylization
+
+The "wow" lives in two places:
+- **Earned wow** (Glasswing Array imaging): beauty you discover with the precision
+  instrument — grows through Sprints 10a/10b/11/13 naturally as resolution improves
+- **Contemplative wow** (all-sky cameras): the sky's inherent beauty captured by
+  wide-field all-sky instruments — delivered by the dedicated rendering sprint.
+  The SKYCHART is NOT a beauty surface — it stays schematic (navigation map).
+
+IMPORTANT: Do NOT implement advanced visual features until the dedicated rendering
+sprints. Earlier sprints keep functional schematic rendering. Building beauty on
+unfinished foundations means rebuilding it. Discipline now, wow later.
 
 ---
 
@@ -556,26 +617,43 @@ Additional observer locations available (for instruments deployed there):
 See: `docs/sprints/sprint_06.md`
 Prompts: `docs/sprints/sprint_06_prompts.md`
 
-**Pending:**
+**Pending sprints (briefs written, awaiting implementation):**
+- Sprint 06 — Solar System + Atmosphere Toggle
 - Sprint 07 — Universe Engine (unified data architecture)
 - Sprint 08 — Knowledge System + Observation Sessions ✅ COMPLETE
 - Sprint 09 — UI Shell Refactor (tab-based, lunar base setting)
-- Sprint 10 — First real instrument (telescope + CCD + imaging tab)
+- Sprint 10a — Array Instrument + physical SNR + multispectral imaging (total-power)
+- Sprint 10b — Interferometry / aperture synthesis (planned, not yet written)
+
+**Instrument concept:** "Glasswing Array" — multispectral EHT-inspired interferometer.
+Stations on Moon (Tycho) + Earth (La Palma, Mauna Kea, Paranal). Starts in total-power
+mode (10a), gains aperture synthesis for microarcsecond resolution (10b).
 
 **Previous:** Sprint 01-05 ✅ — Phase 1 Planetarium Core complete
 
 **Roadmap:**
 ```
-Sprint 06: Solar System + Atmosphere Toggle
-Sprint 07: Universe Engine (unify data, procedural foundation)
-Sprint 08: Knowledge System + Observation Sessions (mock instrument E2E) ✅
-Sprint 09: UI Shell Refactor (tab system, lunar base setting)
-Sprint 10: First real instrument — telescope + CCD + Imaging tab + AllSky
-Sprint 11: Photometry analysis tools + first real discoveries
-Sprint 12: Spectroscopy
-Sprint 13: Sub-universe activation (stars inside M31, planets in Sirius)
-Sprint 14+: Earth-Moon interferometry, advanced instruments
+Sprint 06:  Solar System + Atmosphere Toggle
+Sprint 07:  Universe Engine (unify data, procedural foundation)
+Sprint 08:  Knowledge System + Observation Sessions (mock E2E) ✅
+Sprint 09:  UI Shell Refactor (tab system, lunar base)
+Sprint 10a: Array instrument + physical SNR + multispectral imaging (total-power)
+Sprint 10b: Interferometry / aperture synthesis (uv coverage, reconstruction)
+Sprint 11:  Photometry/analysis tools + first discoveries + all-sky camera (functional)
+Sprint 12:  Spectroscopy
+Sprint 13:  Sub-universe activation (stars inside M31, planets in Sirius)
+Sprint 14:  "All-Sky Wow" — Milky Way, nebulae, Earth-from-Moon, bloom, timelapse
+Sprint 15:  "Imaging Wow" — photorealistic resolved objects, surface maps
+Sprint 16+: Frontier instruments, transients, cosmological survey, career system
 ```
+
+The "wow" rendering sprints (14-15) come AFTER solid foundations.
+Earlier sprints keep functional schematic rendering — discipline now, wow later.
+
+**Instrument: "Glasswing Array"** — EHT-inspired multispectral interferometer.
+Starts total-power (10a), gains aperture synthesis (10b). Progression via more
+stations, more spectral bands (Visible/IR unlocked → Mid-IR/Radio-K/Submm),
+better (u,v) coverage and angular resolution.
 
 ---
 

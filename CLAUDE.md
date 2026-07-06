@@ -525,18 +525,41 @@ instruments (fisheye / equiangular) that capture the whole sky beautifully.
 
 **Direction: Space Engine photorealism filtered through high-resolution pixel-art sensibility.**
 
-Parallax is both a rigorous scientific instrument AND a game that should make
-players stop and stare. Scientific accuracy and beauty are not in tension —
-the discipline is to make accuracy *beautiful*.
+**Primary style reference for celestial objects (stars, nebulae, galaxies, all real
+and procedural objects): the videogame "Substrate: Emergence" (Petri Dish Games).**
 
-The aesthetic target:
-- **Photorealistic cosmic structure** like Space Engine — real nebula colors,
-  accurate stellar populations, believable galaxy morphology, true sky brightness
-- **High-resolution pixel-art treatment** — ordered dithering, controlled palettes,
-  coherent grain, sub-pixel intensity. NOT chunky low-res pixels; rather the
-  disciplined color/luminance handling of fine pixel art at full resolution
-- **Retro scientific instrument feel** — UI and overlays stay terminal-green and
-  CRT-flavored, but the sky itself is rich and deep
+Substrate: Emergence renders fluorescent cells with psychedelic pixel art inspired
+by fluorescence microscopy — luminous organic structures glowing against darkness,
+saturated emission colors, hypnotic emergent patterns. This maps directly onto
+astronomical imaging:
+
+- **Fluorescence microscopy ≈ emission nebulae**: both are luminous structures
+  emerging from a dark background. Nebulae ARE cosmic fluorescence (H-alpha red,
+  OIII teal, SII gold — emission lines as "fluorophores")
+- **Glowing structures with soft falloff**: stars and nebulae should have that
+  fluorescent luminosity — light that feels emitted, not painted
+- **Saturated but physically-motivated palettes**: colors encode real physics
+  (emission lines, blackbody temperature, redshift) rendered with the vivid
+  intensity of fluorescence imaging
+- **High-res pixel art discipline**: ordered dithering, controlled palettes,
+  coherent grain — the Substrate: Emergence look of fine pixel detail forming
+  larger organic/cosmic structure
+- **Dark field dominance**: the void is truly black; objects bloom out of it
+
+Applied per object type:
+- Stars: luminous points with fluorescent-like glow cores, diffraction accents
+- Emission nebulae: layered translucent filaments in emission-line palettes,
+  like fluorescent-stained structures
+- Galaxies: dense luminous cell-colony-like cores with resolved star grain
+- Procedural planets/surfaces: same palette discipline, multispectral falsecolor
+
+The aesthetic target remains:
+- **Photorealistic cosmic structure** like Space Engine — real morphology,
+  believable physics, true sky brightness relationships
+- **Substrate: Emergence rendering language** — fluorescent luminosity,
+  psychedelic-but-scientific palettes, high-res pixel art discipline
+- **Retro scientific instrument feel** — UI and overlays stay terminal-green
+  and CRT-flavored; the sky itself is rich and deep
 
 When the rendering sprints arrive:
 - Dithering as an aesthetic choice, not a limitation

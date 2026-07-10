@@ -83,6 +83,19 @@ namespace parallax::instruments
         return total_area;
     }
 
+    f64 ArrayInstrument::get_largest_aperture_diameter_m() const
+    {
+        f64 largest = 0.0;
+        for (const Station& station : m_stations)
+        {
+            if (station.is_active)
+            {
+                largest = std::max(largest, static_cast<f64>(station.aperture_diameter_m));
+            }
+        }
+        return largest;
+    }
+
     f64 ArrayInstrument::get_angular_resolution_arcsec(f64 wavelength_nm) const
     {
         // Sprint 10a total-power mode: resolution is set by the largest single

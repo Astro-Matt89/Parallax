@@ -38,6 +38,12 @@ namespace parallax::instruments
         /// @brief Combined collecting area of active stations (m², total-power mode).
         [[nodiscard]] f64 get_total_collecting_area_m2() const;
 
+        /// @brief Diameter of the largest active single aperture (m).
+        ///
+        /// In Sprint 10a total-power mode the PSF width is the diffraction limit of
+        /// the single largest aperture.  Returns 0 when no stations are active.
+        [[nodiscard]] f64 get_largest_aperture_diameter_m() const;
+
         /// @brief Angular resolution (arcsec) at a wavelength.
         ///
         /// Sprint 10a: diffraction limit of the largest active single aperture

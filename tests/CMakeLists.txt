@@ -293,3 +293,22 @@ target_link_libraries(test_pane_tree PRIVATE
     glm::glm
     Vulkan::Vulkan
 )
+
+# -----------------------------------------------------------------
+# Test: SnrCalculator                             <- SPRINT 10a Task 10a.2
+# -----------------------------------------------------------------
+add_executable(test_snr_calculator
+    test_snr_calculator.cpp
+    "${CMAKE_SOURCE_DIR}/src/instruments/snr_calculator.cpp"
+)
+
+target_include_directories(test_snr_calculator PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_snr_calculator PRIVATE
+    doctest::doctest
+    glm::glm
+)
+
+add_test(NAME SnrCalculator COMMAND test_snr_calculator)

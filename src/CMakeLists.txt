@@ -115,6 +115,7 @@ target_include_directories(parallax PRIVATE
 
 add_subdirectory(instruments)
 add_subdirectory(analysis)
+add_subdirectory(imaging)
 
 # -----------------------------------------------------------------
 # Compile definitions

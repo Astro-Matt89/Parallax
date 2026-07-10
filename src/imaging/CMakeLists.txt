@@ -3,8 +3,8 @@
 # -----------------------------------------------------------------
 
 target_sources(parallax PRIVATE
-    imaging/image.hpp
-    imaging/multispectral_image.hpp
-    imaging/psf.hpp
-    imaging/psf.cpp
+    image.hpp
+    multispectral_image.hpp
+    psf.hpp
+    psf.cpp
 )

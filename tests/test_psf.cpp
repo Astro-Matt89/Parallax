@@ -111,8 +111,9 @@ TEST_CASE("Image at() and operator() read and write correctly")
 TEST_CASE("Image at() throws on out-of-range access")
 {
     Image img(8, 8);
-    CHECK_THROWS_AS(img.at(8, 0), std::out_of_range);
-    CHECK_THROWS_AS(img.at(0, 8), std::out_of_range);
+    // Cast to void: at() is [[nodiscard]], and here we only care that it throws.
+    CHECK_THROWS_AS((void)img.at(8, 0), std::out_of_range);
+    CHECK_THROWS_AS((void)img.at(0, 8), std::out_of_range);
 }
 
 // =============================================================================

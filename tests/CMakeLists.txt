@@ -331,3 +331,25 @@ target_link_libraries(test_psf PRIVATE
 )
 
 add_test(NAME Psf COMMAND test_psf)
+
+# -----------------------------------------------------------------
+# Test: ImageFormation                            <- SPRINT 10a Task 10a.4
+# -----------------------------------------------------------------
+add_executable(test_image_formation
+    test_image_formation.cpp
+    "${CMAKE_SOURCE_DIR}/src/imaging/psf.cpp"
+    "${CMAKE_SOURCE_DIR}/src/imaging/image_formation.cpp"
+    "${CMAKE_SOURCE_DIR}/src/instruments/array_instrument.cpp"
+    "${CMAKE_SOURCE_DIR}/src/instruments/snr_calculator.cpp"
+)
+
+target_include_directories(test_image_formation PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_image_formation PRIVATE
+    doctest::doctest
+    glm::glm
+)
+
+add_test(NAME ImageFormation COMMAND test_image_formation)

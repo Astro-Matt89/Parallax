@@ -20,7 +20,7 @@
 
 #include "analysis/mock_analyzer.hpp"
 #include "core/user_data_path.hpp"
-#include "instruments/mock_instrument.hpp"
+#include "instruments/array_instrument.hpp"
 #include "knowledge/knowledge_database.hpp"
 #include "observation/data_archive.hpp"
 #include "observation/session_scheduler.hpp"
@@ -164,7 +164,8 @@ void Application::init()
         PLX_CORE_INFO("Initialized empty data archive: {}", archive_path.string());
     }
 
-    m_mock_instrument = std::make_unique<instruments::MockInstrument>(1, "Magic Instrument");
+    m_array_instrument = std::make_unique<instruments::ArrayInstrument>(
+        instruments::ArrayInstrument::create_default());
     m_analyzer = std::make_unique<analysis::MockAnalyzer>();
 
     // 9. Simulation time
@@ -278,7 +279,7 @@ void Application::shutdown()
     }
 
     m_analyzer.reset();
-    m_mock_instrument.reset();
+    m_array_instrument.reset();
     m_shell.reset();
     m_archive.reset();
     m_scheduler.reset();
@@ -440,7 +441,10 @@ void Application::update_simulation(f64 delta_time_sec)
 
     if (m_scheduler && m_universe)
     {
-        m_scheduler->update(m_julian_date, delta_time_sec, *m_universe);
+        if (m_array_instrument)
+        {
+            m_scheduler->update(m_julian_date, delta_time_sec, *m_universe, *m_array_instrument);
+        }
 
         std::vector<std::uint64_t> completed_ids;
         for (const auto* session : m_scheduler->get_completed())

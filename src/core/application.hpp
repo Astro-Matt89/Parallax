@@ -28,7 +28,7 @@
 #include <vector>
 
 namespace parallax::analysis { class MockAnalyzer; }
-namespace parallax::instruments { class MockInstrument; }
+namespace parallax::instruments { class ArrayInstrument; }
 namespace parallax::rendering { class LineRenderer; }
 
 namespace parallax::knowledge
@@ -127,7 +127,7 @@ namespace parallax::core
         std::unique_ptr<knowledge::KnowledgeDatabase> m_knowledge;
         std::unique_ptr<observation::SessionScheduler> m_scheduler;
         std::unique_ptr<observation::DataArchive> m_archive;
-        std::unique_ptr<instruments::MockInstrument> m_mock_instrument;
+        std::unique_ptr<instruments::ArrayInstrument> m_array_instrument;
         std::unique_ptr<analysis::MockAnalyzer> m_analyzer;
 
         // -----------------------------------------------------------------

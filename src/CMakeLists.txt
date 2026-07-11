@@ -111,6 +111,7 @@ add_executable(parallax
 
 target_include_directories(parallax PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${STB_INCLUDE_DIRS}"
 )
 
 add_subdirectory(instruments)
@@ -135,6 +136,7 @@ target_link_libraries(parallax PRIVATE
     spdlog::spdlog
     GPUOpen::VulkanMemoryAllocator
     nlohmann_json::nlohmann_json
+    cfitsio
 )
 
 # -----------------------------------------------------------------

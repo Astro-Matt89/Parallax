@@ -191,6 +191,7 @@ void Application::init()
                                                   m_pipeline->get_render_pass(),
                                                   shader_dir,
                                                   *m_universe,
+                                                  *m_array_instrument,
                                                   *m_knowledge,
                                                   *m_archive,
                                                   *m_scheduler,

@@ -3,6 +3,7 @@
 
 #include "observation/session_scheduler.hpp"
 
+#include "instruments/array_instrument.hpp"
 #include "universe/universe.hpp"
 
 namespace parallax::observation
@@ -37,8 +38,9 @@ void SessionScheduler::abort(std::uint64_t id)
 // =============================================================================
 
 void SessionScheduler::update(double                    current_jd,
-                               double                    dt_seconds,
-                               const universe::Universe& universe)
+                              double                    dt_seconds,
+                              const universe::Universe& universe,
+                              const instruments::ArrayInstrument& instrument)
 {
     // Collect sessions to tick.  We must not mutate m_sessions while iterating.
     // (Sessions only change internal state during tick — no insertions/erasures
@@ -60,9 +62,7 @@ void SessionScheduler::update(double                    current_jd,
         auto it = m_sessions.find(id);
         if (it != m_sessions.end())
         {
-            // TODO(Task 8.6+): look up the real instrument by
-            // it->second->parameters().instrument_id and pass it here.
-            it->second->tick(current_jd, dt_seconds, universe, nullptr);
+            it->second->tick(current_jd, dt_seconds, universe, instrument);
         }
     }
 }

@@ -16,6 +16,11 @@ namespace parallax::universe
 class Universe;
 } // namespace parallax::universe
 
+namespace parallax::instruments
+{
+class ArrayInstrument;
+} // namespace parallax::instruments
+
 namespace parallax::observation
 {
 
@@ -64,9 +69,11 @@ public:
     /// @param current_jd  Current simulation time as a Julian Date.
     /// @param dt_seconds  Elapsed time this frame (seconds).
     /// @param universe    Read-only universe reference forwarded to each session.
+    /// @param instrument  Active array instrument forwarded to each session.
     void update(double                    current_jd,
                 double                    dt_seconds,
-                const universe::Universe& universe);
+                const universe::Universe& universe,
+                const instruments::ArrayInstrument& instrument);
 
     // -------------------------------------------------------------------------
     // Queries (non-owning views)

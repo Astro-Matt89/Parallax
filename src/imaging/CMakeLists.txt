@@ -9,4 +9,6 @@ target_sources(parallax PRIVATE
     psf.cpp
     image_formation.hpp
     image_formation.cpp
+    image_exporter.hpp
+    image_exporter.cpp
 )

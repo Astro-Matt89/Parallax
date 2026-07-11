@@ -55,6 +55,8 @@ find_package(glm CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(VulkanMemoryAllocator CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
+find_package(cfitsio CONFIG REQUIRED)
+find_path(STB_INCLUDE_DIRS NAMES stb_image_write.h PATH_SUFFIXES stb REQUIRED)
 
 # -----------------------------------------------------------------
 # Shader compilation (GLSL → SPIR-V via glslangValidator)

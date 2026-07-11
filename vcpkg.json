@@ -11,6 +11,8 @@
         "spdlog",
         "vulkan-memory-allocator",
         "doctest",
-        "nlohmann-json"
+        "nlohmann-json",
+        "cfitsio",
+        "stb"
     ]
 }

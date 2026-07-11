@@ -353,3 +353,25 @@ target_link_libraries(test_image_formation PRIVATE
 )
 
 add_test(NAME ImageFormation COMMAND test_image_formation)
+
+# -----------------------------------------------------------------
+# Test: ImageExporter                            <- SPRINT 10a Task 10a.5
+# -----------------------------------------------------------------
+add_executable(test_image_exporter
+    test_image_exporter.cpp
+    "${CMAKE_SOURCE_DIR}/src/imaging/image_exporter.cpp"
+    "${CMAKE_SOURCE_DIR}/src/core/user_data_path.cpp"
+)
+
+target_include_directories(test_image_exporter PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+    "${STB_INCLUDE_DIRS}"
+)
+
+target_link_libraries(test_image_exporter PRIVATE
+    doctest::doctest
+    glm::glm
+    cfitsio
+)
+
+add_test(NAME ImageExporter COMMAND test_image_exporter)

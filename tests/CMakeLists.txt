@@ -371,7 +371,6 @@ target_include_directories(test_image_exporter PRIVATE
 target_link_libraries(test_image_exporter PRIVATE
     doctest::doctest
     glm::glm
-    cfitsio
 )
 
 add_test(NAME ImageExporter COMMAND test_image_exporter)

@@ -55,23 +55,7 @@ find_package(glm CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(VulkanMemoryAllocator CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
-find_package(cfitsio CONFIG REQUIRED)
 find_path(STB_INCLUDE_DIRS NAMES stb_image_write.h PATH_SUFFIXES stb REQUIRED)
-
-# -----------------------------------------------------------------
-# cfitsio target name normalisation
-# -----------------------------------------------------------------
-# The vcpkg cfitsio port exposes different target names depending on version:
-# older ports provide a bare `cfitsio` target, newer ones a namespaced
-# `cfitsio::cfitsio`. Expose a single PLX_CFITSIO_TARGET for downstream use.
-if(TARGET cfitsio::cfitsio)
-    set(PLX_CFITSIO_TARGET cfitsio::cfitsio CACHE INTERNAL "cfitsio link target")
-elseif(TARGET cfitsio)
-    set(PLX_CFITSIO_TARGET cfitsio CACHE INTERNAL "cfitsio link target")
-else()
-    message(FATAL_ERROR "cfitsio found but neither `cfitsio` nor `cfitsio::cfitsio` target is defined")
-endif()
-message(STATUS "cfitsio link target: ${PLX_CFITSIO_TARGET}")
 
 # -----------------------------------------------------------------
 # Shader compilation (GLSL → SPIR-V via glslangValidator)

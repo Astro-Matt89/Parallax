@@ -12,7 +12,6 @@
         "vulkan-memory-allocator",
         "doctest",
         "nlohmann-json",
-        "cfitsio",
         "stb"
     ]
 }

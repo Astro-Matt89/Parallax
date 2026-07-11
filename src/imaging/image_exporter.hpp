@@ -52,7 +52,7 @@ namespace parallax::imaging
         /// - One FLOAT_IMG extension per band (BITPIX=-32) with BANDNAME/WAVELEN/SNR and WCS
         ///
         /// The output path is resolved to `<user_data>/exports` by default and created if needed.
-        /// Existing files are overwritten via cfitsio `!filename` clobber semantics.
+        /// FITS export is currently a stub and returns an empty path.
         [[nodiscard]] static std::filesystem::path export_fits(
             const MultispectralImage&      image,
             const std::filesystem::path&   filename,

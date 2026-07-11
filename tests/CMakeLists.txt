@@ -361,6 +361,7 @@ add_executable(test_image_exporter
     test_image_exporter.cpp
     "${CMAKE_SOURCE_DIR}/src/imaging/image_exporter.cpp"
     "${CMAKE_SOURCE_DIR}/src/core/user_data_path.cpp"
+    "${CMAKE_SOURCE_DIR}/src/core/logger.cpp"
 )
 
 target_include_directories(test_image_exporter PRIVATE
@@ -371,6 +372,7 @@ target_include_directories(test_image_exporter PRIVATE
 target_link_libraries(test_image_exporter PRIVATE
     doctest::doctest
     glm::glm
+    spdlog::spdlog
 )
 
 add_test(NAME ImageExporter COMMAND test_image_exporter)

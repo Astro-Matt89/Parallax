@@ -6,8 +6,6 @@
 
 #include "imaging/image_exporter.hpp"
 
-#include <fitsio.h>
-
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -84,26 +82,9 @@ namespace parallax::imaging
             return image;
         }
 
-        [[nodiscard]] f64 read_key_double(fitsfile* fits, const char* key)
-        {
-            int status = 0;
-            f64 value = 0.0;
-            fits_read_key(fits, TDOUBLE, key, &value, nullptr, &status);
-            REQUIRE(status == 0);
-            return value;
-        }
-
-        [[nodiscard]] std::string read_key_string(fitsfile* fits, const char* key)
-        {
-            int status = 0;
-            char value[FLEN_VALUE] = {};
-            fits_read_key(fits, TSTRING, key, value, nullptr, &status);
-            REQUIRE(status == 0);
-            return std::string(value);
-        }
     }
 
-    TEST_CASE("export_fits writes multi-extension float FITS with metadata and WCS")
+    TEST_CASE("export_fits is currently a stub and returns an empty path")
     {
         const ScopedTempDir temp_dir;
         const MultispectralImage image = make_test_multispectral_image();
@@ -123,71 +104,7 @@ namespace parallax::imaging
             metadata,
             temp_dir.path());
 
-        REQUIRE(std::filesystem::exists(fits_path));
-        REQUIRE(std::filesystem::file_size(fits_path) > 0);
-
-        fitsfile* fits = nullptr;
-        int status = 0;
-        fits_open_file(&fits, fits_path.string().c_str(), READONLY, &status);
-        REQUIRE(status == 0);
-
-        int hdu_count = 0;
-        fits_get_num_hdus(fits, &hdu_count, &status);
-        REQUIRE(status == 0);
-        CHECK(hdu_count == 3); // primary + 2 bands
-
-        int hdu_type = 0;
-        fits_movabs_hdu(fits, 1, &hdu_type, &status);
-        REQUIRE(status == 0);
-        CHECK(read_key_string(fits, "OBJECT") == "HIP 32005");
-        CHECK(read_key_double(fits, "EXPTIME") == doctest::Approx(120.0));
-        CHECK(read_key_string(fits, "BAND001") == "Visible");
-        CHECK(read_key_string(fits, "BAND002") == "Near-IR");
-        CHECK(read_key_double(fits, "WAVE001") == doctest::Approx(550.0));
-        CHECK(read_key_double(fits, "SNR001") == doctest::Approx(25.5));
-
-        for (int hdu_index = 2; hdu_index <= 3; ++hdu_index)
-        {
-            fits_movabs_hdu(fits, hdu_index, &hdu_type, &status);
-            REQUIRE(status == 0);
-
-            int bitpix = 0;
-            int naxis = 0;
-            long axes[2] = {0, 0};
-            fits_get_img_param(fits, 2, &bitpix, &naxis, axes, &status);
-            REQUIRE(status == 0);
-            CHECK(bitpix == FLOAT_IMG);
-            CHECK(naxis == 2);
-            CHECK(axes[0] == 4);
-            CHECK(axes[1] == 3);
-
-            const std::string band_name = read_key_string(fits, "BANDNAME");
-            if (hdu_index == 2)
-            {
-                CHECK(band_name == "Visible");
-                CHECK(read_key_double(fits, "WAVELEN") == doctest::Approx(550.0));
-                CHECK(read_key_double(fits, "SNR") == doctest::Approx(25.5));
-            }
-            else
-            {
-                CHECK(band_name == "Near-IR");
-                CHECK(read_key_double(fits, "WAVELEN") == doctest::Approx(1600.0));
-                CHECK(read_key_double(fits, "SNR") == doctest::Approx(12.25));
-            }
-
-            const f64 expected_cdelt = 1.5 / 3600.0;
-            CHECK(read_key_double(fits, "CRVAL1") == doctest::Approx(metadata.target_ra_rad * astro_constants::kRadToDeg));
-            CHECK(read_key_double(fits, "CRVAL2") == doctest::Approx(metadata.target_dec_rad * astro_constants::kRadToDeg));
-            CHECK(read_key_double(fits, "CDELT1") == doctest::Approx(-expected_cdelt));
-            CHECK(read_key_double(fits, "CDELT2") == doctest::Approx(expected_cdelt));
-            CHECK(read_key_string(fits, "CTYPE1") == "RA---TAN");
-            CHECK(read_key_string(fits, "CTYPE2") == "DEC--TAN");
-            CHECK(read_key_string(fits, "CUNIT1") == "deg");
-            CHECK(read_key_string(fits, "CUNIT2") == "deg");
-        }
-
-        fits_close_file(fits, &status);
-        REQUIRE(status == 0);
+        CHECK(fits_path.empty());
     }
 
     TEST_CASE("stretch_to_u16 linear maps min and max to full range")

@@ -136,7 +136,6 @@ target_link_libraries(parallax PRIVATE
     spdlog::spdlog
     GPUOpen::VulkanMemoryAllocator
     nlohmann_json::nlohmann_json
-    cfitsio
 )
 
 # -----------------------------------------------------------------

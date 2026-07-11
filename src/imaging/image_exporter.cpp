@@ -3,16 +3,14 @@
 
 #include "imaging/image_exporter.hpp"
 
+#include "core/logger.hpp"
 #include "core/types.hpp"
 #include "core/user_data_path.hpp"
-
-#include <fitsio.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
 #include <algorithm>
-#include <cstdio>
 #include <cmath>
 #include <limits>
 #include <stdexcept>
@@ -22,23 +20,6 @@ namespace parallax::imaging
 {
     namespace
     {
-        using astro_constants::kRadToDeg;
-
-        [[nodiscard]] std::string fits_error_message(int status)
-        {
-            char buffer[FLEN_STATUS] = {};
-            fits_get_errstatus(status, buffer);
-            return std::string(buffer);
-        }
-
-        void check_fits_status(int status, const char* operation)
-        {
-            if (status != 0)
-            {
-                throw std::runtime_error(std::string(operation) + ": " + fits_error_message(status));
-            }
-        }
-
         [[nodiscard]] std::filesystem::path resolve_output_path(
             const std::filesystem::path& filename,
             const std::filesystem::path& output_directory)
@@ -56,93 +37,6 @@ namespace parallax::imaging
                 return filename;
             }
             return output_path;
-        }
-
-        void write_primary_metadata(
-            fitsfile*                        fits,
-            const ExportMetadata&            metadata,
-            std::size_t                      band_count,
-            int*                             status)
-        {
-            std::string object = metadata.object_name;
-            std::string date   = metadata.date_obs_utc;
-            std::string instrument = metadata.instrument_name;
-
-            f64 ra_deg = metadata.target_ra_rad * kRadToDeg;
-            f64 dec_deg = metadata.target_dec_rad * kRadToDeg;
-            f64 exptime = metadata.exposure_time_s;
-            i32 bands_i32 = static_cast<i32>(band_count);
-
-            fits_update_key(fits, TSTRING, "OBJECT", object.data(), nullptr, status);
-            fits_update_key(fits, TDOUBLE, "RA", &ra_deg, nullptr, status);
-            fits_update_key(fits, TDOUBLE, "DEC", &dec_deg, nullptr, status);
-            fits_update_key(fits, TSTRING, "DATE-OBS", date.data(), nullptr, status);
-            fits_update_key(fits, TDOUBLE, "EXPTIME", &exptime, nullptr, status);
-            fits_update_key(fits, TSTRING, "INSTRUME", instrument.data(), nullptr, status);
-            fits_update_key(fits, TINT, "BANDCNT", &bands_i32, nullptr, status);
-        }
-
-        void write_primary_band_summary(
-            fitsfile*                        fits,
-            const MultispectralImage&        image,
-            const ExportMetadata&            metadata,
-            int*                             status)
-        {
-            for (std::size_t i = 0; i < image.band_count(); ++i)
-            {
-                const Image& band = image.band(i);
-                std::string band_name = band.metadata().band_name;
-                f64 wavelength = band.metadata().wavelength_nm;
-                f64 snr = metadata.band_snr.at(i);
-
-                char band_key[9] = {};
-                char wave_key[9] = {};
-                char snr_key[9] = {};
-                (void)std::snprintf(band_key, sizeof(band_key), "BAND%03u", static_cast<u32>(i + 1));
-                (void)std::snprintf(wave_key, sizeof(wave_key), "WAVE%03u", static_cast<u32>(i + 1));
-                (void)std::snprintf(snr_key, sizeof(snr_key), "SNR%03u", static_cast<u32>(i + 1));
-
-                fits_update_key(fits, TSTRING, band_key, band_name.data(), nullptr, status);
-                fits_update_key(fits, TDOUBLE, wave_key, &wavelength, nullptr, status);
-                fits_update_key(fits, TDOUBLE, snr_key, &snr, nullptr, status);
-            }
-        }
-
-        void write_band_headers(
-            fitsfile*                        fits,
-            const Image&                     band,
-            const ExportMetadata&            metadata,
-            f64                              snr,
-            f64                              cdelt_deg,
-            int*                             status)
-        {
-            std::string band_name = band.metadata().band_name;
-            std::string ctype1 = "RA---TAN";
-            std::string ctype2 = "DEC--TAN";
-            std::string cunit = "deg";
-
-            f64 ra_deg = metadata.target_ra_rad * kRadToDeg;
-            f64 dec_deg = metadata.target_dec_rad * kRadToDeg;
-            f64 crpix1 = (static_cast<f64>(band.width()) + 1.0) * 0.5;
-            f64 crpix2 = (static_cast<f64>(band.height()) + 1.0) * 0.5;
-            f64 cdelt1 = -cdelt_deg;
-            f64 cdelt2 = cdelt_deg;
-            f64 wavelength = band.metadata().wavelength_nm;
-
-            fits_update_key(fits, TSTRING, "BANDNAME", band_name.data(), nullptr, status);
-            fits_update_key(fits, TDOUBLE, "WAVELEN", &wavelength, nullptr, status);
-            fits_update_key(fits, TDOUBLE, "SNR", &snr, nullptr, status);
-
-            fits_update_key(fits, TDOUBLE, "CRVAL1", &ra_deg, nullptr, status);
-            fits_update_key(fits, TDOUBLE, "CRVAL2", &dec_deg, nullptr, status);
-            fits_update_key(fits, TDOUBLE, "CRPIX1", &crpix1, nullptr, status);
-            fits_update_key(fits, TDOUBLE, "CRPIX2", &crpix2, nullptr, status);
-            fits_update_key(fits, TDOUBLE, "CDELT1", &cdelt1, nullptr, status);
-            fits_update_key(fits, TDOUBLE, "CDELT2", &cdelt2, nullptr, status);
-            fits_update_key(fits, TSTRING, "CTYPE1", ctype1.data(), nullptr, status);
-            fits_update_key(fits, TSTRING, "CTYPE2", ctype2.data(), nullptr, status);
-            fits_update_key(fits, TSTRING, "CUNIT1", cunit.data(), nullptr, status);
-            fits_update_key(fits, TSTRING, "CUNIT2", cunit.data(), nullptr, status);
         }
 
         [[nodiscard]] std::vector<u8> quantize_u16_to_u8(std::span<const u16> pixels)
@@ -219,69 +113,14 @@ namespace parallax::imaging
         const ExportMetadata&          metadata,
         const std::filesystem::path&   output_directory)
     {
-        if (metadata.band_snr.size() != image.band_count())
-        {
-            throw std::invalid_argument("ExportMetadata.band_snr must contain one value per image band");
-        }
+        (void)image;
+        (void)filename;
+        (void)metadata;
+        (void)output_directory;
 
-        const std::filesystem::path output_path = resolve_output_path(filename, output_directory);
-        const std::string clobber_path = "!" + output_path.string();
-
-        fitsfile* fits = nullptr;
-        int status = 0;
-
-        try
-        {
-            fits_create_file(&fits, clobber_path.c_str(), &status);
-            check_fits_status(status, "fits_create_file");
-
-            fits_create_img(fits, FLOAT_IMG, 0, nullptr, &status);
-            check_fits_status(status, "fits_create_img(primary)");
-
-            write_primary_metadata(fits, metadata, image.band_count(), &status);
-            check_fits_status(status, "fits_update_key(primary headers)");
-            write_primary_band_summary(fits, image, metadata, &status);
-            check_fits_status(status, "fits_update_key(primary band summary)");
-
-            for (std::size_t band_index = 0; band_index < image.band_count(); ++band_index)
-            {
-                const Image& band = image.band(band_index);
-                long axes[2] = {
-                    static_cast<long>(band.width()),
-                    static_cast<long>(band.height())
-                };
-                fits_create_img(fits, FLOAT_IMG, 2, axes, &status);
-                check_fits_status(status, "fits_create_img(extension)");
-
-                const f64 cdelt_deg = band.metadata().pixel_scale_arcsec_per_px / 3600.0;
-                const f64 snr = metadata.band_snr.at(band_index);
-                write_band_headers(fits, band, metadata, snr, cdelt_deg, &status);
-                check_fits_status(status, "fits_update_key(extension headers)");
-
-                const LONGLONG first_pixel = 1;
-                const LONGLONG pixel_count = static_cast<LONGLONG>(band.width()) * static_cast<LONGLONG>(band.height());
-                fits_write_img(
-                    fits,
-                    TFLOAT,
-                    first_pixel,
-                    pixel_count,
-                    const_cast<f32*>(band.data()),
-                    &status);
-                check_fits_status(status, "fits_write_img");
-            }
-
-            fits_close_file(fits, &status);
-            check_fits_status(status, "fits_close_file");
-            return output_path;
-        }
-        catch (...)
-        {
-            if (fits != nullptr)
-            {
-                (void)fits_close_file(fits, &status);
-            }
-            throw;
-        }
+        // TODO: implement minimal FITS writer (no external dependency)
+        PLX_CORE_WARN("FITS export not yet implemented");
+        return {};
     }
 
     std::filesystem::path ImageExporter::export_png_single_band(

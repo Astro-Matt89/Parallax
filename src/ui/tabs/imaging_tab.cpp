@@ -139,10 +139,12 @@ namespace parallax::ui::tabs
             "      ||___||"
         };
 
-        constexpr std::array<std::string_view, 3> kDescription = {
+        constexpr std::array<std::string_view, 5> kDescription = {
             "Live telescope feed.",
             "Capture frames, stack exposures,",
-            "feed observations into the archive."
+            "feed observations into the archive.",
+            "SAVE PNG: available",
+            "SAVE FITS: coming soon (disabled)"
         };
 
         draw_placeholder(

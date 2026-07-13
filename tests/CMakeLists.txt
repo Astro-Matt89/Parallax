@@ -376,3 +376,41 @@ target_link_libraries(test_image_exporter PRIVATE
 )
 
 add_test(NAME ImageExporter COMMAND test_image_exporter)
+
+# -----------------------------------------------------------------
+# Test: ImageAnalyzer                            <- SPRINT 10a Task 10a.8
+# -----------------------------------------------------------------
+add_executable(test_image_analyzer
+    test_image_analyzer.cpp
+    "${CMAKE_SOURCE_DIR}/src/analysis/image_analyzer.cpp"
+    "${CMAKE_SOURCE_DIR}/src/imaging/image_formation.cpp"
+    "${CMAKE_SOURCE_DIR}/src/imaging/psf.cpp"
+    "${CMAKE_SOURCE_DIR}/src/instruments/array_instrument.cpp"
+    "${CMAKE_SOURCE_DIR}/src/instruments/snr_calculator.cpp"
+    "${CMAKE_SOURCE_DIR}/src/knowledge/property_registry.cpp"
+    "${CMAKE_SOURCE_DIR}/src/universe/universe.cpp"
+    "${CMAKE_SOURCE_DIR}/src/universe/star_catalog_provider.cpp"
+    "${CMAKE_SOURCE_DIR}/src/universe/dso_provider.cpp"
+    "${CMAKE_SOURCE_DIR}/src/universe/solar_system_provider.cpp"
+    "${CMAKE_SOURCE_DIR}/src/universe/procedural_provider.cpp"
+    "${CMAKE_SOURCE_DIR}/src/astro/solar_system.cpp"
+    "${CMAKE_SOURCE_DIR}/src/astro/time_system.cpp"
+    "${CMAKE_SOURCE_DIR}/src/astro/coordinates.cpp"
+    "${CMAKE_SOURCE_DIR}/src/catalog/catalog_loader.cpp"
+    "${CMAKE_SOURCE_DIR}/src/catalog/dso_loader.cpp"
+    "${CMAKE_SOURCE_DIR}/src/catalog/spatial_index.cpp"
+    "${CMAKE_SOURCE_DIR}/src/core/logger.cpp"
+)
+
+target_include_directories(test_image_analyzer PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_image_analyzer PRIVATE
+    doctest::doctest
+    glm::glm
+    spdlog::spdlog
+    nlohmann_json::nlohmann_json
+)
+
+add_test(NAME ImageAnalyzer COMMAND test_image_analyzer)

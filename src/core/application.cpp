@@ -18,9 +18,11 @@
 
 #include "core/application.hpp"
 
-#include "analysis/mock_analyzer.hpp"
+#include "analysis/image_analyzer.hpp"
 #include "core/user_data_path.hpp"
+#include "imaging/image_formation.hpp"
 #include "instruments/array_instrument.hpp"
+#include "observation/observation_session.hpp"
 #include "knowledge/knowledge_database.hpp"
 #include "observation/data_archive.hpp"
 #include "observation/session_scheduler.hpp"
@@ -166,7 +168,7 @@ void Application::init()
 
     m_array_instrument = std::make_unique<instruments::ArrayInstrument>(
         instruments::ArrayInstrument::create_default());
-    m_analyzer = std::make_unique<analysis::MockAnalyzer>();
+    m_analyzer = std::make_unique<analysis::ImageAnalyzer>();
 
     // 9. Simulation time
     m_julian_date = astro::TimeSystem::now_as_jd();
@@ -447,10 +449,39 @@ void Application::update_simulation(f64 delta_time_sec)
             m_scheduler->update(m_julian_date, delta_time_sec, *m_universe, *m_array_instrument);
         }
 
+        // Build a thin IObjectSource adapter so form_image can query the universe.
+        struct UniverseSource final : public imaging::IObjectSource
+        {
+            explicit UniverseSource(const universe::Universe& u) : m_u(u) {}
+            void query_fov(double ra, double dec, double rad, float mag,
+                           std::vector<universe::CelestialObject>& results) const override
+            {
+                m_u.query_fov(ra, dec, rad, mag, universe::QueryFlags::All, results);
+            }
+            const universe::Universe& m_u;
+        };
+        const UniverseSource object_source{*m_universe};
+
+        // Collect completed session ids (must not mutate scheduler while iterating).
         std::vector<std::uint64_t> completed_ids;
         for (const auto* session : m_scheduler->get_completed())
         {
             completed_ids.push_back(session->id());
+        }
+
+        // Build (id → image) before harvesting so the session objects remain alive.
+        using ImagePair = std::pair<std::uint64_t, imaging::MultispectralImage>;
+        std::vector<ImagePair> session_images;
+        session_images.reserve(completed_ids.size());
+
+        if (m_array_instrument)
+        {
+            for (const auto* session : m_scheduler->get_completed())
+            {
+                session_images.emplace_back(
+                    session->id(),
+                    session->form_image(*m_array_instrument, *m_universe, object_source));
+            }
         }
 
         for (const std::uint64_t session_id : completed_ids)
@@ -462,29 +493,44 @@ void Application::update_simulation(f64 delta_time_sec)
             }
 
             observation::DataRecord data = std::move(*maybe);
-            // DataArchive is keyed by DataRecord::id; bind it to session_id for
-            // mock-session records so each harvested session persists as a unique row.
+            // DataArchive is keyed by DataRecord::id; bind it to session_id so
+            // each harvested session persists as a unique row.
             data.id = data.session_id;
 
             if (m_analyzer && m_knowledge)
             {
-                const auto updates = m_analyzer->analyze(data, *m_universe);
-                std::unordered_set<u64> detection_targets;
-                for (const auto& update : updates)
+                // Locate the pre-formed image for this session (may be absent if
+                // the instrument was not yet available at completion time).
+                const imaging::MultispectralImage* img_ptr = nullptr;
+                for (const auto& [id, img] : session_images)
                 {
-                    if (update.object_id != 0 && !detection_targets.contains(update.object_id))
+                    if (id == session_id)
                     {
-                        m_knowledge->add_detection(update.object_id, session_id);
-                        detection_targets.insert(update.object_id);
+                        img_ptr = &img;
+                        break;
                     }
+                }
 
-                    m_knowledge->record_measurement(
-                        update.object_id,
-                        update.property_name,
-                        update.value,
-                        update.uncertainty,
-                        update.snr,
-                        session_id);
+                if (img_ptr != nullptr)
+                {
+                    const auto updates = m_analyzer->analyze(data, *img_ptr, *m_universe);
+                    std::unordered_set<u64> detection_targets;
+                    for (const auto& update : updates)
+                    {
+                        if (update.object_id != 0 && !detection_targets.contains(update.object_id))
+                        {
+                            m_knowledge->add_detection(update.object_id, session_id);
+                            detection_targets.insert(update.object_id);
+                        }
+
+                        m_knowledge->record_measurement(
+                            update.object_id,
+                            update.property_name,
+                            update.value,
+                            update.uncertainty,
+                            update.snr,
+                            session_id);
+                    }
                 }
             }
 

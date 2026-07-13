@@ -92,6 +92,7 @@ namespace parallax::ui::shell
         [[nodiscard]] tabs::EncyclopediaTab& get_encyclopedia_tab() noexcept;
         [[nodiscard]] tabs::BaseTab& get_base_tab() noexcept;
         [[nodiscard]] tabs::ArchiveTab& get_archive_tab() noexcept;
+        [[nodiscard]] tabs::ImagingTab& get_imaging_tab() noexcept;
 
         void save_layout();
 

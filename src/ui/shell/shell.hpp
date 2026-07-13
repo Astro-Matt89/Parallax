@@ -15,6 +15,7 @@
 #include <string>
 
 namespace parallax::astro { class ObserverRegistry; }
+namespace parallax::instruments { class ArrayInstrument; }
 namespace parallax::knowledge { class KnowledgeDatabase; }
 namespace parallax::observation { class DataArchive; class SessionScheduler; }
 namespace parallax::rendering { class LineRenderer; }
@@ -56,6 +57,7 @@ namespace parallax::ui::shell
               VkRenderPass render_pass,
               const std::filesystem::path& shader_dir,
               universe::Universe& universe,
+              instruments::ArrayInstrument& array_instrument,
               knowledge::KnowledgeDatabase& knowledge,
               observation::DataArchive& archive,
               observation::SessionScheduler& scheduler,
@@ -114,6 +116,7 @@ namespace parallax::ui::shell
         std::filesystem::path m_shader_dir;
 
         universe::Universe& m_universe;
+        instruments::ArrayInstrument& m_array_instrument;
         knowledge::KnowledgeDatabase& m_knowledge;
         observation::DataArchive& m_archive;
         observation::SessionScheduler& m_scheduler;

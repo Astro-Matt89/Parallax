@@ -7,6 +7,7 @@
 #include "core/logger.hpp"
 #include "core/user_data_path.hpp"
 #include "knowledge/knowledge_database.hpp"
+#include "instruments/array_instrument.hpp"
 #include "observation/data_archive.hpp"
 #include "observation/session_scheduler.hpp"
 #include "rendering/camera.hpp"
@@ -377,6 +378,7 @@ namespace parallax::ui::shell
                  const VkRenderPass render_pass,
                  const std::filesystem::path& shader_dir,
                  universe::Universe& universe,
+                 instruments::ArrayInstrument& array_instrument,
                  knowledge::KnowledgeDatabase& knowledge,
                  observation::DataArchive& archive,
                  observation::SessionScheduler& scheduler,
@@ -393,6 +395,7 @@ namespace parallax::ui::shell
         , m_render_pass(render_pass)
         , m_shader_dir(shader_dir)
         , m_universe(universe)
+        , m_array_instrument(array_instrument)
         , m_knowledge(knowledge)
         , m_archive(archive)
         , m_scheduler(scheduler)
@@ -411,7 +414,16 @@ namespace parallax::ui::shell
                                                                 m_font,
                                                                 m_julian_date,
                                                                 m_observer_registry);
-        m_imaging = std::make_unique<tabs::ImagingTab>(m_font);
+        m_imaging = std::make_unique<tabs::ImagingTab>(m_context,
+                                                       m_swapchain,
+                                                       m_render_pass,
+                                                       m_shader_dir,
+                                                       m_universe,
+                                                       m_array_instrument,
+                                                       m_scheduler,
+                                                       m_selection,
+                                                       m_font,
+                                                       m_julian_date);
         m_spectroscopy = std::make_unique<tabs::SpectroscopyTab>(m_font);
         m_analysis = std::make_unique<tabs::AnalysisTab>(m_font);
         m_archive_tab = std::make_unique<tabs::ArchiveTab>(m_font, m_line_renderer, m_swapchain, m_archive);

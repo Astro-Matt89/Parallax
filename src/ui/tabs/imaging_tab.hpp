@@ -78,6 +78,13 @@ namespace parallax::ui::tabs
         void render(VkCommandBuffer cmd, const shell::ViewportRect& viewport) override;
         void on_input(const shell::InputEvent& event, const shell::ViewportRect& viewport) override;
 
+        /// @brief Pre-set the observation target to the given universe object ID.
+        ///
+        /// Looks up the object in the universe, stores its RA/Dec and display name,
+        /// and resets any active session so the new target can be observed immediately.
+        /// No-op if @p object_id is 0 or the object cannot be resolved.
+        void set_target(u64 object_id);
+
         [[nodiscard]] shell::TabId get_id() const override
         {
             return shell::TabId::Imaging;

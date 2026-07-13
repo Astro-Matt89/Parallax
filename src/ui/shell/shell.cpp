@@ -540,9 +540,10 @@ namespace parallax::ui::shell
                 focus_tab(TabId::Planetarium);
                 m_planetarium->start_tracking(id);
             },
-            .open_observe_for = [this](u64)
+            .open_observe_for = [this](const u64 id)
             {
-                push_notification("OBSERVE workflow lands in Sprint 10+", NotificationSeverity::Info);
+                m_imaging->set_target(id);
+                focus_tab(TabId::Imaging);
             }
         });
 
@@ -598,12 +599,18 @@ namespace parallax::ui::shell
         }
 
         SidebarState sidebar_state;
-        sidebar_state.instruments.push_back({
-            .id = "magic_instrument",
-            .name = "Magic Instrument",
-            .status = m_scheduler.get_active().empty() ? "idle" : "busy"
-        });
-        sidebar_state.selected_instrument_id = "magic_instrument";
+        {
+            const u32 active_stations = m_array_instrument.get_active_station_count();
+            const bool sessions_active = !m_scheduler.get_active().empty();
+            sidebar_state.instruments.push_back({
+                .id     = "glasswing_array",
+                .name   = m_array_instrument.get_name(),
+                .status = sessions_active
+                    ? fmt::format("integrating ({} sta.)", active_stations)
+                    : fmt::format("idle ({} sta.)", active_stations)
+            });
+            sidebar_state.selected_instrument_id = "glasswing_array";
+        }
         sidebar_state.visible_tabs = visible_tabs;
         sidebar_state.time.paused = (m_time_scale == 0.0);
         sidebar_state.time.time_scale = m_time_scale;
@@ -1060,8 +1067,12 @@ namespace parallax::ui::shell
         return *m_archive_tab;
     }
 
-    TabContent& Shell::tab_for(const TabId id) noexcept
+    tabs::ImagingTab& Shell::get_imaging_tab() noexcept
     {
+        return *m_imaging;
+    }
+
+
         TabContent* tab = m_tabs_by_id[static_cast<u32>(id)];
         if (tab == nullptr)
         {

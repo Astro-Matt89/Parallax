@@ -748,6 +748,32 @@ namespace parallax::ui::tabs
         m_last_image_elapsed_s = -1.0;
     }
 
+    void ImagingTab::set_target(const u64 object_id)
+    {
+        if (object_id == 0)
+        {
+            return;
+        }
+
+        const std::optional<universe::CelestialObject> obj = m_universe.query_object(object_id);
+        if (!obj.has_value())
+        {
+            return;
+        }
+
+        m_target.object_id = obj->id;
+        m_target.ra_rad    = obj->ra;
+        m_target.dec_rad   = obj->dec;
+
+        const std::string_view display_name = m_universe.get_name(object_id);
+        m_target.name = display_name.empty()
+            ? std::format("OBJ {}", object_id)
+            : std::string{display_name};
+
+        m_last_image_elapsed_s = -1.0;
+    }
+
+
     void ImagingTab::update_live_preview_objects()
     {
         if (m_target.object_id == 0)

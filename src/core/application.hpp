@@ -27,7 +27,7 @@
 #include <memory>
 #include <vector>
 
-namespace parallax::analysis { class MockAnalyzer; }
+namespace parallax::analysis { class ImageAnalyzer; }
 namespace parallax::instruments { class ArrayInstrument; }
 namespace parallax::rendering { class LineRenderer; }
 
@@ -128,7 +128,7 @@ namespace parallax::core
         std::unique_ptr<observation::SessionScheduler> m_scheduler;
         std::unique_ptr<observation::DataArchive> m_archive;
         std::unique_ptr<instruments::ArrayInstrument> m_array_instrument;
-        std::unique_ptr<analysis::MockAnalyzer> m_analyzer;
+        std::unique_ptr<analysis::ImageAnalyzer> m_analyzer;
 
         // -----------------------------------------------------------------
         // UI subsystems                                     ← SPRINT 09

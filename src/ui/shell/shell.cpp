@@ -1072,7 +1072,8 @@ namespace parallax::ui::shell
         return *m_imaging;
     }
 
-
+    TabContent& Shell::tab_for(TabId id) noexcept
+    {
         TabContent* tab = m_tabs_by_id[static_cast<u32>(id)];
         if (tab == nullptr)
         {

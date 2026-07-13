@@ -151,7 +151,7 @@ namespace
             .mag_limit                 = 30.0f,
             .seed                      = 42u,
         };
-        return ImageFormation::form(p, src, inst);
+        return ImageFormation::form(p, inst, src);
     }
 
     /// Return the (x,y) of the maximum pixel in an image.

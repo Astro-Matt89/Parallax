@@ -23698,3 +23698,1463 @@
 [10:39:24.474] [PARALLAX] [trace] Vulkan instance destroyed
 [10:39:24.590] [PARALLAX] [info] Window destroyed
 [10:39:24.855] [PARALLAX] [info] Parallax shutdown complete.
+[18:46:35.949] [PARALLAX] [info] Parallax v0.1.0 starting...
+[18:46:36.238] [PARALLAX] [info] Window created: "Parallax" (1280x720) [Vulkan | resizable]
+[18:46:36.239] [PARALLAX] [trace] SDL2 requires 2 Vulkan instance extension(s):
+[18:46:36.240] [PARALLAX] [trace]   - VK_KHR_surface
+[18:46:36.241] [PARALLAX] [trace]   - VK_KHR_win32_surface
+[18:46:36.253] [PARALLAX] [info] Requesting 3 instance extension(s):
+[18:46:36.253] [PARALLAX] [info]   - VK_KHR_surface
+[18:46:36.254] [PARALLAX] [info]   - VK_KHR_win32_surface
+[18:46:36.256] [PARALLAX] [info]   - VK_EXT_debug_utils
+[18:46:36.256] [PARALLAX] [info] Validation layers enabled: VK_LAYER_KHRONOS_validation
+[18:46:36.259] [PARALLAX] [trace] [Vulkan] windows_get_device_registry_files: GUID for 3 is not SoftwareComponent skipping
+[18:46:36.263] [PARALLAX] [trace] [Vulkan] Searching for ICD drivers named .\nvoglv64.dll
+[18:46:36.328] [PARALLAX] [trace] [Vulkan] Loading layer library C:\VulkanSDK\1.4.341.1\Bin\.\VkLayer_khronos_validation.dll
+[18:46:36.413] [PARALLAX] [trace] [Vulkan] Loading layer library C:\ProgramData\obs-studio-hook\.\graphics-hook64.dll
+[18:46:36.415] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[18:46:36.416] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[18:46:36.558] [PARALLAX] [info] Vulkan instance created (API 1.3)
+[18:46:36.559] [PARALLAX] [info] Vulkan debug messenger created
+[18:46:36.561] [PARALLAX] [info] Vulkan surface created
+[18:46:36.564] [PARALLAX] [info] Found 1 Vulkan-capable GPU(s):
+[18:46:36.565] [PARALLAX] [info]   - NVIDIA GeForce GTX 1660 (type: discrete)
+[18:46:36.622] [PARALLAX] [info] Selected GPU: NVIDIA GeForce GTX 1660
+[18:46:36.623] [PARALLAX] [info]   Driver version: 79.344.0
+[18:46:36.624] [PARALLAX] [info]   Vulkan API: 1.4.325
+[18:46:36.626] [PARALLAX] [info]   VRAM: 6180 MB
+[18:46:36.627] [PARALLAX] [info]   Graphics queue family: 0
+[18:46:36.628] [PARALLAX] [info]   Present queue family: 0
+[18:46:36.693] [PARALLAX] [info] Vulkan logical device created
+[18:46:36.698] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[18:46:36.698] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[18:46:36.833] [PARALLAX] [info] Swapchain created: 1280x720, 3 images, format 50, MAILBOX (triple buffer)
+[18:46:36.834] [PARALLAX] [info] Shader directory: C:/Parallax-dev/Parallax/build/shaders
+[18:46:36.835] [PARALLAX] [info] Render pass created
+[18:46:36.836] [PARALLAX] [trace] Shader module loaded: test_star.vert.spv
+[18:46:36.837] [PARALLAX] [trace] Shader module loaded: test_star.frag.spv
+[18:46:36.838] [PARALLAX] [info] Graphics pipeline created (POINT_LIST, dynamic viewport/scissor)
+[18:46:36.839] [PARALLAX] [info] Framebuffers created: 3 (1280x720)
+[18:46:36.842] [PARALLAX] [info] LineRenderer pipeline created (LINE_LIST, standard alpha blend)
+[18:46:36.842] [PARALLAX] [info] LineRenderer initialized (131072 max vertices)
+[18:46:36.845] [PARALLAX] [trace] Font atlas created: 128x96 R8_UNORM, 95 glyphs
+[18:46:36.847] [PARALLAX] [trace] Shader module loaded: text.vert.spv
+[18:46:36.848] [PARALLAX] [trace] Shader module loaded: text.frag.spv
+[18:46:36.850] [PARALLAX] [info] Text pipeline created (alpha blend, vertex-colored)
+[18:46:36.851] [PARALLAX] [info] BitmapFont initialized (128x96 atlas, 4096 max chars/frame)
+[18:46:36.854] [PARALLAX] [info] PanelSystem pipeline created (triangle list, alpha blend)
+[18:46:36.855] [PARALLAX] [info] PanelSystem initialized (8192 max vertices)
+[18:46:36.856] [PARALLAX] [error] CatalogLoader: No valid stars found in Tycho-2: data/catalogs\tycho2.csv
+[18:46:36.877] [PARALLAX] [warning] StarCatalogProvider: Tycho-2 not found at 'data/catalogs\tycho2.csv'
+[18:46:37.098] [PARALLAX] [info] CatalogLoader: Loaded 116812 stars from data/catalogs\hipparcos.csv
+[18:46:37.099] [PARALLAX] [info] StarCatalogProvider: Hipparcos loaded as primary (116812 stars)
+[18:46:37.116] [PARALLAX] [info] StarCatalogProvider: building spatial index for 116812 stars...
+[18:46:37.122] [PARALLAX] [info] SpatialIndex built: 116812 stars, 180 bands (0 empty), band size 8-969
+[18:46:37.123] [PARALLAX] [info] StarCatalogProvider: HIP map built from primary Hipparcos catalog (116812 stars)
+[18:46:37.142] [PARALLAX] [info] DSO catalog loaded: 110 objects (0 skipped) from messier.csv
+[18:46:37.143] [PARALLAX] [info] DsoCatalogProvider: 110 objects loaded (110 indexed by Messier number)
+[18:46:37.145] [PARALLAX] [info] Universe: star name database loaded (196 entries from 'star_names.csv')
+[18:46:37.145] [PARALLAX] [info] Universe: catalogs loaded — 116812 stars, 110 DSOs
+[18:46:37.179] [PARALLAX] [info] ProceduralProvider: master seed set to 0x00000000a5735e5d
+[18:46:37.186] [PARALLAX] [info] Universe: procedural generator initialised (seed=2775801437)
+[18:46:37.187] [PARALLAX] [info] Universe initialized: 116931 real objects
+[18:46:41.150] [PARALLAX] [info] Loaded knowledge save: C:\Users\sputn\AppData\Roaming\Parallax\save\knowledge.json
+[18:46:41.182] [PARALLAX] [info] Loaded data archive save: C:\Users\sputn\AppData\Roaming\Parallax\save\archive.json
+[18:46:41.227] [PARALLAX] [info] Simulation start: JD 2461235.199088 (2026-07-13 16:46:41.2 UTC)
+[18:46:41.228] [PARALLAX] [info] Observer: Tycho Crater Base (-43.31, -11.36)
+[18:46:41.230] [PARALLAX] [trace] Sky background UBO created: 48 bytes
+[18:46:41.231] [PARALLAX] [trace] Shader module loaded: sky_background.vert.spv
+[18:46:41.233] [PARALLAX] [trace] Shader module loaded: sky_background.frag.spv
+[18:46:41.247] [PARALLAX] [info] Sky background pipeline created (fullscreen triangle, UBO)
+[18:46:41.248] [PARALLAX] [info] Sky background renderer initialized
+[18:46:41.253] [PARALLAX] [info] Starfield pipeline created (skychart, additive blend)
+[18:46:41.254] [PARALLAX] [info] Starfield renderer initialized (skychart mode, 300000 max stars)
+[18:46:41.256] [PARALLAX] [info] LineRenderer pipeline created (LINE_LIST, standard alpha blend)
+[18:46:41.257] [PARALLAX] [info] LineRenderer initialized (131072 max vertices)
+[18:46:41.258] [PARALLAX] [info] Star names loaded: 196 entries from data/catalogs/star_names.csv
+[18:46:41.259] [PARALLAX] [info] Star names loaded: 195 entries
+[18:46:41.293] [PARALLAX] [info] Constellation names matched: 88/88
+[18:46:41.294] [PARALLAX] [info] Constellations loaded: 88 constellations, 756 segments
+[18:46:41.296] [PARALLAX] [info] Constellations resolved via Universe: 1511 resolved, 1 missing
+[18:46:41.299] [PARALLAX] [info] LineRenderer pipeline created (LINE_LIST, standard alpha blend)
+[18:46:41.300] [PARALLAX] [info] LineRenderer initialized (131072 max vertices)
+[18:46:41.863] [PARALLAX] [info] Application initialized — shell integration active
+[18:46:41.864] [PARALLAX] [info] Entering main loop...
+[18:46:41.907] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:41.909] [PARALLAX] [info] Procedural provider active — master seed 0xA5735E5D, nside=64 cells
+[18:46:42.287] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:42.440] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:42.594] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:42.744] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:42.891] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:43.042] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:43.186] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:43.326] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:43.472] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:43.623] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:43.760] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:43.904] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:44.046] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:44.184] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:44.333] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:44.478] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:44.625] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:44.889] [PARALLAX] [trace] Window resized: 1920x1057
+[18:46:44.890] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:45.086] [PARALLAX] [trace] Swapchain destroyed
+[18:46:45.091] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[18:46:45.091] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[18:46:45.098] [PARALLAX] [info] Swapchain created: 1920x1057, 3 images, format 50, MAILBOX (triple buffer)
+[18:46:45.099] [PARALLAX] [info] Render pass created
+[18:46:45.100] [PARALLAX] [trace] Shader module loaded: test_star.vert.spv
+[18:46:45.102] [PARALLAX] [trace] Shader module loaded: test_star.frag.spv
+[18:46:45.104] [PARALLAX] [info] Graphics pipeline created (POINT_LIST, dynamic viewport/scissor)
+[18:46:45.104] [PARALLAX] [info] Framebuffers created: 3 (1920x1057)
+[18:46:45.124] [PARALLAX] [trace] Graphics pipeline destroyed
+[18:46:45.135] [PARALLAX] [trace] Render pass destroyed
+[18:46:45.136] [PARALLAX] [info] Swapchain recreated: 1920x1057
+[18:46:45.138] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:45.299] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:45.449] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:45.588] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:45.731] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:45.875] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:46.016] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:46.149] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:46.287] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:46.427] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:46.569] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:46.718] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:46.860] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:47.000] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:47.140] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:47.284] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:47.429] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:47.569] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:47.710] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:47.848] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:47.986] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:48.123] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:48.260] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:48.399] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:48.536] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:48.674] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:48.811] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:48.952] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:49.089] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:49.229] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:49.369] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:49.512] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:49.651] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:49.795] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:49.939] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1991
+[18:46:50.079] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:50.215] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:50.354] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:50.488] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:50.626] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:50.761] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:50.900] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:51.036] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:51.173] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:51.309] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:51.450] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:51.588] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:51.723] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:51.859] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:51.992] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:52.124] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:52.262] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:52.394] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:52.529] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:52.663] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:52.796] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:52.934] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:53.073] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:53.208] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:53.344] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:53.485] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:53.625] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:53.766] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:53.906] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:54.045] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:54.181] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:54.321] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:54.460] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:54.602] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:54.740] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:54.880] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:55.016] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:55.150] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:55.285] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:55.425] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:55.561] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:55.697] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:55.836] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:55.972] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:56.106] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:56.244] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:56.380] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:56.518] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:56.655] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:56.787] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:56.927] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:57.065] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:57.201] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:57.340] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:57.480] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:57.617] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:57.754] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:57.893] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:58.030] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:58.170] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:58.305] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:58.446] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:58.579] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:58.716] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:58.853] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:58.989] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:59.126] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:59.265] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:59.406] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:59.543] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:59.678] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:59.813] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:46:59.951] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:47:00.094] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:47:00.230] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:47:00.369] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:47:00.508] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:47:00.646] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:47:00.785] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:47:00.925] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:47:01.065] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:47:01.200] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:47:01.339] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:47:01.476] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:47:01.613] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:47:01.747] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1992
+[18:47:01.884] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:02.023] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:02.160] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:02.298] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:02.436] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:02.571] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:02.711] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:02.851] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:02.991] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:03.127] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:03.271] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:03.415] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:03.549] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:03.688] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:03.827] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:03.964] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:04.101] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:04.238] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:04.376] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:04.513] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:04.648] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:04.785] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:04.928] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:05.069] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:05.210] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:05.348] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:05.486] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:05.626] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:05.763] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:05.903] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:06.039] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:06.177] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:06.315] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:06.456] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:06.601] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:06.740] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:06.882] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:07.020] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:07.163] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:07.301] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:07.443] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:07.581] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:07.720] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:07.863] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:07.999] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:08.143] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:08.284] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:08.422] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:08.557] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:08.692] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:08.832] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:08.974] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:09.109] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:09.244] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:09.384] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:09.520] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:09.652] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:09.790] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:09.927] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:10.063] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:10.204] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:10.338] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:10.474] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:10.607] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:10.743] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:10.880] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:11.015] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:11.150] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:11.286] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:11.427] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:11.563] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:11.698] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:11.838] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:11.976] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:12.113] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:12.253] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:12.389] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:12.527] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:12.664] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:12.799] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:12.940] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:13.075] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:13.213] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:13.354] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:13.492] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:13.625] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:13.763] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1993
+[18:47:13.901] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:14.034] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:14.172] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:14.310] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:14.446] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:14.582] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:14.719] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:14.858] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:14.995] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:15.135] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:15.272] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:15.412] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:15.547] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:15.688] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:15.826] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:15.963] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:16.097] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:16.234] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:16.377] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:16.522] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:16.659] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:16.798] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:16.937] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:17.075] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:17.212] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:17.358] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:17.499] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:17.640] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:17.782] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:17.922] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:18.055] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:18.195] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:18.339] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:18.486] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:18.625] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:18.763] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:18.904] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:19.042] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:19.179] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:19.323] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:19.460] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:19.600] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:19.741] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:19.886] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:20.028] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:20.167] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:20.306] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:20.443] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:20.585] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:20.729] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:20.869] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:21.009] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:21.150] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:21.297] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:21.438] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:21.578] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:21.714] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:21.854] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:21.995] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:22.131] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:22.266] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:22.404] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:22.542] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:22.687] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:22.831] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:22.970] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:23.112] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:23.249] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:23.386] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:23.525] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:23.668] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:23.807] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:23.949] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:24.088] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:24.227] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:24.371] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:24.510] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:24.645] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:24.790] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:24.935] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:25.083] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:25.223] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:25.368] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:25.508] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:25.646] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:25.792] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1994
+[18:47:25.939] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:26.082] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:26.230] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:26.365] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:26.504] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:26.640] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:26.776] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:26.918] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:27.059] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:27.197] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:27.334] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:27.474] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:27.617] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:27.761] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:27.906] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:28.048] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:28.187] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:28.328] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:28.466] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:28.602] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:28.740] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:28.880] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:29.019] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:29.156] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:29.294] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:29.432] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:29.569] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:29.707] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:29.845] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:29.982] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:30.120] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:30.264] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:30.406] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:30.546] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:30.683] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:30.821] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:30.962] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:31.100] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:31.238] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:31.377] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:31.514] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:31.651] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:31.791] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:31.930] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:32.067] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:32.205] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:32.343] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:32.479] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:32.616] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:32.754] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:32.893] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:33.030] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:33.166] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:33.305] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:33.441] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:33.582] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:33.720] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:33.860] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:34.000] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:34.135] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:34.272] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:34.409] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:34.548] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:34.686] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:34.827] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:34.965] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:35.108] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:35.248] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:35.389] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:35.527] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:35.663] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:35.799] [PARALLAX] [info] Instrument selected in shell sidebar: glasswing_array
+[18:47:35.800] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:35.938] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:36.075] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:36.212] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:36.348] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:36.485] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:36.628] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:36.771] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:36.909] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:37.050] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:37.187] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:37.325] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:37.463] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:37.607] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:37.742] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1995
+[18:47:37.889] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:38.027] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:38.165] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:38.302] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:38.445] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:38.589] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:38.731] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:38.875] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:39.017] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:39.157] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:39.299] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:39.441] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:39.590] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:39.737] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:39.878] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:40.014] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:40.150] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:40.299] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:40.447] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:40.592] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:40.736] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:40.878] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:41.019] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:41.157] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:41.295] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:41.432] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:41.567] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:41.706] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:41.842] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:41.982] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:42.119] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:42.256] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:42.394] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:42.532] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:42.671] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:42.808] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:42.951] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:43.090] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:43.226] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:43.364] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:43.502] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:43.639] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:43.773] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:43.912] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:44.048] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:44.186] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:44.333] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:44.472] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:44.608] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:44.746] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:44.886] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:45.024] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:45.163] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:45.300] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:45.438] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:45.573] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:45.710] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:45.850] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:45.989] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:46.125] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:46.262] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:46.400] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:46.537] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:46.674] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:46.812] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:46.952] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:47.089] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:47.225] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:47.366] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:47.505] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:47.644] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:47.780] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:47.917] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:48.055] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:48.190] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:48.327] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:48.465] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:48.605] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:48.741] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:48.880] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:49.016] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:49.152] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:49.288] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:49.431] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:49.568] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:49.711] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:49.860] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1996
+[18:47:50.003] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:50.146] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:50.287] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:50.427] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:50.569] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:50.707] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:50.846] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:50.986] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:51.123] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:51.261] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:51.429] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:51.565] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:51.707] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:51.842] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:51.978] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:52.114] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:52.254] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:52.396] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:52.533] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:52.672] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:52.809] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:52.952] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:53.089] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:53.224] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:53.363] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:53.499] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:53.636] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:53.772] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:53.910] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:54.047] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:54.186] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:54.322] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:54.460] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:54.601] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:54.739] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:54.874] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:55.011] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:55.148] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:55.284] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:55.426] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:55.566] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:55.701] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:55.838] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:55.977] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:56.112] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:56.249] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:56.385] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:56.524] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:56.663] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:56.799] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:56.939] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:57.077] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:57.212] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:57.349] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:57.489] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:57.628] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:57.763] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:57.904] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:58.041] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:58.177] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:58.315] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:58.452] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:58.586] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:58.723] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:58.864] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:59.001] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:59.139] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:59.278] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:59.420] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:59.557] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:59.694] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:59.831] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:47:59.967] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:48:00.111] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:48:00.249] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:48:00.387] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:48:00.527] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:48:00.665] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:48:00.799] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:48:00.940] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:48:01.076] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:48:01.215] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:48:01.353] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:48:01.491] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:48:01.627] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:48:01.763] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1997
+[18:48:01.905] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:02.042] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:02.185] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:02.326] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:02.472] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:02.701] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:02.836] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:02.976] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:03.112] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:03.251] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:03.397] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:03.534] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:03.670] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:03.806] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:03.944] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:04.078] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:04.216] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:04.352] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:04.495] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:04.637] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:04.777] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:04.918] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:05.056] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:05.194] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:05.333] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:05.472] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:05.608] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:05.748] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:05.893] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:06.028] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:06.164] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:06.304] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:06.446] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:06.584] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:06.722] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:06.862] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:07.000] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:07.138] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:07.274] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:07.415] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:07.555] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:07.694] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:07.835] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:07.974] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:08.113] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:08.255] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:08.392] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:08.533] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:08.669] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:08.804] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:08.942] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:09.077] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:09.215] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:09.352] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:09.487] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:09.623] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:09.760] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:09.901] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:10.039] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:10.176] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:10.315] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:10.451] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:10.590] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:10.725] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:10.863] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:11.001] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:11.141] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:11.279] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:11.416] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:11.554] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:11.691] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:11.828] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:11.968] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:12.114] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:12.258] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:12.401] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:12.540] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:12.679] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:12.816] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:12.953] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:13.086] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:13.230] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:13.376] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:13.519] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:13.662] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:13.800] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1998
+[18:48:13.939] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1999
+[18:48:14.083] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1999
+[18:48:14.228] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1999
+[18:48:14.371] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1999
+[18:48:14.512] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1999
+[18:48:14.647] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1999
+[18:48:14.793] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1999
+[18:48:14.942] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1999
+[18:48:15.085] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1999
+[18:48:15.227] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1999
+[18:48:15.457] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.1999
+[18:48:15.598] [PARALLAX] [info] Main loop exited
+[18:48:17.798] [PARALLAX] [trace] LineRenderer destroyed
+[18:48:17.801] [PARALLAX] [trace] LineRenderer destroyed
+[18:48:17.802] [PARALLAX] [trace] Starfield renderer destroyed
+[18:48:17.803] [PARALLAX] [trace] Sky background renderer destroyed
+[18:48:17.857] [PARALLAX] [trace] PanelSystem destroyed
+[18:48:17.858] [PARALLAX] [trace] BitmapFont destroyed
+[18:48:17.860] [PARALLAX] [trace] LineRenderer destroyed
+[18:48:17.860] [PARALLAX] [trace] Graphics pipeline destroyed
+[18:48:17.861] [PARALLAX] [trace] Render pass destroyed
+[18:48:17.863] [PARALLAX] [trace] Swapchain destroyed
+[18:48:17.995] [PARALLAX] [trace] Vulkan logical device destroyed
+[18:48:18.043] [PARALLAX] [trace] Vulkan debug messenger destroyed
+[18:48:18.044] [PARALLAX] [trace] Vulkan surface destroyed
+[18:48:18.059] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\nvoglv64.dll
+[18:48:18.060] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\nvoglv64.dll
+[18:48:18.061] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\ProgramData\obs-studio-hook\graphics-hook64.dll
+[18:48:18.091] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\VulkanSDK\1.4.341.1\Bin\VkLayer_khronos_validation.dll
+[18:48:18.092] [PARALLAX] [trace] Vulkan instance destroyed
+[18:48:18.141] [PARALLAX] [info] Window destroyed
+[18:48:18.226] [PARALLAX] [info] Parallax shutdown complete.
+[18:48:56.355] [PARALLAX] [info] Parallax v0.1.0 starting...
+[18:48:56.492] [PARALLAX] [info] Window created: "Parallax" (1280x720) [Vulkan | resizable]
+[18:48:56.493] [PARALLAX] [trace] SDL2 requires 2 Vulkan instance extension(s):
+[18:48:56.493] [PARALLAX] [trace]   - VK_KHR_surface
+[18:48:56.494] [PARALLAX] [trace]   - VK_KHR_win32_surface
+[18:48:56.506] [PARALLAX] [info] Requesting 3 instance extension(s):
+[18:48:56.506] [PARALLAX] [info]   - VK_KHR_surface
+[18:48:56.507] [PARALLAX] [info]   - VK_KHR_win32_surface
+[18:48:56.509] [PARALLAX] [info]   - VK_EXT_debug_utils
+[18:48:56.509] [PARALLAX] [info] Validation layers enabled: VK_LAYER_KHRONOS_validation
+[18:48:56.512] [PARALLAX] [trace] [Vulkan] windows_get_device_registry_files: GUID for 3 is not SoftwareComponent skipping
+[18:48:56.517] [PARALLAX] [trace] [Vulkan] Searching for ICD drivers named .\nvoglv64.dll
+[18:48:56.520] [PARALLAX] [trace] [Vulkan] Loading layer library C:\VulkanSDK\1.4.341.1\Bin\.\VkLayer_khronos_validation.dll
+[18:48:56.521] [PARALLAX] [trace] [Vulkan] Loading layer library C:\ProgramData\obs-studio-hook\.\graphics-hook64.dll
+[18:48:56.522] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[18:48:56.522] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[18:48:56.605] [PARALLAX] [info] Vulkan instance created (API 1.3)
+[18:48:56.606] [PARALLAX] [info] Vulkan debug messenger created
+[18:48:56.607] [PARALLAX] [info] Vulkan surface created
+[18:48:56.609] [PARALLAX] [info] Found 1 Vulkan-capable GPU(s):
+[18:48:56.610] [PARALLAX] [info]   - NVIDIA GeForce GTX 1660 (type: discrete)
+[18:48:56.618] [PARALLAX] [info] Selected GPU: NVIDIA GeForce GTX 1660
+[18:48:56.619] [PARALLAX] [info]   Driver version: 79.344.0
+[18:48:56.620] [PARALLAX] [info]   Vulkan API: 1.4.325
+[18:48:56.620] [PARALLAX] [info]   VRAM: 6180 MB
+[18:48:56.621] [PARALLAX] [info]   Graphics queue family: 0
+[18:48:56.623] [PARALLAX] [info]   Present queue family: 0
+[18:48:56.697] [PARALLAX] [info] Vulkan logical device created
+[18:48:56.701] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[18:48:56.702] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[18:48:56.721] [PARALLAX] [info] Swapchain created: 1280x720, 3 images, format 50, MAILBOX (triple buffer)
+[18:48:56.721] [PARALLAX] [info] Shader directory: C:/Parallax-dev/Parallax/build/shaders
+[18:48:56.722] [PARALLAX] [info] Render pass created
+[18:48:56.724] [PARALLAX] [trace] Shader module loaded: test_star.vert.spv
+[18:48:56.724] [PARALLAX] [trace] Shader module loaded: test_star.frag.spv
+[18:48:56.726] [PARALLAX] [info] Graphics pipeline created (POINT_LIST, dynamic viewport/scissor)
+[18:48:56.726] [PARALLAX] [info] Framebuffers created: 3 (1280x720)
+[18:48:56.728] [PARALLAX] [info] LineRenderer pipeline created (LINE_LIST, standard alpha blend)
+[18:48:56.730] [PARALLAX] [info] LineRenderer initialized (131072 max vertices)
+[18:48:56.733] [PARALLAX] [trace] Font atlas created: 128x96 R8_UNORM, 95 glyphs
+[18:48:56.735] [PARALLAX] [trace] Shader module loaded: text.vert.spv
+[18:48:56.736] [PARALLAX] [trace] Shader module loaded: text.frag.spv
+[18:48:56.738] [PARALLAX] [info] Text pipeline created (alpha blend, vertex-colored)
+[18:48:56.738] [PARALLAX] [info] BitmapFont initialized (128x96 atlas, 4096 max chars/frame)
+[18:48:56.740] [PARALLAX] [info] PanelSystem pipeline created (triangle list, alpha blend)
+[18:48:56.740] [PARALLAX] [info] PanelSystem initialized (8192 max vertices)
+[18:48:56.741] [PARALLAX] [error] CatalogLoader: No valid stars found in Tycho-2: data/catalogs\tycho2.csv
+[18:48:56.741] [PARALLAX] [warning] StarCatalogProvider: Tycho-2 not found at 'data/catalogs\tycho2.csv'
+[18:48:56.964] [PARALLAX] [info] CatalogLoader: Loaded 116812 stars from data/catalogs\hipparcos.csv
+[18:48:56.965] [PARALLAX] [info] StarCatalogProvider: Hipparcos loaded as primary (116812 stars)
+[18:48:56.983] [PARALLAX] [info] StarCatalogProvider: building spatial index for 116812 stars...
+[18:48:56.988] [PARALLAX] [info] SpatialIndex built: 116812 stars, 180 bands (0 empty), band size 8-969
+[18:48:56.989] [PARALLAX] [info] StarCatalogProvider: HIP map built from primary Hipparcos catalog (116812 stars)
+[18:48:57.007] [PARALLAX] [info] DSO catalog loaded: 110 objects (0 skipped) from messier.csv
+[18:48:57.007] [PARALLAX] [info] DsoCatalogProvider: 110 objects loaded (110 indexed by Messier number)
+[18:48:57.009] [PARALLAX] [info] Universe: star name database loaded (196 entries from 'star_names.csv')
+[18:48:57.010] [PARALLAX] [info] Universe: catalogs loaded — 116812 stars, 110 DSOs
+[18:48:57.011] [PARALLAX] [info] ProceduralProvider: master seed set to 0x00000000a5735e5d
+[18:48:57.012] [PARALLAX] [info] Universe: procedural generator initialised (seed=2775801437)
+[18:48:57.013] [PARALLAX] [info] Universe initialized: 116931 real objects
+[18:49:00.151] [PARALLAX] [info] Loaded knowledge save: C:\Users\sputn\AppData\Roaming\Parallax\save\knowledge.json
+[18:49:00.152] [PARALLAX] [info] Loaded data archive save: C:\Users\sputn\AppData\Roaming\Parallax\save\archive.json
+[18:49:00.153] [PARALLAX] [info] Simulation start: JD 2461235.200696 (2026-07-13 16:49:00.2 UTC)
+[18:49:00.154] [PARALLAX] [info] Observer: Tycho Crater Base (-43.31, -11.36)
+[18:49:00.155] [PARALLAX] [trace] Sky background UBO created: 48 bytes
+[18:49:00.156] [PARALLAX] [trace] Shader module loaded: sky_background.vert.spv
+[18:49:00.157] [PARALLAX] [trace] Shader module loaded: sky_background.frag.spv
+[18:49:00.158] [PARALLAX] [info] Sky background pipeline created (fullscreen triangle, UBO)
+[18:49:00.158] [PARALLAX] [info] Sky background renderer initialized
+[18:49:00.161] [PARALLAX] [info] Starfield pipeline created (skychart, additive blend)
+[18:49:00.161] [PARALLAX] [info] Starfield renderer initialized (skychart mode, 300000 max stars)
+[18:49:00.164] [PARALLAX] [info] LineRenderer pipeline created (LINE_LIST, standard alpha blend)
+[18:49:00.166] [PARALLAX] [info] LineRenderer initialized (131072 max vertices)
+[18:49:00.167] [PARALLAX] [info] Star names loaded: 196 entries from data/catalogs/star_names.csv
+[18:49:00.168] [PARALLAX] [info] Star names loaded: 195 entries
+[18:49:00.170] [PARALLAX] [info] Constellation names matched: 88/88
+[18:49:00.171] [PARALLAX] [info] Constellations loaded: 88 constellations, 756 segments
+[18:49:00.172] [PARALLAX] [info] Constellations resolved via Universe: 1511 resolved, 1 missing
+[18:49:00.174] [PARALLAX] [info] LineRenderer pipeline created (LINE_LIST, standard alpha blend)
+[18:49:00.174] [PARALLAX] [info] LineRenderer initialized (131072 max vertices)
+[18:49:00.198] [PARALLAX] [info] Application initialized — shell integration active
+[18:49:00.199] [PARALLAX] [info] Entering main loop...
+[18:49:00.204] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:00.205] [PARALLAX] [info] Procedural provider active — master seed 0xA5735E5D, nside=64 cells
+[18:49:00.352] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:00.493] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:00.632] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:00.774] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:00.920] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:01.069] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:01.216] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:01.356] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:01.497] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:01.637] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:01.775] [PARALLAX] [info] Instrument selected in shell sidebar: glasswing_array
+[18:49:01.776] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:01.915] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:02.054] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:02.199] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:02.342] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:02.480] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:02.619] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:02.761] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:02.899] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:03.040] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:03.182] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:03.333] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:03.474] [PARALLAX] [info] Instrument selected in shell sidebar: glasswing_array
+[18:49:03.474] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:03.610] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:03.754] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:03.899] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:04.045] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:04.191] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:04.336] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:04.481] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:04.620] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:04.758] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:04.897] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:05.038] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:05.177] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:05.315] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:05.457] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:05.599] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:05.745] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:05.892] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:06.038] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:06.184] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:06.326] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:06.463] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:06.601] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:06.741] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2007
+[18:49:06.888] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:07.033] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:07.180] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:07.324] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:07.471] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:07.615] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:07.757] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:07.899] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:08.042] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:08.186] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:08.326] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:08.473] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:08.623] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:08.771] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:08.917] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:09.058] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:09.201] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:09.340] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:09.478] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:09.613] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:09.750] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:09.893] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:10.030] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:10.165] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:10.305] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:10.441] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:10.575] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:10.708] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:10.844] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:10.978] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:11.115] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:11.251] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:11.387] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:11.521] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:11.660] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:11.800] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:11.937] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:12.074] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:12.208] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:12.345] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:12.481] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:12.615] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:12.752] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:12.891] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:13.025] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:13.159] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:13.293] [PARALLAX] [info] Selected star: HIP 55953 mag 6.44
+[18:49:13.293] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:13.429] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:13.566] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:13.700] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:13.835] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:13.971] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:14.104] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:14.239] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:14.373] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:14.508] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:14.641] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:14.776] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:14.911] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:15.044] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:15.180] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:15.312] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:15.448] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:15.581] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:15.718] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:15.852] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:15.988] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:16.124] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:16.262] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:16.394] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:16.527] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:16.665] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:16.803] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:16.943] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:17.080] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:17.217] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:17.356] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:17.497] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:17.636] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:17.773] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:17.915] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:18.057] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:18.195] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:18.331] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:18.468] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:18.606] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2008
+[18:49:18.747] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:18.886] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:19.025] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:19.165] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:19.307] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:19.447] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:19.587] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:19.725] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:19.869] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:20.006] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:20.145] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:20.286] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:20.427] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:20.572] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:20.711] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:20.852] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:20.995] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:21.143] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:21.289] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:21.429] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:21.576] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:21.716] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:21.857] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:22.003] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:22.145] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:22.294] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:22.437] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:22.581] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:22.722] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:22.872] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:23.023] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:23.168] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:23.314] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:23.455] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:23.598] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:23.742] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:23.888] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:24.031] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:24.173] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:24.315] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:24.460] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:24.602] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:24.741] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:24.882] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:25.020] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:25.164] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:25.307] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:25.450] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:25.592] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:25.732] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:25.874] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:26.018] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:26.160] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:26.306] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:26.450] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:26.591] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:26.737] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:26.878] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:27.019] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:27.160] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:27.304] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:27.447] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:27.585] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:27.725] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:27.864] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:28.002] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:28.144] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:28.285] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:28.429] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:28.569] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:28.708] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:28.854] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:29.002] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:29.145] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:29.291] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:29.438] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:29.581] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:29.724] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:29.869] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:30.011] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:30.154] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:30.295] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:30.440] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:30.580] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:30.717] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:30.861] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:30.999] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2009
+[18:49:31.142] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:31.282] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:31.424] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:31.565] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:31.707] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:31.849] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:31.989] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:32.131] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:32.269] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:32.411] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:32.550] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:32.686] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:32.822] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:32.958] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:33.095] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:33.238] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:33.380] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:33.517] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:33.657] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:33.801] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:33.939] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:34.077] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:34.218] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:34.359] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:34.500] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:34.646] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:34.791] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:34.933] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:35.076] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:35.214] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:35.356] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:35.499] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:35.640] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:35.779] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:35.918] [PARALLAX] [info] Instrument selected in shell sidebar: glasswing_array
+[18:49:35.919] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:36.055] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:36.195] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:36.333] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:36.471] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:36.610] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:36.752] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:36.892] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:37.030] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:37.167] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:37.304] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:37.447] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:37.588] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:37.729] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:37.866] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:38.006] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:38.144] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:38.283] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:38.421] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:38.562] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:38.697] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:38.832] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:38.970] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:39.109] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:39.249] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:39.390] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:39.530] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:39.667] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:39.808] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:39.946] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:40.086] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:40.229] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:40.372] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:40.515] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:40.661] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:40.807] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:40.947] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:41.088] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:41.240] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:41.387] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:41.547] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:41.691] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:41.835] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:42.077] [PARALLAX] [trace] Window resized: 1920x1057
+[18:49:42.078] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:42.224] [PARALLAX] [trace] Swapchain destroyed
+[18:49:42.228] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[18:49:42.228] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[18:49:42.233] [PARALLAX] [info] Swapchain created: 1920x1057, 3 images, format 50, MAILBOX (triple buffer)
+[18:49:42.234] [PARALLAX] [info] Render pass created
+[18:49:42.234] [PARALLAX] [trace] Shader module loaded: test_star.vert.spv
+[18:49:42.235] [PARALLAX] [trace] Shader module loaded: test_star.frag.spv
+[18:49:42.236] [PARALLAX] [info] Graphics pipeline created (POINT_LIST, dynamic viewport/scissor)
+[18:49:42.236] [PARALLAX] [info] Framebuffers created: 3 (1920x1057)
+[18:49:42.236] [PARALLAX] [trace] Graphics pipeline destroyed
+[18:49:42.236] [PARALLAX] [trace] Render pass destroyed
+[18:49:42.236] [PARALLAX] [info] Swapchain recreated: 1920x1057
+[18:49:42.237] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:42.377] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:42.513] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:42.650] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:42.788] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:42.926] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:43.064] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:43.201] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2010
+[18:49:43.339] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:43.478] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:43.619] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:43.762] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:43.903] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:44.045] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:44.185] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:44.329] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:44.478] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:44.623] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:44.769] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:44.911] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:45.048] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:45.187] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:45.341] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:45.492] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:45.634] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:45.773] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:45.912] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:46.060] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:46.206] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:46.345] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:46.483] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:46.618] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:46.752] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:46.891] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:47.027] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:47.171] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:47.310] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:47.451] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:47.588] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:47.726] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:47.863] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:48.000] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:48.138] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:48.288] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:48.429] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:48.570] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:48.709] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:48.848] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:48.986] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:49.125] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:49.261] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:49.400] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:49.538] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:49.677] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:49.817] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:49.971] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:50.117] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:50.254] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:50.390] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:50.533] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:50.680] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:50.830] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:50.978] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:51.117] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:51.257] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:51.397] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:51.535] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:51.675] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:51.824] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:51.976] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:52.130] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:52.279] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:52.428] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:52.585] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:52.740] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:52.895] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:53.041] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:53.176] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:53.313] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:53.450] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:53.587] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:53.723] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:53.863] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:54.015] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:54.162] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:54.312] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:54.459] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:54.607] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:54.755] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:54.901] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:55.043] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[18:49:55.229] [PARALLAX] [trace] Window minimized
+[19:04:17.632] [PARALLAX] [trace] Window restored: 1920x1057
+[19:04:17.632] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[19:04:17.784] [PARALLAX] [trace] Swapchain destroyed
+[19:04:17.787] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[19:04:17.788] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[19:04:17.796] [PARALLAX] [info] Swapchain created: 1920x1057, 3 images, format 50, MAILBOX (triple buffer)
+[19:04:17.796] [PARALLAX] [info] Render pass created
+[19:04:17.797] [PARALLAX] [trace] Shader module loaded: test_star.vert.spv
+[19:04:17.798] [PARALLAX] [trace] Shader module loaded: test_star.frag.spv
+[19:04:17.798] [PARALLAX] [info] Graphics pipeline created (POINT_LIST, dynamic viewport/scissor)
+[19:04:17.799] [PARALLAX] [info] Framebuffers created: 3 (1920x1057)
+[19:04:17.799] [PARALLAX] [trace] Graphics pipeline destroyed
+[19:04:17.799] [PARALLAX] [trace] Render pass destroyed
+[19:04:17.799] [PARALLAX] [info] Swapchain recreated: 1920x1057
+[19:04:17.801] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[19:04:17.941] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2011
+[19:04:18.086] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2012
+[19:04:18.232] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2012
+[19:04:18.371] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2012
+[19:04:18.513] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2012
+[19:04:18.649] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2012
+[19:04:18.788] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2012
+[19:04:18.926] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2012
+[19:04:19.064] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2012
+[19:04:19.200] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2012
+[19:04:19.339] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2012
+[19:04:19.479] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2012
+[19:04:19.617] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2012
+[19:04:19.760] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2012
+[19:04:19.903] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2012
+[19:04:20.045] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2012
+[19:04:20.191] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2012
+[19:04:20.423] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461235.2012
+[19:04:20.562] [PARALLAX] [info] Main loop exited
+[19:04:22.784] [PARALLAX] [trace] LineRenderer destroyed
+[19:04:22.785] [PARALLAX] [trace] LineRenderer destroyed
+[19:04:22.785] [PARALLAX] [trace] Starfield renderer destroyed
+[19:04:22.786] [PARALLAX] [trace] Sky background renderer destroyed
+[19:04:22.840] [PARALLAX] [trace] PanelSystem destroyed
+[19:04:22.841] [PARALLAX] [trace] BitmapFont destroyed
+[19:04:22.842] [PARALLAX] [trace] LineRenderer destroyed
+[19:04:22.842] [PARALLAX] [trace] Graphics pipeline destroyed
+[19:04:22.843] [PARALLAX] [trace] Render pass destroyed
+[19:04:22.845] [PARALLAX] [trace] Swapchain destroyed
+[19:04:22.869] [PARALLAX] [trace] Vulkan logical device destroyed
+[19:04:22.869] [PARALLAX] [trace] Vulkan debug messenger destroyed
+[19:04:22.870] [PARALLAX] [trace] Vulkan surface destroyed
+[19:04:22.870] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\nvoglv64.dll
+[19:04:22.871] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\nvoglv64.dll
+[19:04:22.871] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\ProgramData\obs-studio-hook\graphics-hook64.dll
+[19:04:22.873] [PARALLAX] [trace] [Vulkan] Unloading layer library C:\VulkanSDK\1.4.341.1\Bin\VkLayer_khronos_validation.dll
+[19:04:22.873] [PARALLAX] [trace] Vulkan instance destroyed
+[19:04:22.883] [PARALLAX] [info] Window destroyed
+[19:04:22.907] [PARALLAX] [info] Parallax shutdown complete.
+[20:01:35.686] [PARALLAX] [info] Parallax v0.1.0 starting...
+[20:01:35.902] [PARALLAX] [info] Window created: "Parallax" (1280x720) [Vulkan | resizable]
+[20:01:35.902] [PARALLAX] [trace] SDL2 requires 2 Vulkan instance extension(s):
+[20:01:35.902] [PARALLAX] [trace]   - VK_KHR_surface
+[20:01:35.903] [PARALLAX] [trace]   - VK_KHR_win32_surface
+[20:01:35.913] [PARALLAX] [info] Requesting 3 instance extension(s):
+[20:01:35.939] [PARALLAX] [info]   - VK_KHR_surface
+[20:01:35.939] [PARALLAX] [info]   - VK_KHR_win32_surface
+[20:01:35.939] [PARALLAX] [info]   - VK_EXT_debug_utils
+[20:01:35.940] [PARALLAX] [info] Validation layers enabled: VK_LAYER_KHRONOS_validation
+[20:01:35.941] [PARALLAX] [trace] [Vulkan] windows_get_device_registry_files: GUID for 3 is not SoftwareComponent skipping
+[20:01:35.945] [PARALLAX] [trace] [Vulkan] Searching for ICD drivers named .\nvoglv64.dll
+[20:01:36.038] [PARALLAX] [trace] [Vulkan] Loading layer library C:\VulkanSDK\1.4.341.1\Bin\.\VkLayer_khronos_validation.dll
+[20:01:36.048] [PARALLAX] [trace] [Vulkan] Loading layer library C:\ProgramData\obs-studio-hook\.\graphics-hook64.dll
+[20:01:36.049] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[20:01:36.049] [PARALLAX] [trace] [Vulkan] Loading layer library C:\Windows\System32\DriverStore\FileRepository\nv_dispi.inf_amd64_adc55ecfca814224\.\nvoglv64.dll
+[20:01:36.172] [PARALLAX] [info] Vulkan instance created (API 1.3)
+[20:01:36.173] [PARALLAX] [info] Vulkan debug messenger created
+[20:01:36.173] [PARALLAX] [info] Vulkan surface created
+[20:01:36.175] [PARALLAX] [info] Found 1 Vulkan-capable GPU(s):
+[20:01:36.175] [PARALLAX] [info]   - NVIDIA GeForce GTX 1660 (type: discrete)
+[20:01:36.256] [PARALLAX] [info] Selected GPU: NVIDIA GeForce GTX 1660
+[20:01:36.257] [PARALLAX] [info]   Driver version: 79.344.0
+[20:01:36.257] [PARALLAX] [info]   Vulkan API: 1.4.325
+[20:01:36.257] [PARALLAX] [info]   VRAM: 6180 MB
+[20:01:36.257] [PARALLAX] [info]   Graphics queue family: 0
+[20:01:36.258] [PARALLAX] [info]   Present queue family: 0
+[20:01:36.313] [PARALLAX] [info] Vulkan logical device created
+[20:01:36.316] [PARALLAX] [trace] Surface format: B8G8R8A8_SRGB + SRGB_NONLINEAR (preferred)
+[20:01:36.316] [PARALLAX] [trace] Present mode: MAILBOX (triple buffering)
+[20:01:36.333] [PARALLAX] [info] Swapchain created: 1280x720, 3 images, format 50, MAILBOX (triple buffer)
+[20:01:36.333] [PARALLAX] [info] Shader directory: C:/Parallax-dev/Parallax/build/shaders
+[20:01:36.334] [PARALLAX] [info] Render pass created
+[20:01:36.334] [PARALLAX] [trace] Shader module loaded: test_star.vert.spv
+[20:01:36.335] [PARALLAX] [trace] Shader module loaded: test_star.frag.spv
+[20:01:36.336] [PARALLAX] [info] Graphics pipeline created (POINT_LIST, dynamic viewport/scissor)
+[20:01:36.337] [PARALLAX] [info] Framebuffers created: 3 (1280x720)
+[20:01:36.339] [PARALLAX] [info] LineRenderer pipeline created (LINE_LIST, standard alpha blend)
+[20:01:36.339] [PARALLAX] [info] LineRenderer initialized (131072 max vertices)
+[20:01:36.341] [PARALLAX] [trace] Font atlas created: 128x96 R8_UNORM, 95 glyphs
+[20:01:36.343] [PARALLAX] [trace] Shader module loaded: text.vert.spv
+[20:01:36.343] [PARALLAX] [trace] Shader module loaded: text.frag.spv
+[20:01:36.345] [PARALLAX] [info] Text pipeline created (alpha blend, vertex-colored)
+[20:01:36.345] [PARALLAX] [info] BitmapFont initialized (128x96 atlas, 4096 max chars/frame)
+[20:01:36.347] [PARALLAX] [info] PanelSystem pipeline created (triangle list, alpha blend)
+[20:01:36.349] [PARALLAX] [info] PanelSystem initialized (8192 max vertices)
+[20:01:36.350] [PARALLAX] [error] CatalogLoader: No valid stars found in Tycho-2: data/catalogs\tycho2.csv
+[20:01:36.375] [PARALLAX] [warning] StarCatalogProvider: Tycho-2 not found at 'data/catalogs\tycho2.csv'
+[20:01:36.600] [PARALLAX] [info] CatalogLoader: Loaded 116812 stars from data/catalogs\hipparcos.csv
+[20:01:36.602] [PARALLAX] [info] StarCatalogProvider: Hipparcos loaded as primary (116812 stars)
+[20:01:36.622] [PARALLAX] [info] StarCatalogProvider: building spatial index for 116812 stars...
+[20:01:36.627] [PARALLAX] [info] SpatialIndex built: 116812 stars, 180 bands (0 empty), band size 8-969
+[20:01:36.628] [PARALLAX] [info] StarCatalogProvider: HIP map built from primary Hipparcos catalog (116812 stars)
+[20:01:36.648] [PARALLAX] [info] DSO catalog loaded: 110 objects (0 skipped) from messier.csv
+[20:01:36.651] [PARALLAX] [info] DsoCatalogProvider: 110 objects loaded (110 indexed by Messier number)
+[20:01:36.652] [PARALLAX] [info] Universe: star name database loaded (196 entries from 'star_names.csv')
+[20:01:36.653] [PARALLAX] [info] Universe: catalogs loaded — 116812 stars, 110 DSOs
+[20:01:36.670] [PARALLAX] [info] ProceduralProvider: master seed set to 0x00000000a5735e5d
+[20:01:36.691] [PARALLAX] [info] Universe: procedural generator initialised (seed=2775801437)
+[20:01:36.692] [PARALLAX] [info] Universe initialized: 116931 real objects
+[20:01:42.318] [PARALLAX] [info] Loaded knowledge save: C:\Users\sputn\AppData\Roaming\Parallax\save\knowledge.json
+[20:01:42.351] [PARALLAX] [info] Loaded data archive save: C:\Users\sputn\AppData\Roaming\Parallax\save\archive.json
+[20:01:42.409] [PARALLAX] [info] Simulation start: JD 2461240.251185 (2026-07-18 18:01:42.4 UTC)
+[20:01:42.409] [PARALLAX] [info] Observer: Tycho Crater Base (-43.31, -11.36)
+[20:01:42.411] [PARALLAX] [trace] Sky background UBO created: 48 bytes
+[20:01:42.454] [PARALLAX] [trace] Shader module loaded: sky_background.vert.spv
+[20:01:42.467] [PARALLAX] [trace] Shader module loaded: sky_background.frag.spv
+[20:01:42.511] [PARALLAX] [info] Sky background pipeline created (fullscreen triangle, UBO)
+[20:01:42.512] [PARALLAX] [info] Sky background renderer initialized
+[20:01:42.565] [PARALLAX] [info] Starfield pipeline created (skychart, additive blend)
+[20:01:42.566] [PARALLAX] [info] Starfield renderer initialized (skychart mode, 300000 max stars)
+[20:01:42.583] [PARALLAX] [info] LineRenderer pipeline created (LINE_LIST, standard alpha blend)
+[20:01:42.583] [PARALLAX] [info] LineRenderer initialized (131072 max vertices)
+[20:01:42.603] [PARALLAX] [info] Star names loaded: 196 entries from data/catalogs/star_names.csv
+[20:01:42.604] [PARALLAX] [info] Star names loaded: 195 entries
+[20:01:42.632] [PARALLAX] [info] Constellation names matched: 88/88
+[20:01:42.633] [PARALLAX] [info] Constellations loaded: 88 constellations, 756 segments
+[20:01:42.634] [PARALLAX] [info] Constellations resolved via Universe: 1511 resolved, 1 missing
+[20:01:42.635] [PARALLAX] [info] LineRenderer pipeline created (LINE_LIST, standard alpha blend)
+[20:01:42.636] [PARALLAX] [info] LineRenderer initialized (131072 max vertices)
+[20:01:42.691] [PARALLAX] [info] Application initialized — shell integration active
+[20:01:42.691] [PARALLAX] [info] Entering main loop...
+[20:01:42.796] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:42.797] [PARALLAX] [info] Procedural provider active — master seed 0xA5735E5D, nside=64 cells
+[20:01:43.320] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:43.471] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:43.613] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:43.751] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:43.889] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:44.032] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:44.177] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:44.318] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:44.464] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:44.605] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:44.749] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:44.889] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:45.026] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:45.167] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:45.308] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:45.448] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:45.594] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:45.728] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:45.864] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:46.013] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:46.154] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:46.294] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:46.435] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:46.575] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:46.717] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:46.854] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:47.000] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:47.133] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:47.275] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:47.417] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:47.562] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:47.700] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:47.838] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:47.987] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:48.139] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:48.292] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:48.433] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:48.576] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:48.714] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:48.856] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:01:48.994] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:02:05.205] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:02:05.349] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:02:05.488] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512
+[20:02:05.624] [PARALLAX] [trace] SolarSystemProvider: updated ephemeris for JD 2461240.2512

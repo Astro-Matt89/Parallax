@@ -414,3 +414,22 @@ target_link_libraries(test_image_analyzer PRIVATE
 )
 
 add_test(NAME ImageAnalyzer COMMAND test_image_analyzer)
+
+# -----------------------------------------------------------------
+# Test: Ephemeris                                <- SPRINT 10b Task 10b.1
+# -----------------------------------------------------------------
+add_executable(test_ephemeris
+    test_ephemeris.cpp
+    "${CMAKE_SOURCE_DIR}/src/interferometry/ephemeris.cpp"
+)
+
+target_include_directories(test_ephemeris PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_ephemeris PRIVATE
+    doctest::doctest
+    glm::glm
+)
+
+add_test(NAME Ephemeris COMMAND test_ephemeris)

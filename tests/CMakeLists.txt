@@ -433,3 +433,24 @@ target_link_libraries(test_ephemeris PRIVATE
 )
 
 add_test(NAME Ephemeris COMMAND test_ephemeris)
+
+# -----------------------------------------------------------------
+# Test: ArrayConfig                              <- SPRINT 10b Task 10b.2
+# -----------------------------------------------------------------
+add_executable(test_array_config
+    test_array_config.cpp
+    "${CMAKE_SOURCE_DIR}/src/interferometry/array_config.cpp"
+)
+
+target_include_directories(test_array_config PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_array_config PRIVATE
+    doctest::doctest
+    glm::glm
+    nlohmann_json::nlohmann_json
+    spdlog::spdlog
+)
+
+add_test(NAME ArrayConfig COMMAND test_array_config)

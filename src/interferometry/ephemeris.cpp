@@ -1,33 +1,11 @@
 #include "interferometry/ephemeris.hpp"
 
-#include "core/types.hpp"
-
 #include <cmath>
 
 namespace parallax::interferometry
 {
     namespace
     {
-        using astro_constants::kDegToRad;
-        using astro_constants::kPi;
-
-        // Normative Sprint 10b constants (ported from glasswing-sandbox-v1_7).
-        constexpr double kOmegaE = 15.0 * kPi / 180.0;
-        constexpr double kOmegaM = (360.0 / (27.321661 * 24.0)) * kPi / 180.0;
-
-        constexpr double kDMoon = 384400e3;
-        constexpr double kRMoon = 1737.4e3;
-        constexpr double kREarth = 6371e3;
-        constexpr double kIncMoon = 20.0 * kDegToRad;
-
-        // NOTE: Sprint 10b ephemeris fixtures use the sandbox oracle values
-        // TYCHO = { lat: -43.3 deg, lon: -11.2 deg } (not the base-site values).
-        [[maybe_unused]] constexpr double kTychoLat = -43.3 * kDegToRad;
-        [[maybe_unused]] constexpr double kTychoLon = -11.2 * kDegToRad;
-
-        constexpr double kMoonPhase0 = 70.0 * kDegToRad;
-        constexpr double kElMin = 10.0 * kDegToRad;
-
         [[nodiscard]] Vec3d moon_orbit_normal()
         {
             return Vec3d {

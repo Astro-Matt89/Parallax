@@ -6,6 +6,20 @@
 
 namespace parallax::interferometry
 {
+    inline constexpr double kOmegaE = 15.0 * astro_constants::kPi / 180.0;
+    inline constexpr double kOmegaM = (360.0 / (27.321661 * 24.0)) * astro_constants::kPi / 180.0;
+
+    inline constexpr double kDMoon = 384400e3;
+    inline constexpr double kRMoon = 1737.4e3;
+    inline constexpr double kREarth = 6371e3;
+    inline constexpr double kIncMoon = 20.0 * astro_constants::kDegToRad;
+
+    inline constexpr double kTychoLat = -43.3 * astro_constants::kDegToRad;
+    inline constexpr double kTychoLon = -11.2 * astro_constants::kDegToRad;
+
+    inline constexpr double kMoonPhase0 = 70.0 * astro_constants::kDegToRad;
+    inline constexpr double kElMin = 10.0 * astro_constants::kDegToRad;
+
     enum class Body
     {
         Earth,

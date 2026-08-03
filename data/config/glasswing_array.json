@@ -1,0 +1,21 @@
+{
+    "schema": "parallax.interferometry.array_config",
+    "version": 1,
+    "geometry": "Y",
+    "antennas_per_arm": 4,
+    "site_extent_m": 10000.0,
+    "station_aperture_m": 12.0,
+    "available_bands": [
+        "Visible",
+        "IR",
+        "MidIR",
+        "RadioK",
+        "Submm"
+    ],
+    "site": {
+        "body": "Moon",
+        "lat_deg": -43.3,
+        "lon_deg": -11.2
+    },
+    "custom_stations": []
+}

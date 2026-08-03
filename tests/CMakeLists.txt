@@ -454,3 +454,45 @@ target_link_libraries(test_array_config PRIVATE
 )
 
 add_test(NAME ArrayConfig COMMAND test_array_config)
+
+# -----------------------------------------------------------------
+# Test: Mulberry32                               <- SPRINT 10b Task 10b.2
+# -----------------------------------------------------------------
+add_executable(test_mulberry32
+    test_mulberry32.cpp
+)
+
+target_include_directories(test_mulberry32 PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_mulberry32 PRIVATE
+    doctest::doctest
+    glm::glm
+)
+
+add_test(NAME Mulberry32 COMMAND test_mulberry32)
+
+# -----------------------------------------------------------------
+# Test: UvSampling                               <- SPRINT 10b Task 10b.2
+# -----------------------------------------------------------------
+add_executable(test_uv_sampling
+    test_uv_sampling.cpp
+    "${CMAKE_SOURCE_DIR}/src/interferometry/ephemeris.cpp"
+    "${CMAKE_SOURCE_DIR}/src/interferometry/array_config.cpp"
+    "${CMAKE_SOURCE_DIR}/src/interferometry/kolmogorov.cpp"
+    "${CMAKE_SOURCE_DIR}/src/interferometry/uv_sampling.cpp"
+)
+
+target_include_directories(test_uv_sampling PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_uv_sampling PRIVATE
+    doctest::doctest
+    glm::glm
+    nlohmann_json::nlohmann_json
+    spdlog::spdlog
+)
+
+add_test(NAME UvSampling COMMAND test_uv_sampling)

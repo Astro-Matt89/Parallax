@@ -52,6 +52,15 @@ namespace
         return parallax::interferometry::generate_stations(config);
     }
 
+    /// Return the three fixed Earth stations (La Palma, Mauna Kea, Paranal).
+    /// These are suitable for tests that require non-empty visibility results.
+    [[nodiscard]] std::vector<Station> make_earth_stations()
+    {
+        std::vector<Station> stations;
+        parallax::interferometry::append_earth_stations(stations);
+        return stations;
+    }
+
     /// Build a simple point-source TargetFT: constant amplitude across the whole grid.
     /// The real part of the FT is 1.0 everywhere, imaginary 0 everywhere.
     [[nodiscard]] TargetFT make_point_source_ft(std::uint32_t N, double amplitude = 1.0)
@@ -292,19 +301,22 @@ TEST_CASE("Hs time offsets are symmetric around zero for K=48")
 
 TEST_CASE("zero errors: measured visibility equals true visibility")
 {
-    const std::vector<Station> stations = make_moon_stations(4);
-    // Use large FoV so most baselines fall inside the grid.
-    const TargetFT ft = make_point_source_ft(64u, 2.5);
+    // Earth stations (3 stations, 3 pairs) with radio wavelength so baselines
+    // land inside the FT grid.  At epoch_days=0.25 (t=6 h) all three stations
+    // are visible for dec=20°.  lambda=0.1 m, theta_fov=5e-7 rad, N=128
+    // → GX ∈ [10, 101], GY ∈ [30, 58], all inside [1, 126].
+    const std::vector<Station> stations = make_earth_stations();
+    const TargetFT ft = make_point_source_ft(128u, 2.5);
 
     ObservationConfig cfg {};
     cfg.dec_rad = 20.0 * kDegToRad;
-    cfg.lambda_m = 1.0e-6;
+    cfg.lambda_m = 0.1;
     cfg.duration_hours = 4.0;
     cfg.rotation = false;
     cfg.mode = InstrumentMode::Radio;
-    cfg.theta_fov_rad = 1.0e-5;
+    cfg.theta_fov_rad = 5.0e-7;
     cfg.flux_total = 1.0;
-    cfg.epoch_days = 0.0;
+    cfg.epoch_days = 0.25; // 6 h offset so all Earth stations face the source
 
     StationErrors err {};
     err.turbulence_rms_rad = 0.0;
@@ -325,18 +337,19 @@ TEST_CASE("zero errors: measured visibility equals true visibility")
 
 TEST_CASE("HBT mode: tVi == 0 and tVr == |V| for all samples")
 {
-    const std::vector<Station> stations = make_moon_stations(4);
-    const TargetFT ft = make_point_source_ft(64u, 3.0);
+    // Earth stations + radio parameters so baselines fall inside the FT grid.
+    const std::vector<Station> stations = make_earth_stations();
+    const TargetFT ft = make_point_source_ft(128u, 3.0);
 
     ObservationConfig cfg {};
     cfg.dec_rad = 10.0 * kDegToRad;
-    cfg.lambda_m = 1.0e-6;
+    cfg.lambda_m = 0.1;
     cfg.duration_hours = 4.0;
     cfg.rotation = false;
     cfg.mode = InstrumentMode::Hbt;
-    cfg.theta_fov_rad = 1.0e-5;
+    cfg.theta_fov_rad = 5.0e-7;
     cfg.flux_total = 1.0;
-    cfg.epoch_days = 0.0;
+    cfg.epoch_days = 0.25;
 
     StationErrors err {};
     err.turbulence_rms_rad = 0.0;
@@ -356,18 +369,19 @@ TEST_CASE("HBT mode: tVi == 0 and tVr == |V| for all samples")
 
 TEST_CASE("HBT mode: results are unchanged when turbulence RMS is raised (phase immunity)")
 {
-    const std::vector<Station> stations = make_moon_stations(4);
-    const TargetFT ft = make_point_source_ft(64u, 1.0);
+    // Earth stations + radio parameters guarantee non-empty results.
+    const std::vector<Station> stations = make_earth_stations();
+    const TargetFT ft = make_point_source_ft(128u, 1.0);
 
     ObservationConfig cfg {};
     cfg.dec_rad = 15.0 * kDegToRad;
-    cfg.lambda_m = 1.0e-6;
+    cfg.lambda_m = 0.1;
     cfg.duration_hours = 4.0;
     cfg.rotation = false;
     cfg.mode = InstrumentMode::Hbt;
-    cfg.theta_fov_rad = 1.0e-5;
+    cfg.theta_fov_rad = 5.0e-7;
     cfg.flux_total = 1.0;
-    cfg.epoch_days = 0.0;
+    cfg.epoch_days = 0.25;
 
     StationErrors err_zero {};
     err_zero.atm_seed = 111u;
@@ -385,6 +399,7 @@ TEST_CASE("HBT mode: results are unchanged when turbulence RMS is raised (phase 
     const std::vector<Visibility> vis1 = sample_uv(stations, cfg, ft, err_atm);
 
     // HBT mode is phase-immune: both runs must produce the same tVr and tVi.
+    REQUIRE(!vis0.empty());
     REQUIRE(vis0.size() == vis1.size());
     for (std::size_t idx = 0; idx < vis0.size(); ++idx)
     {
@@ -434,19 +449,20 @@ TEST_CASE("Point-source FT with zero errors gives constant tVr and tVi == 0")
 {
     // A target whose FT is constant (Fre=C, Fim=0) should give the same tVr
     // for every baseline (since all bilinear samples return C).
-    const std::vector<Station> stations = make_moon_stations(4);
+    // Earth stations + radio wavelength so baselines land inside the FT grid.
+    const std::vector<Station> stations = make_earth_stations();
     constexpr double kAmplitude = 3.7;
-    const TargetFT ft = make_point_source_ft(64u, kAmplitude);
+    const TargetFT ft = make_point_source_ft(128u, kAmplitude);
 
     ObservationConfig cfg {};
     cfg.dec_rad = 20.0 * kDegToRad;
-    cfg.lambda_m = 1.0e-6;
+    cfg.lambda_m = 0.1;
     cfg.duration_hours = 4.0;
     cfg.rotation = false;
     cfg.mode = InstrumentMode::Radio;
-    cfg.theta_fov_rad = 1.0e-5;
+    cfg.theta_fov_rad = 5.0e-7;
     cfg.flux_total = 1.0;
-    cfg.epoch_days = 0.0;
+    cfg.epoch_days = 0.25;
 
     StationErrors err {};
     err.turbulence_rms_rad = 0.0;
@@ -531,18 +547,19 @@ TEST_CASE("station_i < station_j for all returned visibilities")
 
 TEST_CASE("Thermal noise changes Vr/Vi but leaves tVr/tVi unchanged")
 {
-    const std::vector<Station> stations = make_moon_stations(4);
-    const TargetFT ft = make_point_source_ft(64u, 1.0);
+    // Earth stations + radio wavelength so baselines land inside the FT grid.
+    const std::vector<Station> stations = make_earth_stations();
+    const TargetFT ft = make_point_source_ft(128u, 1.0);
 
     ObservationConfig cfg {};
     cfg.dec_rad = 20.0 * kDegToRad;
-    cfg.lambda_m = 1.0e-6;
+    cfg.lambda_m = 0.1;
     cfg.duration_hours = 4.0;
     cfg.rotation = false;
     cfg.mode = InstrumentMode::Radio;
-    cfg.theta_fov_rad = 1.0e-5;
+    cfg.theta_fov_rad = 5.0e-7;
     cfg.flux_total = 10.0;
-    cfg.epoch_days = 0.0;
+    cfg.epoch_days = 0.25;
 
     StationErrors err_clean {};
     err_clean.turbulence_rms_rad = 0.0;
@@ -558,6 +575,7 @@ TEST_CASE("Thermal noise changes Vr/Vi but leaves tVr/tVi unchanged")
     const std::vector<Visibility> vis_clean = sample_uv(stations, cfg, ft, err_clean);
     const std::vector<Visibility> vis_noisy = sample_uv(stations, cfg, ft, err_noisy);
 
+    REQUIRE(!vis_clean.empty());
     REQUIRE(vis_clean.size() == vis_noisy.size());
     bool any_Vr_changed = false;
     for (std::size_t idx = 0; idx < vis_clean.size(); ++idx)
@@ -570,8 +588,5 @@ TEST_CASE("Thermal noise changes Vr/Vi but leaves tVr/tVi unchanged")
             any_Vr_changed = true;
         }
     }
-    if (!vis_clean.empty())
-    {
-        CHECK(any_Vr_changed); // noise must have changed something
-    }
+    CHECK(any_Vr_changed); // noise must have changed something
 }

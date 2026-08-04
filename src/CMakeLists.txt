@@ -44,6 +44,8 @@ add_executable(parallax
     core/user_data_path.hpp
     core/user_data_path.cpp
     core/input.cpp
+    core/fft.hpp
+    core/fft.cpp
     vulkan/context.cpp
     vulkan/swapchain.cpp
     vulkan/pipeline.cpp

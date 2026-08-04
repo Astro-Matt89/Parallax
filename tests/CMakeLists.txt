@@ -496,3 +496,48 @@ target_link_libraries(test_uv_sampling PRIVATE
 )
 
 add_test(NAME UvSampling COMMAND test_uv_sampling)
+
+# -----------------------------------------------------------------
+# Test: Fft                                      <- SPRINT 10b Task 10b.3
+# -----------------------------------------------------------------
+add_executable(test_fft
+    test_fft.cpp
+    "${CMAKE_SOURCE_DIR}/src/core/fft.cpp"
+)
+
+target_include_directories(test_fft PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_fft PRIVATE
+    doctest::doctest
+)
+
+add_test(NAME Fft COMMAND test_fft)
+
+# -----------------------------------------------------------------
+# Test: Clean (Högbom CLEAN)                     <- SPRINT 10b Task 10b.4
+# -----------------------------------------------------------------
+add_executable(test_clean
+    test_clean.cpp
+    "${CMAKE_SOURCE_DIR}/src/core/fft.cpp"
+    "${CMAKE_SOURCE_DIR}/src/interferometry/ephemeris.cpp"
+    "${CMAKE_SOURCE_DIR}/src/interferometry/array_config.cpp"
+    "${CMAKE_SOURCE_DIR}/src/interferometry/kolmogorov.cpp"
+    "${CMAKE_SOURCE_DIR}/src/interferometry/uv_sampling.cpp"
+    "${CMAKE_SOURCE_DIR}/src/interferometry/imaging.cpp"
+    "${CMAKE_SOURCE_DIR}/src/interferometry/clean.cpp"
+)
+
+target_include_directories(test_clean PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_clean PRIVATE
+    doctest::doctest
+    glm::glm
+    nlohmann_json::nlohmann_json
+    spdlog::spdlog
+)
+
+add_test(NAME Clean COMMAND test_clean)

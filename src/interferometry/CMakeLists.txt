@@ -12,4 +12,8 @@ target_sources(parallax PRIVATE
     kolmogorov.cpp
     uv_sampling.hpp
     uv_sampling.cpp
+    imaging.hpp
+    imaging.cpp
+    clean.hpp
+    clean.cpp
 )

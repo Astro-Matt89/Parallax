@@ -541,3 +541,28 @@ target_link_libraries(test_clean PRIVATE
 )
 
 add_test(NAME Clean COMMAND test_clean)
+
+# -----------------------------------------------------------------
+# Test: ClosurePhases                            <- SPRINT 10b Task 10b.5
+# -----------------------------------------------------------------
+add_executable(test_closure
+    test_closure.cpp
+    "${CMAKE_SOURCE_DIR}/src/interferometry/ephemeris.cpp"
+    "${CMAKE_SOURCE_DIR}/src/interferometry/array_config.cpp"
+    "${CMAKE_SOURCE_DIR}/src/interferometry/kolmogorov.cpp"
+    "${CMAKE_SOURCE_DIR}/src/interferometry/uv_sampling.cpp"
+    "${CMAKE_SOURCE_DIR}/src/interferometry/closure.cpp"
+)
+
+target_include_directories(test_closure PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_closure PRIVATE
+    doctest::doctest
+    glm::glm
+    nlohmann_json::nlohmann_json
+    spdlog::spdlog
+)
+
+add_test(NAME ClosurePhases COMMAND test_closure)

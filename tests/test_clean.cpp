@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <numbers>
 #include <numeric>
 #include <vector>
 
@@ -329,14 +330,14 @@ TEST_CASE("CLEAN: two separated point sources both recovered within 1 px and 15%
     CHECK(ampB > 0.0);
 
     // Position of each local max must be within 1 px of the true source.
-    auto near = [](std::uint32_t px, std::uint32_t py,
+    auto is_near = [](std::uint32_t px, std::uint32_t py,
                    std::uint32_t spx, std::uint32_t spy) -> bool
     {
         return std::abs(static_cast<std::int32_t>(px) - static_cast<std::int32_t>(spx)) <= 1 &&
                std::abs(static_cast<std::int32_t>(py) - static_cast<std::int32_t>(spy)) <= 1;
     };
-    CHECK(near(posA.first, posA.second, kPxA, kPyA));
-    CHECK(near(posB.first, posB.second, kPxB, kPyB));
+    CHECK(is_near(posA.first, posA.second, kPxA, kPyA));
+    CHECK(is_near(posB.first, posB.second, kPxB, kPyB));
 
     // Amplitude ratio of the two local peaks must be within 15% of 1.0/0.6 ≈ 1.667.
     const double amp_ratio = ampA / ampB;
@@ -489,7 +490,7 @@ TEST_CASE("CLEAN: end-to-end smoke — sample_uv → make_images → hogbom succ
     // For stronger uv coverage use Earth stations (baselines ~8000 km):
     //   u ~ 8e7 wl → GX = 64 + 8e7 * 5e-7 = 64 + 40 = 104  ✓ in [1,126]
     ObservationConfig obs{};
-    obs.dec_rad        = 20.0 * (M_PI / 180.0); // 20° declination
+    obs.dec_rad        = 20.0 * (std::numbers::pi / 180.0); // 20° declination
     obs.lambda_m       = 0.1;    // 10 cm radio
     obs.duration_hours = 4.0;
     obs.rotation       = true;

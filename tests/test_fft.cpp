@@ -15,6 +15,7 @@
 
 #include <cmath>
 #include <complex>
+#include <numbers>
 #include <vector>
 
 namespace
@@ -59,8 +60,8 @@ TEST_CASE("fft1d: inverse(forward(x)) == x within tolerance")
     // Build a non-trivial input.
     std::vector<std::complex<double>> original(N);
     for (std::uint32_t i = 0u; i < N; ++i)
-        original[i] = {std::sin(2.0 * M_PI * 3.0 * i / N),
-                        std::cos(2.0 * M_PI * 5.0 * i / N)};
+        original[i] = {std::sin(2.0 * std::numbers::pi * 3.0 * i / N),
+                        std::cos(2.0 * std::numbers::pi * 5.0 * i / N)};
 
     auto data = original;
     parallax::core::fft1d(data, false);  // forward
@@ -98,7 +99,7 @@ TEST_CASE("fft2/ifft2: inverse(forward(x)) == x within tolerance")
 
     std::vector<double> re(sz), im(sz, 0.0);
     for (std::size_t i = 0u; i < sz; ++i)
-        re[i] = std::sin(2.0 * M_PI * static_cast<double>(i) / 100.0);
+        re[i] = std::sin(2.0 * std::numbers::pi * static_cast<double>(i) / 100.0);
 
     const auto orig_re = re;
     const auto orig_im = im;

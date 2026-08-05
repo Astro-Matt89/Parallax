@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <numbers>
 #include <stdexcept>
 
 namespace parallax::core
@@ -28,7 +29,7 @@ void fft1d(std::vector<std::complex<double>>& data, bool inverse)
     // Cooley-Tukey butterfly stages
     for (std::uint32_t len = 2u; len <= n; len <<= 1u)
     {
-        const double theta = (inverse ? 1.0 : -1.0) * 2.0 * M_PI / static_cast<double>(len);
+        const double theta = (inverse ? 1.0 : -1.0) * 2.0 * std::numbers::pi / static_cast<double>(len);
         const std::complex<double> wlen(std::cos(theta), std::sin(theta));
 
         for (std::uint32_t i = 0u; i < n; i += len)

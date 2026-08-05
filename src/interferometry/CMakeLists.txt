@@ -16,4 +16,6 @@ target_sources(parallax PRIVATE
     imaging.cpp
     clean.hpp
     clean.cpp
+    closure.hpp
+    closure.cpp
 )

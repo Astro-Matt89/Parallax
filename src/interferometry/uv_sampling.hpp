@@ -24,6 +24,7 @@ namespace parallax::interferometry
         std::vector<double> Fre; ///< Real part of the 2-D FFT.
         std::vector<double> Fim; ///< Imaginary part of the 2-D FFT.
         std::uint32_t N;         ///< Grid side length (pixels).
+        double flux_total = 0.0; ///< Total source flux (sum of sky image; used for noise scaling).
     };
 
     // ── Observation configuration ─────────────────────────────────────────────────

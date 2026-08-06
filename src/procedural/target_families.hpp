@@ -442,4 +442,10 @@ constexpr double kDefaultRenderNu = 230e9;
 /// @brief Designation formatter: "GW Jhhmm[±]ddmm".
 [[nodiscard]] std::string generate_designation(std::uint32_t seed);
 
+/// @brief Italian family label (verbatim from sandbox FAMILY_LABEL).
+[[nodiscard]] std::string family_label(Family f);
+
+/// @brief Italian subtype label (verbatim from sandbox SUBTYPE_LABEL).
+[[nodiscard]] std::string subtype_label(const std::string& subtype);
+
 } // namespace parallax::procedural

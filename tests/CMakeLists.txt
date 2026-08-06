@@ -566,3 +566,30 @@ target_link_libraries(test_closure PRIVATE
 )
 
 add_test(NAME ClosurePhases COMMAND test_closure)
+
+# -----------------------------------------------------------------
+# Test: TargetFamilies                           <- SPRINT 10b Task 10b.6
+# -----------------------------------------------------------------
+add_executable(test_target_families
+    test_target_families.cpp
+    "${CMAKE_SOURCE_DIR}/src/procedural/target_families.cpp"
+    "${CMAKE_SOURCE_DIR}/src/procedural/target_primitives.cpp"
+    "${CMAKE_SOURCE_DIR}/src/procedural/target_recipes.cpp"
+    "${CMAKE_SOURCE_DIR}/src/core/fft.cpp"
+    "${CMAKE_SOURCE_DIR}/src/interferometry/ephemeris.cpp"
+    "${CMAKE_SOURCE_DIR}/src/interferometry/kolmogorov.cpp"
+    "${CMAKE_SOURCE_DIR}/src/interferometry/uv_sampling.cpp"
+)
+
+target_include_directories(test_target_families PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_link_libraries(test_target_families PRIVATE
+    doctest::doctest
+    glm::glm
+    nlohmann_json::nlohmann_json
+    spdlog::spdlog
+)
+
+add_test(NAME TargetFamilies COMMAND test_target_families)

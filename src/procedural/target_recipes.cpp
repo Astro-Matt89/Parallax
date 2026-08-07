@@ -1536,7 +1536,11 @@ void apply_compatible_modifiers(TargetModel& m, Rng& rng,
     }
     else
     {
-        rng.next();                          // draw: consumed but discarded
+        // The draw is consumed but unused for non-COMMON rarity. It is LOAD-BEARING:
+        // the oracle always consumes one draw here, so removing this call would
+        // desynchronise the RNG stream and change every target
+        // (SPECIFICA_10b §2 — RNG draw order is a binding contract). Do not delete.
+        static_cast<void>(rng.next());
         switch (rarity)
         {
         case Rarity::Uncommon:   budget = 2; break;
@@ -1633,7 +1637,7 @@ std::string generate_designation(std::uint32_t seed)
     const std::uint32_t raMin = h % 1440u;
     const std::uint32_t d2    = h * 2654435761u; // Math.imul = modular uint32 multiply
     const std::uint32_t dec   = d2 % 5400u;
-    const char          sgn   = ((d2 >> 16u) & 1u) ? '+' : '\u2212';
+    const std::string   sgn   = ((d2 >> 16u) & 1u) ? "+" : "\u2212";  // U+2212 MINUS SIGN (3 UTF-8 bytes)
 
     auto pad2 = [](std::uint32_t v) -> std::string
     {

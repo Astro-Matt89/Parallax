@@ -107,7 +107,7 @@ TEST_CASE("Family forcing: forced family is produced; all subtypes reachable")
         {
             CHECK_MESSAGE(std::find(seen_subtypes.begin(), seen_subtypes.end(), st)
                           != seen_subtypes.end(),
-                          "Subtype not reached: " + st);
+                          "Subtype not reached: " << st);
         }
     };
 
@@ -133,7 +133,7 @@ TEST_CASE("Designation: matches GW Jhhmm[+-]ddmm format, deterministic")
     {
         const std::string desig = generate_designation(seed);
         CHECK_MESSAGE(std::regex_match(desig, kPattern),
-                      "Bad designation: " + desig);
+                      "Bad designation: " << desig);
         // Deterministic: same seed → same result
         CHECK(generate_designation(seed) == desig);
     }
@@ -145,7 +145,8 @@ TEST_CASE("Designation: matches GW Jhhmm[+-]ddmm format, deterministic")
     const std::string d0 = generate_designation(0u);
     CHECK(d0.substr(0, 4) == "GW J");
     CHECK(d0.substr(4, 4) == "0000");
-    CHECK(d0.size() == 9u); // "GW J" + 4 + sign(1 byte for ASCII '+' or 3 bytes for U+2212)
+    // seed 0: (d2>>16)&1 == 0 → U+2212 MINUS SIGN (3 UTF-8 bytes), total = "GW J"(4) + "0000"(4) + sign(3) + "0000"(4) = 15
+    CHECK(d0.size() == 15u); // U+2212 is 3 UTF-8 bytes; '+' would give 13
     //  U+2212 is 3 UTF-8 bytes, '+' is 1 — just check digits
     CHECK(d0.substr(0, 4) == "GW J");
 }
@@ -207,9 +208,9 @@ TEST_CASE("Render sanity: N=128 sky is finite, non-negative, non-zero for all fa
             const auto m    = generate_target_model(seed, opts);
             const auto sky  = render_target_at(m, kLambda, 0.0, 128u);
             REQUIRE(sky.size() == 128u * 128u);
-            CHECK_MESSAGE(is_finite_all(sky), "NaN/Inf in family " + std::to_string(int(fam)));
-            CHECK_MESSAGE(is_nonneg_all(sky), "Negative flux in family " + std::to_string(int(fam)));
-            CHECK_MESSAGE(sum(sky) > 0.0, "Zero total flux in family " + std::to_string(int(fam)));
+            CHECK_MESSAGE(is_finite_all(sky), "NaN/Inf in family " << int(fam));
+            CHECK_MESSAGE(is_nonneg_all(sky), "Negative flux in family " << int(fam));
+            CHECK_MESSAGE(sum(sky) > 0.0, "Zero total flux in family " << int(fam));
         }
     }
 }
@@ -327,9 +328,8 @@ TEST_CASE("Draw-order regression: fixed seed produces identical model (100 runs)
         for (std::uint32_t seed : {0u, 1u, 42u, 0xDEADBEEFu})
         {
             CHECK_MESSAGE(draw_count_stable(fam, seed),
-                "Draw-order instability for family "
-                + std::to_string(static_cast<int>(fam))
-                + " seed " + std::to_string(seed));
+                "Draw-order instability for family " << static_cast<int>(fam)
+                << " seed " << seed);
         }
     }
 }

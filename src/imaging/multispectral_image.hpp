@@ -73,6 +73,10 @@ namespace parallax::imaging
         ///
         /// The image is zero-initialised; metadata (other than pixel_scale) must
         /// be set on the returned reference if needed, or passed in via @p meta.
+        ///
+        /// @warning Bands are stored in a std::vector, so a later add_band() or
+        /// emplace_band() can reallocate and invalidate the returned reference.
+        /// Use it before adding the next band, or re-acquire it via band(index).
         Image& emplace_band(ImageMetadata meta = {})
         {
             meta.pixel_scale_arcsec_per_px = m_pixel_scale;

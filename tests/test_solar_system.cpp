@@ -131,16 +131,46 @@ TEST_CASE("Sun position — J2000.0 (2000-01-01 12:00 UTC)")
 }
 
 // =================================================================
-// TEST 3: JPL Horizons reference — 2024-01-01 12:00 UTC
+// TEST 3: cross-check against the low-precision solar formula
+//          — 2024-01-01 12:00 UTC (JD 2460311.0)
 //
-// JPL Horizons geocentric apparent:
-//   RA  ≈ 18h 44m 00s  = 18.7333h
-//   Dec ≈ -23° 03' 27" = -23.0575°
+// This case previously claimed a JPL Horizons reference of
+// RA 18h 44m 00s / Dec −23° 03' 27", which is wrong: it puts the Sun
+// about 0.44° from where every solar formula places it on that date.
+// Cross-check with the equation of time, which is independent of the
+// module under test:
 //
-// Accept < 0.03° total separation.
+//   EoT ≈ L0 − RA.  With RA = 18.765 h this gives −3.3 min, the
+//   published value for 1 January.  With RA = 18.7333 h it would give
+//   −1.4 min, the value for about 27-28 December.
+//
+// The reference below is therefore recomputed with the *low-precision*
+// solar position formula (Meeus Ch. 25, low-accuracy form — the one the
+// USNO/NOAA algorithm uses), which is an independent implementation but
+// NOT an independent ephemeris:
+//
+//   n  = JD − 2451545.0
+//   L  = 280.460 + 0.9856474 n                       (deg, mod 360)
+//   g  = 357.528 + 0.9856003 n                       (deg, mod 360)
+//   λ  = L + 1.915 sin g + 0.020 sin 2g
+//   ε  = 23.439 − 0.0000004 n
+//   RA = atan2(cos ε sin λ, cos λ),  Dec = asin(sin ε sin λ)
+//
+// → RA = 18.7652 h, Dec = −23.0161°
+//
+// That formula is quoted as good to ~0.01°, and compute_sun() implements
+// the fuller Ch. 25 series (equation of centre, apparent longitude with
+// nutation and aberration, corrected obliquity), so a residual of order
+// 10" between the two is expected and is not an error in either.
+// Tolerance is set at 0.02°, i.e. twice the quoted accuracy of the
+// reference formula.
+//
+// NOTE: this is a self-consistency check between two solar formulas, not
+// a validation against a precise ephemeris.  Restoring a real, verified
+// JPL Horizons reference for this epoch would be a strictly better test.
 // =================================================================
 
-TEST_CASE("Sun position — JPL Horizons reference (2024-01-01 12:00 UTC)")
+TEST_CASE("Sun position — low-precision formula cross-check (2024-01-01 12:00 UTC)")
 {
     const f64 jd = TimeSystem::to_julian_date(DateTime{
         .year = 2024, .month = 1, .day = 1,
@@ -152,23 +182,27 @@ TEST_CASE("Sun position — JPL Horizons reference (2024-01-01 12:00 UTC)")
     const f64 ra_h    = ra_to_hours(sun.equatorial.ra);
     const f64 dec_deg = dec_to_deg(sun.equatorial.dec);
 
-    // JPL Horizons reference values
-    constexpr f64 kJplRaH    = 18.7333;  // 18h 44m 00s
-    constexpr f64 kJplDecDeg = -23.0575; // -23° 03' 27"
+    // Low-precision formula values (see derivation above).
+    constexpr f64 kRefRaH    = 18.7652;
+    constexpr f64 kRefDecDeg = -23.0161;
+
+    // Accuracy of the reference formula itself (~0.01°), doubled for margin.
+    constexpr f64 kTolDeg = 0.02;
 
     const EquatorialCoord expected{
-        .ra  = kJplRaH * astro_constants::kHourToRad,
-        .dec = kJplDecDeg * astro_constants::kDegToRad,
+        .ra  = kRefRaH * astro_constants::kHourToRad,
+        .dec = kRefDecDeg * astro_constants::kDegToRad,
     };
 
     const f64 sep = angular_separation_deg(sun.equatorial, expected);
-    CHECK(sep < 0.03);
+    CHECK(sep < kTolDeg);
 
-    // Individual axis checks
-    CHECK(ra_h == doctest::Approx(kJplRaH).epsilon(0.02));
-    CHECK(dec_deg == doctest::Approx(kJplDecDeg).epsilon(0.02));
+    // Individual axis checks, in absolute terms (the previous relative
+    // epsilon of 0.02 allowed a 22-minute error in RA).
+    CHECK(std::abs(ra_h - kRefRaH) * 15.0 < kTolDeg);
+    CHECK(std::abs(dec_deg - kRefDecDeg) < kTolDeg);
 
-    MESSAGE("JPL 2024-01-01: RA = ", ra_h, "h, Dec = ", dec_deg,
+    MESSAGE("2024-01-01: RA = ", ra_h, "h, Dec = ", dec_deg,
             "°, sep = ", sep, "°");
 }
 

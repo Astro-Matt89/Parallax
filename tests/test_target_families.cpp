@@ -65,8 +65,11 @@ TEST_CASE("Determinism: same seed → byte-identical model and sky")
     const auto sky1 = render_target_at(m1, kLambda, 0.0, 128u);
     const auto sky2 = render_target_at(m2, kLambda, 0.0, 128u);
     REQUIRE(sky1.size() == sky2.size());
+    // Bit-for-bit equality: Approx(x).epsilon(0.0) compares with a strict `<`,
+    // so it rejects even identical values (0 == Approx(0) fails).  The claim
+    // here is exact reproducibility, so compare exactly.
     for (std::size_t i = 0; i < sky1.size(); ++i)
-        CHECK(sky1[i] == doctest::Approx(sky2[i]).epsilon(0.0));
+        CHECK(sky1[i] == sky2[i]);
 
     // Also verify: different seed → different designation
     const auto m3 = generate_target_model(kSeed + 1u, opts);
@@ -125,15 +128,27 @@ TEST_CASE("Family forcing: forced family is produced; all subtypes reachable")
 
 TEST_CASE("Designation: matches GW Jhhmm[+-]ddmm format, deterministic")
 {
-    // Regex: "GW J" + 4 digits + ('+' or U+2212 MINUS SIGN, 1 char) + 4 digits
-    // We match the sign as any non-digit after the first 4 digits
-    const std::regex kPattern{R"(GW J\d{4}.{1}\d{4})"};
+    // Regex: "GW J" + 4 digits + sign + 4 digits.
+    // The sign is either '+' (1 byte) or U+2212 MINUS SIGN, which the oracle
+    // emits verbatim and the port reproduces — 3 bytes in UTF-8.  std::regex
+    // works on bytes, so `.` (one byte) cannot match the minus: match the sign
+    // as a run of non-digit bytes instead, and check its exact value below.
+    const std::regex kPattern{R"(GW J\d{4}[^\d]+\d{4})"};
+
+    // Same literal as the production code, so both go through the same
+    // compiler translation of − (the build sets /utf-8).
+    const std::string kMinus = "−";
 
     for (std::uint32_t seed = 0; seed < 64u; ++seed)
     {
         const std::string desig = generate_designation(seed);
         CHECK_MESSAGE(std::regex_match(desig, kPattern),
                       "Bad designation: " << desig);
+
+        // The sign is whatever sits between the two 4-digit groups.
+        const std::string sign = desig.substr(8, desig.size() - 12);
+        CHECK_MESSAGE((sign == "+" || sign == kMinus),
+                      "Bad sign in designation: " << desig);
         // Deterministic: same seed → same result
         CHECK(generate_designation(seed) == desig);
     }
@@ -237,17 +252,21 @@ TEST_CASE("FFT round-trip: single centered point → DC = total flux, flat magni
     const double dc_im = ft.Fim[kN / 2 * kN + kN / 2];
     const double dc_mag = std::sqrt(dc_re * dc_re + dc_im * dc_im);
 
-    // DC magnitude for a unit impulse at center should equal N² (unnormalised FFT)
+    // compute_target_fft shifts the sky before the transform, so the impulse
+    // lands on sample (0,0) and the un-normalised forward FFT of a unit impulse
+    // is exactly 1 in every bin — DC included.  (N² would be the value of the
+    // *inverse* transform of a flat spectrum, not of this one.)
     CHECK(ft.flux_total == doctest::Approx(1.0).epsilon(kEps));
-    CHECK(dc_mag == doctest::Approx(static_cast<double>(kN2)).epsilon(1e-6));
+    CHECK(dc_mag == doctest::Approx(ft.flux_total).epsilon(1e-9));
+    CHECK(dc_mag == doctest::Approx(1.0).epsilon(1e-9));
 
-    // For a single centred impulse, the spectrum magnitude should be flat (all N²)
+    // For a single centred impulse, the spectrum magnitude is flat at 1.
     for (std::size_t i = 0; i < kN2; ++i)
     {
         const double re  = ft.Fre[i];
         const double im  = ft.Fim[i];
         const double mag = std::sqrt(re * re + im * im);
-        CHECK(mag == doctest::Approx(static_cast<double>(kN2)).epsilon(1e-5));
+        CHECK(mag == doctest::Approx(1.0).epsilon(1e-9));
     }
 }
 

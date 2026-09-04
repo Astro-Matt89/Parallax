@@ -4,11 +4,12 @@
 /// Tests: build, query correctness, magnitude filtering, polar regions,
 /// RA wrap-around, and empty queries.
 
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#define DOCTEST_CONFIG_IMPLEMENT
 #include <doctest/doctest.h>
 
 #include "catalog/spatial_index.hpp"
 #include "catalog/star_entry.hpp"
+#include "core/logger.hpp"
 #include "core/types.hpp"
 
 #include <glm/gtc/constants.hpp>
@@ -35,6 +36,23 @@ StarEntry make_star(f64 ra_deg, f64 dec_deg, f32 mag, u32 id = 0)
 }
 
 } // anonymous namespace
+
+// =================================================================
+// Custom main: initialize logger before tests
+//
+// SpatialIndex::build() logs through PLX_CORE_INFO, which dereferences
+// Logger::get_core_logger().  Without Logger::init() that shared_ptr is
+// null and the first build() call segfaults.  Same pattern as
+// test_catalog_loader.cpp.
+// =================================================================
+
+int main(int argc, char** argv)
+{
+    parallax::core::Logger::init();
+    const int result = doctest::Context(argc, argv).run();
+    parallax::core::Logger::shutdown();
+    return result;
+}
 
 TEST_CASE("SpatialIndex: build and basic properties")
 {

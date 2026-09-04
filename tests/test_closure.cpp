@@ -30,17 +30,23 @@ using parallax::astro_constants::kPi;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-/// Build a Y-array on the Moon.
-[[nodiscard]] std::vector<Station> make_moon_stations(std::uint32_t n_per_arm)
+/// Build a Y-array on Earth (La Palma site centre).
+///
+/// The array is sited on Earth, and `make_obs()` pairs it with a radio
+/// wavelength, for the same reason as in test_uv_sampling.cpp (commit 13b1e61):
+/// with an optical wavelength every baseline maps to |u| ≫ N/(2·theta_fov) and
+/// `sample_uv` discards the whole set, leaving the closure tests with nothing
+/// to work on.  See `make_obs()` for the numbers.
+[[nodiscard]] std::vector<Station> make_array_stations(std::uint32_t n_per_arm)
 {
     ArrayConfig cfg;
     cfg.geometry         = ArrayGeometry::Y;
     cfg.antennas_per_arm = n_per_arm;
     cfg.site_extent_m    = 10000.0;
     cfg.site             = SiteCenter {
-        .body = Body::Moon,
-        .lat  = -43.3 * kDegToRad,
-        .lon  = -11.2 * kDegToRad,
+        .body = Body::Earth,
+        .lat  = 28.7569 * kDegToRad,  // La Palma
+        .lon  = -17.8925 * kDegToRad,
     };
     return generate_stations(cfg);
 }
@@ -56,7 +62,16 @@ using parallax::astro_constants::kPi;
 }
 
 /// Observation config for a transit at declination 20° with Earth rotation.
-[[nodiscard]] ObservationConfig make_obs(double lambda_m = 0.5e-6)
+///
+/// Parameters chosen so that `sample_uv` actually returns samples with the
+/// array built by `make_array_stations()`:
+///   - lambda = 0.1 m (radio): the 10 km site gives |B| <= ~7.4 km, so
+///     |u| <= 7.4e4 wavelengths;
+///   - theta_fov = 1e-4 rad: du = 1/theta_fov, so |u|/du <= 7.4 grid cells and
+///     every sample lands well inside the [1, N-2] window of a 64² grid;
+///   - epoch_days = 0.05 (t ≈ 1.2 h) centres the 4 h track on the site's
+///     meridian, so all stations stay above EL_MIN for the whole observation.
+[[nodiscard]] ObservationConfig make_obs(double lambda_m = 0.1)
 {
     return ObservationConfig {
         .dec_rad        = 20.0 * kDegToRad,
@@ -64,9 +79,9 @@ using parallax::astro_constants::kPi;
         .duration_hours = 4.0,
         .rotation       = true,
         .mode           = InstrumentMode::Radio,
-        .theta_fov_rad  = 1e-6,
+        .theta_fov_rad  = 1e-4,
         .flux_total     = 1.0,
-        .epoch_days     = 0.0,
+        .epoch_days     = 0.05,
     };
 }
 
@@ -95,7 +110,7 @@ double max_closure_diff(
 
 TEST_CASE("Closure phase is immune to station-based turbulence (< 1e-9 rad)")
 {
-    const auto stations = make_moon_stations(4); // 13 stations
+    const auto stations = make_array_stations(4); // 13 stations
     const auto obs      = make_obs();
     const auto ft       = make_point_source_ft(64);
 
@@ -138,7 +153,7 @@ TEST_CASE("Closure phase is immune to station-based turbulence (< 1e-9 rad)")
 
 TEST_CASE("Closure phase is immune to gain errors (< 1e-9 rad)")
 {
-    const auto stations = make_moon_stations(4);
+    const auto stations = make_array_stations(4);
     const auto obs      = make_obs();
     const auto ft       = make_point_source_ft(64);
 
@@ -166,7 +181,7 @@ TEST_CASE("Closure phase is immune to gain errors (< 1e-9 rad)")
 
 TEST_CASE("Thermal noise corrupts closure (non-station-based error)")
 {
-    const auto stations = make_moon_stations(4);
+    const auto stations = make_array_stations(4);
     const auto obs      = make_obs();
     const auto ft       = make_point_source_ft(64, 1.0);
 
@@ -242,7 +257,7 @@ TEST_CASE("wrap_phase maps to (-pi, pi]")
 
     // Already in range
     CHECK(std::abs(wrap_phase(0.0)) < kTol);
-    CHECK(std::abs(wrap_phase(kPi)) < kTol);         // π → π
+    CHECK(std::abs(wrap_phase(kPi) - kPi) < kTol);   // π → π (interval closed at +π)
     CHECK(std::abs(wrap_phase(-kPi) - kPi) < kTol);  // -π → +π (closed at +π)
 
     // Beyond +π
@@ -296,7 +311,7 @@ TEST_CASE("Closure wraps correctly when individual phases sum beyond pi")
 
 TEST_CASE("Triangle selection is deterministic across repeated calls")
 {
-    const auto stations = make_moon_stations(4);
+    const auto stations = make_array_stations(4);
     const auto obs      = make_obs();
     const auto ft       = make_point_source_ft(64);
     const StationErrors err { .turbulence_rms_rad = 0.0, .snr = 0.0, .gain_errors = false, .atm_seed = 1 };
@@ -404,7 +419,7 @@ TEST_CASE("No NaN in result on zero-amplitude visibilities")
 
 TEST_CASE("Works with antennas_per_arm = 4 (13 stations)")
 {
-    const auto stations = make_moon_stations(4);
+    const auto stations = make_array_stations(4);
     CHECK(stations.size() == 13u);
 
     const auto obs = make_obs();
@@ -429,7 +444,7 @@ TEST_CASE("Works with antennas_per_arm = 4 (13 stations)")
 
 TEST_CASE("Works with antennas_per_arm = 7 (22 stations)")
 {
-    const auto stations = make_moon_stations(7);
+    const auto stations = make_array_stations(7);
     CHECK(stations.size() == 22u);
 
     const auto obs = make_obs();
@@ -455,7 +470,7 @@ TEST_CASE("Works with antennas_per_arm = 7 (22 stations)")
 
 TEST_CASE("max_triangles parameter limits the number of returned triangles")
 {
-    const auto stations = make_moon_stations(4);
+    const auto stations = make_array_stations(4);
     const auto obs      = make_obs();
     const auto ft       = make_point_source_ft(64);
     const StationErrors err { .turbulence_rms_rad = 0.0, .snr = 0.0, .gain_errors = false, .atm_seed = 5 };

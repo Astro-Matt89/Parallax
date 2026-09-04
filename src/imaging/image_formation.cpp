@@ -252,12 +252,20 @@ namespace parallax::imaging
                     const f64 mean_count = std::max(signal + bg_electrons, 0.0);
 
                     // Poisson noise on (signal + background).
-                    std::poisson_distribution<long long> poisson_dist(mean_count);
-                    const f64 poisson_sample = static_cast<f64>(poisson_dist(rng));
+                    // A mean of exactly 0 is a legitimate state (empty pixel with
+                    // the background disabled), but both distributions below require
+                    // a strictly positive parameter — passing 0 is undefined behaviour
+                    // and fires an assertion in the MSVC STL.  Both degenerate cases
+                    // have an exact answer, so short-circuit them: Poisson(0) is
+                    // identically 0 and N(0, 0) is identically 0.
+                    const f64 poisson_sample = (mean_count > 0.0)
+                        ? static_cast<f64>(std::poisson_distribution<long long>(mean_count)(rng))
+                        : 0.0;
 
-                    // Gaussian read noise.
-                    std::normal_distribution<f64> gauss_dist(0.0, params.read_noise_electrons);
-                    const f64 read_noise = gauss_dist(rng);
+                    // Gaussian read noise (skipped for a noiseless detector).
+                    const f64 read_noise = (params.read_noise_electrons > 0.0)
+                        ? std::normal_distribution<f64>(0.0, params.read_noise_electrons)(rng)
+                        : 0.0;
 
                     img(px, py) = static_cast<f32>(poisson_sample + read_noise);
                 }

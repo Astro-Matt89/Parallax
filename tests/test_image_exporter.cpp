@@ -1,10 +1,12 @@
 /// @file test_image_exporter.cpp
 /// @brief Unit tests for ImageExporter (Sprint 10a Task 10a.5).
 
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#define DOCTEST_CONFIG_IMPLEMENT
 #include <doctest/doctest.h>
 
 #include "imaging/image_exporter.hpp"
+
+#include "core/logger.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -15,6 +17,23 @@
 #include <random>
 #include <string>
 #include <vector>
+
+// =================================================================
+// Custom main: initialize logger before tests
+//
+// ImageExporter::export_fits() logs through PLX_CORE_WARN, which
+// dereferences Logger::get_core_logger().  Without Logger::init() that
+// shared_ptr is null and the call segfaults.  Same pattern as
+// test_catalog_loader.cpp.
+// =================================================================
+
+int main(int argc, char** argv)
+{
+    parallax::core::Logger::init();
+    const int result = doctest::Context(argc, argv).run();
+    parallax::core::Logger::shutdown();
+    return result;
+}
 
 namespace parallax::imaging
 {
@@ -55,19 +74,25 @@ namespace parallax::imaging
         {
             MultispectralImage image(4, 3, 1.5);
 
-            Image& visible = image.emplace_band(ImageMetadata{
+            image.emplace_band(ImageMetadata{
                 .band_name = "Visible",
                 .band_index = 0,
                 .wavelength_nm = 550.0,
                 .pixel_scale_arcsec_per_px = 1.5,
             });
 
-            Image& nir = image.emplace_band(ImageMetadata{
+            image.emplace_band(ImageMetadata{
                 .band_name = "Near-IR",
                 .band_index = 1,
                 .wavelength_nm = 1600.0,
                 .pixel_scale_arcsec_per_px = 1.5,
             });
+
+            // Take the band references only after every band exists: bands live in
+            // a std::vector, so the second emplace_band can reallocate and would
+            // leave a reference returned by the first one dangling.
+            Image& visible = image.band(0);
+            Image& nir     = image.band(1);
 
             for (u32 y = 0; y < image.height(); ++y)
             {

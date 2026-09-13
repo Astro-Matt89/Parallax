@@ -482,6 +482,38 @@ target_link_libraries(test_station_positions PRIVATE
 add_test(NAME StationPositions COMMAND test_station_positions)
 
 # -----------------------------------------------------------------
+# Test: FixtureVisibilities (oracle gate, level 2)  <- SPRINT 10b Task 10b.7
+# -----------------------------------------------------------------
+add_executable(test_fixture_visibilities
+    test_fixture_visibilities.cpp
+    "${CMAKE_SOURCE_DIR}/src/core/fft.cpp"
+    "${CMAKE_SOURCE_DIR}/src/interferometry/ephemeris.cpp"
+    "${CMAKE_SOURCE_DIR}/src/interferometry/array_config.cpp"
+    "${CMAKE_SOURCE_DIR}/src/interferometry/kolmogorov.cpp"
+    "${CMAKE_SOURCE_DIR}/src/interferometry/uv_sampling.cpp"
+    "${CMAKE_SOURCE_DIR}/src/procedural/target_families.cpp"
+    "${CMAKE_SOURCE_DIR}/src/procedural/target_primitives.cpp"
+    "${CMAKE_SOURCE_DIR}/src/procedural/target_recipes.cpp"
+)
+
+target_include_directories(test_fixture_visibilities PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_compile_definitions(test_fixture_visibilities PRIVATE
+    PLX_FIXTURE_BATTERY_PATH="${CMAKE_SOURCE_DIR}/data/fixtures/glasswing_fixture_battery_v1_2.json"
+)
+
+target_link_libraries(test_fixture_visibilities PRIVATE
+    doctest::doctest
+    glm::glm
+    nlohmann_json::nlohmann_json
+    spdlog::spdlog
+)
+
+add_test(NAME FixtureVisibilities COMMAND test_fixture_visibilities)
+
+# -----------------------------------------------------------------
 # Test: Mulberry32                               <- SPRINT 10b Task 10b.2
 # -----------------------------------------------------------------
 add_executable(test_mulberry32

@@ -456,6 +456,32 @@ target_link_libraries(test_array_config PRIVATE
 add_test(NAME ArrayConfig COMMAND test_array_config)
 
 # -----------------------------------------------------------------
+# Test: StationPositions (oracle gate, level 1)  <- SPRINT 10b Task 10b.7
+# -----------------------------------------------------------------
+add_executable(test_station_positions
+    test_station_positions.cpp
+    "${CMAKE_SOURCE_DIR}/src/interferometry/ephemeris.cpp"
+    "${CMAKE_SOURCE_DIR}/src/interferometry/array_config.cpp"
+)
+
+target_include_directories(test_station_positions PRIVATE
+    "${CMAKE_SOURCE_DIR}/src"
+)
+
+target_compile_definitions(test_station_positions PRIVATE
+    PLX_FIXTURE_BATTERY_PATH="${CMAKE_SOURCE_DIR}/data/fixtures/glasswing_fixture_battery_v1_1.json"
+)
+
+target_link_libraries(test_station_positions PRIVATE
+    doctest::doctest
+    glm::glm
+    nlohmann_json::nlohmann_json
+    spdlog::spdlog
+)
+
+add_test(NAME StationPositions COMMAND test_station_positions)
+
+# -----------------------------------------------------------------
 # Test: Mulberry32                               <- SPRINT 10b Task 10b.2
 # -----------------------------------------------------------------
 add_executable(test_mulberry32

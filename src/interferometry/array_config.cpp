@@ -4,6 +4,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include <algorithm>
 #include <cmath>
 #include <filesystem>
 #include <fstream>
@@ -190,17 +191,21 @@ namespace parallax::interferometry
 
             const double half_extent_m = config.site_extent_m / 2.0;
             const double radius = body_radius(config.site.body);
+            // Oracle Earth branch clamps cos(lat0) at 0.05 to stay finite near the poles. Its Moon branch
+            // has no clamp, but the Moon site is Tycho (cos = 0.73), where the clamp is a no-op.
+            const double lon_radius = radius * std::max(0.05, std::cos(config.site.lat));
 
             for (std::size_t i = 0; i < normalized_stations.size(); ++i)
             {
-                // Preserve oracle buildStations expression shape/order for fixture compatibility:
-                // x_m = x_norm * (site_extent_m / 2), y_m = y_norm * (site_extent_m / 2),
-                // lat = site.lat + y_m / R, lon = site.lon + x_m / R.
+                // Oracle buildStations, expression shape/order preserved for fixture compatibility:
+                // scale = site_extent_m / 2,
+                // lat = lat0 + (-y * scale) / R            (layout +y maps to south),
+                // lon = lon0 + (x * scale) / (R * cos(lat0)).
                 const double x_m = normalized_stations[i].x * half_extent_m;
                 const double y_m = normalized_stations[i].y * half_extent_m;
 
-                const double lat = config.site.lat + y_m / radius;
-                const double lon = config.site.lon + x_m / radius;
+                const double lat = config.site.lat + (-y_m) / radius;
+                const double lon = config.site.lon + x_m / lon_radius;
 
                 stations.push_back(Station {
                     .name = station_name(config.geometry, i, config.antennas_per_arm),

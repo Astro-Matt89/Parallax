@@ -58,11 +58,13 @@ namespace
 
         const double half_extent = site_extent_m / 2.0;
         const double radius = radius_for(site.body);
+        const double lon_radius = radius * std::max(0.05, std::cos(site.lat));
 
         for (const Station& station : stations)
         {
-            const double x_norm = ((station.lon - site.lon) * radius) / half_extent;
-            const double y_norm = ((station.lat - site.lat) * radius) / half_extent;
+            // Inverse of the oracle buildStations mapping (lat uses -y, lon uses R * cos(lat0)).
+            const double x_norm = ((station.lon - site.lon) * lon_radius) / half_extent;
+            const double y_norm = (-(station.lat - site.lat) * radius) / half_extent;
             normalized.emplace_back(x_norm, y_norm);
         }
 
@@ -74,14 +76,15 @@ namespace
         const SiteCenter& site)
     {
         const double radius = radius_for(site.body);
+        const double lon_radius = radius * std::max(0.05, std::cos(site.lat));
 
         std::vector<parallax::Vec2d> offsets;
         offsets.reserve(stations.size());
         for (const Station& station : stations)
         {
             offsets.emplace_back(
-                (station.lon - site.lon) * radius,
-                (station.lat - site.lat) * radius);
+                (station.lon - site.lon) * lon_radius,
+                -(station.lat - site.lat) * radius);
         }
 
         double max_baseline = 0.0;

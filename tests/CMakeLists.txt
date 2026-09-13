@@ -469,7 +469,7 @@ target_include_directories(test_station_positions PRIVATE
 )
 
 target_compile_definitions(test_station_positions PRIVATE
-    PLX_FIXTURE_BATTERY_PATH="${CMAKE_SOURCE_DIR}/data/fixtures/glasswing_fixture_battery_v1_1.json"
+    PLX_FIXTURE_BATTERY_PATH="${CMAKE_SOURCE_DIR}/data/fixtures/glasswing_fixture_battery_v1_2.json"
 )
 
 target_link_libraries(test_station_positions PRIVATE

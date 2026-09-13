@@ -270,24 +270,28 @@ namespace parallax::interferometry
 
     std::vector<Station> earth_stations()
     {
+        // Contract with the oracle: these are the sandbox GW table values, rounded to 0.01 deg ON PURPOSE.
+        // The surveyed coordinates (e.g. La Palma 28.7569 / -17.8925) lie up to ~450 m away, which moves
+        // baselines far outside the fixture uv tolerance (1e-9 relative). Do not make them more precise
+        // unless the oracle and its fixture battery are regenerated with the same values.
         return {
             Station {
                 .name = "La Palma",
                 .body = Body::Earth,
-                .lat = 28.7569 * astro_constants::kDegToRad,
-                .lon = -17.8925 * astro_constants::kDegToRad,
+                .lat = 28.76 * astro_constants::kDegToRad,
+                .lon = -17.89 * astro_constants::kDegToRad,
             },
             Station {
                 .name = "Mauna Kea",
                 .body = Body::Earth,
-                .lat = 19.8206 * astro_constants::kDegToRad,
-                .lon = -155.4681 * astro_constants::kDegToRad,
+                .lat = 19.82 * astro_constants::kDegToRad,
+                .lon = -155.47 * astro_constants::kDegToRad,
             },
             Station {
                 .name = "Paranal",
                 .body = Body::Earth,
-                .lat = -24.6275 * astro_constants::kDegToRad,
-                .lon = -70.4044 * astro_constants::kDegToRad,
+                .lat = -24.63 * astro_constants::kDegToRad,
+                .lon = -70.40 * astro_constants::kDegToRad,
             },
         };
     }

@@ -126,25 +126,22 @@ TEST_CASE("kolmogorov_series with rms=0 produces all-zeros series")
     }
 }
 
-TEST_CASE("kolmogorov_series consumes RNG even when rms=0 (stream consistency)")
+TEST_CASE("kolmogorov_series consumes no RNG draws when rms=0 (oracle early return)")
 {
-    // Two generators with the same seed: one calls kolmogorov with rms=0,
-    // the other with rms=1.5.  After kolmogorov, they must be at the SAME
-    // position in the RNG stream (both consumed station_count*M draws).
+    // The oracle kolmSeries returns before drawing any phase when rms <= 0, so
+    // the error stream must be exactly where it was before the call.
     constexpr std::size_t kStations = 3;
     constexpr std::size_t kK = 10;
     constexpr std::uint32_t kSeed = 42u;
 
-    Mulberry32 rng0(kSeed);
-    Mulberry32 rng1(kSeed);
+    Mulberry32 rng_called(kSeed);
+    Mulberry32 rng_untouched(kSeed);
 
-    (void)kolmogorov_series(kStations, kK, 0.0, rng0);
-    (void)kolmogorov_series(kStations, kK, 1.5, rng1);
+    (void)kolmogorov_series(kStations, kK, 0.0, rng_called);
 
-    // Next draw from both must be the same (same position in stream).
-    const double d0 = rng0.next();
-    const double d1 = rng1.next();
-    CHECK(d0 == d1);
+    const double d_called = rng_called.next();
+    const double d_untouched = rng_untouched.next();
+    CHECK(d_called == d_untouched);
 }
 
 TEST_CASE("kolmogorov_series is deterministic for the same seed")

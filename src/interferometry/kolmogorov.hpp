@@ -20,9 +20,8 @@ namespace parallax::interferometry
     ///   ph[k]       = Σ_m amplitude_m * sin(2π m k/K + phase_m)
     ///
     /// The raw series is then normalised to the requested RMS (rms_rad).
-    /// If rms_rad == 0 the output is all-zeros, but RNG draws for the phase
-    /// offsets are still consumed so that the error-generator stream stays
-    /// consistent across calls with different rms values.
+    /// If rms_rad <= 0 the output is all zeros and NO draws are consumed: the
+    /// oracle kolmSeries returns before drawing anything.
     ///
     /// Generation order (binding contract for fixture compatibility):
     ///   for s = 0 .. station_count-1:

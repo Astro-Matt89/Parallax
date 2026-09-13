@@ -19,25 +19,22 @@ namespace parallax::interferometry
 
         std::vector<std::vector<double>> result(station_count, std::vector<double>(k_samples, 0.0));
 
+        // Oracle kolmSeries: `if(rms<=0)return ph;` — zeros, and NO draws consumed.
+        if (rms_rad <= 0.0)
+        {
+            return result;
+        }
+
         const double K = static_cast<double>(k_samples);
 
         for (std::size_t s = 0; s < station_count; ++s)
         {
             // ── Draw phases (binding draw order: station-major, mode-major) ──────
             // phase_m ∈ [0, 2π) for m = 1 .. kKolmogorovModes
-            // Draws are always consumed regardless of rms_rad so that the error-RNG
-            // stream position is identical for every call with the same station_count
-            // and k_samples.
             double phases[kKolmogorovModes];
             for (int m = 0; m < kKolmogorovModes; ++m)
             {
                 phases[m] = astro_constants::kTwoPi * rng.next();
-            }
-
-            if (rms_rad == 0.0)
-            {
-                // Series stays zero; draws were consumed above for RNG consistency.
-                continue;
             }
 
             // ── Build raw series ──────────────────────────────────────────────────

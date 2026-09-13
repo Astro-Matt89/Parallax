@@ -116,8 +116,8 @@ namespace parallax::interferometry
         Mulberry32 err_rng(errors.atm_seed);
 
         // ── 5. Kolmogorov atmospheric phase series (drawn before sampling loop) ──
-        // Generation order: station-major, mode-major (see kolmogorov.hpp).
-        // Draws happen regardless of rms so the RNG stream stays consistent.
+        // Generation order: station-major, mode-major; no draws when rms <= 0 and a
+        // single randn per station when K == 1 (see kolmogorov.hpp).
         const std::vector<std::vector<double>> phases = kolmogorov_series(
             n_stations, K, errors.turbulence_rms_rad, err_rng);
 
@@ -134,7 +134,9 @@ namespace parallax::interferometry
             }
         }
 
-        // ── 7. Sampling loop: enumerate pairs (i < j) then time (k) ──────────────
+        // ── 7. Sampling loop: time k outer, pairs (i < j) inner — oracle order ───
+        // This order fixes the thermal-noise draw sequence and the order of the
+        // emitted samples (the fixtures store k, not the station pair).
         const bool comb_mode = (config.mode == InstrumentMode::Comb);
         const bool hbt_mode  = (config.mode == InstrumentMode::Hbt);
         const double noise_sig = (errors.snr > 0.0) ? (config.flux_total / errors.snr) : 0.0;
@@ -142,34 +144,40 @@ namespace parallax::interferometry
         std::vector<Visibility> result;
         result.reserve(n_pairs * K / 2); // rough pre-allocation
 
-        for (std::size_t i = 0; i < n_stations; ++i)
+        std::vector<StationState> states(n_stations);
+        std::vector<bool> visible(n_stations, false);
+
+        for (std::size_t k = 0; k < K; ++k)
         {
-            for (std::size_t j = i + 1u; j < n_stations; ++j)
+            // Absolute observation time for this sample.
+            const double t_hours = config.epoch_days * 24.0 + Hs[k];
+
+            // Station states and visibility at time t. The oracle hides a station when
+            // up·s < sin(EL_MIN) or the other body occults it, so elevation ≥ sin(EL_MIN) is visible.
+            for (std::size_t s = 0; s < n_stations; ++s)
             {
-                // Comb mode: skip pairs involving any Moon station.
-                if (comb_mode
-                    && (stations[i].body == Body::Moon || stations[j].body == Body::Moon))
+                states[s] = station_state(stations[s], t_hours);
+                visible[s] = is_visible(states[s], s3, t_hours, stations[s].body);
+            }
+
+            for (std::size_t i = 0; i < n_stations; ++i)
+            {
+                for (std::size_t j = i + 1u; j < n_stations; ++j)
                 {
-                    continue;
-                }
-
-                for (std::size_t k = 0; k < K; ++k)
-                {
-                    // Absolute observation time for this sample.
-                    const double t_hours = config.epoch_days * 24.0 + Hs[k];
-
-                    // Station states at time t.
-                    const StationState si = station_state(stations[i], t_hours);
-                    const StationState sj = station_state(stations[j], t_hours);
-
-                    // Visibility check: elevation ≥ sin(EL_MIN) AND not occulted.
-                    // Brief uses ≥; SPECIFICA §3 uses >. Implemented as ≥ here
-                    // (matching is_visible); flip to > if a fixture disagrees.
-                    if (!is_visible(si, s3, t_hours, stations[i].body)
-                        || !is_visible(sj, s3, t_hours, stations[j].body))
+                    // Comb mode: skip pairs involving any Moon station.
+                    if (comb_mode
+                        && (stations[i].body == Body::Moon || stations[j].body == Body::Moon))
                     {
                         continue;
                     }
+
+                    if (!visible[i] || !visible[j])
+                    {
+                        continue;
+                    }
+
+                    const StationState& si = states[i];
+                    const StationState& sj = states[j];
 
                     // Baseline and (u,v) coordinates.
                     const Vec3d B = si.position - sj.position;

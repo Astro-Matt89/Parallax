@@ -71,12 +71,12 @@ namespace parallax::interferometry
     ///   2. Build sample times: Hs[k] = ((k / (K-1)) - 0.5) × durationHours; Hs[0]=0 when K=1.
     ///   3. Source direction: s3 = {cos(dec), 0, sin(dec)};
     ///      uv basis: eU = {0,-1,0}, eV = {sin(dec), 0, -cos(dec)}.
-    ///   4. Enumerate pairs i < j (in index order — part of fixture contract).
-    ///   5. For each pair and each time k:
+    ///   4. Enumerate time k (outer) and pairs i < j in index order (inner): the oracle
+    ///      order, part of the fixture contract (it fixes noise draws and output order).
+    ///   5. For each time k and pair:
     ///        - Compute station states from ephemerides at t = epoch_days*24 + Hs[k].
-    ///        - Require both stations visible (elevation ≥ sin(EL_MIN), not occulted).
-    ///          Note: the brief uses ≥; SPECIFICA §3 uses >; implemented as ≥ here
-    ///          (matches existing is_visible); comment preserved for fixture review.
+    ///        - Require both stations visible (elevation ≥ sin(EL_MIN), not occulted);
+    ///          the oracle hides a station only when up·s < sin(EL_MIN).
     ///        - Baseline B = P_i - P_j; u = B·eU/λ; v = B·eV/λ.
     ///        - Grid coords: du = 1/theta_fov_rad; GX = N/2 + u/du; GY = N/2 + v/du.
     ///        - Bilinear sample target_ft at (GX,GY) if GX,GY ∈ [1, N-2]; else skip.

@@ -161,17 +161,25 @@ TEST_CASE("kolmogorov_series is deterministic for the same seed")
     }
 }
 
-TEST_CASE("kolmogorov_series K=1 produces one-element series with finite value")
+TEST_CASE("kolmogorov_series K=1 is one randn draw scaled by rms per station (oracle)")
 {
+    // Oracle kolmSeries: if(K===1){ph[0]=randn(rng)*rms;} — no modal series, no normalisation.
+    constexpr double kRms = 0.6;
     Mulberry32 rng(123u);
-    const auto series = kolmogorov_series(2, 1, 0.6, rng);
+    Mulberry32 reference(123u);
+
+    const auto series = kolmogorov_series(2, 1, kRms, rng);
     REQUIRE(series.size() == 2u);
     for (const auto& st_series : series)
     {
         REQUIRE(st_series.size() == 1u);
-        // Normalised to rms = 0.6 over one sample means |ph[0]| == 0.6.
-        CHECK(std::abs(std::abs(st_series[0]) - 0.6) <= 1.0e-10);
+        CHECK(st_series[0] == reference.randn() * kRms);
     }
+
+    // Exactly one randn per station was consumed.
+    const double d_series = rng.next();
+    const double d_reference = reference.next();
+    CHECK(d_series == d_reference);
 }
 
 // ── sample_uv: snapshot mode (no rotation) ────────────────────────────────────

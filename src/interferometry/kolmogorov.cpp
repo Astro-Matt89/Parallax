@@ -25,6 +25,17 @@ namespace parallax::interferometry
             return result;
         }
 
+        // Oracle kolmSeries: `if(K===1){ph[0]=randn(rng)*rms;return ph;}` — one randn
+        // (2 draws) per station, no modal series and no normalisation.
+        if (k_samples == 1)
+        {
+            for (std::size_t s = 0; s < station_count; ++s)
+            {
+                result[s][0] = rng.randn() * rms_rad;
+            }
+            return result;
+        }
+
         const double K = static_cast<double>(k_samples);
 
         for (std::size_t s = 0; s < station_count; ++s)
@@ -46,7 +57,6 @@ namespace parallax::interferometry
                 {
                     const int m = mi + 1; // 1-indexed mode number
                     const double amplitude = std::pow(static_cast<double>(m), -4.0 / 3.0);
-                    // K > 1: argument varies over time; K == 1: k = 0 → argument = 0
                     const double arg = astro_constants::kTwoPi * static_cast<double>(m)
                         * static_cast<double>(k) / K
                         + phases[mi];

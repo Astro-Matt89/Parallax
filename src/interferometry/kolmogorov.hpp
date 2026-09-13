@@ -22,6 +22,8 @@ namespace parallax::interferometry
     /// The raw series is then normalised to the requested RMS (rms_rad).
     /// If rms_rad <= 0 the output is all zeros and NO draws are consumed: the
     /// oracle kolmSeries returns before drawing anything.
+    /// If k_samples == 1 each station gets randn() * rms_rad (2 draws), with no
+    /// modal series and no normalisation, as in the oracle.
     ///
     /// Generation order (binding contract for fixture compatibility):
     ///   for s = 0 .. station_count-1:

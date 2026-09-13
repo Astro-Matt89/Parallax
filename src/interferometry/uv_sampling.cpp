@@ -111,9 +111,9 @@ namespace parallax::interferometry
         const double half_N = static_cast<double>(target_ft.N) / 2.0;
         const double N_m2   = static_cast<double>(target_ft.N) - 2.0;
 
-        // ── 4. Error-RNG (seeded separately per SPECIFICA §2) ────────────────────
-        // Seeding contract: errors use atmSeed ^ 0x9e3779b9 (Fibonacci constant).
-        Mulberry32 err_rng(errors.atm_seed ^ 0x9e3779b9u);
+        // ── 4. Error-RNG (separate from the target-model RNG, SPECIFICA §2) ──────
+        // Oracle: arng = mulberry32(atmSeed) — the seed is used as is, no xor.
+        Mulberry32 err_rng(errors.atm_seed);
 
         // ── 5. Kolmogorov atmospheric phase series (drawn before sampling loop) ──
         // Generation order: station-major, mode-major (see kolmogorov.hpp).

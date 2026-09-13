@@ -46,7 +46,7 @@ namespace parallax::interferometry
         double turbulence_rms_rad = 0.0; ///< Atmospheric phase RMS per station (radians).
         double snr = 0.0;                ///< System SNR; ≤ 0 disables thermal noise.
         bool gain_errors = false;        ///< Enable random gain errors per station.
-        std::uint32_t atm_seed = 0;      ///< Seed for the error RNG (used as atm_seed ^ 0x9e3779b9).
+        std::uint32_t atm_seed = 0;      ///< Seed for the error RNG (used as is, like the oracle).
     };
 
     // ── Measured visibility sample ────────────────────────────────────────────────
@@ -81,7 +81,7 @@ namespace parallax::interferometry
     ///        - Grid coords: du = 1/theta_fov_rad; GX = N/2 + u/du; GY = N/2 + v/du.
     ///        - Bilinear sample target_ft at (GX,GY) if GX,GY ∈ [1, N-2]; else skip.
     ///        - Apply instrument mode (Comb: Earth-only; Hbt: amplitude + dphi=0).
-    ///        - Apply station errors in this order (error-RNG seeded atm_seed^0x9e3779b9):
+    ///        - Apply station errors in this order (error-RNG seeded with atm_seed, no xor):
     ///            (a) Kolmogorov phases drawn before the loop (station-major, mode-major);
     ///            (b) gain errors drawn before the loop (per station, if enabled);
     ///            (c) thermal noise drawn inside the loop per visible sample.

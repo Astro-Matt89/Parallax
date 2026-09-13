@@ -21,7 +21,7 @@ function mulberry32(a){return function(){
 }}
 ```
 
-L'**ordine di consumo** dei numeri casuali è parte del contratto: ogni recipe consuma rng() in un ordine fisso documentato dal sorgente del sandbox; cambiarlo cambia tutti i target. La generazione del modello consuma, nell'ordine: eventuale scelta di famiglia (solo se non forzata), corpo della recipe, roll di rarità, budget (un draw sempre consumato), capRoll di complessità, shuffle di Fisher-Yates dei modificatori compatibili, poi i draw interni dei modificatori applicati. Gli errori di stazione usano un generatore separato inizializzato con `atmSeed ^ 0x9e3779b9`; le firme audio con `seed ^ 0x51ab` (non normativo per 10b). Il rumore gaussiano usa Box-Muller sui draw del generatore d'atmosfera.
+L'**ordine di consumo** dei numeri casuali è parte del contratto: ogni recipe consuma rng() in un ordine fisso documentato dal sorgente del sandbox; cambiarlo cambia tutti i target. La generazione del modello consuma, nell'ordine: eventuale scelta di famiglia (solo se non forzata), corpo della recipe, roll di rarità, budget (un draw sempre consumato), capRoll di complessità, shuffle di Fisher-Yates dei modificatori compatibili, poi i draw interni dei modificatori applicati. Gli errori di stazione usano un generatore separato inizializzato con `atmSeed` così com'è: `mulberry32(atmSeed)`, **senza xor** (le versioni precedenti di questa specifica indicavano `atmSeed ^ 0x9e3779b9`, in contraddizione con l'oracolo: vince l'oracolo); le firme audio con `seed ^ 0x51ab` (non normativo per 10b). Il rumore gaussiano usa Box-Muller sui draw del generatore d'atmosfera.
 
 ## 3. Formule normative
 

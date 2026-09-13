@@ -29,9 +29,9 @@
 //             Normally 2 draws. A zero draw (probability 2^-32) is rejected and
 //             costs one more draw, exactly like the oracle's while(u===0) loops.
 //
-// Seeding convention for station errors (SPECIFICA §2):
-//   The Kolmogorov / gain / noise error generator is seeded with
-//   atm_seed ^ 0x9e3779b9u — do NOT share this stream with the target-model RNG.
+// Seeding convention for station errors (oracle compute(), SPECIFICA §2):
+//   The Kolmogorov / gain / noise error generator is seeded with atm_seed as is
+//   (mulberry32(atmSeed), no xor) — do NOT share this stream with the target-model RNG.
 
 #include "core/types.hpp"
 

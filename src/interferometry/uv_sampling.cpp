@@ -77,7 +77,22 @@ namespace parallax::interferometry
         const TargetFT& target_ft,
         const StationErrors& errors)
     {
-        const std::size_t n_stations = stations.size();
+        // ── 0. Stations taking part (oracle compute()) ───────────────────────────
+        // HBT and optical comb keep Earth stations only (coherence on the ground). The oracle
+        // REDUCES the list before anything else, so the pairs, the K cap and the per-station
+        // error draws all follow the reduced list. Output indices refer back to `stations`.
+        const bool earth_only = (config.mode == InstrumentMode::Hbt || config.mode == InstrumentMode::Comb);
+        std::vector<std::size_t> active;
+        active.reserve(stations.size());
+        for (std::size_t s = 0; s < stations.size(); ++s)
+        {
+            if (!earth_only || stations[s].body == Body::Earth)
+            {
+                active.push_back(s);
+            }
+        }
+
+        const std::size_t n_stations = active.size();
         if (n_stations < 2 || target_ft.N < 3 || target_ft.Fre.empty())
         {
             return {};
@@ -137,7 +152,6 @@ namespace parallax::interferometry
         // ── 7. Sampling loop: time k outer, pairs (i < j) inner — oracle order ───
         // This order fixes the thermal-noise draw sequence and the order of the
         // emitted samples (the fixtures store k, not the station pair).
-        const bool comb_mode = (config.mode == InstrumentMode::Comb);
         const bool hbt_mode  = (config.mode == InstrumentMode::Hbt);
         const double noise_sig = (errors.snr > 0.0) ? (config.flux_total / errors.snr) : 0.0;
 
@@ -156,21 +170,15 @@ namespace parallax::interferometry
             // up·s < sin(EL_MIN) or the other body occults it, so elevation ≥ sin(EL_MIN) is visible.
             for (std::size_t s = 0; s < n_stations; ++s)
             {
-                states[s] = station_state(stations[s], t_hours);
-                visible[s] = is_visible(states[s], s3, t_hours, stations[s].body);
+                const Station& station = stations[active[s]];
+                states[s] = station_state(station, t_hours);
+                visible[s] = is_visible(states[s], s3, t_hours, station.body);
             }
 
             for (std::size_t i = 0; i < n_stations; ++i)
             {
                 for (std::size_t j = i + 1u; j < n_stations; ++j)
                 {
-                    // Comb mode: skip pairs involving any Moon station.
-                    if (comb_mode
-                        && (stations[i].body == Body::Moon || stations[j].body == Body::Moon))
-                    {
-                        continue;
-                    }
-
                     if (!visible[i] || !visible[j])
                     {
                         continue;
@@ -235,8 +243,8 @@ namespace parallax::interferometry
                         .tVr = tVr,
                         .tVi = tVi,
                         .time_index = static_cast<std::uint32_t>(k),
-                        .station_i = static_cast<std::uint32_t>(i),
-                        .station_j = static_cast<std::uint32_t>(j),
+                        .station_i = static_cast<std::uint32_t>(active[i]),
+                        .station_j = static_cast<std::uint32_t>(active[j]),
                     });
                 }
             }

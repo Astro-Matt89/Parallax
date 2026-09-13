@@ -11,9 +11,9 @@ namespace parallax::interferometry
     enum class InstrumentMode
     {
         Radio, // Direct interferometry (complex visibility), all baselines.
-        Comb,  // Optical combiner: Earth-only baselines (no Moon station in any pair).
-        Hbt,   // Hanbury Brown–Twiss intensity interferometry: amplitude only,
-               // phase-immune (dphi forced to 0 regardless of turbulence).
+        Comb,  // Optical combiner: Earth stations only (list reduced before pairing).
+        Hbt,   // Hanbury Brown–Twiss intensity interferometry: Earth stations only,
+               // amplitude only, phase-immune (dphi forced to 0 regardless of turbulence).
         Epr,   // Entanglement-based Earth-Moon optical coherence (complex, like Radio).
     };
 
@@ -59,13 +59,16 @@ namespace parallax::interferometry
         double tVr;          ///< True real part (noiseless).
         double tVi;          ///< True imaginary part (noiseless).
         std::uint32_t time_index;  ///< Time-sample index k within the observation.
-        std::uint32_t station_i;   ///< Index of the first station (baseline i < j).
-        std::uint32_t station_j;   ///< Index of the second station.
+        std::uint32_t station_i;   ///< Index into the caller's station list of the first station (i < j).
+        std::uint32_t station_j;   ///< Index into the caller's station list of the second station.
     };
 
     /// Sample the (u,v) plane for a given station set, observation, and error model.
     ///
     /// Algorithm summary:
+    ///   0. Hbt and Comb keep Earth stations only. As in the oracle the list is REDUCED first,
+    ///      so pairs, the K cap and per-station error draws use the reduced list; the
+    ///      station indices of the output still refer to `stations`.
     ///   1. Determine K time samples (48 if rotation, 1 otherwise); reduce K when
     ///      pairs × K > 8000 via K = floor(8000 / pairs).
     ///   2. Build sample times: Hs[k] = ((k / (K-1)) - 0.5) × durationHours; Hs[0]=0 when K=1.
@@ -80,7 +83,7 @@ namespace parallax::interferometry
     ///        - Baseline B = P_i - P_j; u = B·eU/λ; v = B·eV/λ.
     ///        - Grid coords: du = 1/theta_fov_rad; GX = N/2 + u/du; GY = N/2 + v/du.
     ///        - Bilinear sample target_ft at (GX,GY) if GX,GY ∈ [1, N-2]; else skip.
-    ///        - Apply instrument mode (Comb: Earth-only; Hbt: amplitude + dphi=0).
+    ///        - Apply instrument mode (Hbt: amplitude only, dphi = 0).
     ///        - Apply station errors in this order (error-RNG seeded with atm_seed, no xor):
     ///            (a) Kolmogorov phases drawn before the loop (station-major, mode-major);
     ///            (b) gain errors drawn before the loop (per station, if enabled);

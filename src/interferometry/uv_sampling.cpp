@@ -163,8 +163,9 @@ namespace parallax::interferometry
 
         for (std::size_t k = 0; k < K; ++k)
         {
-            // Absolute observation time for this sample.
-            const double t_hours = config.epoch_days * 24.0 + Hs[k];
+            // Oracle: stationState(s, Hs[k]) — hours from the track centre, no epoch offset
+            // (the epoch acts only on the target model through applyTemporal).
+            const double t_hours = Hs[k];
 
             // Station states and visibility at time t. The oracle hides a station when
             // up·s < sin(EL_MIN) or the other body occults it, so elevation ≥ sin(EL_MIN) is visible.

@@ -52,12 +52,19 @@ namespace
         return parallax::interferometry::generate_stations(config);
     }
 
-    /// Return the three fixed Earth stations (La Palma, Mauna Kea, Paranal).
+    /// Return the three fixed Earth stations (La Palma, Mauna Kea, Paranal) turned 90° east.
+    /// sample_uv centres every track on t = 0 (oracle: no epoch offset on the geometry); the
+    /// extra longitude is 6 h of Earth rotation, the same geometry as the former
+    /// epoch_days = 0.25 setup, in which all three face the test declinations.
     /// These are suitable for tests that require non-empty visibility results.
     [[nodiscard]] std::vector<Station> make_earth_stations()
     {
         std::vector<Station> stations;
         parallax::interferometry::append_earth_stations(stations);
+        for (Station& station : stations)
+        {
+            station.lon += 90.0 * kDegToRad;
+        }
         return stations;
     }
 
@@ -197,8 +204,6 @@ TEST_CASE("snapshot mode (rotation=false) produces K=1 and at most n_pairs sampl
     cfg.mode = InstrumentMode::Radio;
     cfg.theta_fov_rad = 1.0e-6;
     cfg.flux_total = 1.0;
-    cfg.epoch_days = 0.0;
-
     StationErrors err {};
     err.turbulence_rms_rad = 0.0;
     err.snr = 0.0;
@@ -233,8 +238,6 @@ TEST_CASE("rotation mode uses K=48 for 13-station array (pairs*48 <= 8000)")
     cfg.mode = InstrumentMode::Radio;
     cfg.theta_fov_rad = 5.0e-7;
     cfg.flux_total = 1.0;
-    cfg.epoch_days = 0.0;
-
     StationErrors err {};
 
     const std::vector<Visibility> vis = sample_uv(stations, cfg, ft, err);
@@ -263,8 +266,6 @@ TEST_CASE("K reduction: pairs*K capped at 8000 for large station count")
     cfg.mode = InstrumentMode::Radio;
     cfg.theta_fov_rad = 5.0e-7;
     cfg.flux_total = 1.0;
-    cfg.epoch_days = 0.0;
-
     StationErrors err {};
 
     const std::vector<Visibility> vis = sample_uv(stations, cfg, ft, err);
@@ -307,8 +308,8 @@ TEST_CASE("Hs time offsets are symmetric around zero for K=48")
 TEST_CASE("zero errors: measured visibility equals true visibility")
 {
     // Earth stations (3 stations, 3 pairs) with radio wavelength so baselines
-    // land inside the FT grid.  At epoch_days=0.25 (t=6 h) all three stations
-    // are visible for dec=20°.  lambda=0.1 m, theta_fov=5e-7 rad, N=128
+    // land inside the FT grid.  With the stations turned 6 h east (make_earth_stations)
+    // all three are visible at t = 0 for dec=20°.  lambda=0.1 m, theta_fov=5e-7 rad, N=128
     // → GX ∈ [10, 101], GY ∈ [30, 58], all inside [1, 126].
     const std::vector<Station> stations = make_earth_stations();
     const TargetFT ft = make_point_source_ft(128u, 2.5);
@@ -321,8 +322,6 @@ TEST_CASE("zero errors: measured visibility equals true visibility")
     cfg.mode = InstrumentMode::Radio;
     cfg.theta_fov_rad = 5.0e-7;
     cfg.flux_total = 1.0;
-    cfg.epoch_days = 0.25; // 6 h offset so all Earth stations face the source
-
     StationErrors err {};
     err.turbulence_rms_rad = 0.0;
     err.snr = 0.0;
@@ -354,8 +353,6 @@ TEST_CASE("HBT mode: tVi == 0 and tVr == |V| for all samples")
     cfg.mode = InstrumentMode::Hbt;
     cfg.theta_fov_rad = 5.0e-7;
     cfg.flux_total = 1.0;
-    cfg.epoch_days = 0.25;
-
     StationErrors err {};
     err.turbulence_rms_rad = 0.0;
     err.snr = 0.0;
@@ -386,8 +383,6 @@ TEST_CASE("HBT mode: results are unchanged when turbulence RMS is raised (phase 
     cfg.mode = InstrumentMode::Hbt;
     cfg.theta_fov_rad = 5.0e-7;
     cfg.flux_total = 1.0;
-    cfg.epoch_days = 0.25;
-
     StationErrors err_zero {};
     err_zero.atm_seed = 111u;
     err_zero.turbulence_rms_rad = 0.0;
@@ -434,8 +429,6 @@ TEST_CASE("Comb mode: no visibility involves a Moon station")
     cfg.mode = InstrumentMode::Comb;
     cfg.theta_fov_rad = 1.0e-5;
     cfg.flux_total = 1.0;
-    cfg.epoch_days = 0.0;
-
     StationErrors err {};
 
     const std::vector<Visibility> vis = sample_uv(stations, cfg, ft, err);
@@ -467,8 +460,6 @@ TEST_CASE("Point-source FT with zero errors gives constant tVr and tVi == 0")
     cfg.mode = InstrumentMode::Radio;
     cfg.theta_fov_rad = 5.0e-7;
     cfg.flux_total = 1.0;
-    cfg.epoch_days = 0.25;
-
     StationErrors err {};
     err.turbulence_rms_rad = 0.0;
     err.snr = 0.0;
@@ -498,8 +489,6 @@ TEST_CASE("Works with n=4 per-arm (13 stations) and n=7 per-arm (22 stations)")
     cfg.mode = InstrumentMode::Radio;
     cfg.theta_fov_rad = 1.0e-5;
     cfg.flux_total = 1.0;
-    cfg.epoch_days = 0.0;
-
     StationErrors err {};
 
     // n=4 → 13 stations.
@@ -535,8 +524,6 @@ TEST_CASE("station_i < station_j for all returned visibilities")
     cfg.mode = InstrumentMode::Radio;
     cfg.theta_fov_rad = 1.0e-5;
     cfg.flux_total = 1.0;
-    cfg.epoch_days = 0.0;
-
     StationErrors err {};
 
     const std::vector<Visibility> vis = sample_uv(stations, cfg, ft, err);
@@ -564,8 +551,6 @@ TEST_CASE("Thermal noise changes Vr/Vi but leaves tVr/tVi unchanged")
     cfg.mode = InstrumentMode::Radio;
     cfg.theta_fov_rad = 5.0e-7;
     cfg.flux_total = 10.0;
-    cfg.epoch_days = 0.25;
-
     StationErrors err_clean {};
     err_clean.turbulence_rms_rad = 0.0;
     err_clean.snr = 0.0;

@@ -37,7 +37,8 @@ namespace parallax::interferometry
         InstrumentMode mode;    ///< Instrument / baseline selection mode.
         double theta_fov_rad;   ///< Field-of-view half-angle used for uv-grid (radians).
         double flux_total;      ///< Total source flux (used for thermal-noise scaling).
-        double epoch_days;      ///< Observation epoch (days); sets ephemeris time offset.
+        // No epoch here: as in the oracle, the epoch only evolves the target model
+        // (render_target_at); every track is centred on t = 0 for the ephemerides.
     };
 
     // ── Per-station error model ───────────────────────────────────────────────────
@@ -77,7 +78,7 @@ namespace parallax::interferometry
     ///   4. Enumerate time k (outer) and pairs i < j in index order (inner): the oracle
     ///      order, part of the fixture contract (it fixes noise draws and output order).
     ///   5. For each time k and pair:
-    ///        - Compute station states from ephemerides at t = epoch_days*24 + Hs[k].
+    ///        - Compute station states from ephemerides at t = Hs[k] (no epoch offset).
     ///        - Require both stations visible (elevation ≥ sin(EL_MIN), not occulted);
     ///          the oracle hides a station only when up·s < sin(EL_MIN).
     ///        - Baseline B = P_i - P_j; u = B·eU/λ; v = B·eV/λ.

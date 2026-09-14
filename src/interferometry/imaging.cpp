@@ -79,11 +79,19 @@ DirtyImages make_images(const std::vector<Visibility>& points,
     std::vector<double> dirty_re = gRe;
     std::vector<double> dirty_im = gIm;
 
+    // Oracle makeImages: shift2 -> ifft2 -> shift2. The gridded plane has its DC cell at (N/2, N/2);
+    // the pre-shift moves it to (0, 0), where the IFFT expects it (the convention compute_target_fft
+    // already uses). Without it the image picks up a (-1)^(x+y) checkerboard.
+    parallax::core::shift2(beam_re, N);
+    parallax::core::shift2(beam_im, N);
+    parallax::core::shift2(dirty_re, N);
+    parallax::core::shift2(dirty_im, N);
+
     // IFFT2 (includes 1/N² normalisation).
     parallax::core::ifft2(beam_re,  beam_im,  N);
     parallax::core::ifft2(dirty_re, dirty_im, N);
 
-    // fftshift: place DC (beam peak) at the centre (N/2, N/2).
+    // Post-shift: place the image centre (beam peak) at (N/2, N/2).
     parallax::core::shift2(beam_re, N);
     parallax::core::shift2(dirty_re, N);
     parallax::core::shift2(dirty_im, N);

@@ -87,7 +87,14 @@
 namespace parallax::procedural
 {
 
+// Exact 2*pi: only the recipe position-angle draws (oracle `PA=rng()*Math.PI*2`).
 static constexpr double k2Pi = 2.0 * std::numbers::pi;
+
+// Oracle literals kept truncated ON PURPOSE (see the sandbox v1.7.5 note on randn). Inside
+// generateTargetModel they are only the span of random phase/angle draws, not a formula constant,
+// and the fixtures were generated with them: replacing them with 2*pi changes every target model.
+static constexpr double kOraclePhaseSpan      = 6.283; // oracle rng()*6.283
+static constexpr double kOraclePhaseSpanShort = 6.28;  // oracle rng()*6.28 (some harmonic phases)
 
 // Helper: rr(rng, a, b) = a + rng.next() * (b − a)
 // Each call consumes exactly one draw.  Never embed multiple calls of this
@@ -214,7 +221,7 @@ static void recipe_binary(TargetModel& m, Rng& rng, std::uint32_t N)
         m.physical.flux_ratio         = q;
         m.physical.total_mass_solar   = Mtot;
 
-        const double ph0 = rng.next() * k2Pi;              // draw 7
+        const double ph0 = rng.next() * kOraclePhaseSpan;              // draw 7
         m.temporal.model        = TemporalModel::Orbit;
         m.temporal.phase0       = ph0;
         m.temporal.period_years = std::sqrt(aAU * aAU * aAU / Mtot);
@@ -261,7 +268,7 @@ static void recipe_binary(TargetModel& m, Rng& rng, std::uint32_t N)
         m.physical.mass_ratio           = q;
         m.physical.distance_pc          = dPc;
 
-        const double ph0    = rng.next() * k2Pi;           // draw 6
+        const double ph0    = rng.next() * kOraclePhaseSpan;           // draw 6
         const double period = rr(rng, 0.3, 2.0) / 365.0;  // draw 7
         m.temporal.model        = TemporalModel::Orbit;
         m.temporal.phase0       = ph0;
@@ -322,7 +329,7 @@ static void recipe_star(TargetModel& m, Rng& rng, std::uint32_t N)
         m.physical.distance_pc     = dPc;
         m.physical.limb_darkening  = ld;
 
-        const double ph0    = rng.next() * k2Pi;           // draw 6
+        const double ph0    = rng.next() * kOraclePhaseSpan;           // draw 6
         const double period = rr(rng, 0.5, 4.0);          // draw 7
         m.temporal.model        = TemporalModel::Rotation;
         m.temporal.phase0       = ph0;
@@ -365,7 +372,7 @@ static void recipe_star(TargetModel& m, Rng& rng, std::uint32_t N)
         m.physical.distance_pc    = dPc;
         m.physical.oblateness     = e;
 
-        const double ph0    = rng.next() * k2Pi;           // draw 7
+        const double ph0    = rng.next() * kOraclePhaseSpan;           // draw 7
         const double period = rr(rng, 0.05, 0.5);         // draw 8
         m.temporal.model        = TemporalModel::Rotation;
         m.temporal.phase0       = ph0;
@@ -420,7 +427,7 @@ static void recipe_star(TargetModel& m, Rng& rng, std::uint32_t N)
         const double storm_r = rng.next();                  // storm roll
         if (storm_r < 0.7)
         {
-            const double storm_a  = rng.next() * k2Pi;     // storm angle
+            const double storm_a  = rng.next() * kOraclePhaseSpan;     // storm angle
             const double storm_rd = rng.next() * R * 0.55; // storm radius
             Component spot;
             spot.id = "macchia_1";
@@ -436,7 +443,7 @@ static void recipe_star(TargetModel& m, Rng& rng, std::uint32_t N)
         }
 
         const double rotH = rr(rng, 2.0, 12.0);            // draw: rotH
-        const double ph0  = rng.next() * k2Pi;             // draw: phase0
+        const double ph0  = rng.next() * kOraclePhaseSpan;             // draw: phase0
         m.physical.radius_jupiter   = Rj;
         m.physical.distance_pc      = dPc;
         m.physical.temp_k           = T;
@@ -588,7 +595,7 @@ static void recipe_star(TargetModel& m, Rng& rng, std::uint32_t N)
         const int    nc   = 2 + static_cast<int>(nc_d * 2.0);
         for (int i = 0; i < nc; ++i)
         {
-            const double cell_a  = rng.next() * k2Pi;     // draw: angle
+            const double cell_a  = rng.next() * kOraclePhaseSpan;     // draw: angle
             const double cell_rd = rng.next() * Rp * 0.6; // draw: radius
             Component cell;
             cell.id = "cella_" + std::to_string(i + 1);
@@ -609,7 +616,7 @@ static void recipe_star(TargetModel& m, Rng& rng, std::uint32_t N)
         for (int i = 0; i < 2; ++i)
         {
             const double ell = rr(rng, 0.0, 0.15);        // draw: ellipticity
-            const double ph  = rng.next() * 6.28;          // draw: harmonic ph
+            const double ph  = rng.next() * kOraclePhaseSpanShort;          // draw: harmonic ph
 
             HarmonicTerm ht;
             ht.k  = 3 + i * 2;
@@ -641,7 +648,7 @@ static void recipe_star(TargetModel& m, Rng& rng, std::uint32_t N)
             const int    nms    = 3;
             for (int i = 0; i < nms; ++i)
             {
-                const double ma  = rng.next() * k2Pi;
+                const double ma  = rng.next() * kOraclePhaseSpan;
                 Component mas;
                 mas.id   = "maser_" + std::to_string(i + 1);
                 mas.type = PrimitiveType::Point;
@@ -762,7 +769,7 @@ static void recipe_proto_disk(TargetModel& m, Rng& rng, std::uint32_t N)
         const double cos_inc = std::cos(inc);
         for (int i = 0; i < nm; ++i)
         {
-            const double ma  = rng.next() * k2Pi;
+            const double ma  = rng.next() * kOraclePhaseSpan;
             const double mrd = rr(rng, 0.2, 0.5) * R3;
             Component mas;
             mas.id   = "maser_" + std::to_string(i + 1);
@@ -807,7 +814,7 @@ static void recipe_nova(TargetModel& m, Rng& rng, std::uint32_t N)
             make_point("pulsar", C, C, 1.2, 1.0, SpectralModel::Synchrotron, 230e9, -1.6));
 
         const double ell_neb = rr(rng, 0.0, 0.3);   // draw 5
-        const double ph_neb  = rng.next() * k2Pi;    // draw 6
+        const double ph_neb  = rng.next() * kOraclePhaseSpanShort;    // draw 6
         {
             HarmonicTerm ht; ht.k = 2; ht.A = 0.3; ht.ph = ph_neb;
             m.components.push_back(
@@ -846,9 +853,9 @@ static void recipe_nova(TargetModel& m, Rng& rng, std::uint32_t N)
 
     // harmonics: k1 · ph1 · k2 · ph2 (4 draws, must bind each)
     const double k1_d = rng.next();                  // draw 6
-    const double ph1  = rng.next() * k2Pi;           // draw 7
+    const double ph1  = rng.next() * kOraclePhaseSpanShort;           // draw 7
     const double k2_d = rng.next();                  // draw 8
-    const double ph2  = rng.next() * k2Pi;           // draw 9
+    const double ph2  = rng.next() * kOraclePhaseSpanShort;           // draw 9
     {
         const int k1 = 2 + static_cast<int>(std::floor(k1_d * 4.0));
         const int k2 = 5 + static_cast<int>(std::floor(k2_d * 6.0));
@@ -879,7 +886,7 @@ static void recipe_nova(TargetModel& m, Rng& rng, std::uint32_t N)
         const double siPA   = std::sin(PA);
         for (int i = 0; i < ns; ++i)
         {
-            const double ma = rng.next() * k2Pi;
+            const double ma = rng.next() * kOraclePhaseSpan;
             const double lx = std::cos(ma) * R;
             const double ly = std::sin(ma) * R * (1.0 - ell);
             Component mas;
@@ -1110,7 +1117,7 @@ static void recipe_planetary(TargetModel& m, Rng& rng, std::uint32_t N)
     auto mk_planet = [&](int idx, double aAU, double contrast,
                           double cosI, SpectralModel spec, double periodY) -> Component
     {
-        const double phase0 = rng.next() * k2Pi;     // draw: phase0
+        const double phase0 = rng.next() * kOraclePhaseSpan;     // draw: phase0
         Orbit orb;
         orb.aPx         = aAU * pxPerAU;
         orb.periodYears = periodY;
@@ -1239,8 +1246,8 @@ static void recipe_planet_res(TargetModel& m, Rng& rng, std::uint32_t N)
     const double rotH = giant ? rr(rng, 8.0, 14.0) : rr(rng, 16.0, 40.0); // draw 4
 
     const double nz_d       = rng.next();             // draw 5
-    const double rotPhase   = rng.next() * k2Pi;      // draw 6
-    const double cloudPhase = rng.next() * k2Pi;      // draw 7
+    const double rotPhase   = rng.next() * kOraclePhaseSpan;      // draw 6
+    const double cloudPhase = rng.next() * kOraclePhaseSpan;      // draw 7
     const double phaseAngle = rr(rng, 0.25, 1.0);    // draw 8
     const double seaLevel   = rr(rng, 0.35, 0.6);    // draw 9
     const double capLat     = rr(rng, 0.9, 1.25);    // draw 10
@@ -1306,7 +1313,7 @@ static bool mod_hotspot(TargetModel& m, Rng& rng)
         if (!ring && c.type == PrimitiveType::Ring) ring = &c;
         if (!disk  && c.type == PrimitiveType::Disk) disk = &c;
     }
-    const double ang = rng.next() * k2Pi;  // draw always
+    const double ang = rng.next() * kOraclePhaseSpan;  // draw always
     if (ring)
     {
         const double coAng = std::cos(ring->angle);
@@ -1349,7 +1356,7 @@ static bool mod_hotspot(TargetModel& m, Rng& rng)
 
 static bool mod_companion(TargetModel& m, Rng& rng, std::uint32_t N)
 {
-    const double ang = rng.next() * k2Pi;
+    const double ang = rng.next() * kOraclePhaseSpan;
     const double rd  = rr(rng, 0.30, 0.44) * static_cast<double>(N);
     const double fc  = rr(rng, 0.05, 0.16);
     const double Chalf = static_cast<double>(N) / 2.0;
@@ -1374,7 +1381,7 @@ static bool mod_asymmetric(TargetModel& m, Rng& rng)
     if (ring)
     {
         const double A  = rr(rng, 0.4, 0.8);
-        const double ph = rng.next() * k2Pi;
+        const double ph = rng.next() * kOraclePhaseSpan;
         HarmonicTerm ht; ht.k = 1; ht.A = A; ht.ph = ph;
         ring->harm.push_back(ht);
     }
@@ -1394,9 +1401,9 @@ static bool mod_clumpy(TargetModel& m, Rng& rng)
     if (!ring) return false;
 
     const double k1_d = rng.next();
-    const double ph1  = rng.next() * k2Pi;
+    const double ph1  = rng.next() * kOraclePhaseSpan;
     const double k2_d = rng.next();
-    const double ph2  = rng.next() * k2Pi;
+    const double ph2  = rng.next() * kOraclePhaseSpan;
     HarmonicTerm h1; h1.k = 5 + static_cast<int>(k1_d * 5.0); h1.A = 0.35; h1.ph = ph1;
     HarmonicTerm h2; h2.k = 8 + static_cast<int>(k2_d * 6.0); h2.A = 0.25; h2.ph = ph2;
     ring->harm.push_back(h1);

@@ -19,25 +19,33 @@ namespace parallax::interferometry
 
         std::vector<std::vector<double>> result(station_count, std::vector<double>(k_samples, 0.0));
 
+        // Oracle kolmSeries: `if(rms<=0)return ph;` — zeros, and NO draws consumed.
+        if (rms_rad <= 0.0)
+        {
+            return result;
+        }
+
+        // Oracle kolmSeries: `if(K===1){ph[0]=randn(rng)*rms;return ph;}` — one randn
+        // (2 draws) per station, no modal series and no normalisation.
+        if (k_samples == 1)
+        {
+            for (std::size_t s = 0; s < station_count; ++s)
+            {
+                result[s][0] = rng.randn() * rms_rad;
+            }
+            return result;
+        }
+
         const double K = static_cast<double>(k_samples);
 
         for (std::size_t s = 0; s < station_count; ++s)
         {
             // ── Draw phases (binding draw order: station-major, mode-major) ──────
             // phase_m ∈ [0, 2π) for m = 1 .. kKolmogorovModes
-            // Draws are always consumed regardless of rms_rad so that the error-RNG
-            // stream position is identical for every call with the same station_count
-            // and k_samples.
             double phases[kKolmogorovModes];
             for (int m = 0; m < kKolmogorovModes; ++m)
             {
                 phases[m] = astro_constants::kTwoPi * rng.next();
-            }
-
-            if (rms_rad == 0.0)
-            {
-                // Series stays zero; draws were consumed above for RNG consistency.
-                continue;
             }
 
             // ── Build raw series ──────────────────────────────────────────────────
@@ -49,7 +57,6 @@ namespace parallax::interferometry
                 {
                     const int m = mi + 1; // 1-indexed mode number
                     const double amplitude = std::pow(static_cast<double>(m), -4.0 / 3.0);
-                    // K > 1: argument varies over time; K == 1: k = 0 → argument = 0
                     const double arg = astro_constants::kTwoPi * static_cast<double>(m)
                         * static_cast<double>(k) / K
                         + phases[mi];

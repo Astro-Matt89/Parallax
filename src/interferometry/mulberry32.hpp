@@ -22,16 +22,16 @@
 //
 // Draw-consumption contract (binding — ties to fixture compatibility):
 //   next()  : advances state once, returns one uniform double in [0, 1).
-//   randn() : consumes exactly 2 draws (non-caching Box-Muller):
-//               u1 = next();  u2 = next();
-//               z0 = sqrt(-2 * ln(u1)) * cos(2π * u2);
-//               returns z0 only; the second variate z1 is discarded.
-//             If a fixture reveals that the sandbox caches z1, switch to the
-//             caching form and update this comment.
+//   randn() : non-caching Box-Muller, as the oracle (v1.7.5) randn:
+//               u1 = next() until non-zero;  u2 = next() until non-zero;
+//               z0 = sqrt(-2 * ln(u1)) * cos(2π * u2);   (exact 2π)
+//             returns z0 only; the second variate z1 is discarded.
+//             Normally 2 draws. A zero draw (probability 2^-32) is rejected and
+//             costs one more draw, exactly like the oracle's while(u===0) loops.
 //
-// Seeding convention for station errors (SPECIFICA §2):
-//   The Kolmogorov / gain / noise error generator is seeded with
-//   atm_seed ^ 0x9e3779b9u — do NOT share this stream with the target-model RNG.
+// Seeding convention for station errors (oracle compute(), SPECIFICA §2):
+//   The Kolmogorov / gain / noise error generator is seeded with atm_seed as is
+//   (mulberry32(atmSeed), no xor) — do NOT share this stream with the target-model RNG.
 
 #include "core/types.hpp"
 
@@ -65,15 +65,22 @@ namespace parallax::interferometry
             return static_cast<double>(t ^ (t >> 14u)) / 4294967296.0;
         }
 
-        /// Return a standard-normal variate via Box-Muller (non-caching, 2 draws).
+        /// Return a standard-normal variate via Box-Muller (non-caching; zero draws are redrawn).
         [[nodiscard]] double randn() noexcept
         {
-            const double u1 = next();
-            const double u2 = next();
-            // Guard against log(0): next() can return 0.0 if the hash produces 0.
-            const double safe_u1 = (u1 > 0.0) ? u1 : 1.0e-300;
-            return std::sqrt(-2.0 * std::log(safe_u1))
-                * std::cos(astro_constants::kTwoPi * u2);
+            // JS: let u=0,v=0; while(u===0)u=rng(); while(v===0)v=rng();
+            double u1 = 0.0;
+            while (u1 == 0.0)
+            {
+                u1 = next();
+            }
+            double u2 = 0.0;
+            while (u2 == 0.0)
+            {
+                u2 = next();
+            }
+            // JS: Math.sqrt(-2*Math.log(u))*Math.cos(TWO_PI*v)
+            return std::sqrt(-2.0 * std::log(u1)) * std::cos(astro_constants::kTwoPi * u2);
         }
 
     private:

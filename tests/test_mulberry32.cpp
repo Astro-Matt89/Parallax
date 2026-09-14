@@ -164,20 +164,25 @@ TEST_CASE("mulberry32 randn() non-caching Box-Muller consumes exactly 2 draws ea
     const double z1 = via_randn.randn(); // draws 2 and 3
     const double z2 = via_randn.randn(); // draws 4 and 5
 
+    // "Exactly 2 draws" holds only when no draw is zero (a zero draw is redrawn, as in the oracle).
+    REQUIRE(r0 > 0.0);
+    REQUIRE(r1 > 0.0);
+    REQUIRE(r2 > 0.0);
+    REQUIRE(r3 > 0.0);
+    REQUIRE(r4 > 0.0);
+    REQUIRE(r5 > 0.0);
+
     // Verify the Box-Muller formula manually for the first call.
-    const double safe_r0 = (r0 > 0.0) ? r0 : 1.0e-300;
-    const double expected_z0 = std::sqrt(-2.0 * std::log(safe_r0))
+    const double expected_z0 = std::sqrt(-2.0 * std::log(r0))
         * std::cos(2.0 * parallax::astro_constants::kPi * r1);
     CHECK(std::abs(z0 - expected_z0) <= kExact);
 
     // Verify second and third calls similarly.
-    const double safe_r2 = (r2 > 0.0) ? r2 : 1.0e-300;
-    const double expected_z1 = std::sqrt(-2.0 * std::log(safe_r2))
+    const double expected_z1 = std::sqrt(-2.0 * std::log(r2))
         * std::cos(2.0 * parallax::astro_constants::kPi * r3);
     CHECK(std::abs(z1 - expected_z1) <= kExact);
 
-    const double safe_r4 = (r4 > 0.0) ? r4 : 1.0e-300;
-    const double expected_z2 = std::sqrt(-2.0 * std::log(safe_r4))
+    const double expected_z2 = std::sqrt(-2.0 * std::log(r4))
         * std::cos(2.0 * parallax::astro_constants::kPi * r5);
     CHECK(std::abs(z2 - expected_z2) <= kExact);
 

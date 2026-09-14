@@ -30,7 +30,11 @@ using parallax::astro_constants::kPi;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-/// Build a Y-array on Earth (La Palma site centre).
+/// Build a Y-array on Earth (La Palma latitude).
+///
+/// The site longitude is La Palma's turned 18° east (1.2 h of Earth rotation):
+/// sample_uv centres every track on t = 0, so this puts the site meridian at the
+/// centre of the 4 h track — the geometry of the former epoch_days = 0.05 setup.
 ///
 /// The array is sited on Earth, and `make_obs()` pairs it with a radio
 /// wavelength, for the same reason as in test_uv_sampling.cpp (commit 13b1e61):
@@ -45,8 +49,8 @@ using parallax::astro_constants::kPi;
     cfg.site_extent_m    = 10000.0;
     cfg.site             = SiteCenter {
         .body = Body::Earth,
-        .lat  = 28.7569 * kDegToRad,  // La Palma
-        .lon  = -17.8925 * kDegToRad,
+        .lat  = 28.7569 * kDegToRad,            // La Palma
+        .lon  = (-17.8925 + 18.0) * kDegToRad,  // La Palma + 1.2 h of rotation
     };
     return generate_stations(cfg);
 }
@@ -69,8 +73,9 @@ using parallax::astro_constants::kPi;
 ///     |u| <= 7.4e4 wavelengths;
 ///   - theta_fov = 1e-4 rad: du = 1/theta_fov, so |u|/du <= 7.4 grid cells and
 ///     every sample lands well inside the [1, N-2] window of a 64² grid;
-///   - epoch_days = 0.05 (t ≈ 1.2 h) centres the 4 h track on the site's
-///     meridian, so all stations stay above EL_MIN for the whole observation.
+///   - the track is centred on t = 0, when the site meridian (see
+///     `make_array_stations()`) faces the source, so all stations stay above
+///     EL_MIN for the whole observation.
 [[nodiscard]] ObservationConfig make_obs(double lambda_m = 0.1)
 {
     return ObservationConfig {
@@ -81,7 +86,6 @@ using parallax::astro_constants::kPi;
         .mode           = InstrumentMode::Radio,
         .theta_fov_rad  = 1e-4,
         .flux_total     = 1.0,
-        .epoch_days     = 0.05,
     };
 }
 

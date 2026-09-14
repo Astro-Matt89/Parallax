@@ -497,7 +497,6 @@ TEST_CASE("CLEAN: end-to-end smoke — sample_uv → make_images → hogbom succ
     obs.mode           = InstrumentMode::Radio;
     obs.theta_fov_rad  = 5.0e-7;
     obs.flux_total     = 1.0;
-    obs.epoch_days     = 0.0;
 
     StationErrors errs{};  // no noise
 

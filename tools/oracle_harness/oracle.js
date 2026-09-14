@@ -75,9 +75,11 @@ function makeSandbox() {
 const EXPORTS = `
 ;globalThis.__oracle = {
     generateTargetModel, applyTemporal, renderTargetAt, computeTargetFFT,
-    evaluateSpectralFlux, scaleComp, applyCompatibleModifiers, mulberry32,
+    evaluateSpectralFlux, scaleComp, applyCompatibleModifiers, mulberry32, makeImages,
     TargetPrimitives, TargetRecipes, TargetModifiers,
     setN: (v) => { N = v; }, getN: () => N,
+    // makeImages reads the weighting from the UI select: 'nat' or 'uni'.
+    setWeighting: (w) => { ui.wt = { value: w }; },
 };`;
 
 function loadOracle(htmlPath = DEFAULT_HTML) {

@@ -1,7 +1,7 @@
 /// @file test_target_families.cpp
 /// @brief Unit tests for the procedural target-model generator (Sprint 10b, Task 10b.6).
 ///
-/// Test plan (9 test cases):
+/// Test plan (10 test cases):
 ///   1. Determinism     — same seed + options → byte-identical results.
 ///   2. Family forcing  — each of 8 families generates the correct family/subtypes.
 ///   3. Designation     — matches "GW J" + 4 digits + sign + 4 digits.
@@ -11,6 +11,7 @@
 ///   7. Noise functions — hardcoded reference values from the JS algorithm.
 ///   8. Draw-order regression — fixed draw count per family per seed.
 ///   9. Epoch / lambda  — accepted and applied without breaking determinism.
+///  10. Oracle render   — mixed spectral models against JS oracle reference values.
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest/doctest.h>
@@ -19,6 +20,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <numbers>
 #include <regex>
 #include <string>
@@ -396,4 +398,80 @@ TEST_CASE("Epoch and lambda: accepted and applied without changing generation de
     // v0.3; the actual v1.7.4 code calls both evaluateSpectralFlux and
     // applyTemporal.  This port matches v1.7.4 real behaviour.
     // Both functions are exercised by the render tests above.
+}
+
+// ─── 10. Mixed-spectrum render against the oracle ────────────────────────────
+//
+// The other render tests are self-consistent, so they could not notice that the
+// spectral models were evaluated at a wrong frequency (a wavelength in metres was
+// used as hertz). These references come from the JS oracle itself
+// (glasswing-sandbox-v1_7_5.html, renderTargetAt at N = 128, via
+// tools/oracle_harness): components with different spectral models scale
+// differently with frequency, so their relative weights — the pixels and the flux
+// below — change as soon as the frequency is wrong.
+
+namespace
+{
+    struct OraclePixel
+    {
+        std::uint32_t x;
+        std::uint32_t y;
+        double value;
+    };
+
+    struct OracleRender
+    {
+        std::uint32_t seed;
+        Family family;
+        const char* subtype;
+        double lambda_m;
+        double flux;
+        std::vector<OraclePixel> pixels;
+    };
+
+    constexpr double kOracleRelTol = 1e-12;
+
+    [[nodiscard]] bool matches_oracle(double computed, double expected)
+    {
+        return std::abs(computed - expected) <= kOracleRelTol * std::abs(expected);
+    }
+}
+
+TEST_CASE("Oracle render: mixed spectral models match JS reference values")
+{
+    const std::vector<OracleRender> references = {
+        // T Tauri: stellar + thermal_dust + free_free, 3 mm (band of fixture 4).
+        {8u, Family::Star, "t_tauri", 0.0029976364796207855, 68.061575418673939,
+            {{64, 64, 0.34792784661183745}, {52, 72, 0.44789603222880925},
+             {73, 58, 0.41306397532162797}, {38, 79, 0.15623832577870320}}},
+        // Same model at 0.87 mm: the dust ring brightens with respect to the jet.
+        {8u, Family::Star, "t_tauri", 0.0008710242128447287, 636.77957898244927,
+            {{64, 64, 0.78082862835252664}, {52, 72, 0.49424490303685831},
+             {73, 58, 1.0606749404413824}, {38, 79, 0.026147732890747535}}},
+        // Pulsar: two synchrotron components (alpha -1.6 and -0.5), 6 cm (band of fixture 9).
+        {1u, Family::Nova, "pulsar", 0.06012493095437851, 20.001874599878704,
+            {{64, 64, 1.0001504674500141}, {63, 48, 0.0096052209513841358}}},
+    };
+
+    for (const OracleRender& ref : references)
+    {
+        CAPTURE(ref.seed);
+        CAPTURE(ref.lambda_m);
+
+        const TargetOptions opts{ref.family, Complexity::Structured};
+        const TargetModel model = generate_target_model(ref.seed, opts);
+        REQUIRE(model.subtype == ref.subtype);
+
+        const std::vector<double> sky = render_target_at(model, ref.lambda_m, 0.0, 128u);
+        REQUIRE(sky.size() == 128u * 128u);
+
+        const double flux = sum(sky);
+        CHECK_MESSAGE(matches_oracle(flux, ref.flux), "flux " << flux << ", oracle " << ref.flux);
+        for (const OraclePixel& px : ref.pixels)
+        {
+            const double value = sky[static_cast<std::size_t>(px.y) * 128u + px.x];
+            CHECK_MESSAGE(matches_oracle(value, px.value),
+                "pixel (" << px.x << ", " << px.y << ") " << value << ", oracle " << px.value);
+        }
+    }
 }

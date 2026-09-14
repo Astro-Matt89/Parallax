@@ -86,21 +86,24 @@ DirtyImages make_images(const std::vector<Visibility>& points,
     // fftshift: place DC (beam peak) at the centre (N/2, N/2).
     parallax::core::shift2(beam_re, N);
     parallax::core::shift2(dirty_re, N);
+    parallax::core::shift2(dirty_im, N);
 
     // Normalise by beam peak.
     const double beam_peak = beam_re[static_cast<std::size_t>(N / 2u) * N + N / 2u];
     if (std::abs(beam_peak) < 1.0e-30)
     {
         spdlog::warn("make_images: beam peak is ~0 — no visibility data? Skipping normalisation.");
-        return DirtyImages{std::move(beam_re), std::move(dirty_re), N, du};
+        return DirtyImages{std::move(beam_re), std::move(dirty_re), N, du, std::move(dirty_im)};
     }
 
     for (auto& v : beam_re)
         v /= beam_peak;
     for (auto& v : dirty_re)
         v /= beam_peak;
+    for (auto& v : dirty_im)
+        v /= beam_peak;
 
-    return DirtyImages{std::move(beam_re), std::move(dirty_re), N, du};
+    return DirtyImages{std::move(beam_re), std::move(dirty_re), N, du, std::move(dirty_im)};
 }
 
 } // namespace parallax::interferometry

@@ -43,6 +43,9 @@ namespace parallax::interferometry
         std::vector<double> dirty; ///< Dirty image, beam-peak normalised.
         std::uint32_t N;           ///< Grid side length.
         double du;                 ///< uv cell size (wavelengths per pixel; = 1/theta_fov_rad).
+        /// Imaginary part of the dirty image after the IFFT, same layout and normalisation as
+        /// `dirty`. Hermitian gridding makes it ~0; exposed so that invariant can be checked.
+        std::vector<double> dirty_imag;
     };
 
     /// Grid the visibility samples and form the dirty beam and dirty image.

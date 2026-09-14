@@ -520,10 +520,11 @@ void dispatch_primitive(std::vector<double>& sky, const Component& c,
 // ─────────────────────────────────────────────────────────────────────────────
 // renderSky — main rendering entry point (called by target_families.cpp)
 // Implements renderTargetAt() logic (without the optical / nulled branches,
-// which are not part of the 10b.6 contract).
+// which are not part of the 10b.6 contract). `nu_hz` is a frequency in Hz,
+// see target_internal.hpp.
 // ─────────────────────────────────────────────────────────────────────────────
 std::vector<double> render_sky(const std::vector<Component>& source_components,
-                                double nu, std::uint32_t N)
+                                double nu_hz, std::uint32_t N)
 {
     std::vector<double> sky(static_cast<std::size_t>(N) * N, 0.0);
 
@@ -549,7 +550,7 @@ std::vector<double> render_sky(const std::vector<Component>& source_components,
     for (const Component* cp : em_comps)
     {
         const double flux_ref = (cp->flux_ref != 0.0) ? cp->flux_ref : cp->flux;
-        const auto   sp       = eval_spectral(*cp, nu);
+        const auto   sp       = eval_spectral(*cp, nu_hz);
         const double eff      = flux_ref * sp.flux_scale;
         if (eff > mx) mx = eff;
         evals.push_back({cp, eff, sp.size_scale});
@@ -563,7 +564,7 @@ std::vector<double> render_sky(const std::vector<Component>& source_components,
             continue;  // below 1:5000 visibility threshold
 
         const Component sc = scale_comp(*ev.comp, ev.size, ev.eff / norm);
-        dispatch_primitive(sky, sc, N, nu);
+        dispatch_primitive(sky, sc, N, nu_hz);
     }
 
     // Apply absorption passes

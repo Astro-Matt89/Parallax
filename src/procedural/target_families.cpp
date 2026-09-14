@@ -282,8 +282,9 @@ std::vector<double> render_target_at(const TargetModel& model,
     const auto source = apply_temporal(model, epoch_days, N);
 
     // Delegate to render_sky (target_primitives.cpp) which handles spectral
-    // evaluation, the 1:5000 cutoff, and the two-pass emission/absorption loop
-    return render_sky(source, lambda_m, N);
+    // evaluation, the 1:5000 cutoff, and the two-pass emission/absorption loop.
+    // render_sky takes a FREQUENCY: oracle renderTargetAt does nu = C_LIGHT / lambdaMeters.
+    return render_sky(source, kCLight / lambda_m, N);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

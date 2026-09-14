@@ -15,12 +15,18 @@ namespace parallax::procedural
 
     // ─── target_primitives.cpp ────────────────────────────────────────────────
 
-    /// Render all components (emission + absorption) to a flat N×N sky grid.
-    /// This is the C++ equivalent of renderTargetAt's inner loop (without the
-    /// spectral evaluation that belongs to the caller).
+    /// Render all components (emission, then absorption) to a flat N×N sky grid: the body of
+    /// the oracle's renderTargetAt after applyTemporal.
+    ///
+    /// `nu_hz` is the observing FREQUENCY in hertz, not a wavelength. render_sky performs the
+    /// spectral evaluation itself: each emission component's flux and size are scaled by its
+    /// spectral model at `nu_hz`, components fainter than 1:5000 of the brightest are skipped,
+    /// fluxes are normalised to the brightest, and `nu_hz` is also the RENDER_NU that
+    /// planet_surface uses for its wavelength-dependent albedo.
+    /// A caller holding a wavelength must convert: kCLight / lambda_m.
     [[nodiscard]] std::vector<double> render_sky(
         const std::vector<Component>& components,
-        double        lambda_m,
+        double        nu_hz,
         std::uint32_t N);
 
     // ─── target_recipes.cpp ───────────────────────────────────────────────────

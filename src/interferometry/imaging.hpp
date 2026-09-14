@@ -26,7 +26,8 @@ namespace parallax::interferometry
     enum class Weighting
     {
         Natural,  ///< No per-cell normalisation — maximises sensitivity.
-        Uniform,  ///< Divide each occupied cell by its sample count — improves resolution.
+        Uniform,  ///< Divide each occupied cell by its sample count and set its weight to 1
+                  ///< (the beam is the IFFT of a binary sampling mask) — improves resolution.
     };
 
     // ── Dirty images output ───────────────────────────────────────────────────

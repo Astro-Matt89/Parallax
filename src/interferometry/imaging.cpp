@@ -57,7 +57,9 @@ DirtyImages make_images(const std::vector<Visibility>& points,
         W[cidx]   += 1.0;
     }
 
-    // Uniform weighting: divide each occupied cell by its weight.
+    // Uniform weighting: divide each occupied cell by its weight, then set the weight to 1 —
+    // oracle makeImages: `gRe[i]/=W[i]; gIm[i]/=W[i]; W[i]=1;`. The dirty beam is therefore the
+    // IFFT of a binary sampling mask.
     if (weighting == Weighting::Uniform)
     {
         for (std::size_t i = 0u; i < sz; ++i)
@@ -66,6 +68,7 @@ DirtyImages make_images(const std::vector<Visibility>& points,
             {
                 gRe[i] /= W[i];
                 gIm[i] /= W[i];
+                W[i] = 1.0;
             }
         }
     }

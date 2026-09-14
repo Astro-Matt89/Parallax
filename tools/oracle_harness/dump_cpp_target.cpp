@@ -4,6 +4,7 @@
 ///        dump_oracle_target.js.
 ///
 /// Usage: dump_cpp_target <fixture-index> <out.json>
+///        dump_cpp_target --models <cases.json> <out.json>   (models only, cases from sweep_models.js)
 
 #include "procedural/target_families.hpp"
 
@@ -177,18 +178,36 @@ namespace
         };
     }
 
-    [[nodiscard]] json dump_fixture(const json& fixture, std::size_t index)
+    /// generateTargetModel options from {requestedClass, complexity} (a fixture or a sweep case).
+    [[nodiscard]] proc::TargetOptions options_from(const json& params)
     {
         proc::TargetOptions options;
-        const int requested_class = fixture.at("requestedClass").get<int>();
+        const int requested_class = params.at("requestedClass").get<int>();
         if (requested_class >= 0)
         {
             options.forced_family = static_cast<proc::Family>(static_cast<std::uint8_t>(requested_class));
         }
-        options.complexity = complexity_from(fixture.at("complexity").get<std::string>());
+        options.complexity = complexity_from(params.at("complexity").get<std::string>());
+        return options;
+    }
 
+    [[nodiscard]] json dump_models(const json& cases)
+    {
+        json models = json::array();
+        for (const json& params : cases)
+        {
+            const proc::TargetModel model =
+                proc::generate_target_model(params.at("seed").get<std::uint32_t>(), options_from(params));
+            models.push_back(model_to_json(model));
+        }
+        return models;
+    }
+
+    [[nodiscard]] json dump_fixture(const json& fixture, std::size_t index)
+    {
         const std::uint32_t grid_n = fixture.at("gridN").get<std::uint32_t>();
-        const proc::TargetModel model = proc::generate_target_model(fixture.at("seed").get<std::uint32_t>(), options);
+        const proc::TargetModel model =
+            proc::generate_target_model(fixture.at("seed").get<std::uint32_t>(), options_from(fixture));
         const std::vector<double> sky = proc::render_target_at(
             model, fixture.at("lambdaMeters").get<double>(), fixture.at("epochDays").get<double>(), grid_n);
 
@@ -208,14 +227,24 @@ namespace
 
 int main(int argc, char** argv)
 {
-    if (argc != 3)
+    const bool models_mode = (argc == 4 && std::string(argv[1]) == "--models");
+    if (argc != 3 && !models_mode)
     {
-        spdlog::error("usage: dump_cpp_target <fixture-index> <out.json>");
+        spdlog::error("usage: dump_cpp_target <fixture-index> <out.json> | --models <cases.json> <out.json>");
         return EXIT_FAILURE;
     }
 
     try
     {
+        if (models_mode)
+        {
+            std::ifstream cases(argv[2]);
+            const json models = dump_models(json::parse(cases));
+            std::ofstream(argv[3]) << models.dump();
+            spdlog::info("{} models written", models.size());
+            return EXIT_SUCCESS;
+        }
+
         std::ifstream in(kBatteryPath);
         const json battery = json::parse(in);
         const std::size_t index = std::stoul(argv[1]);

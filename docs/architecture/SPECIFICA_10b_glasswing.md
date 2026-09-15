@@ -62,7 +62,7 @@ Architettura compositiva: primitive (point, gaussian ellittica, disk con oscuram
 | visibilities | {u,v,Vr,Vi,trueVr,trueVi,k}[] | campioni: corrotti E veri |
 | dirtyImage, dirtyBeam | number[N²] | matrici normalizzate sul picco del beam (flusso/beam), a piena precisione (vedi §7) |
 
-La batteria corrente (`glasswing_fixture_battery_v1_3.json`, generata dall'oracolo v1.7.7) contiene 15 fixture che coprono le 8 famiglie, tutti i sottotipi stellari nuovi, i tre regimi d'array (sito 1–1000 km, rete Terra, Terra-Luna), pesatura naturale e uniforme, e un caso con turbolenza+rumore+guadagni attivi. Nella batteria il CLEAN è disattivato per costruzione (le sue verifiche usano invarianti, non matrici).
+La batteria corrente (`glasswing_fixture_battery_v1_3.json`, generata dall'oracolo v1.7.7; l'oracolo di riferimento corrente è la v1.7.8, che ne differisce solo nei commenti) contiene 15 fixture che coprono le 8 famiglie, tutti i sottotipi stellari nuovi, i tre regimi d'array (sito 1–1000 km, rete Terra, Terra-Luna), pesatura naturale e uniforme, e un caso con turbolenza+rumore+guadagni attivi. Nella batteria il CLEAN è disattivato per costruzione (le sue verifiche usano invarianti, non matrici).
 
 ## 6. Piano dei test C++
 

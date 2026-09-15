@@ -77,17 +77,23 @@ const EXPORTS = `
     generateTargetModel, applyTemporal, renderTargetAt, computeTargetFFT,
     evaluateSpectralFlux, scaleComp, applyCompatibleModifiers, mulberry32, makeImages,
     TargetPrimitives, TargetRecipes, TargetModifiers,
+    buildFixtureBattery, FIXTURE_SCENARIOS, setEpochFromSlider, $,
     setN: (v) => { N = v; }, getN: () => N,
     // makeImages reads the weighting from the UI select: 'nat' or 'uni'.
     setWeighting: (w) => { ui.wt = { value: w }; },
+    // What the moon-phase slider listener does when a user moves it.
+    setMoonPhaseDeg: (deg) => { moonPhase0 = deg * Math.PI / 180; },
 };`;
 
-function loadOracle(htmlPath = DEFAULT_HTML) {
-    const source = extractScript(fs.readFileSync(htmlPath, 'utf8'));
-    const sandbox = makeSandbox();
+/// options.sandbox: optional factory (html) => sandbox, e.g. battery_dom.makeStatefulSandbox.
+/// The default sandbox is inert: fine for the target model, not for anything that reads the UI.
+function loadOracle(htmlPath = DEFAULT_HTML, options = {}) {
+    const html = fs.readFileSync(htmlPath, 'utf8');
+    const source = extractScript(html);
+    const sandbox = options.sandbox ? options.sandbox(html) : makeSandbox();
     vm.createContext(sandbox);
     vm.runInContext(source + EXPORTS, sandbox, { filename: path.basename(htmlPath) + '.js' });
     return sandbox.__oracle;
 }
 
-module.exports = { loadOracle, DEFAULT_HTML };
+module.exports = { loadOracle, makeSandbox, makeStub, DEFAULT_HTML };

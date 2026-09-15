@@ -1,7 +1,12 @@
 # Sprint 10b — Interferometry & Aperture Synthesis
 
 **Prerequisite:** Sprint 10a complete (ArrayInstrument, physical SNR, total-power imaging) ✅
-**Oracle (conceptual reference):** `glasswing-sandbox-v1_7.html` — the interferometry pipeline
+**Oracle (reference):** `tools/glasswing-sandbox-v1_7_8.html` — the interferometry pipeline
+(older versions stay in `tools/` for history)
+**Normative spec:** `docs/architecture/SPECIFICA_10b_glasswing.md` — where this brief and the
+SPECIFICA disagree, the SPECIFICA and the oracle win
+**Status (2026-09-15):** 10b.1–10b.7 implemented. The 10b.7 oracle gate passes all 15 fixtures of
+battery v1.3 at levels 1, 2, 3 and 5. 10b.8 and 10b.9 not started.
 **Goal:** Real aperture synthesis. Earth-Moon baselines sampled from ephemerides, (u,v) coverage
 built over an observation, gridding → dirty image, Högbom CLEAN reconstruction, closure phases.
 Cross-validate the C++ against fixtures exported from the sandbox.
@@ -13,7 +18,7 @@ image via CLEAN, achieve angular resolution λ/B_max (micro-arcseconds with Eart
 
 ## The Sandbox as Conceptual Oracle
 
-The `glasswing-sandbox-v1_7.html` implements the complete interferometry pipeline in JavaScript.
+The oracle (`tools/glasswing-sandbox-v1_7_8.html`) implements the complete interferometry pipeline in JavaScript.
 It is the **conceptual reference**: the C++ must replicate its mathematics faithfully (the math is
 correct and validated), but the C++ MAY diverge in implementation details — data structures,
 memory layout, optimizations, code organization — as long as the numbers match within tolerance.
@@ -30,10 +35,13 @@ memory layout, optimizations, code organization — as long as the numbers match
 - Threading
 - Rendering of the (u,v) plane and images (visual, not numeric)
 
-**How to get fixtures:** open the sandbox in a browser, click "⭳ BATTERIA FIXTURE 10b" to export
-`glasswing_fixture_battery_v1_1.json` (15 deterministic scenarios covering all target families and
-regimes). Also export individual single-target datasets ("testset") as needed. The RNG is
-`mulberry32` — replicate it exactly so noise/atmosphere seeds line up.
+**Fixtures:** the gate uses `data/fixtures/glasswing_fixture_battery_v1_3.json` (15 deterministic
+scenarios covering all target families and regimes), exported from the oracle with
+"⭳ BATTERIA FIXTURE 10b" (generated with v1.7.7; v1.7.8 differs only in comments). The export pins
+the parameters listed in SPECIFICA §7 and writes the image matrices at full precision. A battery
+regenerated any other way is not comparable, and a regenerated battery must be verified against the
+previous one before the gate uses it. The RNG is `mulberry32` — replicate it exactly so
+noise/atmosphere seeds line up.
 
 ---
 
@@ -140,7 +148,8 @@ eU = [ 0, -1, 0 ]                       // uv-plane basis vectors
 eV = [ sin(dec), 0, -cos(dec) ]
 ```
 
-For each pair of stations (i,j) at each sample time k:
+At each sample time k (outer loop), for each station pair i < j in index order (inner loop —
+this order is part of the fixture contract: it fixes the noise draws and the output order):
 ```
 1. Check visibility: station up · s3 >= sin(EL_MIN), and not occulted
 2. Baseline vector: B = P_i - P_j
@@ -153,7 +162,8 @@ For each pair of stations (i,j) at each sample time k:
 
 **Time sampling:** if rotation enabled, K=48 sample times spread over the observation
 duration (durH hours): `Hs[k] = ((k/(K-1)) - 0.5) × durH`. Cap total samples: if
-`pairs × K > 8000`, reduce K. Without rotation, K=1 (snapshot).
+`pairs × K > 8000`, reduce K. Without rotation, K=1 (snapshot). Station states are evaluated at
+t = Hs[k]: there is no epoch offset on the ephemerides (the epoch only evolves the target model).
 
 ### 3. Station Errors (atmosphere, gain, noise)
 
@@ -172,6 +182,11 @@ Applied as phase difference: dphi = ph_i[k] - ph_j[k]
 
 **Thermal noise:** `noiseSig = flux/snr` (when snr > 0), added to Vr and Vi as Gaussian.
 
+**Error stream (fixture contract, SPECIFICA §2):** a separate `mulberry32(atmSeed)` generator, seeded
+with atmSeed as is (no xor). Draw order: per station `kolmSeries` (no draws when rms ≤ 0; a single
+`randn`·rms when K = 1; otherwise 12 phases), then one gain per station (if enabled), then thermal
+noise (Vr, then Vi) for each accepted sample, time outer and pairs inner. `randn` redraws zero uniforms.
+
 **Measured visibility:**
 ```
 g = gain_i × gain_j
@@ -187,6 +202,9 @@ Vi = g × (tVr×sin(dphi) + tVi×cos(dphi)) + noise
   (`tVr = |V|, tVi = 0`), immune to atmospheric phase (dphi = 0)
 - `epr` — sci-fi entanglement-based, Earth-Moon optical coherence
 
+`hbt` and `comb` reduce the station list to Earth stations BEFORE forming pairs, so the pair count,
+the K cap and the per-station error draws follow the reduced list.
+
 ### 5. Gridding → Dirty Image + Dirty Beam
 
 ```
@@ -194,10 +212,12 @@ For each visibility point, grid it (and its conjugate at -u,-v):
   gRe[cell] += Vr;  gIm[cell] += Vi;  W[cell] += 1
   conjugate cell: gRe += Vr; gIm -= Vi; W += 1
 
-If uniform weighting: divide each occupied cell by its weight W.
+If uniform weighting: divide each occupied cell by its weight W, then set W = 1
+(the dirty beam becomes the IFFT of a binary sampling mask).
 
-Dirty beam  = IFFT2(W)   (real part, fftshifted)
-Dirty image = IFFT2(gRe + i·gIm)   (real part, fftshifted)
+Dirty beam  = shift2(IFFT2(shift2(W)))              (real part)
+Dirty image = shift2(IFFT2(shift2(gRe + i·gIm)))    (real part)
+The pre-shift is required: without it both images pick up a (-1)^(x+y) checkerboard.
 
 Normalize both by the beam peak (bp = beam[center]):
   beam /= bp;  dirty /= bp
@@ -275,12 +295,12 @@ namespace parallax::interferometry {
 struct Visibility { f64 u, v, Vr, Vi, tVr, tVi; u32 time_index; };
 std::vector<Visibility> sample_uv(
     const std::vector<Station>& stations,
-    const ObservationConfig& config,   // dec, lambda, duration, rotation, mode, weighting
+    const ObservationConfig& config,   // dec, lambda, duration, rotation, mode, theta_fov, flux_total
     const TargetFT& target_ft,          // Fourier transform of the target sky
     const StationErrors& errors);       // turbulence, gain, noise + seed
 
 // src/interferometry/imaging.hpp
-struct DirtyImages { std::vector<f32> beam; std::vector<f32> dirty; u32 N; f64 du; };
+struct DirtyImages { std::vector<f64> beam, dirty; u32 N; f64 du; std::vector<f64> dirty_imag; };
 DirtyImages make_images(const std::vector<Visibility>& pts, f64 du, u32 N, Weighting w);
 
 // src/interferometry/clean.hpp
@@ -292,6 +312,10 @@ CleanResult hogbom(const std::vector<f32>& dirty, const std::vector<f32>& beam,
 std::vector<ClosureTriangle> compute_closure_phases(
     const std::vector<Visibility>& pts, const std::vector<Station>& stations);
 ```
+
+**`ObservationConfig::epoch_days` was removed.** The oracle evaluates the ephemerides at Hs[k]
+only; the epoch acts on the target model alone, through `render_target_at`. Code that used the
+epoch to turn the Earth towards the source must set the station longitude instead.
 
 ---
 
@@ -315,6 +339,8 @@ Files: `src/interferometry/imaging.hpp/cpp`
 Implement make_images: gridding with conjugates, natural/uniform weighting,
 FFT to beam and dirty image, beam-peak normalization. Reuse 10a FFT.
 Assert: beam[center] normalizes to 1.
+Tests: `tests/test_fixture_images.cpp` (level-3 golden comparison and level-5 invariants), the
+first dedicated coverage of this task.
 
 ### Task 10b.4 — Högbom CLEAN
 Files: `src/interferometry/clean.hpp/cpp`, `tests/test_clean.cpp`
@@ -331,14 +357,25 @@ Files: `src/procedural/target_families.hpp/cpp` (integrate with Sprint 07 proced
 Port the 8 families + subtypes. Each renders a sky grid + computes its FT.
 This is the concrete procedural generator (CLAUDE.md 7c). Deterministic from seed.
 
-### Task 10b.7 — Fixture Cross-Validation
-Files: `tests/test_interferometry_fixtures.cpp`, `data/fixtures/glasswing_fixture_battery_v1_1.json`
-Load the fixture battery. For each of the 15 fixtures, run the C++ pipeline with the
-same inputs and assert:
-- (u,v) coordinates: relative 1e-9
-- visibilities: relative 1e-7
-- dirty image / beam: absolute 1e-6 of peak
-This is the acceptance gate for the whole sprint.
+### Task 10b.7 — Fixture Cross-Validation ✅ COMPLETE
+Files: `tests/test_station_positions.cpp` (level 1), `tests/test_fixture_visibilities.cpp` (level 2),
+`tests/test_fixture_images.cpp` (levels 3 and 5), shared helpers `tests/glasswing_fixture_battery.hpp`
+and `tests/glasswing_fixture_pipeline.hpp`; battery `data/fixtures/glasswing_fixture_battery_v1_3.json`.
+For each of the 15 fixtures the C++ pipeline is rebuilt from seeds and parameters only. The gate is
+structured in the levels of SPECIFICA §6:
+- Level 1 — station positions against `stationPositionsPerSampleM`: relative 1e-9
+- Level 2 — (u,v) relative 1e-9; true and corrupted visibilities relative 1e-7 (plus a check of the
+  station-error stream that does not depend on the target model)
+- Level 3 — dirty beam and dirty image: absolute 1e-6 of peak, per pixel
+- Level 5 — oracle-independent invariants: the dirty image is real (hermitian gridding) and a zero
+  baseline samples the total flux
+Level 4 (CLEAN invariants against JS values) is not part of the gate: the battery carries no CLEAN
+data by construction. Result: all 15 fixtures pass every level. This is the acceptance gate for the
+whole sprint.
+
+The pipeline orchestrator previously listed as a prerequisite of this task turned out not to be
+needed: the tests rebuild the chain themselves (`tests/glasswing_fixture_pipeline.hpp`). The
+orchestrator moves to 10b.9.
 
 ### Task 10b.8 — Interferometry Tab / Imaging Tab Integration
 Files: `src/ui/tabs/imaging_tab.cpp` (extend), or new interferometry view
@@ -352,6 +389,9 @@ Files: `src/ui/tabs/imaging_tab.cpp` (extend), or new interferometry view
   interferometric resolution for the same target
 
 ### Task 10b.9 — Integration
+- Pipeline orchestrator: one entry point from an observation configuration to stations → target →
+  sample_uv → make_images → hogbom → closure phases (today this chain exists only inside the tests,
+  `tests/glasswing_fixture_pipeline.hpp`)
 - Wire interferometry into ArrayInstrument (the array now has an interferometric mode)
 - Sessions can be interferometric observations
 - Knowledge unlocks from resolved structure (L5 Resolved via interferometry)
@@ -361,18 +401,20 @@ Files: `src/ui/tabs/imaging_tab.cpp` (extend), or new interferometry view
 
 ## Definition of Done
 
-- [ ] Ephemerides match sandbox station positions (Earth + Moon) over time
-- [ ] (u,v) sampling reproduces sandbox coordinates within 1e-9
-- [ ] Visibilities match within 1e-7 (including atmosphere/gain/noise with same seeds)
-- [ ] Dirty image + beam match within 1e-6 of peak
-- [ ] Högbom CLEAN reconstructs point sources and extended structure
-- [ ] Closure phases immune to station phase errors
-- [ ] All 8 target families port and render deterministically
-- [ ] **All 15 fixtures in the battery pass** (the acceptance gate)
+- [x] Ephemerides match sandbox station positions (Earth + Moon) over time
+- [x] (u,v) sampling reproduces sandbox coordinates within 1e-9
+- [x] Visibilities match within 1e-7 (including atmosphere/gain/noise with same seeds)
+- [x] Dirty image + beam match within 1e-6 of peak
+- [ ] Högbom CLEAN reconstructs point sources and extended structure (point and two-source cases
+      covered by `test_clean`; extended structure not verified)
+- [x] Closure phases immune to station phase errors
+- [x] All 8 target families port and render deterministically (and match the oracle)
+- [x] **All 15 fixtures in the battery pass** (the acceptance gate — battery v1.3, levels 1/2/3/5)
 - [ ] (u,v) coverage accumulates live during an observation
 - [ ] Angular resolution readout shows λ/B_max (micro-arcsec with Earth-Moon)
-- [ ] Instrument modes work (radio/comb/hbt/epr)
-- [ ] Natural + uniform weighting
+- [ ] Instrument modes work (radio/comb/hbt/epr) — radio and comb validated by the fixtures;
+      hbt and epr are not exercised by any fixture
+- [x] Natural + uniform weighting
 - [ ] Knowledge L5 (Resolved) unlocks from interferometric imaging
 - [ ] No regressions in 10a; ≥ 60fps; no Vulkan validation errors
 

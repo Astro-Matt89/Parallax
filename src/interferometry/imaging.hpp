@@ -26,7 +26,8 @@ namespace parallax::interferometry
     enum class Weighting
     {
         Natural,  ///< No per-cell normalisation — maximises sensitivity.
-        Uniform,  ///< Divide each occupied cell by its sample count — improves resolution.
+        Uniform,  ///< Divide each occupied cell by its sample count and set its weight to 1
+                  ///< (the beam is the IFFT of a binary sampling mask) — improves resolution.
     };
 
     // ── Dirty images output ───────────────────────────────────────────────────
@@ -43,6 +44,9 @@ namespace parallax::interferometry
         std::vector<double> dirty; ///< Dirty image, beam-peak normalised.
         std::uint32_t N;           ///< Grid side length.
         double du;                 ///< uv cell size (wavelengths per pixel; = 1/theta_fov_rad).
+        /// Imaginary part of the dirty image after the IFFT, same layout and normalisation as
+        /// `dirty`. Hermitian gridding makes it ~0; exposed so that invariant can be checked.
+        std::vector<double> dirty_imag;
     };
 
     /// Grid the visibility samples and form the dirty beam and dirty image.

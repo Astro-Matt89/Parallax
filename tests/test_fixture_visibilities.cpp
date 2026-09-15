@@ -13,9 +13,8 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest/doctest.h>
 
-#include "glasswing_fixture_battery.hpp"
+#include "glasswing_fixture_pipeline.hpp"
 #include "interferometry/uv_sampling.hpp"
-#include "procedural/target_families.hpp"
 
 #include <nlohmann/json.hpp>
 
@@ -32,7 +31,6 @@ namespace
     using nlohmann::json;
     namespace fx = parallax::test_fixtures;
     namespace itf = parallax::interferometry;
-    namespace proc = parallax::procedural;
 
     /// (u,v) contract, SPECIFICA §7.
     constexpr double kUvRelTol = 1.0e-9;
@@ -40,80 +38,7 @@ namespace
     /// True and corrupted visibility contract, SPECIFICA §7.
     constexpr double kVisibilityRelTol = 1.0e-7;
 
-    /// Normative sky grid of the battery.
-    constexpr std::uint32_t kGridN = 128;
-
     constexpr std::size_t kNoMismatch = std::numeric_limits<std::size_t>::max();
-
-    [[nodiscard]] proc::Complexity complexity_from(const json& fixture)
-    {
-        // Oracle COMPLEXITY_CAP keys; any other value draws the cap from capRoll ("free").
-        const std::string name = fixture.at("complexity").get<std::string>();
-        if (name == "simple")
-        {
-            return proc::Complexity::Simple;
-        }
-        if (name == "structured")
-        {
-            return proc::Complexity::Structured;
-        }
-        if (name == "complex")
-        {
-            return proc::Complexity::Complex;
-        }
-        return proc::Complexity::Free;
-    }
-
-    struct FixtureRun
-    {
-        proc::TargetModel model;
-        double theta_fov_rad = 0.0;
-        double flux_total = 0.0;
-        std::vector<itf::Visibility> visibilities;
-    };
-
-    /// Oracle regenTarget() + refreshTargetRender() + compute(), from fixture parameters only.
-    [[nodiscard]] FixtureRun run_fixture(const json& fixture)
-    {
-        proc::TargetOptions options;
-        const int requested_class = fixture.at("requestedClass").get<int>();
-        if (requested_class >= 0)
-        {
-            options.forced_family = static_cast<proc::Family>(static_cast<std::uint8_t>(requested_class));
-        }
-        options.complexity = complexity_from(fixture);
-
-        const double lambda_m = fixture.at("lambdaMeters").get<double>();
-
-        FixtureRun run;
-        run.model = proc::generate_target_model(fixture.at("seed").get<std::uint32_t>(), options);
-        // Oracle genTarget: thetaFov = thetaObj * fovMul.
-        run.theta_fov_rad = run.model.theta_obj * run.model.fov_mul;
-
-        const std::vector<double> sky = proc::render_target_at(
-            run.model, lambda_m, fixture.at("epochDays").get<double>(), kGridN);
-        const itf::TargetFT target_ft = proc::compute_target_fft(sky, kGridN);
-        run.flux_total = target_ft.flux_total;
-
-        const itf::ObservationConfig observation {
-            .dec_rad = fx::oracle_deg_to_rad(fixture.at("decDeg").get<double>()),
-            .lambda_m = lambda_m,
-            .duration_hours = fixture.at("durationHours").get<double>(),
-            .rotation = fixture.at("rotation").get<bool>(),
-            .mode = fx::instrument_mode(fixture),
-            .theta_fov_rad = run.theta_fov_rad,
-            .flux_total = target_ft.flux_total,
-        };
-        const itf::StationErrors errors {
-            .turbulence_rms_rad = fixture.at("turbulenceRms").get<double>(),
-            .snr = fixture.at("snr").get<double>(),
-            .gain_errors = fixture.at("gainErrors").get<bool>(),
-            .atm_seed = fixture.at("atmSeed").get<std::uint32_t>(),
-        };
-
-        run.visibilities = itf::sample_uv(fx::oracle_stations(fixture), observation, target_ft, errors);
-        return run;
-    }
 
     /// Error of one field normalised by the reference modulus of its pair. Exact matches give 0;
     /// a non-finite computed value or a zero reference modulus with a non-zero error gives +inf.
@@ -246,9 +171,9 @@ TEST_CASE("Level 2: (u,v) and visibilities match every fixture")
         CAPTURE(f);
         INFO("scenario: " << scenario);
 
-        CHECK(fixture.at("gridN").get<std::uint32_t>() == kGridN);
+        CHECK(fixture.at("gridN").get<std::uint32_t>() == fx::kGridN);
 
-        const FixtureRun run = run_fixture(fixture);
+        const fx::FixtureRun run = fx::run_fixture(fixture);
         const json& expected = fixture.at("visibilities");
 
         // Target-model prerequisites: a divergence here explains any visibility failure below.
@@ -259,7 +184,7 @@ TEST_CASE("Level 2: (u,v) and visibilities match every fixture")
         MESSAGE("fixture " << f << " " << scenario << ": samples C++ " << run.visibilities.size()
                 << " / oracle " << expected.size()
                 << " | thetaFov rel " << fx::relative_error(run.theta_fov_rad, fixture.at("thetaFovRad").get<double>())
-                << ", flux rel " << fx::relative_error(run.flux_total, fixture.at("fluxTotal").get<double>())
+                << ", flux rel " << fx::relative_error(run.target_ft.flux_total, fixture.at("fluxTotal").get<double>())
                 << " | u " << d.u.error << ", v " << d.v.error
                 << ", Vr " << d.vr.error << ", Vi " << d.vi.error
                 << ", tVr " << d.tvr.error << ", tVi " << d.tvi.error);
@@ -306,7 +231,7 @@ TEST_CASE("Level 2, target-independent: station-error stream matches where it is
             continue;
         }
 
-        const FixtureRun run = run_fixture(fixture);
+        const fx::FixtureRun run = fx::run_fixture(fixture);
         const json& expected = fixture.at("visibilities");
         CHECK(run.visibilities.size() == expected.size());
         if (run.visibilities.size() != expected.size())
@@ -342,7 +267,7 @@ TEST_CASE("Level 2, target-independent: station-error stream matches where it is
             else
             {
                 q_oracle = (v_oracle - tv_oracle) / flux_oracle;
-                q_cpp = (v_cpp - tv_cpp) / run.flux_total;
+                q_cpp = (v_cpp - tv_cpp) / run.target_ft.flux_total;
             }
 
             const double absolute = std::abs(q_cpp - q_oracle);

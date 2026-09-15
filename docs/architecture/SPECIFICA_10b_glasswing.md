@@ -60,9 +60,9 @@ Architettura compositiva: primitive (point, gaussian ellittica, disk con oscuram
 | stationPositionsPerSampleM | number[K][nSt][3] | posizioni XYZ per campione (verifica indipendente della geometria) |
 | gridN, thetaFovRad, thetaObjRad, fluxTotal | number | griglia e normalizzazioni |
 | visibilities | {u,v,Vr,Vi,trueVr,trueVi,k}[] | campioni: corrotti E veri |
-| dirtyImage, dirtyBeam | number[N²] | matrici normalizzate flusso/beam, 6 cifre |
+| dirtyImage, dirtyBeam | number[N²] | matrici normalizzate sul picco del beam (flusso/beam), a piena precisione (vedi §7) |
 
-La batteria (`glasswing_fixture_battery_v1_1.json`) contiene 15 fixture che coprono le 8 famiglie, tutti i sottotipi stellari nuovi, i tre regimi d'array (sito 1–1000 km, rete Terra, Terra-Luna), pesatura naturale e uniforme, e un caso con turbolenza+rumore+guadagni attivi. Nella batteria il CLEAN è disattivato per costruzione (le sue verifiche usano invarianti, non matrici).
+La batteria corrente (`glasswing_fixture_battery_v1_3.json`, generata dall'oracolo v1.7.7; l'oracolo di riferimento corrente è la v1.7.8, che ne differisce solo nei commenti) contiene 15 fixture che coprono le 8 famiglie, tutti i sottotipi stellari nuovi, i tre regimi d'array (sito 1–1000 km, rete Terra, Terra-Luna), pesatura naturale e uniforme, e un caso con turbolenza+rumore+guadagni attivi. Nella batteria il CLEAN è disattivato per costruzione (le sue verifiche usano invarianti, non matrici).
 
 ## 6. Piano dei test C++
 
@@ -80,6 +80,23 @@ Livello 1 — unitari puri: mulberry32 (sequenze note), generazione modello (ste
 | CLEAN | solo invarianti (sez. 6) | percorso non riproducibile |
 
 Se l'RNG C++ non è bit-esatto, i livelli 2-corrotto e 3 falliscono a catena: verificare il livello 1 per primo, sempre.
+
+**Precisione dell'export (vincolo del contratto).** Le matrici `dirtyImage` e `dirtyBeam` (e `cleanRestored`, quando presente) sono esportate a piena precisione double, senza arrotondamento, come le visibilità. Non è un dettaglio di formato: la tolleranza del livello 3 è assoluta, 10⁻⁶ × picco per pixel, mentre un export a 6 cifre significative introduce da solo un errore fino a 5·10⁻⁶ × picco quando la mantissa dei valori è bassa (la dirty image è normalizzata sul picco del beam, quindi i suoi pixel possono valere diverse unità). Con la battery v1.2, esportata con `toPrecision(6)`, nemmeno l'oracolo superava il proprio export su 11 fixture su 15. Una battery con matrici immagine arrotondate non è valida per il livello 3.
+
+**Parametri fissati dalla battery.** La generazione della battery imposta esplicitamente, e ripristina al termine, ogni parametro che tocca la pipeline senza essere dichiarato per scenario:
+
+| Parametro | Valore | Cosa determina |
+|---|---|---|
+| atmSeed | 777 | stream degli errori di stazione |
+| N (griglia) | 128 | cielo, FFT, gridding |
+| iterazioni CLEAN | 0 | nessuna matrice CLEAN nelle fixture |
+| latitudine del sito | 28° | stazioni della modalità sandbox |
+| epoca | 0 giorni | nessuna evoluzione temporale del target |
+| fase lunare (moonPhase0) | 70° | posizioni delle stazioni lunari |
+| guadagno di loop del CLEAN | 15 % | ininfluente con 0 iterazioni |
+| nulling | disattivato | cielo degli strumenti comb/epr |
+
+Una battery generata con valori diversi non è confrontabile con queste fixture: prima della v1.7.7 questi valori venivano ereditati dai cursori dell'interfaccia, e una battery rigenerata con un cursore spostato cambiava stazioni e visibilità senza segnalarlo. Nota: il cursore `slGain` dell'oracolo (commentato come "ampiezza errori di guadagno") è il guadagno di loop del CLEAN (`cgain`); l'ampiezza degli errori di guadagno delle stazioni non è un parametro, è fissa a 0,18 nel codice (g = max(0,3; 1+0,18·N(0,1)), §3).
 
 ## 8. Fuori scope (esplicito)
 

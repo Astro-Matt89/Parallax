@@ -12,7 +12,7 @@ const fs = require('fs');
 const path = require('path');
 const { loadOracle } = require('./oracle');
 
-const DEFAULT_BATTERY = path.resolve(__dirname, '..', '..', 'data', 'fixtures', 'glasswing_fixture_battery_v1_2.json');
+const DEFAULT_BATTERY = path.resolve(__dirname, '..', '..', 'data', 'fixtures', 'glasswing_fixture_battery_v1_3.json');
 
 function main() {
     const [indexArg, outPath, batteryPath = DEFAULT_BATTERY] = process.argv.slice(2);

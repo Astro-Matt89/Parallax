@@ -35,6 +35,13 @@ DirtyImages make_images(const std::vector<Visibility>& points,
         const auto gx = static_cast<std::int32_t>(std::round(gx_f));
         const auto gy = static_cast<std::int32_t>(std::round(gy_f));
 
+        // Known divergence from the oracle at the grid edge — documented, deliberately not changed.
+        // Oracle makeImages bounds-checks a sample's cell and its conjugate SEPARATELY and never wraps
+        // the conjugate: cx = N - gx, and a conjugate landing on N is dropped, while a sample whose own
+        // cell is off the grid still adds its conjugate. Here an off-grid sample is skipped entirely and
+        // the conjugate index wraps modulo N (gx == 0 gives cx == 0). It is unreachable from sample_uv,
+        // which keeps every sample within [1, N-2] grid units: then gx is in [1, N-2] and cx in [2, N-1],
+        // and both rules grid the same cells.
         if (gx < 0 || gx >= static_cast<std::int32_t>(N) ||
             gy < 0 || gy >= static_cast<std::int32_t>(N))
             continue;
@@ -47,7 +54,8 @@ DirtyImages make_images(const std::vector<Visibility>& points,
         W[idx]   += 1.0;
 
         // Conjugate: (-u, -v) maps to (N - gx, N - gy) mod N.
-        // Edge case: gx == 0 → conj_x = N (out of range), so use 0 with wrap.
+        // Edge case: gx == 0 → conj_x = N (out of range), so use 0 with wrap (the oracle drops it
+        // instead; see the note above the bounds check).
         const auto cx = static_cast<std::uint32_t>((N - static_cast<std::uint32_t>(gx)) % N);
         const auto cy = static_cast<std::uint32_t>((N - static_cast<std::uint32_t>(gy)) % N);
         const std::size_t cidx = static_cast<std::size_t>(cy) * N + static_cast<std::size_t>(cx);
@@ -57,7 +65,9 @@ DirtyImages make_images(const std::vector<Visibility>& points,
         W[cidx]   += 1.0;
     }
 
-    // Uniform weighting: divide each occupied cell by its weight.
+    // Uniform weighting: divide each occupied cell by its weight, then set the weight to 1 —
+    // oracle makeImages: `gRe[i]/=W[i]; gIm[i]/=W[i]; W[i]=1;`. The dirty beam is therefore the
+    // IFFT of a binary sampling mask.
     if (weighting == Weighting::Uniform)
     {
         for (std::size_t i = 0u; i < sz; ++i)
@@ -66,6 +76,7 @@ DirtyImages make_images(const std::vector<Visibility>& points,
             {
                 gRe[i] /= W[i];
                 gIm[i] /= W[i];
+                W[i] = 1.0;
             }
         }
     }
@@ -79,28 +90,39 @@ DirtyImages make_images(const std::vector<Visibility>& points,
     std::vector<double> dirty_re = gRe;
     std::vector<double> dirty_im = gIm;
 
+    // Oracle makeImages: shift2 -> ifft2 -> shift2. The gridded plane has its DC cell at (N/2, N/2);
+    // the pre-shift moves it to (0, 0), where the IFFT expects it (the convention compute_target_fft
+    // already uses). Without it the image picks up a (-1)^(x+y) checkerboard.
+    parallax::core::shift2(beam_re, N);
+    parallax::core::shift2(beam_im, N);
+    parallax::core::shift2(dirty_re, N);
+    parallax::core::shift2(dirty_im, N);
+
     // IFFT2 (includes 1/N² normalisation).
     parallax::core::ifft2(beam_re,  beam_im,  N);
     parallax::core::ifft2(dirty_re, dirty_im, N);
 
-    // fftshift: place DC (beam peak) at the centre (N/2, N/2).
+    // Post-shift: place the image centre (beam peak) at (N/2, N/2).
     parallax::core::shift2(beam_re, N);
     parallax::core::shift2(dirty_re, N);
+    parallax::core::shift2(dirty_im, N);
 
     // Normalise by beam peak.
     const double beam_peak = beam_re[static_cast<std::size_t>(N / 2u) * N + N / 2u];
     if (std::abs(beam_peak) < 1.0e-30)
     {
         spdlog::warn("make_images: beam peak is ~0 — no visibility data? Skipping normalisation.");
-        return DirtyImages{std::move(beam_re), std::move(dirty_re), N, du};
+        return DirtyImages{std::move(beam_re), std::move(dirty_re), N, du, std::move(dirty_im)};
     }
 
     for (auto& v : beam_re)
         v /= beam_peak;
     for (auto& v : dirty_re)
         v /= beam_peak;
+    for (auto& v : dirty_im)
+        v /= beam_peak;
 
-    return DirtyImages{std::move(beam_re), std::move(dirty_re), N, du};
+    return DirtyImages{std::move(beam_re), std::move(dirty_re), N, du, std::move(dirty_im)};
 }
 
 } // namespace parallax::interferometry

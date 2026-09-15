@@ -13,17 +13,18 @@ namespace parallax::interferometry
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-/// 2 × sqrt(2 × ln2) — converts Gaussian FWHM to sigma.
-static constexpr double kFwhmToSigma = 2.3548200450309493;
+/// FWHM → sigma divisor exactly as the oracle hogbom writes it: `sig = fwhmPx / 2.355`.
+/// Deliberately the oracle literal, not 2·sqrt(2·ln 2) = 2.35482…: the contract is to reproduce
+/// the oracle, and no fixture checks CLEAN matrices, so a drift here would never be caught.
+static constexpr double kFwhmToSigma = 2.355;
 
 /// Stopping threshold: break when peak < this fraction of the initial peak.
 static constexpr double kStopFraction = 0.02;
 
-/// Truncation radius for the restore Gaussian, in units of sigma.
-/// ±4σ captures > 99.994% of a Gaussian's integral — negligible flux loss.
-/// Documented choice: wider truncation would slow large component counts without
-/// measurably changing the restored image.
-static constexpr double kGaussianTruncSigma = 4.0;
+/// Truncation of the restore Gaussian, in units of sigma: oracle `r3 = ceil(sig * 3)`, a square
+/// window of half-side r3 clipped to the grid. Along the axes the Gaussian at 3σ is
+/// exp(-4.5) ≈ 1.1% of its peak; pixels beyond the window are not restored, as in the oracle.
+static constexpr double kGaussianTruncSigma = 3.0;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -83,8 +84,8 @@ static void subtract_beam(std::vector<double>& res,
 /// Add a unit-peak circular Gaussian centred at (cx, cy) scaled by flux `f`
 /// to `image`.
 ///
-/// The Gaussian is evaluated over a truncated support of ±kGaussianTruncSigma σ
-/// for efficiency; flux outside this radius is negligible (< 3.2 × 10⁻⁸ of peak).
+/// The Gaussian is evaluated on the oracle's square window of half-side
+/// ceil(kGaussianTruncSigma · σ), clipped to the grid.
 ///
 /// Normalisation: the Gaussian has peak amplitude 1.0 (unit-peak, NOT unit-integral).
 /// A component of flux f therefore contributes f to the restored image peak.
@@ -97,7 +98,6 @@ static void add_gaussian(std::vector<double>& image,
                           double f,
                           double sigma)
 {
-    const double inv2s2 = 1.0 / (2.0 * sigma * sigma);
     const std::int32_t radius = static_cast<std::int32_t>(std::ceil(kGaussianTruncSigma * sigma));
     const std::int32_t iN = static_cast<std::int32_t>(N);
     const std::int32_t icx = static_cast<std::int32_t>(cx);
@@ -113,9 +113,10 @@ static void add_gaussian(std::vector<double>& image,
             const std::int32_t rx = icx + dx;
             if (rx < 0 || rx >= iN)
                 continue;
+            // Oracle: f*Math.exp(-(dx*dx+dy*dy)/(2*sig*sig)) — same operation order.
             const double r2 = static_cast<double>(dx * dx + dy * dy);
             image[static_cast<std::uint32_t>(ry) * N + static_cast<std::uint32_t>(rx)] +=
-                f * std::exp(-r2 * inv2s2);
+                f * std::exp(-r2 / (2.0 * sigma * sigma));
         }
     }
 }
@@ -203,7 +204,7 @@ CleanResult hogbom(const std::vector<double>& dirty,
     }
 
     // Restore: residual + Σ component Gaussians.
-    // Gaussian sigma from FWHM: sigma = fwhm_px / (2√(2 ln 2)).
+    // Gaussian sigma from FWHM with the oracle divisor: sigma = fwhm_px / 2.355.
     const double sigma = fwhm_px / kFwhmToSigma;
 
     std::vector<double> restored(res); // start from residual

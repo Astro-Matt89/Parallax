@@ -35,6 +35,13 @@ DirtyImages make_images(const std::vector<Visibility>& points,
         const auto gx = static_cast<std::int32_t>(std::round(gx_f));
         const auto gy = static_cast<std::int32_t>(std::round(gy_f));
 
+        // Known divergence from the oracle at the grid edge — documented, deliberately not changed.
+        // Oracle makeImages bounds-checks a sample's cell and its conjugate SEPARATELY and never wraps
+        // the conjugate: cx = N - gx, and a conjugate landing on N is dropped, while a sample whose own
+        // cell is off the grid still adds its conjugate. Here an off-grid sample is skipped entirely and
+        // the conjugate index wraps modulo N (gx == 0 gives cx == 0). It is unreachable from sample_uv,
+        // which keeps every sample within [1, N-2] grid units: then gx is in [1, N-2] and cx in [2, N-1],
+        // and both rules grid the same cells.
         if (gx < 0 || gx >= static_cast<std::int32_t>(N) ||
             gy < 0 || gy >= static_cast<std::int32_t>(N))
             continue;
@@ -47,7 +54,8 @@ DirtyImages make_images(const std::vector<Visibility>& points,
         W[idx]   += 1.0;
 
         // Conjugate: (-u, -v) maps to (N - gx, N - gy) mod N.
-        // Edge case: gx == 0 → conj_x = N (out of range), so use 0 with wrap.
+        // Edge case: gx == 0 → conj_x = N (out of range), so use 0 with wrap (the oracle drops it
+        // instead; see the note above the bounds check).
         const auto cx = static_cast<std::uint32_t>((N - static_cast<std::uint32_t>(gx)) % N);
         const auto cy = static_cast<std::uint32_t>((N - static_cast<std::uint32_t>(gy)) % N);
         const std::size_t cidx = static_cast<std::size_t>(cy) * N + static_cast<std::size_t>(cx);

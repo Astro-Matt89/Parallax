@@ -89,7 +89,7 @@ footer .amber{color:var(--amber-dim)}
 <header>
   <div class="mode">GLASSWING ARRAY · SINTESI DI APERTURA</div>
   <div class="center">LUNA SURFACE OPERATIONS</div>
-  <div class="ver">SANDBOX v1.7.7</div>
+  <div class="ver">SANDBOX v1.7.8</div>
 </header>
 
 <main>
@@ -1549,11 +1549,13 @@ function buildFixtureBattery(){
      spostato produceva fixture diverse senza che nulla lo segnalasse.
      Questi cinque toccano la pipeline: latitudine del sito (stazioni),
      epoca (modello temporale del target), fase lunare (posizioni stazioni),
-     ampiezza degli errori di guadagno, nulling (attivo su comb/epr). */
+     guadagno di loop del CLEAN, nulling (attivo su comb/epr).
+     NB: l'ampiezza degli errori di guadagno delle stazioni NON e' un
+     controllo UI: e' fissa a 0.18 nel codice. */
   $("slLat").value="28";      // latitudine del sito
   $("slEpoch").value="0";     // epoca zero: nessuna evoluzione temporale
   $("slMph").value="70";      // fase lunare = moonPhase0
-  $("slGain").value="15";     // ampiezza errori di guadagno
+  $("slGain").value="15";     // guadagno di loop CLEAN (ininfluente: 0 iterazioni)
   $("ckNull").checked=false;  // nulling disattivato
   const fixtures=[];
   for(const sc of FIXTURE_SCENARIOS){

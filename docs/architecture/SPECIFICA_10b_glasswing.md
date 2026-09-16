@@ -62,7 +62,7 @@ Architettura compositiva: primitive (point, gaussian ellittica, disk con oscuram
 | visibilities | {u,v,Vr,Vi,trueVr,trueVi,k}[] | campioni: corrotti E veri |
 | dirtyImage, dirtyBeam | number[N²] | matrici normalizzate sul picco del beam (flusso/beam), a piena precisione (vedi §7) |
 
-La batteria corrente (`glasswing_fixture_battery_v1_3.json`, generata dall'oracolo v1.7.7; l'oracolo di riferimento corrente è la v1.7.8, che ne differisce solo nei commenti) contiene 15 fixture che coprono le 8 famiglie, tutti i sottotipi stellari nuovi, i tre regimi d'array (sito 1–1000 km, rete Terra, Terra-Luna), pesatura naturale e uniforme, e un caso con turbolenza+rumore+guadagni attivi. Nella batteria il CLEAN è disattivato per costruzione (le sue verifiche usano invarianti, non matrici).
+La batteria corrente (`glasswing_fixture_battery_v1_3.json`, generata nel browser dall'oracolo v1.7.7; l'oracolo di riferimento corrente è la v1.7.10, che produce la stessa battery e fissa più stato dell'interfaccia — vedi §7) contiene 15 fixture che coprono le 8 famiglie, tutti i sottotipi stellari nuovi, i tre regimi d'array (sito 1–1000 km, rete Terra, Terra-Luna), pesatura naturale e uniforme, e un caso con turbolenza+rumore+guadagni attivi. Nella batteria il CLEAN è disattivato per costruzione (le sue verifiche usano invarianti, non matrici).
 
 ## 6. Piano dei test C++
 
@@ -96,7 +96,17 @@ Se l'RNG C++ non è bit-esatto, i livelli 2-corrotto e 3 falliscono a catena: ve
 | guadagno di loop del CLEAN | 15 % | ininfluente con 0 iterazioni |
 | nulling | disattivato | cielo degli strumenti comb/epr |
 
-Una battery generata con valori diversi non è confrontabile con queste fixture: prima della v1.7.7 questi valori venivano ereditati dai cursori dell'interfaccia, e una battery rigenerata con un cursore spostato cambiava stazioni e visibilità senza segnalarlo. Nota: il cursore `slGain` dell'oracolo (commentato come "ampiezza errori di guadagno") è il guadagno di loop del CLEAN (`cgain`); l'ampiezza degli errori di guadagno delle stazioni non è un parametro, è fissa a 0,18 nel codice (g = max(0,3; 1+0,18·N(0,1)), §3).
+| complessità | structured | modificatori del modello |
+| stazioni terrestri (GW) | default di fabbrica (La Palma, Mauna Kea, Paranal attive) | rete Terra e modalità mista |
+| layout dell'array sandbox | preset Y | stazioni della modalità sandbox |
+
+Una battery generata con valori diversi non è confrontabile con queste fixture: prima della v1.7.7 questi valori venivano ereditati dai cursori dell'interfaccia, e una battery rigenerata con un cursore spostato cambiava stazioni e visibilità senza segnalarlo. Dalla v1.7.10 la linea di base è applicata **dentro il ciclo**, prima del `cfg` di ogni scenario (così nessuno scenario eredita dal precedente), e agisce sulle **variabili derivate**, non sui cursori: scrivere `.value` non scatena l'evento del cursore, quindi `resetEpoch()`, l'assegnazione di `moonPhase0`, i default di `GW` e `presets("y")` sono l'unico modo di fissare davvero epoca, fase lunare, stazioni e layout. Verificato headless: perturbando epoca, fase lunare, complessità, stazioni GW e preset dell'array, e invertendo l'ordine degli scenari, la battery resta identica byte per byte. Nota: il cursore `slGain` dell'oracolo (commentato come "ampiezza errori di guadagno") è il guadagno di loop del CLEAN (`cgain`); l'ampiezza degli errori di guadagno delle stazioni non è un parametro, è fissa a 0,18 nel codice (g = max(0,3; 1+0,18·N(0,1)), §3).
+
+**Motore di generazione (vincolo del contratto).** La battery di riferimento si genera **nel browser**, col pulsante dell'oracolo, non in node. L'identità byte per byte vale solo **entro lo stesso motore JavaScript**: motori diversi differiscono sull'ultimo bit delle funzioni matematiche e la differenza si propaga lungo la pipeline. Fra motori diversi vale invece la tolleranza del gate, cioè la tabella qui sopra. Misure sulla v1.3 (oracolo v1.7.10 rieseguito headless in node 18 contro la battery generata nel browser, metriche del gate): posizioni 2,9e-16, (u,v) 2,5e-11, Vr/Vi 3,6e-10, trueVr/trueVi 6,3e-10, dirtyImage 4,5e-13 × picco, dirtyBeam 0. La deriva arriva anche ai parametri dichiarati: nella fixture 13 `lambdaMeters` differisce di 1 ulp fra i due motori.
+
+Il C++ concorda con la battery del browser allo stesso ordine di grandezza (Vr 3,6e-10, trueVr 6,3e-10 nel gate di livello 2), quindi rigenerare la battery in node **non** la avvicinerebbe al C++: sposterebbe il riferimento di una quantità paragonabile al margine del gate, senza alcun guadagno. Regola: il riferimento si produce nel browser; la rigenerazione headless (`tools/oracle_harness/regenerate_battery.js`) serve a verificare che il risultato non dipenda dall'ordine degli scenari né dallo stato dell'interfaccia, non a produrre il riferimento.
+
+**Motore da registrare.** Per la v1.3 non è stato possibile ricostruire browser e versione: il file non porta metadati di download (nessun flusso `Zone.Identifier`) e la battery non li dichiara. Alla prossima rigenerazione vanno annotati qui browser e versione esatti; sulla macchina di sviluppo sono presenti Chrome 152, Edge 153 e Firefox 155. Conviene che l'oracolo li scriva nell'header della battery (`navigator.userAgent`).
 
 ## 8. Fuori scope (esplicito)
 

@@ -12,11 +12,13 @@
 
 namespace parallax::interferometry
 {
+    /// Generated layouts follow the oracle's Y preset; anything else is described station by
+    /// station as Custom. The oracle's ring/grid/random presets are sandbox exploration tools,
+    /// not array geometries of the game (CLAUDE.md §9.1 specifies the Y-shaped array), and the
+    /// port never reproduced their numbers — they were removed rather than aligned.
     enum class ArrayGeometry
     {
         Y,
-        Ring,
-        Grid,
         Custom,
     };
 

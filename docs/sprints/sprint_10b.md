@@ -1,7 +1,7 @@
 # Sprint 10b — Interferometry & Aperture Synthesis
 
 **Prerequisite:** Sprint 10a complete (ArrayInstrument, physical SNR, total-power imaging) ✅
-**Oracle (reference):** `tools/glasswing-sandbox-v1_7_10.html` — the interferometry pipeline
+**Oracle (reference):** `tools/glasswing-sandbox-v1_8_0.html` — the interferometry pipeline
 (older versions stay in `tools/` for history)
 **Normative spec:** `docs/architecture/SPECIFICA_10b_glasswing.md` — where this brief and the
 SPECIFICA disagree, the SPECIFICA and the oracle win
@@ -18,7 +18,7 @@ image via CLEAN, achieve angular resolution λ/B_max (micro-arcseconds with Eart
 
 ## The Sandbox as Conceptual Oracle
 
-The oracle (`tools/glasswing-sandbox-v1_7_10.html`) implements the complete interferometry pipeline in JavaScript.
+The oracle (`tools/glasswing-sandbox-v1_8_0.html`) implements the complete interferometry pipeline in JavaScript.
 It is the **conceptual reference**: the C++ must replicate its mathematics faithfully (the math is
 correct and validated), but the C++ MAY diverge in implementation details — data structures,
 memory layout, optimizations, code organization — as long as the numbers match within tolerance.

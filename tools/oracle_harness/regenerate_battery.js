@@ -3,6 +3,10 @@
 //
 //   node tools/oracle_harness/regenerate_battery.js <oracle.html> <out.json> [--reverse] [--perturb]
 //
+// Comparing two runs byte for byte: normalise the header first. Since oracle v1.8.0 the battery
+// carries generatedAt (and userAgent), so two runs of the same oracle always differ in those bytes
+// and only in those; strip them before concluding anything about the pipeline.
+//
 // --reverse  runs the scenarios in reverse order (the fixtures are written back in the normal order):
 //            the output must not change if every scenario is self-contained.
 // --perturb  moves the UI away from its defaults before generating, the way a user could have left it

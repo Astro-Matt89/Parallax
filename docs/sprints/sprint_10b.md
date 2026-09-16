@@ -1,7 +1,7 @@
 # Sprint 10b — Interferometry & Aperture Synthesis
 
 **Prerequisite:** Sprint 10a complete (ArrayInstrument, physical SNR, total-power imaging) ✅
-**Oracle (reference):** `tools/glasswing-sandbox-v1_7_8.html` — the interferometry pipeline
+**Oracle (reference):** `tools/glasswing-sandbox-v1_7_10.html` — the interferometry pipeline
 (older versions stay in `tools/` for history)
 **Normative spec:** `docs/architecture/SPECIFICA_10b_glasswing.md` — where this brief and the
 SPECIFICA disagree, the SPECIFICA and the oracle win
@@ -18,7 +18,7 @@ image via CLEAN, achieve angular resolution λ/B_max (micro-arcseconds with Eart
 
 ## The Sandbox as Conceptual Oracle
 
-The oracle (`tools/glasswing-sandbox-v1_7_8.html`) implements the complete interferometry pipeline in JavaScript.
+The oracle (`tools/glasswing-sandbox-v1_7_10.html`) implements the complete interferometry pipeline in JavaScript.
 It is the **conceptual reference**: the C++ must replicate its mathematics faithfully (the math is
 correct and validated), but the C++ MAY diverge in implementation details — data structures,
 memory layout, optimizations, code organization — as long as the numbers match within tolerance.
@@ -37,7 +37,8 @@ memory layout, optimizations, code organization — as long as the numbers match
 
 **Fixtures:** the gate uses `data/fixtures/glasswing_fixture_battery_v1_3.json` (15 deterministic
 scenarios covering all target families and regimes), exported from the oracle with
-"⭳ BATTERIA FIXTURE 10b" (generated with v1.7.7; v1.7.8 differs only in comments). The export pins
+"⭳ BATTERIA FIXTURE 10b" in a browser (generated with v1.7.7; the current v1.7.10 produces the same
+battery and pins more of the UI state). The export pins
 the parameters listed in SPECIFICA §7 and writes the image matrices at full precision. A battery
 regenerated any other way is not comparable, and a regenerated battery must be verified against the
 previous one before the gate uses it. The RNG is `mulberry32` — replicate it exactly so

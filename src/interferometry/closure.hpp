@@ -25,7 +25,7 @@
 /// (a,b), (b,c), (a,c) are simultaneously present** in the supplied visibility
 /// list are selected.
 ///
-/// The oracle (`compute()` in tools/glasswing-sandbox-v1_7_8.html) instead takes the
+/// The oracle (`compute()` in tools/glasswing-sandbox-v1_7_10.html) instead takes the
 /// first three triangles by index whether or not they have any data.  This port does
 /// NOT follow it, on purpose: a triangle without common-time coverage yields an empty
 /// series and carries no information, whereas skipping it makes `max_triangles` count

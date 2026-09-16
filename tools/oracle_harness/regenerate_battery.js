@@ -5,9 +5,10 @@
 //
 // --reverse  runs the scenarios in reverse order (the fixtures are written back in the normal order):
 //            the output must not change if every scenario is self-contained.
-// --perturb  moves UI controls away from their defaults before generating, the way a user could have
-//            left them (site latitude, epoch, moon phase, CLEAN gain, nulling, complexity): the output
-//            must not change if the battery pins everything that reaches the pipeline.
+// --perturb  moves the UI away from its defaults before generating, the way a user could have left it
+//            (site latitude, epoch, moon phase, CLEAN gain, nulling, complexity, Earth-station
+//            selection and sandbox array layout): the output must not change if the battery pins
+//            everything that reaches the pipeline.
 
 'use strict';
 
@@ -26,6 +27,9 @@ function perturbUi(oracle) {
     $('slGain').value = '25';
     $('ckNull').checked = true;
     $('selCx').value = 'complex';
+    // Earth-station selection (the GW checkboxes) and the sandbox array layout (preset buttons).
+    oracle.GW.forEach((station, i) => { station.on = i % 2 === 1; });
+    oracle.presets('ring');
 }
 
 function main() {

@@ -1,4 +1,4 @@
-// Headless loader for the Glasswing sandbox oracle (default: tools/glasswing-sandbox-v1_7_8.html).
+// Headless loader for the Glasswing sandbox oracle (default: tools/glasswing-sandbox-v1_7_10.html).
 //
 // Extracts the single <script> block, runs it in a node `vm` context whose browser globals are
 // inert stubs, and exposes the target-model pipeline. The page's top-level UI code runs once
@@ -15,7 +15,7 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-const DEFAULT_HTML = path.resolve(__dirname, '..', 'glasswing-sandbox-v1_7_8.html');
+const DEFAULT_HTML = path.resolve(__dirname, '..', 'glasswing-sandbox-v1_7_10.html');
 
 // A callable, constructible object that absorbs any property access, assignment or call.
 function makeStub() {
@@ -77,7 +77,7 @@ const EXPORTS = `
     generateTargetModel, applyTemporal, renderTargetAt, computeTargetFFT,
     evaluateSpectralFlux, scaleComp, applyCompatibleModifiers, mulberry32, makeImages,
     TargetPrimitives, TargetRecipes, TargetModifiers,
-    buildFixtureBattery, FIXTURE_SCENARIOS, setEpochFromSlider, $,
+    buildFixtureBattery, FIXTURE_SCENARIOS, setEpochFromSlider, presets, GW, $,
     setN: (v) => { N = v; }, getN: () => N,
     // makeImages reads the weighting from the UI select: 'nat' or 'uni'.
     setWeighting: (w) => { ui.wt = { value: w }; },

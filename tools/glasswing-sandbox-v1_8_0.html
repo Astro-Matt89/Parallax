@@ -89,7 +89,7 @@ footer .amber{color:var(--amber-dim)}
 <header>
   <div class="mode">GLASSWING ARRAY · SINTESI DI APERTURA</div>
   <div class="center">LUNA SURFACE OPERATIONS</div>
-  <div class="ver">SANDBOX v1.7.8</div>
+  <div class="ver">SANDBOX v1.8.0</div>
 </header>
 
 <main>
@@ -1513,7 +1513,7 @@ const FIXTURE_SCENARIOS=[
   {label:"binaria_larga_radio_sito",cls:0,sub:"wide_binary",cfg:{selMode:"sandbox",selBody:"earth",selInstr:"radio",selScale:"10000",slLam:350,slDec:38,slDur:8,selWt:"nat",selTurb:"0",selSnr:"0",ckGain:false,ckRot:true}},
   {label:"binaria_contatto_100km",cls:0,sub:"contact_binary",cfg:{selMode:"sandbox",selBody:"earth",selInstr:"radio",selScale:"100000",slLam:200,slDec:38,slDur:8,selWt:"nat",selTurb:"0",selSnr:"0",ckGain:false,ckRot:true}},
   {label:"supergigante_submm",cls:1,sub:"supergiant",cfg:{selMode:"sandbox",selBody:"earth",selInstr:"radio",selScale:"10000",slLam:135,slDec:38,slDur:8,selWt:"nat",selTurb:"0",selSnr:"0",ckGain:false,ckRot:true}},
-  {label:"nana_bruna_rete_terra",cls:1,sub:"brown_dwarf",cfg:{selMode:"earth",selInstr:"radio",slLam:135,slDec:20,slDur:12,selWt:"uni",selTurb:"0",selSnr:"0",ckGain:false,ckRot:true}},
+  {label:"nana_bruna_rete_terra",cls:1,sub:"brown_dwarf",cfg:{selMode:"earth",selBody:"earth",selScale:"10000",selInstr:"radio",slLam:135,slDec:20,slDur:12,selWt:"uni",selTurb:"0",selSnr:"0",ckGain:false,ckRot:true}},
   {label:"t_tauri_getto_hh",cls:1,sub:"t_tauri",cfg:{selMode:"sandbox",selBody:"earth",selInstr:"radio",selScale:"10000",slLam:318,slDec:38,slDur:8,selWt:"nat",selTurb:"0",selSnr:"0",ckGain:false,ckRot:true}},
   {label:"wolf_rayet_girandola",cls:1,sub:"wolf_rayet",cfg:{selMode:"sandbox",selBody:"earth",selInstr:"radio",selScale:"100000",slLam:318,slDec:38,slDur:8,selWt:"nat",selTurb:"0",selSnr:"0",ckGain:false,ckRot:true}},
   {label:"supergigante_morente_turb",cls:1,sub:"dying_supergiant",cfg:{selMode:"sandbox",selBody:"earth",selInstr:"radio",selScale:"10000",slLam:135,slDec:38,slDur:8,selWt:"nat",selTurb:"1.5",selSnr:"0",ckGain:false,ckRot:true}},
@@ -1522,9 +1522,28 @@ const FIXTURE_SCENARIOS=[
   {label:"pulsar_nebulosa",cls:3,sub:"pulsar",cfg:{selMode:"sandbox",selBody:"earth",selInstr:"radio",selScale:"1000",slLam:762,slDec:38,slDur:8,selWt:"nat",selTurb:"0",selSnr:"0",ckGain:false,ckRot:true}},
   {label:"agn_getto_errori_1000km",cls:4,sub:"core_jet",cfg:{selMode:"sandbox",selBody:"earth",selInstr:"radio",selScale:"1000000",slLam:762,slDec:38,slDur:12,selWt:"nat",selTurb:"0.6",selSnr:"100",ckGain:true,ckRot:true}},
   {label:"radiogalassia_lobi",cls:4,sub:"double_lobe",cfg:{selMode:"sandbox",selBody:"earth",selInstr:"radio",selScale:"1000",slLam:762,slDec:38,slDur:8,selWt:"nat",selTurb:"0",selSnr:"0",ckGain:false,ckRot:true}},
-  {label:"bh_terra_luna",cls:5,sub:"bh_crescent",cfg:{selMode:"full",selInstr:"radio",slLam:659,slDec:-30,slDur:300,selWt:"nat",selTurb:"0",selSnr:"0",ckGain:false,ckRot:true}},
+  {label:"bh_terra_luna",cls:5,sub:"bh_crescent",cfg:{selMode:"full",selBody:"earth",selScale:"1000",selInstr:"radio",slLam:659,slDec:-30,slDur:300,selWt:"nat",selTurb:"0",selSnr:"0",ckGain:false,ckRot:true}},
   {label:"sistema_planetario_snr",cls:6,sub:"sculpted_disk",cfg:{selMode:"sandbox",selBody:"earth",selInstr:"radio",selScale:"10000",slLam:194,slDec:38,slDur:12,selWt:"uni",selTurb:"0",selSnr:"30",ckGain:false,ckRot:true}},
-  {label:"pianeta_gigante_ottico",cls:7,sub:"planet_giant",cfg:{selMode:"sandbox",selBody:"earth",selInstr:"comb",selScale:"10000",slLam:200,slDec:38,slDur:12,selWt:"uni",selTurb:"0",selSnr:"0",ckGain:false,ckRot:true}}
+  {label:"pianeta_gigante_ottico",cls:7,sub:"planet_giant",cfg:{selMode:"sandbox",selBody:"earth",selInstr:"comb",selScale:"10000",slLam:200,slDec:38,slDur:12,selWt:"uni",selTurb:"0",selSnr:"0",ckGain:false,ckRot:true}},
+  /* v1.8.0 - array lunare a Y sulla base Tycho: e' lo strumento del gioco
+     (CLAUDE.md 9.1) e finora nessuna fixture lo esercitava. Tutti gli scenari
+     sandbox avevano selBody:"earth"; la Luna compariva solo come singola
+     stazione nella fixture full.
+     ATTENZIONE alla declinazione: la branca lunare di buildStations usa
+     TYCHO.lat = -43.3 gradi, quindi slLat e' irrilevante e una sorgente a
+     dec +38 (usata da 11 scenari terrestri) transiterebbe a 8.7 gradi, sotto
+     EL_MIN = 10: zero visibilita'. Servono declinazioni australi.
+     Niente turbolenza: kolmSeries si applica a tutte le stazioni senza
+     distinguere il tipo, e fase atmosferica nel vuoto non ha senso fisico.
+     Declinazioni verificate headless prima della rigenerazione (campioni
+     accettati su 78 coppie x 48 tempi): -40 -> 3744 (10 km), -45 -> 1972
+     (100 km), -50 -> 3744 (1 km). Le prime scelte -20 e 0 lasciavano la
+     sorgente sotto EL_MIN per tutta la traccia e producevano fixture VUOTE;
+     -45 e -50 stanno in mezzo all'altopiano, lontano dal bordo dove il
+     conteggio crolla (sotto dec -36 per lo scenario a 100 km). */
+  {label:"luna_tycho_y_10km",cls:5,sub:"bh_crescent",cfg:{selMode:"sandbox",selBody:"moon",selInstr:"radio",selScale:"10000",slLam:135,slDec:-40,slDur:12,selWt:"nat",selTurb:"0",selSnr:"0",ckGain:false,ckRot:true}},
+  {label:"luna_tycho_y_100km_uni",cls:2,sub:"multi_ring_disk",cfg:{selMode:"sandbox",selBody:"moon",selInstr:"radio",selScale:"100000",slLam:135,slDec:-45,slDur:12,selWt:"uni",selTurb:"0",selSnr:"0",ckGain:false,ckRot:true}},
+  {label:"luna_tycho_y_1km_snr",cls:4,sub:"core_jet",cfg:{selMode:"sandbox",selBody:"moon",selInstr:"radio",selScale:"1000",slLam:318,slDec:-50,slDur:8,selWt:"nat",selTurb:"0",selSnr:"30",ckGain:false,ckRot:true}}
 ];
 function findFixtureSeed(cls,sub){
   for(let s=1;s<4000;s++)
@@ -1552,13 +1571,33 @@ function buildFixtureBattery(){
      guadagno di loop del CLEAN, nulling (attivo su comb/epr).
      NB: l'ampiezza degli errori di guadagno delle stazioni NON e' un
      controllo UI: e' fissa a 0.18 nel codice. */
-  $("slLat").value="28";      // latitudine del sito
-  $("slEpoch").value="0";     // epoca zero: nessuna evoluzione temporale
-  $("slMph").value="70";      // fase lunare = moonPhase0
-  $("slGain").value="15";     // guadagno di loop CLEAN (ininfluente: 0 iterazioni)
-  $("ckNull").checked=false;  // nulling disattivato
+  /* v1.7.9 - la linea di base normativa e' applicata DENTRO il ciclo, prima
+     del cfg di ogni scenario. Prima stava fuori: applyFixtureCfg imposta solo
+     le chiavi presenti nel cfg, quindi ogni scenario ereditava dal precedente
+     tutto il resto. Finche' nessuno scenario toccava questi parametri era
+     innocuo, ma il primo scenario lunare (slLat = -43.3) lo avrebbe fatto
+     ereditare a tutti quelli successivi: la stessa contaminazione della
+     v1.7.7, spostata fra scenari. Ogni scenario deve essere autonomo e il
+     risultato indipendente dall'ordine. */
+  /* v1.7.10 - scrivere .value NON scatena l'evento del cursore, quindi le
+     variabili derivate restavano quelle lasciate dall'utente. La v1.7.9
+     credeva di fissare epoca e fase lunare: fissava solo la posizione del
+     cursore. Qui si agisce sulle variabili, non sull'interfaccia. */
+  const FIXTURE_BASELINE=()=>{
+    $("slLat").value="28";            // latitudine del sito (letta da ui.lat.value)
+    $("slGain").value="15";           // guadagno di loop CLEAN (ininfluente: 0 iterazioni)
+    $("ckNull").checked=false;        // nulling disattivato
+    $("slIter").value="0";            // niente CLEAN nelle fixture
+    $("selCx").value="structured";    // complessita' normativa
+    resetEpoch();                     // azzera ui.ep.value E currentEpoch
+    moonPhase0=70*Math.PI/180;        // variabile derivata, non solo il cursore
+    $("slMph").value="70";
+    GW.forEach((st,i)=>{st.on=GW_DEFAULT_ON[i];});   // stazioni terrestri ai default
+    presets("y");                     // layout sandbox normativo: array a Y
+  };
   const fixtures=[];
   for(const sc of FIXTURE_SCENARIOS){
+    FIXTURE_BASELINE();
     $("selClass").value=String(sc.cls);
     applyFixtureCfg(sc.cfg);
     seed=findFixtureSeed(sc.cls,sc.sub);
@@ -1571,7 +1610,14 @@ function buildFixtureBattery(){
   applyFixtureCfg(keep.vals);
   $("selClass").value=keep.vals.selClass;$("slIter").value=keep.vals.slIter;$("selCx").value=keep.vals.selCx;
   seed=keep.seed;regenTarget();
-  return {version:"1.3",generator:"glasswing-sandbox",kind:"fixture-battery",
+  /* v1.8.0 - provenienza. L'identita' al byte della battery vale solo entro
+     lo stesso motore JavaScript: fra node e browser la deriva su sin/cos/exp
+     arriva anche agli input dichiarati (1 ulp su lambdaMeters). Registrare
+     motore e data e' l'unico modo per sapere cosa si sta confrontando. */
+  return {version:"1.4",generator:"glasswing-sandbox",kind:"fixture-battery",
+    oracleVersion:"1.8.0",
+    userAgent:(typeof navigator!=="undefined"&&navigator.userAgent)||"unknown",
+    generatedAt:new Date().toISOString(),
     gridN:N,rngAlgorithm:"mulberry32",
     tolerances:{uvRelative:1e-9,visibilityRelative:1e-7,imageAbsOfPeak:1e-6},
     fixtures};
@@ -1579,7 +1625,7 @@ function buildFixtureBattery(){
 function exportFixtureBattery(){
   $("ftState").textContent="GENERAZIONE BATTERIA\u2026";
   const b=buildFixtureBattery();
-  downloadJSON(b,"glasswing_fixture_battery_v1_3.json");
+  downloadJSON(b,"glasswing_fixture_battery_v1_4.json");
   $("ftState").textContent="BATTERIA PRONTA \u00b7 "+b.fixtures.length+" fixture";
 }
 function exportTestDataset(){
@@ -1648,6 +1694,7 @@ const GW=[
 const R_EARTH=6371e3;
 
 /* ================= stato ================= */
+const GW_DEFAULT_ON=GW.map(st=>st.on); // default di fabbrica, per la linea di base delle fixture
 let stations=[]; // sandbox, normalizzate [-1,1]
 let seed=(Math.random()*1e9)|0, atmSeed=(Math.random()*1e9)|0;
 const $=id=>document.getElementById(id);

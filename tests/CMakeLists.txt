@@ -469,7 +469,7 @@ target_include_directories(test_station_positions PRIVATE
 )
 
 target_compile_definitions(test_station_positions PRIVATE
-    PLX_FIXTURE_BATTERY_PATH="${CMAKE_SOURCE_DIR}/data/fixtures/glasswing_fixture_battery_v1_3.json"
+    PLX_FIXTURE_BATTERY_PATH="${CMAKE_SOURCE_DIR}/data/fixtures/glasswing_fixture_battery_v1_4.json"
 )
 
 target_link_libraries(test_station_positions PRIVATE
@@ -501,7 +501,7 @@ target_include_directories(test_fixture_visibilities PRIVATE
 )
 
 target_compile_definitions(test_fixture_visibilities PRIVATE
-    PLX_FIXTURE_BATTERY_PATH="${CMAKE_SOURCE_DIR}/data/fixtures/glasswing_fixture_battery_v1_3.json"
+    PLX_FIXTURE_BATTERY_PATH="${CMAKE_SOURCE_DIR}/data/fixtures/glasswing_fixture_battery_v1_4.json"
 )
 
 target_link_libraries(test_fixture_visibilities PRIVATE
@@ -534,7 +534,7 @@ target_include_directories(test_fixture_images PRIVATE
 )
 
 target_compile_definitions(test_fixture_images PRIVATE
-    PLX_FIXTURE_BATTERY_PATH="${CMAKE_SOURCE_DIR}/data/fixtures/glasswing_fixture_battery_v1_3.json"
+    PLX_FIXTURE_BATTERY_PATH="${CMAKE_SOURCE_DIR}/data/fixtures/glasswing_fixture_battery_v1_4.json"
 )
 
 target_link_libraries(test_fixture_images PRIVATE
@@ -565,7 +565,7 @@ target_include_directories(dump_cpp_target PRIVATE
 )
 
 target_compile_definitions(dump_cpp_target PRIVATE
-    PLX_FIXTURE_BATTERY_PATH="${CMAKE_SOURCE_DIR}/data/fixtures/glasswing_fixture_battery_v1_3.json"
+    PLX_FIXTURE_BATTERY_PATH="${CMAKE_SOURCE_DIR}/data/fixtures/glasswing_fixture_battery_v1_4.json"
 )
 
 target_link_libraries(dump_cpp_target PRIVATE

@@ -107,6 +107,8 @@ namespace parallax::interferometry
 
         // ── Step 4: enumerate triangles a < b < c, select first max_triangles
         //            that have at least one fully-covered time sample ───────────────
+        // Deliberate divergence: the oracle keeps the first three by index even when
+        // empty (see closure.hpp, "Triangle selection rule").
         std::vector<ClosureTriangle> result;
         result.reserve(max_triangles);
 

@@ -24,7 +24,8 @@ namespace parallax::test_fixtures
 {
     inline constexpr const char* kBatteryPath = PLX_FIXTURE_BATTERY_PATH;
 
-    inline constexpr std::size_t kFixtureCount = 15;
+    /// 15 scenarios from battery v1.2/v1.3 plus the three lunar Tycho arrays added in v1.4.
+    inline constexpr std::size_t kFixtureCount = 18;
 
     /// Antennas per arm of the sandbox "y" preset, the layout the battery was exported with.
     inline constexpr std::uint32_t kSandboxAntennasPerArm = 4;

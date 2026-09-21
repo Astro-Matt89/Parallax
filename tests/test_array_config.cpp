@@ -229,7 +229,7 @@ TEST_CASE("Antenna count is fully data-driven")
 TEST_CASE("Array config JSON round trip preserves fields and angle boundary")
 {
     ArrayConfig config;
-    config.geometry = ArrayGeometry::Grid;
+    config.geometry = ArrayGeometry::Custom;
     config.antennas_per_arm = 5;
     config.site_extent_m = 100000.0;
     config.station_aperture_m = 8.25;
@@ -289,6 +289,30 @@ TEST_CASE("Malformed/missing field JSON returns nullopt")
 
     CHECK_FALSE(parallax::interferometry::from_json(missing_fields).has_value());
     CHECK_FALSE(parallax::interferometry::from_json(malformed_types).has_value());
+}
+
+TEST_CASE("Removed and unknown geometries are rejected, not downgraded to Y")
+{
+    auto config_with = [](const char* geometry)
+    {
+        return nlohmann::json {
+            {"geometry", geometry},
+            {"antennas_per_arm", 4},
+            {"site_extent_m", 10000.0},
+            {"station_aperture_m", 12.0},
+            {"available_bands", nlohmann::json::array({"Visible"})},
+            {"site", {{"body", "Moon"}, {"lat_deg", -43.3}, {"lon_deg", -11.2}}},
+        };
+    };
+
+    // Ring and Grid were removed: naming them must fail the load rather than silently
+    // produce a Y array whose stations are somewhere else entirely.
+    CHECK_FALSE(parallax::interferometry::from_json(config_with("Ring")).has_value());
+    CHECK_FALSE(parallax::interferometry::from_json(config_with("Grid")).has_value());
+    CHECK_FALSE(parallax::interferometry::from_json(config_with("Spiral")).has_value());
+
+    CHECK(parallax::interferometry::from_json(config_with("Y")).has_value());
+    CHECK(parallax::interferometry::from_json(config_with("Custom")).has_value());
 }
 
 TEST_CASE("earth_stations returns fixed Earth locations")

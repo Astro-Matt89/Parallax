@@ -17,19 +17,21 @@
 /// also leave closure intact.  Thermal noise is NOT a station-based error; it adds
 /// independently on each baseline and therefore DOES corrupt the closure phase.
 ///
-/// ## Triangle selection rule (deterministic, documented)
+/// ## Triangle selection rule — DELIBERATE divergence from the oracle
 ///
 /// Candidate triangles (a, b, c) are enumerated in ascending station-index order
 /// (a < b < c, then b increases before a increases).  The first `max_triangles`
 /// candidates that have **at least one time sample where all three baselines
 /// (a,b), (b,c), (a,c) are simultaneously present** in the supplied visibility
-/// list are selected.  This rule is deterministic given the input ordering and
-/// must be documented rather than left implicit.
+/// list are selected.
 ///
-/// **Note**: the current rule selects the three lowest-index triangles that have
-/// data, which favours the shortest baselines in a Y-array.  If the 10b.7 fixture
-/// battery implies a different selection (e.g. longest baselines, best-coverage),
-/// revise this rule and update the tests accordingly.
+/// The oracle (`compute()` in tools/glasswing-sandbox-v1_8_0.html) instead takes the
+/// first three triangles by index whether or not they have any data.  This port does
+/// NOT follow it, on purpose: a triangle without common-time coverage yields an empty
+/// series and carries no information, whereas skipping it makes `max_triangles` count
+/// informative triangles only.  The two rules select the same triangles whenever the
+/// lowest-index ones are covered.  No fixture exports closure phases, so the oracle
+/// gate does not check this choice.  Decided in Sprint 10b — see SPECIFICA_10b §3.
 ///
 /// ## HBT degeneracy
 ///

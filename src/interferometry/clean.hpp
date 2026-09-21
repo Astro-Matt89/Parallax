@@ -17,7 +17,9 @@
 ///        subtract f × beam_shifted_to(px,py) from res
 ///   3. restore:
 ///        restored = res  +  Σ_k  f_k × Gaussian(sigma, px_k, py_k)
-///        where sigma = fwhm_px / (2 × sqrt(2 × ln2))
+///        where sigma = fwhm_px / 2.355 (the oracle literal, not 2·sqrt(2·ln2)) and each
+///        Gaussian covers a square window of half-side ceil(3·sigma) clipped to the grid,
+///        exactly as the oracle hogbom restore
 ///
 /// ## Boundary choice (non-wrapping beam subtraction)
 ///

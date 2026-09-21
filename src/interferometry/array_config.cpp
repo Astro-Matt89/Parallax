@@ -34,22 +34,29 @@ namespace parallax::interferometry
             switch (geometry)
             {
                 case ArrayGeometry::Y: return "Y";
-                case ArrayGeometry::Ring: return "Ring";
-                case ArrayGeometry::Grid: return "Grid";
                 case ArrayGeometry::Custom: return "Custom";
             }
             return "Y";
         }
 
-        [[nodiscard]] ArrayGeometry geometry_from_string(std::string_view geometry)
+        /// Returns nullopt for an unknown geometry: loading an array with the wrong layout silently
+        /// is worse than refusing it. "Ring" and "Grid" were removed (see ArrayGeometry).
+        [[nodiscard]] std::optional<ArrayGeometry> geometry_from_string(std::string_view geometry)
         {
             if (geometry == "Y") { return ArrayGeometry::Y; }
-            if (geometry == "Ring") { return ArrayGeometry::Ring; }
-            if (geometry == "Grid") { return ArrayGeometry::Grid; }
             if (geometry == "Custom") { return ArrayGeometry::Custom; }
 
-            spdlog::warn("[ArrayConfig] unknown geometry \"{}\"; falling back to Y", std::string(geometry));
-            return ArrayGeometry::Y;
+            if (geometry == "Ring" || geometry == "Grid")
+            {
+                spdlog::error(
+                    "[ArrayConfig] geometry \"{}\" was removed: the oracle ring/grid presets are sandbox "
+                    "tools, not array geometries. Use \"Y\", or \"Custom\" with explicit stations.",
+                    std::string(geometry));
+                return std::nullopt;
+            }
+
+            spdlog::error("[ArrayConfig] unknown geometry \"{}\"; expected \"Y\" or \"Custom\"", std::string(geometry));
+            return std::nullopt;
         }
 
         [[nodiscard]] std::string body_to_string(Body body)
@@ -109,51 +116,6 @@ namespace parallax::interferometry
             return normalized_stations;
         }
 
-        [[nodiscard]] std::vector<Vec2d> make_ring_layout(std::uint32_t antennas_per_arm)
-        {
-            const std::uint32_t ring_count = 3u * antennas_per_arm;
-            std::vector<Vec2d> normalized_stations;
-            normalized_stations.reserve(ring_count + 1u);
-
-            for (std::uint32_t i = 0; i < ring_count; ++i)
-            {
-                const double t = astro_constants::kTwoPi * (static_cast<double>(i) / static_cast<double>(ring_count));
-                normalized_stations.push_back(Vec2d {
-                    kArmRadiusScale * std::cos(t),
-                    kArmRadiusScale * std::sin(t),
-                });
-            }
-
-            normalized_stations.push_back(Vec2d {0.0, 0.0});
-            return normalized_stations;
-        }
-
-        [[nodiscard]] std::vector<Vec2d> make_grid_layout(std::uint32_t antennas_per_arm)
-        {
-            const std::uint32_t total = 3u * antennas_per_arm + 1u;
-            const std::uint32_t side = static_cast<std::uint32_t>(std::ceil(std::sqrt(static_cast<double>(total))));
-            std::vector<Vec2d> normalized_stations;
-            normalized_stations.reserve(total);
-
-            for (std::uint32_t row = 0; row < side && normalized_stations.size() < total; ++row)
-            {
-                for (std::uint32_t col = 0; col < side && normalized_stations.size() < total; ++col)
-                {
-                    const double x = (side == 1u)
-                        ? 0.0
-                        : -kArmRadiusScale + (2.0 * kArmRadiusScale * static_cast<double>(col)
-                                              / static_cast<double>(side - 1u));
-                    const double y = (side == 1u)
-                        ? 0.0
-                        : -kArmRadiusScale + (2.0 * kArmRadiusScale * static_cast<double>(row)
-                                              / static_cast<double>(side - 1u));
-                    normalized_stations.push_back(Vec2d {x, y});
-                }
-            }
-
-            return normalized_stations;
-        }
-
         [[nodiscard]] std::string station_name(ArrayGeometry geometry, std::size_t index, std::uint32_t antennas_per_arm)
         {
             if (geometry == ArrayGeometry::Y)
@@ -167,16 +129,6 @@ namespace parallax::interferometry
                 const std::size_t arm = index / antennas_per_arm;
                 const std::size_t arm_index = (index % antennas_per_arm) + 1u;
                 return "GW-Y-A" + std::to_string(arm) + "-" + std::to_string(arm_index);
-            }
-
-            if (geometry == ArrayGeometry::Ring)
-            {
-                return "GW-R-" + std::to_string(index);
-            }
-
-            if (geometry == ArrayGeometry::Grid)
-            {
-                return "GW-G-" + std::to_string(index);
             }
 
             return "GW-C-" + std::to_string(index);
@@ -255,17 +207,7 @@ namespace parallax::interferometry
                 config.site_extent_m);
         }
 
-        if (config.geometry == ArrayGeometry::Y)
-        {
-            return build_stations_from_normalized(make_y_layout(config.antennas_per_arm), config);
-        }
-
-        if (config.geometry == ArrayGeometry::Ring)
-        {
-            return build_stations_from_normalized(make_ring_layout(config.antennas_per_arm), config);
-        }
-
-        return build_stations_from_normalized(make_grid_layout(config.antennas_per_arm), config);
+        return build_stations_from_normalized(make_y_layout(config.antennas_per_arm), config);
     }
 
     std::vector<Station> earth_stations()
@@ -351,7 +293,13 @@ namespace parallax::interferometry
             }
 
             ArrayConfig config;
-            config.geometry = geometry_from_string(json.at("geometry").get<std::string>());
+            const std::optional<ArrayGeometry> geometry =
+                geometry_from_string(json.at("geometry").get<std::string>());
+            if (!geometry)
+            {
+                return std::nullopt;
+            }
+            config.geometry = *geometry;
             config.antennas_per_arm = json.at("antennas_per_arm").get<std::uint32_t>();
             config.site_extent_m = json.at("site_extent_m").get<double>();
             config.station_aperture_m = json.at("station_aperture_m").get<double>();

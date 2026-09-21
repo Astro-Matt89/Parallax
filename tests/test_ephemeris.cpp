@@ -170,6 +170,108 @@ TEST_CASE("occulted_by handles behind-body, tangent, and proj<=0 cases")
     CHECK_FALSE(parallax::interferometry::occulted_by(st.position, source_opposite, moon_center, kRMoon));
 }
 
+// ── Occultation coverage ─────────────────────────────────────────────────────
+//
+// The TRUE branch of occulted_by is not exercised by the fixture battery, and these tests are the
+// only coverage it has (SPECIFICA_10b §6). A scan of the full-mode parameter space (declination
+// -80..+80 deg x duration 24..648 h, moonPhase0 = 70 deg) finds a single reachable case — the Earth
+// covering Tycho, a 3.3 h window at declination 0 against a 13.8 h sample spacing at 648 h, i.e. one
+// station-sample — and no case at all of the Moon covering an Earth station. A fixture built on that
+// single sample would lose the coverage at the first change of moonPhase0 or K and stay green.
+
+TEST_CASE("occulted_by: the Earth hides a Moon station that is above its horizon")
+{
+    const Station tycho {
+        .name = "Tycho",
+        .body = Body::Moon,
+        .lat = kTychoLat,
+        .lon = kTychoLon,
+    };
+
+    // Scan result: the Earth covers Tycho from t = 198.6 h to t = 201.9 h for a source at dec 0.
+    constexpr double kOccultedHours = 200.0;
+    const StationState st = parallax::interferometry::station_state(tycho, kOccultedHours);
+    const Vec3d source {1.0, 0.0, 0.0}; // declination 0: s = (cos dec, 0, sin dec)
+
+    // Above the local horizon, so only the occultation can hide it.
+    CHECK(glm::dot(st.up, source) > std::sin(kElMin));
+    CHECK(parallax::interferometry::occulted_by(st.position, source, Vec3d {0.0, 0.0, 0.0}, kREarth));
+    CHECK_FALSE(parallax::interferometry::is_visible(st, source, kOccultedHours, Body::Moon));
+
+    // Six hours earlier the Earth is out of the way and the same station sees the same source.
+    const StationState clear = parallax::interferometry::station_state(tycho, kOccultedHours - 6.0);
+    CHECK_FALSE(parallax::interferometry::occulted_by(clear.position, source, Vec3d {0.0, 0.0, 0.0}, kREarth));
+    CHECK(parallax::interferometry::is_visible(clear, source, kOccultedHours - 6.0, Body::Moon));
+}
+
+TEST_CASE("occulted_by: the Moon hides an Earth station that is above its horizon")
+{
+    const Station la_palma {
+        .name = "La Palma",
+        .body = Body::Earth,
+        .lat = 28.7569 * kDegToRad,
+        .lon = -17.8925 * kDegToRad,
+    };
+
+    // Point straight at the Moon at a time when the Moon is also above La Palma's horizon, so the
+    // rejection comes from the occultation and not from EL_MIN. This geometry never occurs in the
+    // battery: it needs the pointing within ~0.26 deg of the Moon.
+    bool tested = false;
+    for (int step = 0; step < 48 && !tested; ++step)
+    {
+        const double hours = 0.5 * static_cast<double>(step);
+        const StationState st = parallax::interferometry::station_state(la_palma, hours);
+        const Vec3d moon_center = parallax::interferometry::moon_center_at(hours);
+        const Vec3d source = glm::normalize(moon_center - st.position);
+        if (glm::dot(st.up, source) <= std::sin(kElMin))
+        {
+            continue;
+        }
+
+        CAPTURE(hours);
+        CHECK(parallax::interferometry::occulted_by(st.position, source, moon_center, kRMoon));
+        CHECK_FALSE(parallax::interferometry::is_visible(st, source, hours, Body::Earth));
+        tested = true;
+    }
+    CHECK_MESSAGE(tested, "no sample time in the first 24 h has the Moon above La Palma's horizon");
+}
+
+TEST_CASE("occulted_by: the limb decides, and a body behind the station never occults")
+{
+    // Synthetic geometry: station at the origin, body centre at distance d along +x. A ray at angle
+    // theta from the centre direction passes d*sin(theta) from the centre, so the body blocks it
+    // exactly when d*sin(theta) < R. Exactly at the limb the strict `<` leaves it visible.
+    auto check_limb = [](double distance, double radius)
+    {
+        const Vec3d station {0.0, 0.0, 0.0};
+        const Vec3d centre {distance, 0.0, 0.0};
+        const double limb = std::asin(radius / distance);
+        const double inside = limb * (1.0 - 1.0e-6);
+        const double outside = limb * (1.0 + 1.0e-6);
+        CAPTURE(distance);
+        CAPTURE(radius);
+
+        CHECK(parallax::interferometry::occulted_by(
+            station, Vec3d {std::cos(inside), std::sin(inside), 0.0}, centre, radius));
+        CHECK_FALSE(parallax::interferometry::occulted_by(
+            station, Vec3d {std::cos(outside), std::sin(outside), 0.0}, centre, radius));
+
+        // Same limb on the other side and out of the plane: the test is on the angle, not the sign.
+        CHECK(parallax::interferometry::occulted_by(
+            station, Vec3d {std::cos(inside), 0.0, -std::sin(inside)}, centre, radius));
+        CHECK_FALSE(parallax::interferometry::occulted_by(
+            station, Vec3d {std::cos(outside), 0.0, -std::sin(outside)}, centre, radius));
+
+        // Body behind the station (proj <= 0): never an occulter, however well aligned.
+        CHECK_FALSE(parallax::interferometry::occulted_by(station, Vec3d {-1.0, 0.0, 0.0}, centre, radius));
+        CHECK_FALSE(parallax::interferometry::occulted_by(
+            station, Vec3d {-std::cos(inside), -std::sin(inside), 0.0}, centre, radius));
+    };
+
+    check_limb(kDMoon, kREarth); // the Earth seen from the Moon: limb at 0.95 deg
+    check_limb(kDMoon, kRMoon);  // the Moon seen from the Earth: limb at 0.26 deg
+}
+
 TEST_CASE("is_visible enforces EL_MIN horizon threshold")
 {
     const StationState st {

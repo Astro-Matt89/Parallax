@@ -38,7 +38,7 @@ memory layout, optimizations, code organization — as long as the numbers match
 
 **Fixtures:** the gate uses `data/fixtures/glasswing_fixture_battery_v1_4.json` (18 deterministic
 scenarios covering all target families and regimes), exported from the oracle with
-"⭳ BATTERIA FIXTURE 10b" in a browser (generated with v1.7.7; the current v1.7.10 produces the same
+"⭳ BATTERIA FIXTURE 10b" in a browser (v1.3 was generated with v1.7.7; the current v1.8.0 produces the same 15 scenarios, adds the three lunar ones, and pins more of the UI state
 battery and pins more of the UI state; v1.4 came from v1.8.0 in Chrome 152, and its header records
 oracleVersion, userAgent and generatedAt). The export pins
 the parameters listed in SPECIFICA §7 and writes the image matrices at full precision. A battery
@@ -367,7 +367,7 @@ This is the concrete procedural generator (CLAUDE.md 7c). Deterministic from see
 Files: `tests/test_station_positions.cpp` (level 1), `tests/test_fixture_visibilities.cpp` (level 2),
 `tests/test_fixture_images.cpp` (levels 3 and 5), shared helpers `tests/glasswing_fixture_battery.hpp`
 and `tests/glasswing_fixture_pipeline.hpp`; battery `data/fixtures/glasswing_fixture_battery_v1_4.json`.
-For each of the 15 fixtures the C++ pipeline is rebuilt from seeds and parameters only. The gate is
+For each of the 18 fixtures the C++ pipeline is rebuilt from seeds and parameters only. The gate is
 structured in the levels of SPECIFICA §6:
 - Level 1 — station positions against `stationPositionsPerSampleM`: relative 1e-9
 - Level 2 — (u,v) relative 1e-9; true and corrupted visibilities relative 1e-7 (plus a check of the

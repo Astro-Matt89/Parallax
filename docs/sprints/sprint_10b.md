@@ -5,8 +5,9 @@
 (older versions stay in `tools/` for history)
 **Normative spec:** `docs/architecture/SPECIFICA_10b_glasswing.md` — where this brief and the
 SPECIFICA disagree, the SPECIFICA and the oracle win
-**Status (2026-09-15):** 10b.1–10b.7 implemented. The 10b.7 oracle gate passes all 15 fixtures of
-battery v1.3 at levels 1, 2, 3 and 5. 10b.8 and 10b.9 not started.
+**Status (2026-09-21):** 10b.1–10b.7 implemented. The 10b.7 oracle gate passes all 18 fixtures of
+battery v1.4 (oracle v1.8.0) at levels 1, 2, 3 and 5 — the 15 original scenarios plus the three
+lunar Tycho arrays at 1, 10 and 100 km. 10b.8 and 10b.9 not started.
 **Goal:** Real aperture synthesis. Earth-Moon baselines sampled from ephemerides, (u,v) coverage
 built over an observation, gridding → dirty image, Högbom CLEAN reconstruction, closure phases.
 Cross-validate the C++ against fixtures exported from the sandbox.
@@ -35,10 +36,11 @@ memory layout, optimizations, code organization — as long as the numbers match
 - Threading
 - Rendering of the (u,v) plane and images (visual, not numeric)
 
-**Fixtures:** the gate uses `data/fixtures/glasswing_fixture_battery_v1_3.json` (15 deterministic
+**Fixtures:** the gate uses `data/fixtures/glasswing_fixture_battery_v1_4.json` (18 deterministic
 scenarios covering all target families and regimes), exported from the oracle with
 "⭳ BATTERIA FIXTURE 10b" in a browser (generated with v1.7.7; the current v1.7.10 produces the same
-battery and pins more of the UI state). The export pins
+battery and pins more of the UI state; v1.4 came from v1.8.0 in Chrome 152, and its header records
+oracleVersion, userAgent and generatedAt). The export pins
 the parameters listed in SPECIFICA §7 and writes the image matrices at full precision. A battery
 regenerated any other way is not comparable, and a regenerated battery must be verified against the
 previous one before the gate uses it. The RNG is `mulberry32` — replicate it exactly so
@@ -60,6 +62,9 @@ Section 9.1). Do NOT hardcode station count or layout.
 - The sandbox provides array-geometry generators (ring/grid/random and the site
   placement math in `buildStations`). Port the Y-arm generator following the same
   station-placement convention (lat/lon offsets from the site center on Moon or Earth).
+  Only Y is ported: `ArrayGeometry` keeps Y and Custom, and the ring/grid presets were
+  removed rather than aligned (they are sandbox exploration tools, never reproduced the
+  oracle numbers, and nothing in the game built one). A config naming them fails to load.
 
 **Sandbox Y preset (normative geometry):**
 ```
@@ -361,7 +366,7 @@ This is the concrete procedural generator (CLAUDE.md 7c). Deterministic from see
 ### Task 10b.7 — Fixture Cross-Validation ✅ COMPLETE
 Files: `tests/test_station_positions.cpp` (level 1), `tests/test_fixture_visibilities.cpp` (level 2),
 `tests/test_fixture_images.cpp` (levels 3 and 5), shared helpers `tests/glasswing_fixture_battery.hpp`
-and `tests/glasswing_fixture_pipeline.hpp`; battery `data/fixtures/glasswing_fixture_battery_v1_3.json`.
+and `tests/glasswing_fixture_pipeline.hpp`; battery `data/fixtures/glasswing_fixture_battery_v1_4.json`.
 For each of the 15 fixtures the C++ pipeline is rebuilt from seeds and parameters only. The gate is
 structured in the levels of SPECIFICA §6:
 - Level 1 — station positions against `stationPositionsPerSampleM`: relative 1e-9
@@ -371,7 +376,9 @@ structured in the levels of SPECIFICA §6:
 - Level 5 — oracle-independent invariants: the dirty image is real (hermitian gridding) and a zero
   baseline samples the total flux
 Level 4 (CLEAN invariants against JS values) is not part of the gate: the battery carries no CLEAN
-data by construction. Result: all 15 fixtures pass every level. This is the acceptance gate for the
+data by construction. Result: all 18 fixtures pass every level, the three lunar ones at the first
+run. Occultation is covered by unit tests in `tests/test_ephemeris.cpp`, not by the gate: the
+battery can reach that branch with a single station-sample at best (SPECIFICA §6). This is the acceptance gate for the
 whole sprint.
 
 The pipeline orchestrator previously listed as a prerequisite of this task turned out not to be
@@ -410,7 +417,7 @@ Files: `src/ui/tabs/imaging_tab.cpp` (extend), or new interferometry view
       covered by `test_clean`; extended structure not verified)
 - [x] Closure phases immune to station phase errors
 - [x] All 8 target families port and render deterministically (and match the oracle)
-- [x] **All 15 fixtures in the battery pass** (the acceptance gate — battery v1.3, levels 1/2/3/5)
+- [x] **All 18 fixtures in the battery pass** (the acceptance gate — battery v1.4, levels 1/2/3/5)
 - [ ] (u,v) coverage accumulates live during an observation
 - [ ] Angular resolution readout shows λ/B_max (micro-arcsec with Earth-Moon)
 - [ ] Instrument modes work (radio/comb/hbt/epr) — radio and comb validated by the fixtures;
@@ -420,6 +427,23 @@ Files: `src/ui/tabs/imaging_tab.cpp` (extend), or new interferometry view
 - [ ] No regressions in 10a; ≥ 60fps; no Vulkan validation errors
 
 ---
+
+## Open items and known debts
+
+- **Scenario 12 (`bh_terra_luna`) declares `slDur: 300` but runs at 24 h.** `applyFixtureCfg`
+  writes the slider values *before* `syncMode()` raises the duration maximum to 648 h for full
+  and lunar modes, so the browser clamps 300 to the 24 h maximum still in force. The battery is
+  self-consistent (it exports `durationHours: 24`, and the gate matches it), but the scenario does
+  not do what it says. Fix at the next oracle revision: call `syncMode()` before applying the cfg,
+  or set `slDur` after it.
+- **`nulling` is declared by every fixture but not implemented in C++.** `render_target_at` omits
+  the `nulled`/`fd` branches; all fixtures carry `nulling: false`, so the gate never notices.
+- **`hbt` and `epr` are not exercised by any fixture.** The station reduction for HBT/comb is
+  covered only by unit tests; `epr` behaves like `radio` in the port.
+- **Level 4 (CLEAN invariants) has no data.** The battery is generated with 0 CLEAN iterations;
+  CLEAN is covered by unit tests only.
+- **Epoch > 0 is never validated against the oracle.** Every fixture uses `epochDays: 0`, so the
+  temporal models are exercised structurally but never numerically.
 
 ## Common Pitfalls
 
